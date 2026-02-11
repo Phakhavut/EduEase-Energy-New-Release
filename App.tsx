@@ -4,34 +4,53 @@ import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
 import { HOUSES } from './constants';
 
+/**
+ * Helper to retrieve stored theme preference with a fallback.
+ */
+const getStoredTheme = (key: string, defaultValue: boolean): boolean => {
+  const saved = localStorage.getItem(key);
+  return saved !== null ? saved === 'true' : defaultValue;
+};
+
 const App: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   
-  // Persist theme states using localStorage
-  const [loginDarkMode, setLoginDarkMode] = useState<boolean>(() => {
-    const saved = localStorage.getItem('loginDarkMode');
-    return saved !== null ? JSON.parse(saved) : true;
-  });
+  // Independent theme states for Login and Dashboard
+  const [loginDarkMode, setLoginDarkMode] = useState<boolean>(() => 
+    getStoredTheme('loginDarkMode', true)
+  );
+  const [dashboardDarkMode, setDashboardDarkMode] = useState<boolean>(() => 
+    getStoredTheme('dashboardDarkMode', false)
+  );
 
-  const [dashboardDarkMode, setDashboardDarkMode] = useState<boolean>(() => {
-    const saved = localStorage.getItem('dashboardDarkMode');
-    return saved !== null ? JSON.parse(saved) : false;
-  });
-
-  const [hasLoggedInOnce, setHasLoggedInOnce] = useState(false);
-
-  const activeHouse = HOUSES[activeIndex];
-
-  // Persist theme changes to localStorage
+  // Synchronize Login theme preference to storage
   useEffect(() => {
-    localStorage.setItem('loginDarkMode', JSON.stringify(loginDarkMode));
+    localStorage.setItem('loginDarkMode', String(loginDarkMode));
   }, [loginDarkMode]);
 
+  // Synchronize Dashboard theme preference to storage
   useEffect(() => {
-    localStorage.setItem('dashboardDarkMode', JSON.stringify(dashboardDarkMode));
+    localStorage.setItem('dashboardDarkMode', String(dashboardDarkMode));
   }, [dashboardDarkMode]);
+
+  // Handle global attributes (body theme/bg) based on current view and its specific theme
+  useEffect(() => {
+    const currentDarkMode = isLoggedIn ? dashboardDarkMode : loginDarkMode;
+    const body = document.body;
+    
+    body.setAttribute('data-theme', currentDarkMode ? 'dark' : 'light');
+    
+    // Apply specific background colors to prevent flickering or inconsistent gaps
+    if (isLoggedIn) {
+      body.style.backgroundColor = currentDarkMode ? '#0b1437' : '#f4f7fe';
+    } else {
+      body.style.backgroundColor = currentDarkMode ? '#000000' : '#ffffff';
+    }
+  }, [isLoggedIn, loginDarkMode, dashboardDarkMode]);
+
+  const activeHouse = HOUSES[activeIndex];
 
   const handleNext = useCallback(() => {
     setActiveIndex((prev) => (prev + 1) % HOUSES.length);
@@ -49,33 +68,9 @@ const App: React.FC = () => {
     setDashboardDarkMode((prev) => !prev);
   };
 
-  // Synchronize global attributes with the current view's theme
-  useEffect(() => {
-    const currentDarkMode = isLoggedIn ? dashboardDarkMode : loginDarkMode;
-    const body = document.body;
-    
-    if (currentDarkMode) {
-      body.style.backgroundColor = '#000000';
-      body.setAttribute('data-theme', 'dark');
-    } else {
-      body.style.backgroundColor = isLoggedIn ? '#f4f7fe' : '#ffffff';
-      body.setAttribute('data-theme', 'light');
-    }
-  }, [isLoggedIn, loginDarkMode, dashboardDarkMode]);
-
   const handleLoginSuccess = (user: string) => {
     setUsername(user);
     setIsLoggedIn(true);
-    
-    // On the very first login of the session, sync dashboard theme to login theme 
-    // unless the user has a specifically saved dashboard preference.
-    if (!hasLoggedInOnce) {
-      const savedDash = localStorage.getItem('dashboardDarkMode');
-      if (savedDash === null) {
-        setDashboardDarkMode(loginDarkMode);
-      }
-      setHasLoggedInOnce(true);
-    }
   };
 
   const handleLogout = () => {
