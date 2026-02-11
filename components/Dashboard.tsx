@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { 
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    PieChart, Pie, Cell, BarChart, Bar, Legend, LineChart, Line
+    PieChart, Pie, Cell, BarChart, Bar, Legend, LineChart, Line, ComposedChart
 } from 'recharts';
 import { GoogleGenAI, Type } from "@google/genai";
 
@@ -25,6 +25,9 @@ const langData = {
         stat_credit_health: "สุขภาพงบประมาณ",
         stat_optimal: "เหมาะสม", stat_deficit: "เกินงบ",
         chart_telemetry_title: "มาตรวัดพลังงาน 7 วันย้อนหลัง",
+        chart_performance_title: "บทวิเคราะห์ประสิทธิภาพโครงข่าย",
+        perf_uptime: "อัปไทม์ระบบ (%)",
+        perf_efficiency: "ประสิทธิภาพพลังงาน",
         ai_scan_title: "AI วิเคราะห์จุดประหยัดไฟ",
         ai_scan_desc: "เราตรวจพบการใช้ไฟผิดปกติในส่วน Entertainment ระหว่างเวลา 02:00-04:00 การปิดโหนด Standby จะช่วยประหยัดเงินได้ ฿210 ในรอบบิลนี้",
         ai_apply: "ยอมรับข้อเสนอปรับปรุง",
@@ -40,6 +43,18 @@ const langData = {
         node_history_title: "ประวัติการโหลด 24 ชม.",
         node_log_resolved: "เสร็จสิ้น",
         node_log_pending: "รอดำเนินการ",
+        node_compare_btn: "เปรียบเทียบอุปกรณ์",
+        node_select_compare: "เลือกเพื่อเปรียบเทียบ",
+        node_comparing: "กำลังเปรียบเทียบ {n} อุปกรณ์",
+
+        // Comparison View
+        comp_title: "วิเคราะห์เปรียบเทียบเชิงลึก",
+        comp_metric_load: "ภาระไฟฟ้า (W)",
+        comp_metric_energy: "พลังงาน/เดือน (kWh)",
+        comp_metric_cost: "ค่าไฟประมาณการ",
+        comp_metric_pf: "ประสิทธิภาพ (PF)",
+        comp_best: "ดีที่สุด",
+        comp_worst: "บริโภคสูงสุด",
 
         // Power Calculator
         calc_planner_title: "แผนผังโครงข่ายยุทธศาสตร์",
@@ -75,10 +90,11 @@ const langData = {
 
         // Telemetry
         telemetry_active_load: "มาตรวัดการโหลดจริง",
-        telemetry_daily: "รายวัน", telemetry_monthly: "รายเดือน",
+        telemetry_daily: "รายชั่วโมง (24 ชม.)", telemetry_monthly: "รายวัน (30 วัน)",
         telemetry_dist: "สัดส่วนการใช้ไฟรายเซกเตอร์",
         telemetry_logs: "บันทึกการชำระเงินย้อนหลัง",
         log_cycle: "รอบบิล", log_units: "หน่วยไฟ", log_settlement: "ยอดชำระสุทธิ",
+        telemetry_perf_metrics: "ตัวบ่งชี้ประสิทธิภาพระบบ",
 
         // Alerts
         alert_log_title: "บันทึกการแจ้งเตือนระบบ",
@@ -132,6 +148,9 @@ const langData = {
         stat_credit_health: "Credit Health",
         stat_optimal: "Optimal", stat_deficit: "Deficit",
         chart_telemetry_title: "7-Day Power Telemetry",
+        chart_performance_title: "Grid Performance Analysis",
+        perf_uptime: "System Uptime (%)",
+        perf_efficiency: "Energy Efficiency",
         ai_scan_title: "AI Optimization Scan",
         ai_scan_desc: "We detected abnormal spikes in the Entertainment sector between 02:00-04:00. Shutting down standby nodes could save you up to ฿210 this cycle.",
         ai_apply: "Apply Optimization",
@@ -147,6 +166,18 @@ const langData = {
         node_history_title: "24h Load Telemetry",
         node_log_resolved: "Resolved",
         node_log_pending: "Pending",
+        node_compare_btn: "Compare Devices",
+        node_select_compare: "Select to Compare",
+        node_comparing: "Comparing {n} Devices",
+
+        // Comparison View
+        comp_title: "Comparative Grid Analysis",
+        comp_metric_load: "Electrical Load (W)",
+        comp_metric_energy: "Energy/Mo (kWh)",
+        comp_metric_cost: "Est. Monthly Cost",
+        comp_metric_pf: "Efficiency (PF)",
+        comp_best: "Optimal Performance",
+        comp_worst: "Highest Consumer",
 
         // Power Calculator
         calc_planner_title: "Strategic Grid Planner",
@@ -182,10 +213,11 @@ const langData = {
 
         // Telemetry
         telemetry_active_load: "Active Load Telemetry",
-        telemetry_daily: "Daily", telemetry_monthly: "Monthly",
+        telemetry_daily: "Hourly (24h)", telemetry_monthly: "Daily (30d)",
         telemetry_dist: "Grid Distribution",
         telemetry_logs: "Settlement Logs",
         log_cycle: "Fiscal Cycle", log_units: "Power Units", log_settlement: "Final Settlement",
+        telemetry_perf_metrics: "Performance Analytics",
 
         // Alerts
         alert_log_title: "Alert Log",
@@ -290,9 +322,13 @@ const Dashboard: React.FC<DashboardProps> = ({ isDarkMode, onToggleTheme, onLogo
     const [searchTerm, setSearchTerm] = useState('');
     const [activeCategory, setActiveCategory] = useState('All');
     const [selectedDeviceId, setSelectedDeviceId] = useState<number | null>(null);
+    const [compareDeviceIds, setCompareDeviceIds] = useState<number[]>([]);
+    const [showComparisonView, setShowComparisonView] = useState(false);
     const [calcMode, setCalcMode] = useState<'hours' | 'budget'>('hours');
     const [calcTab, setCalcTab] = useState<'detailed' | 'batch' | 'tariff'>('detailed');
     const [statsFrame, setStatsFrame] = useState<'daily' | 'monthly'>('daily');
+    const [perfRange, setPerfRange] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
+    const [telemetryPerfRange, setTelemetryPerfRange] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isAiScanning, setIsAiScanning] = useState(false);
     const [aiAlerts, setAiAlerts] = useState<any[]>([]);
@@ -366,6 +402,38 @@ const Dashboard: React.FC<DashboardProps> = ({ isDarkMode, onToggleTheme, onLogo
         cost: +(analytics.totalCost / 30 + (Math.random() * 10 - 5)).toFixed(1)
     })), [analytics]);
 
+    const telemetryChartData = useMemo(() => {
+        if (statsFrame === 'daily') {
+            return Array.from({ length: 24 }, (_, i) => ({
+                name: `${i.toString().padStart(2, '0')}:00`,
+                usage: +( (analytics.totalUnits / (30 * 24)) * (0.5 + Math.random()) ).toFixed(3),
+            }));
+        } else {
+            return Array.from({ length: 30 }, (_, i) => ({
+                name: `Day ${i + 1}`,
+                usage: +( (analytics.totalUnits / 30) * (0.8 + Math.random() * 0.4) ).toFixed(2),
+            }));
+        }
+    }, [statsFrame, analytics.totalUnits]);
+
+    const performanceChartData = useMemo(() => {
+        const count = perfRange === 'daily' ? 24 : perfRange === 'weekly' ? 7 : 30;
+        return Array.from({ length: count }, (_, i) => ({
+            name: perfRange === 'daily' ? `${i}:00` : perfRange === 'weekly' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i] : `Day ${i + 1}`,
+            uptime: +(98 + Math.random() * 2).toFixed(2),
+            efficiency: +(85 + Math.random() * 15).toFixed(1)
+        }));
+    }, [perfRange]);
+
+    const telemetryPerformanceData = useMemo(() => {
+        const count = telemetryPerfRange === 'daily' ? 24 : telemetryPerfRange === 'weekly' ? 7 : 30;
+        return Array.from({ length: count }, (_, i) => ({
+            name: telemetryPerfRange === 'daily' ? `${i}:00` : telemetryPerfRange === 'weekly' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i] : `Day ${i + 1}`,
+            uptime: +(98.5 + Math.random() * 1.5).toFixed(2),
+            efficiency: +(88 + Math.random() * 10).toFixed(1)
+        }));
+    }, [telemetryPerfRange]);
+
     const deviceSpecificChartData = useMemo(() => {
         if (!selectedDeviceId) return [];
         const dev = multiDevices.find(d => d.id === selectedDeviceId);
@@ -375,6 +443,10 @@ const Dashboard: React.FC<DashboardProps> = ({ isDarkMode, onToggleTheme, onLogo
             load: +(dev.watt * (0.5 + Math.random() * 0.5)).toFixed(0)
         }));
     }, [selectedDeviceId, multiDevices]);
+
+    const compareDevices = useMemo(() => {
+        return multiDevices.filter(d => compareDeviceIds.includes(d.id));
+    }, [multiDevices, compareDeviceIds]);
 
     const updateDevice = (id: number, field: string, value: any) => {
         setMultiDevices(multiDevices.map(d => d.id === id ? { ...d, [field]: value } : d));
@@ -405,12 +477,20 @@ const Dashboard: React.FC<DashboardProps> = ({ isDarkMode, onToggleTheme, onLogo
     const removeDevice = (id: number) => {
         setMultiDevices(multiDevices.filter(d => d.id !== id));
         setSelectedDeviceId(null);
+        setCompareDeviceIds(prev => prev.filter(cid => cid !== id));
+    };
+
+    const toggleCompareSelection = (e: React.MouseEvent, id: number) => {
+        e.stopPropagation();
+        setCompareDeviceIds(prev => 
+            prev.includes(id) ? prev.filter(cid => cid !== id) : [...prev, id]
+        );
     };
 
     const navigateTo = (pageId: string) => {
         setCurrentPage(pageId);
         setSelectedDeviceId(null);
-        setIsMobileMenuOpen(false); // Auto-close on selection
+        setIsMobileMenuOpen(false);
     };
 
     const runAiAnomalyScan = async () => {
@@ -480,8 +560,7 @@ const Dashboard: React.FC<DashboardProps> = ({ isDarkMode, onToggleTheme, onLogo
     const currentAlerts = [...aiAlerts.map(a => ({ t: a.title, d: a.description, c: a.severity, i: a.icon, time: a.time, isAi: true })), ...baseAlerts];
 
     return (
-        <div className="dashboard-container" data-theme={isDarkMode ? 'dark' : 'light'}>
-            {/* Sidebar Overlay for Mobile */}
+        <div className="dashboard-container relative" data-theme={isDarkMode ? 'dark' : 'light'}>
             <div className={`sidebar-overlay ${isMobileMenuOpen ? 'show' : ''}`} onClick={() => setIsMobileMenuOpen(false)} />
 
             <aside className={`sidebar flex flex-col justify-between ${isMobileMenuOpen ? 'show' : ''}`}>
@@ -556,20 +635,42 @@ const Dashboard: React.FC<DashboardProps> = ({ isDarkMode, onToggleTheme, onLogo
                                     </div>
                                 ))}
                             </div>
-                            <div className="row g-4">
+
+                            <div className="row g-4 mb-8">
                                 <div className="col-12 col-xl-8">
-                                    <div className="dashboard-card border-0 p-4 p-md-6 h-100">
-                                        <h5 className="font-bold mb-6 font-display text-lg">{t('chart_telemetry_title')}</h5>
-                                        <div className="h-[250px] md:h-[300px]">
+                                    <div className="dashboard-card border-0 p-6 md:p-8">
+                                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                                            <div>
+                                                <h5 className="font-bold mb-1 font-display text-lg tracking-tight">{t('chart_performance_title')}</h5>
+                                                <p className="text-[10px] text-muted font-bold uppercase tracking-widest">System KPIs & Uptime Telemetry</p>
+                                            </div>
+                                            <div className="p-1 bg-light rounded-2xl flex gap-1 w-full md:w-auto">
+                                                {(['daily', 'weekly', 'monthly'] as const).map(range => (
+                                                    <button 
+                                                        key={range}
+                                                        onClick={() => setPerfRange(range)}
+                                                        className={`btn btn-xs flex-grow md:flex-none px-4 rounded-xl font-bold uppercase text-[9px] tracking-widest ${perfRange === range ? 'btn-primary shadow-md' : 'text-muted opacity-60'}`}
+                                                    >
+                                                        {t(range === 'daily' ? 'telemetry_daily' : range === 'weekly' ? 'weekly' : 'telemetry_monthly')}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        <div className="h-[300px] md:h-[350px]">
                                             <ResponsiveContainer>
-                                                <AreaChart data={chartData}>
-                                                    <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--primary)" stopOpacity={0.2}/><stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/></linearGradient></defs>
+                                                <ComposedChart data={performanceChartData}>
+                                                    <defs>
+                                                        <linearGradient id="upColor" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/><stop offset="95%" stopColor="#10b981" stopOpacity={0}/></linearGradient>
+                                                        <linearGradient id="effColor" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--primary)" stopOpacity={0.2}/><stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/></linearGradient>
+                                                    </defs>
                                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? '#1b254b' : '#eee'} />
-                                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10}} />
-                                                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10}} />
-                                                    <Tooltip />
-                                                    <Area type="monotone" dataKey="usage" stroke="var(--primary)" strokeWidth={3} fill="url(#g1)" />
-                                                </AreaChart>
+                                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 9, fontWeight: 'bold'}} />
+                                                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 9}} domain={[80, 100]} />
+                                                    <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }} />
+                                                    <Legend align="right" verticalAlign="top" iconType="circle" wrapperStyle={{ paddingBottom: '20px', fontSize: '10px', fontWeight: 'bold' }} />
+                                                    <Area name={t('perf_uptime')} type="monotone" dataKey="uptime" stroke="#10b981" strokeWidth={3} fill="url(#upColor)" />
+                                                    <Line name={t('perf_efficiency')} type="monotone" dataKey="efficiency" stroke="var(--primary)" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 6 }} />
+                                                </ComposedChart>
                                             </ResponsiveContainer>
                                         </div>
                                     </div>
@@ -580,6 +681,23 @@ const Dashboard: React.FC<DashboardProps> = ({ isDarkMode, onToggleTheme, onLogo
                                         <h5 className="font-bold mb-4 font-display text-lg relative z-10">{t('ai_scan_title')}</h5>
                                         <p className="text-xs opacity-80 leading-relaxed mb-6 relative z-10">{t('ai_scan_desc')}</p>
                                         <button className="btn btn-white w-100 rounded-2xl py-3 font-bold text-[10px] uppercase tracking-widest text-primary relative z-10">{t('ai_apply')}</button>
+                                        
+                                        <div className="mt-auto relative z-10 pt-10 border-top border-white/10">
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <div className="p-2 bg-white/10 rounded-xl"><i className="fas fa-bolt text-xs"></i></div>
+                                                <div>
+                                                    <div className="text-[10px] font-bold opacity-60 uppercase">Real-time Efficiency</div>
+                                                    <div className="text-xl font-bold mono-font">94.2%</div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-white/10 rounded-xl"><i className="fas fa-microchip text-xs"></i></div>
+                                                <div>
+                                                    <div className="text-[10px] font-bold opacity-60 uppercase">System Health</div>
+                                                    <div className="text-xl font-bold mono-font">Optimal</div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -599,118 +717,47 @@ const Dashboard: React.FC<DashboardProps> = ({ isDarkMode, onToggleTheme, onLogo
                                         {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
-                                <button className="btn btn-primary rounded-2xl px-6 py-3 font-bold text-xs uppercase shadow-lg shadow-primary/20" onClick={addDevice}><i className="fas fa-plus me-2"></i> Node</button>
+                                <div className="flex gap-2">
+                                    {compareDeviceIds.length > 0 && (
+                                        <button 
+                                            className="btn btn-primary rounded-2xl px-4 py-3 font-bold text-xs uppercase shadow-lg shadow-primary/20 flex items-center gap-2"
+                                            onClick={() => setShowComparisonView(true)}
+                                        >
+                                            <i className="fas fa-balance-scale"></i>
+                                            {t('node_compare_btn')} ({compareDeviceIds.length})
+                                        </button>
+                                    )}
+                                    <button className="btn btn-white border-2 border-light rounded-2xl px-6 py-3 font-bold text-xs uppercase text-primary" onClick={addDevice}><i className="fas fa-plus me-2"></i> Node</button>
+                                </div>
                             </div>
                             
                             <div className="row g-3 g-md-4">
-                                {filteredDevices.map((dev, i) => (
-                                    <div key={dev.id} className="col-12 col-md-6 col-lg-4 animate-slide-up" style={{ animationDelay: `${i * 50}ms` }}>
-                                        <div onClick={() => setSelectedDeviceId(dev.id)} className="dashboard-card border-0 p-5 cursor-pointer hover:shadow-xl transition-all group relative overflow-hidden">
-                                            <div className={`absolute top-0 right-0 p-3 text-[8px] font-bold uppercase tracking-widest ${dev.status === 'active' ? 'bg-emerald-500' : 'bg-amber-500'} text-white`}>{dev.status}</div>
-                                            <div className="p-3 bg-primary-subtle text-primary rounded-2xl w-fit mb-4 group-hover:bg-primary group-hover:text-white transition-all"><i className={`fas ${dev.category === 'Cooling' ? 'fa-snowflake' : 'fa-plug'} text-lg`}></i></div>
-                                            <h6 className="font-bold text-lg mb-1">{dev.name}</h6>
-                                            <p className="label text-[9px] mb-4 opacity-60">{dev.category}</p>
-                                            <div className="flex justify-between items-end border-top border-light pt-4">
-                                                <div className="mono-font font-bold text-primary">฿{((dev.watt/1000)*dev.hours*calcDays*unitRate).toFixed(0)}</div>
-                                                <div className="text-[10px] text-muted font-bold">{dev.watt}W</div>
+                                {filteredDevices.map((dev, i) => {
+                                    const isSelected = compareDeviceIds.includes(dev.id);
+                                    return (
+                                        <div key={dev.id} className="col-12 col-md-6 col-lg-4 animate-slide-up" style={{ animationDelay: `${i * 50}ms` }}>
+                                            <div onClick={() => setSelectedDeviceId(dev.id)} className={`dashboard-card border-0 p-5 cursor-pointer hover:shadow-xl transition-all group relative overflow-hidden ${isSelected ? 'ring-2 ring-primary ring-inset' : ''}`}>
+                                                <div className="absolute top-0 left-0 p-3 z-10">
+                                                    <button 
+                                                        onClick={(e) => toggleCompareSelection(e, dev.id)}
+                                                        className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${isSelected ? 'bg-primary text-white shadow-md' : 'bg-white/80 backdrop-blur-sm border-2 border-primary/20 text-primary hover:bg-primary hover:text-white'}`}
+                                                    >
+                                                        <i className={`fas ${isSelected ? 'fa-check' : 'fa-plus'} text-[10px]`}></i>
+                                                    </button>
+                                                </div>
+                                                <div className={`absolute top-0 right-0 p-3 text-[8px] font-bold uppercase tracking-widest ${dev.status === 'active' ? 'bg-emerald-500' : 'bg-amber-500'} text-white`}>{dev.status}</div>
+                                                <div className="p-3 bg-primary-subtle text-primary rounded-2xl w-fit mb-4 group-hover:bg-primary group-hover:text-white transition-all"><i className={`fas ${dev.category === 'Cooling' ? 'fa-snowflake' : 'fa-plug'} text-lg`}></i></div>
+                                                <h6 className="font-bold text-lg mb-1">{dev.name}</h6>
+                                                <p className="label text-[9px] mb-4 opacity-60">{dev.category}</p>
+                                                <div className="flex justify-between items-end border-top border-light pt-4">
+                                                    <div className="mono-font font-bold text-primary">฿{((dev.watt/1000)*dev.hours*calcDays*unitRate).toFixed(0)}</div>
+                                                    <div className="text-[10px] text-muted font-bold">{dev.watt}W</div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
-
-                            {selectedDeviceId && (
-                                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[2000] flex justify-end">
-                                    <div className="w-full max-w-xl bg-body h-full shadow-2xl p-6 md:p-10 animate-slide-left overflow-y-auto">
-                                        <div className="flex justify-between items-center mb-8">
-                                            <h3 className="font-display font-bold text-xl md:text-2xl">{t('node_config_title')}</h3>
-                                            <button className="btn btn-light rounded-2xl p-3" onClick={() => setSelectedDeviceId(null)}><i className="fas fa-times"></i></button>
-                                        </div>
-                                        {multiDevices.find(d => d.id === selectedDeviceId) && (() => {
-                                            const d = multiDevices.find(d => d.id === selectedDeviceId)!;
-                                            return (
-                                                <div className="space-y-8">
-                                                    <div className="row g-4">
-                                                        <div className="col-md-7">
-                                                            <div className="p-5 bg-primary/5 rounded-[2rem] border border-primary/10">
-                                                                <label className="label text-[10px] block mb-3">{t('node_id')}: {d.id}</label>
-                                                                <input type="text" className="form-control text-xl font-bold border-0 bg-transparent p-0 mb-4" value={d.name} onChange={e => updateDevice(d.id, 'name', e.target.value)} />
-                                                                
-                                                                <div className="row g-3">
-                                                                    <div className="col-6">
-                                                                        <label className="label text-[10px] block mb-2">{t('node_watt')}</label>
-                                                                        <input type="number" className="form-control border-2 rounded-2xl p-3 font-bold mono-font" value={d.watt} onChange={e => updateDevice(d.id, 'watt', +e.target.value)} />
-                                                                    </div>
-                                                                    <div className="col-6">
-                                                                        <label className="label text-[10px] block mb-2">{t('node_hours')}</label>
-                                                                        <input type="number" className="form-control border-2 rounded-2xl p-3 font-bold mono-font" value={d.hours} onChange={e => updateDevice(d.id, 'hours', +e.target.value)} />
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="col-md-5">
-                                                            <div className="p-5 bg-emerald-500/5 rounded-[2rem] border border-emerald-500/10 h-100">
-                                                                <h6 className="label text-[10px] mb-4">{t('node_tech_specs')}</h6>
-                                                                <div className="mb-4">
-                                                                    <span className="text-[10px] font-bold text-muted uppercase block mb-1">{t('node_pf')}</span>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <div className="text-2xl font-bold text-emerald-500 mono-font">{d.pf}</div>
-                                                                        <div className="badge bg-emerald-500/10 text-emerald-500 text-[8px] px-2 py-1 rounded-full uppercase">Optimal</div>
-                                                                    </div>
-                                                                </div>
-                                                                <div>
-                                                                    <span className="text-[10px] font-bold text-muted uppercase block mb-1">Grid Compliance</span>
-                                                                    <div className="text-xs font-bold text-main">Phase A: 228.4V</div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="p-6 bg-light rounded-[2.5rem]">
-                                                        <h6 className="label text-[10px] mb-6">{t('node_history_title')}</h6>
-                                                        <div className="h-[200px]">
-                                                            <ResponsiveContainer>
-                                                                <AreaChart data={deviceSpecificChartData}>
-                                                                    <defs><linearGradient id="dColor" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/><stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/></linearGradient></defs>
-                                                                    <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.1} />
-                                                                    <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{fontSize: 9}} />
-                                                                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 9}} />
-                                                                    <Tooltip />
-                                                                    <Area type="monotone" dataKey="load" stroke="var(--primary)" strokeWidth={3} fill="url(#dColor)" />
-                                                                </AreaChart>
-                                                            </ResponsiveContainer>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="p-6 bg-white border rounded-[2.5rem] shadow-sm">
-                                                        <h6 className="label text-[10px] mb-6">{t('node_maintenance')}</h6>
-                                                        <div className="space-y-4">
-                                                            {d.logs.length > 0 ? d.logs.map((log, li) => (
-                                                                <div key={li} className="flex justify-between items-center p-3 bg-light rounded-2xl border border-transparent hover:border-primary/20 transition-all">
-                                                                    <div>
-                                                                        <div className="text-[11px] font-bold text-main mb-1">{log.action}</div>
-                                                                        <div className="text-[9px] font-bold text-muted uppercase tracking-widest">{log.date}</div>
-                                                                    </div>
-                                                                    <div className={`badge rounded-full px-3 py-1.5 text-[8px] font-bold uppercase ${log.status === 'resolved' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}`}>
-                                                                        {log.status === 'resolved' ? t('node_log_resolved') : t('node_log_pending')}
-                                                                    </div>
-                                                                </div>
-                                                            )) : (
-                                                                <div className="text-center py-6 italic text-muted text-xs opacity-50">No logs on record.</div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="pt-6 flex flex-col sm:flex-row gap-3">
-                                                        <button className="btn btn-primary flex-grow rounded-[1.5rem] py-4 font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20" onClick={() => setSelectedDeviceId(null)}>{t('node_auth')}</button>
-                                                        <button className="btn btn-outline-danger rounded-[1.5rem] py-4 sm:px-6" onClick={() => removeDevice(d.id)}><i className="fas fa-trash"></i></button>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })()}
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     )}
 
@@ -1010,7 +1057,7 @@ const Dashboard: React.FC<DashboardProps> = ({ isDarkMode, onToggleTheme, onLogo
                                 </div>
                                 <div className="h-[250px] md:h-[400px]">
                                     <ResponsiveContainer>
-                                        <AreaChart data={chartData}>
+                                        <AreaChart data={telemetryChartData}>
                                             <defs><linearGradient id="pColor" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4}/><stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/></linearGradient></defs>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? '#1b254b' : '#eee'} />
                                             <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 10, fontWeight: 'bold'}} />
@@ -1021,8 +1068,47 @@ const Dashboard: React.FC<DashboardProps> = ({ isDarkMode, onToggleTheme, onLogo
                                     </ResponsiveContainer>
                                 </div>
                             </div>
+
+                            {/* Performance Metrics Charts in Telemetry */}
+                            <div className="dashboard-card border-0 p-6 md:p-10 mb-8 shadow-xl animate-slide-up" style={{ animationDelay: '100ms' }}>
+                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+                                    <div>
+                                        <h4 className="font-display font-bold text-lg md:text-2xl tracking-tight">{t('telemetry_perf_metrics')}</h4>
+                                        <p className="text-[10px] text-muted font-bold uppercase tracking-widest mt-1">Uptime & Efficiency Telemetry</p>
+                                    </div>
+                                    <div className="p-1 bg-light rounded-2xl flex gap-1 w-full md:w-auto">
+                                        {(['daily', 'weekly', 'monthly'] as const).map(range => (
+                                            <button 
+                                                key={range}
+                                                onClick={() => setTelemetryPerfRange(range)}
+                                                className={`btn btn-xs flex-grow md:flex-none px-4 rounded-xl font-bold uppercase text-[9px] tracking-widest ${telemetryPerfRange === range ? 'btn-primary shadow-md' : 'text-muted opacity-60'}`}
+                                            >
+                                                {t(range === 'daily' ? 'telemetry_daily' : range === 'weekly' ? 'weekly' : 'telemetry_monthly')}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="h-[300px] md:h-[400px]">
+                                    <ResponsiveContainer>
+                                        <ComposedChart data={telemetryPerformanceData}>
+                                            <defs>
+                                                <linearGradient id="teleUptimeColor" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/><stop offset="95%" stopColor="#10b981" stopOpacity={0}/></linearGradient>
+                                                <linearGradient id="teleEffColor" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--primary)" stopOpacity={0.2}/><stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/></linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDarkMode ? '#1b254b' : '#eee'} />
+                                            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 9, fontWeight: 'bold'}} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{fontSize: 9}} domain={[85, 100]} />
+                                            <Tooltip contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 40px rgba(0,0,0,0.1)' }} />
+                                            <Legend align="center" verticalAlign="bottom" iconType="circle" wrapperStyle={{ paddingTop: '30px', fontSize: '11px', fontWeight: 'bold' }} />
+                                            <Area name={t('perf_uptime')} type="monotone" dataKey="uptime" stroke="#10b981" strokeWidth={3} fill="url(#teleUptimeColor)" />
+                                            <Line name={t('perf_efficiency')} type="monotone" dataKey="efficiency" stroke="var(--primary)" strokeWidth={3} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 6 }} />
+                                        </ComposedChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
                             <div className="row g-4">
-                                <div className="col-12 col-xl-6 animate-slide-up" style={{ animationDelay: '100ms' }}>
+                                <div className="col-12 col-xl-6 animate-slide-up" style={{ animationDelay: '200ms' }}>
                                     <div className="dashboard-card border-0 p-6 md:p-8 h-100">
                                         <h6 className="font-bold font-display text-lg mb-8">{t('telemetry_dist')}</h6>
                                         <div className="h-[250px] md:h-[300px]">
@@ -1038,7 +1124,7 @@ const Dashboard: React.FC<DashboardProps> = ({ isDarkMode, onToggleTheme, onLogo
                                         </div>
                                     </div>
                                 </div>
-                                <div className="col-12 col-xl-6 animate-slide-up" style={{ animationDelay: '200ms' }}>
+                                <div className="col-12 col-xl-6 animate-slide-up" style={{ animationDelay: '300ms' }}>
                                     <div className="dashboard-card border-0 p-6 md:p-8 h-100 overflow-hidden">
                                         <h6 className="font-bold font-display text-lg mb-8">{t('telemetry_logs')}</h6>
                                         <div className="table-responsive">
@@ -1209,6 +1295,180 @@ const Dashboard: React.FC<DashboardProps> = ({ isDarkMode, onToggleTheme, onLogo
 
                 </div>
             </main>
+
+            {/* Modal Components - Moved to Root Level to prevent Sidebar overlap */}
+            
+            {/* Comparison View Overlay */}
+            {showComparisonView && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[5000] flex items-center justify-center p-4">
+                    <div className="w-full max-w-6xl bg-body rounded-[3rem] shadow-2xl overflow-hidden animate-slide-up h-[90vh] flex flex-col">
+                        <div className="p-6 md:p-10 flex justify-between items-center border-bottom border-light bg-card shadow-sm z-10">
+                            <div>
+                                <h3 className="font-display font-bold text-2xl md:text-3xl mb-1">{t('comp_title')}</h3>
+                                <p className="text-[10px] text-muted font-bold uppercase tracking-widest">{t('node_comparing').replace('{n}', compareDevices.length.toString())}</p>
+                            </div>
+                            <button className="btn btn-light rounded-2xl p-4 shadow-sm" onClick={() => setShowComparisonView(false)}>
+                                <i className="fas fa-times text-lg"></i>
+                            </button>
+                        </div>
+                        
+                        <div className="flex-grow overflow-x-auto p-6 md:p-10 custom-scrollbar">
+                            <div className="min-w-[1000px]">
+                                <div className="row g-4 h-full">
+                                    {compareDevices.map((dev, di) => {
+                                        const energyMonth = (dev.watt / 1000) * dev.hours * calcDays;
+                                        const costMonth = energyMonth * unitRate;
+                                        const isBestPF = dev.pf === Math.max(...compareDevices.map(d => d.pf));
+                                        const isWorstConsumer = dev.watt === Math.max(...compareDevices.map(d => d.watt));
+
+                                        return (
+                                            <div key={dev.id} className="col">
+                                                <div className={`dashboard-card p-6 h-100 flex flex-col relative transition-all border-2 ${isBestPF ? 'border-emerald-500/20 shadow-emerald-500/10' : di === 0 ? 'border-primary/20' : 'border-light'}`}>
+                                                    {isBestPF && (
+                                                        <div className="absolute top-4 right-4"><span className="badge bg-emerald-500 text-white rounded-full text-[8px] font-bold uppercase py-1.5 px-3"><i className="fas fa-star me-1"></i> {t('comp_best')}</span></div>
+                                                    )}
+                                                    {isWorstConsumer && (
+                                                        <div className="absolute top-4 right-4"><span className="badge bg-danger text-white rounded-full text-[8px] font-bold uppercase py-1.5 px-3">{t('comp_worst')}</span></div>
+                                                    )}
+
+                                                    <div className="p-4 bg-light rounded-[2rem] w-fit mb-6">
+                                                        <i className={`fas ${dev.category === 'Cooling' ? 'fa-snowflake' : 'fa-plug'} text-primary text-xl`}></i>
+                                                    </div>
+                                                    <h4 className="font-bold text-xl mb-1">{dev.name}</h4>
+                                                    <p className="text-[10px] text-muted uppercase font-bold tracking-widest mb-8">{dev.category} Sector</p>
+                                                    
+                                                    <div className="space-y-6 mt-auto">
+                                                        <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
+                                                            <span className="text-[9px] font-bold text-muted uppercase block mb-1">{t('comp_metric_load')}</span>
+                                                            <div className="text-xl font-bold mono-font">{dev.watt} W</div>
+                                                        </div>
+                                                        <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
+                                                            <span className="text-[9px] font-bold text-muted uppercase block mb-1">{t('comp_metric_energy')}</span>
+                                                            <div className="text-xl font-bold mono-font text-primary">{energyMonth.toFixed(1)} kWh</div>
+                                                        </div>
+                                                        <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
+                                                            <span className="text-[9px] font-bold text-muted uppercase block mb-1">{t('comp_metric_cost')}</span>
+                                                            <div className="text-xl font-bold mono-font text-emerald-500">฿{costMonth.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+                                                        </div>
+                                                        <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
+                                                            <span className="text-[9px] font-bold text-muted uppercase block mb-1">{t('comp_metric_pf')}</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="text-xl font-bold mono-font">{dev.pf}</div>
+                                                                <div className={`w-2 h-2 rounded-full ${dev.pf > 0.9 ? 'bg-emerald-500' : 'bg-amber-500'} animate-pulse`}></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div className="p-8 bg-card border-top border-light flex justify-center">
+                            <div className="flex gap-4 p-2 bg-light rounded-full border shadow-inner">
+                                <button className="btn btn-primary rounded-full px-10 py-3 font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20" onClick={() => setShowComparisonView(false)}>Done</button>
+                                <button className="btn btn-outline-danger border-0 rounded-full px-6 py-3 font-bold text-[10px] uppercase" onClick={() => {setCompareDeviceIds([]); setShowComparisonView(false);}}>Clear Selection</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Node Config Overlay */}
+            {selectedDeviceId && !showComparisonView && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[4000] flex justify-end">
+                    <div className="w-full max-w-xl bg-body h-full shadow-2xl p-6 md:p-10 animate-slide-left overflow-y-auto">
+                        <div className="flex justify-between items-center mb-8">
+                            <h3 className="font-display font-bold text-xl md:text-2xl">{t('node_config_title')}</h3>
+                            <button className="btn btn-light rounded-2xl p-3" onClick={() => setSelectedDeviceId(null)}><i className="fas fa-times"></i></button>
+                        </div>
+                        {multiDevices.find(d => d.id === selectedDeviceId) && (() => {
+                            const d = multiDevices.find(d => d.id === selectedDeviceId)!;
+                            return (
+                                <div className="space-y-8">
+                                    <div className="row g-4">
+                                        <div className="col-md-7">
+                                            <div className="p-5 bg-primary/5 rounded-[2rem] border border-primary/10">
+                                                <label className="label text-[10px] block mb-3">{t('node_id')}: {d.id}</label>
+                                                <input type="text" className="form-control text-xl font-bold border-0 bg-transparent p-0 mb-4" value={d.name} onChange={e => updateDevice(d.id, 'name', e.target.value)} />
+                                                
+                                                <div className="row g-3">
+                                                    <div className="col-6">
+                                                        <label className="label text-[10px] block mb-2">{t('node_watt')}</label>
+                                                        <input type="number" className="form-control border-2 rounded-2xl p-3 font-bold mono-font" value={d.watt} onChange={e => updateDevice(d.id, 'watt', +e.target.value)} />
+                                                    </div>
+                                                    <div className="col-6">
+                                                        <label className="label text-[10px] block mb-2">{t('node_hours')}</label>
+                                                        <input type="number" className="form-control border-2 rounded-2xl p-3 font-bold mono-font" value={d.hours} onChange={e => updateDevice(d.id, 'hours', +e.target.value)} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-md-5">
+                                            <div className="p-5 bg-emerald-500/5 rounded-[2rem] border border-emerald-500/10 h-100">
+                                                <h6 className="label text-[10px] mb-4">{t('node_tech_specs')}</h6>
+                                                <div className="mb-4">
+                                                    <span className="text-[10px] font-bold text-muted uppercase block mb-1">{t('node_pf')}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="text-2xl font-bold text-emerald-500 mono-font">{d.pf}</div>
+                                                        <div className="badge bg-emerald-500/10 text-emerald-500 text-[8px] px-2 py-1 rounded-full uppercase">Optimal</div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span className="text-[10px] font-bold text-muted uppercase block mb-1">Grid Compliance</span>
+                                                    <div className="text-xs font-bold text-main">Phase A: 228.4V</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-6 bg-light rounded-[2.5rem]">
+                                        <h6 className="label text-[10px] mb-6">{t('node_history_title')}</h6>
+                                        <div className="h-[200px]">
+                                            <ResponsiveContainer>
+                                                <AreaChart data={deviceSpecificChartData}>
+                                                    <defs><linearGradient id="dColor" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/><stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/></linearGradient></defs>
+                                                    <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.1} />
+                                                    <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{fontSize: 9}} />
+                                                    <YAxis axisLine={false} tickLine={false} tick={{fontSize: 9}} />
+                                                    <Tooltip />
+                                                    <Area type="monotone" dataKey="load" stroke="var(--primary)" strokeWidth={3} fill="url(#dColor)" />
+                                                </AreaChart>
+                                            </ResponsiveContainer>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-6 bg-white border rounded-[2.5rem] shadow-sm">
+                                        <h6 className="label text-[10px] mb-6">{t('node_maintenance')}</h6>
+                                        <div className="space-y-4">
+                                            {d.logs.length > 0 ? d.logs.map((log, li) => (
+                                                <div key={li} className="flex justify-between items-center p-3 bg-light rounded-2xl border border-transparent hover:border-primary/20 transition-all">
+                                                    <div>
+                                                        <div className="text-[11px] font-bold text-main mb-1">{log.action}</div>
+                                                        <div className="text-[9px] font-bold text-muted uppercase tracking-widest">{log.date}</div>
+                                                    </div>
+                                                    <div className={`badge rounded-full px-3 py-1.5 text-[8px] font-bold uppercase ${log.status === 'resolved' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                                                        {log.status === 'resolved' ? t('node_log_resolved') : t('node_log_pending')}
+                                                    </div>
+                                                </div>
+                                            )) : (
+                                                <div className="text-center py-6 italic text-muted text-xs opacity-50">No logs on record.</div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-6 flex flex-col sm:flex-row gap-3">
+                                        <button className="btn btn-primary flex-grow rounded-[1.5rem] py-4 font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20" onClick={() => setSelectedDeviceId(null)}>{t('node_auth')}</button>
+                                        <button className="btn btn-outline-danger rounded-[1.5rem] py-4 sm:px-6" onClick={() => removeDevice(d.id)}><i className="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                            );
+                        })()}
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -85,6 +85,24 @@
             display: none;
         }
 
+        /* Custom Scrollbar for specific containers */
+        .custom-scrollbar::-webkit-scrollbar {
+            display: block;
+            height: 10px;
+            width: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            opacity: 0.5;
+            border-radius: 10px;
+            border: 3px solid transparent;
+            background-clip: padding-box;
+        }
+
         .sidebar { 
             width: 280px; 
             height: 100vh; 
