@@ -2,7 +2,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
+import UserManual from './components/UserManual';
 import { HOUSES } from './constants';
+import { useOnboardingTour } from './hooks/useOnboardingTour';
 
 /**
  * Helper to retrieve stored theme preference with a fallback.
@@ -16,7 +18,21 @@ const App: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
+  const [isManualOpen, setIsManualOpen] = useState(false);
+  const [lang, setLang] = useState<'th' | 'en'>('th');
   
+  const { tourCompleted, markCompleted, setStartImmediate } = useOnboardingTour();
+  const showWelcomeTourPrompt = !tourCompleted;
+
+  const handleStartOnboardingTour = () => {
+    setStartImmediate(true);
+    handleLoginSuccess('Demo User');
+  };
+
+  const handleSkipOnboardingTour = () => {
+    markCompleted();
+  };
+
   // Independent theme states for Login and Dashboard
   const [loginDarkMode, setLoginDarkMode] = useState<boolean>(() => 
     getStoredTheme('loginDarkMode', true)
@@ -103,15 +119,15 @@ const App: React.FC = () => {
   const navTextColor = loginDarkMode ? 'text-white/30 hover:text-white' : 'text-slate-400 hover:text-emerald-600';
 
   return (
-    <div className={`relative min-h-screen w-full overflow-hidden transition-colors duration-700 ${loginDarkMode ? 'bg-black' : 'bg-white'}`}>
+    <div className={`relative min-h-screen w-full overflow-hidden transition-colors duration-700 ${loginDarkMode ? 'bg-black' : 'bg-slate-50'}`}>
       {/* Background Slider */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {HOUSES.map((house, idx) => (
           <div
             key={house.id}
-            className={`absolute inset-0 bg-transition ${
+            className={`absolute inset-0 bg-transition duration-[1000ms] ${
               idx === activeIndex 
-                ? (loginDarkMode ? 'opacity-100 scale-100' : 'opacity-10 scale-100')
+                ? (loginDarkMode ? 'opacity-100 scale-100' : 'opacity-70 scale-100')
                 : 'opacity-0 scale-110'
             }`}
             style={{
@@ -122,9 +138,9 @@ const App: React.FC = () => {
           />
         ))}
         {/* Visual Filters */}
-        <div className={`absolute inset-0 ${loginDarkMode ? 'bg-black/50' : 'bg-white/80'} backdrop-blur-[1px] transition-all duration-700`} />
-        <div className={`absolute inset-0 ${loginDarkMode ? 'bg-gradient-to-t from-black via-transparent to-black/60' : 'bg-gradient-to-t from-white via-transparent to-white/90'} transition-all duration-500`} />
-        <div className={`absolute inset-0 ${loginDarkMode ? 'bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]' : 'bg-[radial-gradient(circle_at_center,transparent_0%,rgba(255,255,255,0.3)_100%)]'} transition-all duration-500`} />
+        <div className={`absolute inset-0 ${loginDarkMode ? 'bg-black/50' : 'bg-white/20'} backdrop-blur-[1px] transition-all duration-700`} />
+        <div className={`absolute inset-0 ${loginDarkMode ? 'bg-gradient-to-t from-black via-transparent to-black/60' : 'bg-gradient-to-t from-white/30 via-transparent to-white/70'} transition-all duration-500`} />
+        <div className={`absolute inset-0 ${loginDarkMode ? 'bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]' : 'bg-[radial-gradient(circle_at_center,transparent_0%,rgba(255,255,255,0.05)_100%)]'} transition-all duration-500`} />
       </div>
 
       {/* Main UI */}
@@ -137,12 +153,29 @@ const App: React.FC = () => {
             <span className={`${textColor} font-display text-sm font-bold tracking-[0.4em] uppercase opacity-90 transition-opacity`}>EduEase Energy</span>
           </div>
           
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-4">
             <nav className="hidden lg:flex gap-8">
               {['Systems', 'Nodes', 'Emergency'].map((link) => (
                 <a key={link} href="#" className={`${navTextColor} transition-all text-[9px] font-bold uppercase tracking-[0.3em]`}>{link}</a>
               ))}
             </nav>
+
+            {/* Language Switcher */}
+            <button
+              onClick={() => setLang(lang === 'th' ? 'en' : 'th')}
+              className={`px-3 py-1.5 rounded-xl border font-bold text-xs transition-all duration-300 ${loginDarkMode ? 'border-white/10 bg-white/5 hover:bg-white/10 text-white' : 'border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700'} shadow-sm`}
+            >
+              {lang.toUpperCase()}
+            </button>
+
+            {/* Quick Access User Manual Button */}
+            <button
+              onClick={() => setIsManualOpen(true)}
+              className={`flex items-center gap-2 px-3.5 py-1.5 text-[10px] uppercase tracking-wider font-bold rounded-xl border transition-all duration-300 ${loginDarkMode ? 'border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-450' : 'border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700'} shadow-sm`}
+            >
+              <i className="fas fa-book-open"></i>
+              <span>{lang === 'th' ? 'คู่มือการใช้งาน' : 'User Manual'}</span>
+            </button>
 
             <button 
               onClick={toggleLoginTheme}
@@ -190,6 +223,65 @@ const App: React.FC = () => {
           </div>
         </footer>
       </div>
+
+      <UserManual 
+        isOpen={isManualOpen} 
+        onClose={() => setIsManualOpen(false)} 
+        isDarkMode={loginDarkMode} 
+        lang={lang} 
+      />
+
+      {/* Onboarding Welcome Prompt (Modal dialog visible on startup) */}
+      {showWelcomeTourPrompt && (
+        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4 animate-fade-in">
+          <div className={`w-full max-w-lg p-6 md:p-8 rounded-[2.5rem] border shadow-2xl transition-all duration-300 transform scale-100 ${
+            loginDarkMode 
+              ? 'bg-slate-900 border-emerald-500/30 text-white' 
+              : 'bg-white border-emerald-200 text-slate-800'
+          }`}>
+            <div className="flex items-center gap-4 mb-4">
+              <div className={`p-4 rounded-2xl ${loginDarkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600'} animate-pulse`}>
+                <i className="fas fa-graduation-cap text-2xl"></i>
+              </div>
+              <div>
+                <h4 className="font-display font-black text-lg md:text-xl leading-tight">
+                  {lang === 'th' ? 'ระบบช่วยนำสอนรูปแบบ Spotlight!' : 'EduEase Spotlight Guided Tour'}
+                </h4>
+                <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest font-mono">Interactive Onboarding</p>
+              </div>
+            </div>
+
+            <p className={`text-xs leading-relaxed mb-6 ${loginDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+              {lang === 'th'
+                ? 'ยินดีต้อนรับสู่ระบบพาชมประสิทธิภาพของเรา! ระบบจะกึ่งหรี่ไฟสีเทาครอบคลุมหน้าจอส่วนอื่นๆ และเว้นช่องแสง (Spotlight) ให้สว่างโร่ ณ บริเวณที่กำลังประยุกต์สอน พร้อมหน้ากากโมชันลื่นไหล เพื่อลดส่วนรบกวนสายตาและทำให้วิทยาทัศน์เด่นชัดที่สุด!'
+                : 'Welcome to our premium Spotlight tour! It dims non-critical elements into soft gray shadows to illuminate active control modules seamlessly, complete with fluid elastic slide motions that focus your view.'}
+            </p>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                id="btn-skip-onboarding"
+                onClick={handleSkipOnboardingTour}
+                className={`w-full py-3.5 rounded-2xl text-xs font-black transition-all ${
+                  loginDarkMode 
+                    ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' 
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 shadow-sm'
+                }`}
+              >
+                <i className="fas fa-forward me-1.5"></i>
+                {lang === 'th' ? 'ข้ามและเริ่มใช้งาน' : 'Skip & Start'}
+              </button>
+              <button
+                id="btn-start-onboarding"
+                onClick={handleStartOnboardingTour}
+                className="w-full py-3.5 bg-primary hover:bg-primary/90 text-white rounded-2xl text-xs font-black transition-all shadow-md shadow-primary/20 hover:scale-[1.02]"
+              >
+                <i className="fas fa-play-circle me-1.5 animate-pulse"></i>
+                {lang === 'th' ? 'เริ่มต้นนำสอน' : 'Start Walkthrough'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className={`absolute inset-0 pointer-events-none ${loginDarkMode ? 'opacity-[0.03]' : 'opacity-[0.01]'} z-50 overflow-hidden`}>
         <div className="h-full w-full bg-[linear-gradient(transparent_0%,rgba(255,255,255,0.5)_50%,transparent_100%)] bg-[length:100%_8px]" />
