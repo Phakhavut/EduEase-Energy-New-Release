@@ -235,7 +235,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
       {/* Top Controls Bar */}
       <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 mb-6 pb-4 border-b border-dashed border-slate-200 dark:border-slate-800">
         <div>
-          <h4 className="text-sm font-bold font-display text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <h4 className="text-sm font-bold font-display text-slate-800 dark:text-slate-50 flex items-center gap-2">
             <i className="fas fa-map-marked-alt text-primary"></i>
             <span>
               {lang === 'th' 
@@ -243,7 +243,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
                 : 'Campus Property Distribution & Sector Heatmap'}
             </span>
           </h4>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal mt-0.5">
+          <p className="text-[10px] text-slate-500 dark:text-slate-100 leading-normal mt-0.5">
             {lang === 'th'
               ? 'เลือกระบบวิเคราะห์เพื่อแสดงสีกราฟความหนาแน่นเชิงพื้นที่ และคลิกเลือกอาคารเพื่อสั่งการปรับจูนกริดไฟฟ้าอัจฉริยะ'
               : 'Switch heatmap views to audit spatial efficiency and click sectors to calibrate localized power distribution.'}
@@ -264,7 +264,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
               className={`px-3 py-1.5 text-[9.5px] font-bold font-display rounded-xl tracking-tight transition-all flex items-center gap-1.5 ${
                 activeMode === mode
                   ? 'bg-white dark:bg-slate-800 text-primary dark:text-sky-400 shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                  : 'text-slate-600 dark:text-slate-100 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               <i className={`fas ${
@@ -299,7 +299,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
             </svg>
           </div>
 
-          <div className="absolute top-3 left-3 text-[9px] font-mono font-black text-slate-400 dark:text-slate-600 tracking-wider">
+          <div className="absolute top-3 left-3 text-[9px] font-mono font-black text-slate-400 dark:text-slate-100 tracking-wider">
             SCADA GEOSPATIAL MAP // ACTIVE_GRID: {activeMode.toUpperCase()}
           </div>
 
@@ -331,8 +331,8 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
               className="w-full h-full select-none"
             >
               {/* Central grid circle */}
-              <circle cx="250" cy="175" r="140" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-slate-200 dark:text-slate-800" strokeDasharray="3,3" />
-              <circle cx="250" cy="175" r="60" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-slate-200 dark:text-slate-800" strokeDasharray="3,3" />
+              <circle cx="250" cy="175" r="140" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-slate-200 dark:text-slate-100" strokeDasharray="3,3" />
+              <circle cx="250" cy="175" r="60" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-slate-200 dark:text-slate-100" strokeDasharray="3,3" />
 
               {/* Map Paths with color and animation */}
               <g className="cursor-pointer">
@@ -390,7 +390,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
                       <g transform={`translate(${labelPos.x - 7}, ${labelPos.y - 18})`} className="pointer-events-none">
                         <circle cx="7" cy="7" r="9" className="fill-white/80 dark:fill-slate-900/90 stroke-slate-300 dark:stroke-slate-700 stroke-[1]" />
                         <foreignObject x="2.5" y="2" width="10" height="10">
-                          <div className="flex items-center justify-center text-[7.5px] text-slate-700 dark:text-slate-300">
+                          <div className="flex items-center justify-center text-[7.5px] text-slate-700 dark:text-slate-100">
                             <i className={`fas ${sec.icon}`}></i>
                           </div>
                         </foreignObject>
@@ -432,12 +432,12 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
           </div>
 
           {/* Color Indicator Legend */}
-          <div className="w-full max-w-[420px] mt-4 pt-3 border-t border-dashed border-slate-200 dark:border-slate-800/80 flex justify-between items-center text-[8.5px] font-mono text-slate-500 dark:text-slate-400">
+          <div className="w-full max-w-[420px] mt-4 pt-3 border-t border-dashed border-slate-200 dark:border-slate-800/80 flex justify-between items-center text-[8.5px] font-mono text-slate-500 dark:text-slate-100">
             <span className="flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded bg-emerald-500/20 border border-emerald-500" />
               <span>{lang === 'th' ? 'ประสิทธิภาพดี / ต่ำ' : 'Optimal / Low'}</span>
             </span>
-            <span className="text-[9px] font-bold text-slate-700 dark:text-slate-300">
+            <span className="text-[9px] font-bold text-slate-700 dark:text-slate-100">
               {lang === 'th' ? modeLabelsTh[activeMode] : modeLabelsEn[activeMode]}
             </span>
             <span className="flex items-center gap-1">
@@ -457,20 +457,20 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
                 <span className="px-2 py-0.5 rounded bg-primary/10 text-primary dark:bg-sky-400/10 dark:text-sky-400 border border-primary/10 dark:border-sky-400/10 text-[7.5px] font-mono font-black uppercase tracking-widest">
                   {selectedSector.id.toUpperCase()}_SECTOR_DIAGNOSTICS
                 </span>
-                <h5 className="text-sm font-bold font-display text-slate-800 dark:text-slate-100 mt-1 leading-tight">
+                <h5 className="text-sm font-bold font-display text-slate-800 dark:text-slate-50 mt-1 leading-tight">
                   {lang === 'th' ? selectedSector.nameTh : selectedSector.nameEn}
                 </h5>
-                <p className="text-[9.5px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5">
+                <p className="text-[9.5px] font-semibold text-slate-500 dark:text-slate-100 flex items-center gap-1 mt-0.5">
                   <i className="fas fa-map-marker-alt text-slate-400 text-[8.5px]"></i>
                   {lang === 'th' ? selectedSector.locationTh : selectedSector.locationEn}
                 </p>
               </div>
-              <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-700 shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-100 border border-slate-200 dark:border-slate-700 shrink-0">
                 <i className={`fas ${selectedSector.icon} text-sm`}></i>
               </div>
             </div>
 
-            <p className="text-[10.5px] text-slate-600 dark:text-slate-300 leading-relaxed bg-white dark:bg-slate-950/20 p-3 rounded-xl border border-slate-150 dark:border-slate-850/40">
+            <p className="text-[10.5px] text-slate-600 dark:text-slate-100 leading-relaxed bg-white dark:bg-slate-950/20 p-3 rounded-xl border border-slate-150 dark:border-slate-850/40">
               {lang === 'th' ? selectedSector.detailsTh : selectedSector.detailsEn}
             </p>
 
@@ -480,7 +480,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
               {/* Load Density Metric */}
               <div className="bg-white/50 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-150 dark:border-slate-850/40">
                 <div className="flex justify-between text-[9.5px] font-mono mb-1">
-                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <span className="text-slate-500 dark:text-slate-100 flex items-center gap-1">
                     <i className="fas fa-bolt text-sky-500"></i>
                     {lang === 'th' ? 'ภาระความต้องการใช้ไฟฟ้า:' : 'Energy Load Density:'}
                   </span>
@@ -489,7 +489,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
                   </span>
                 </div>
                 {/* Visual meter */}
-                <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-sky-500 transition-all duration-500"
                     style={{ width: `${Math.min(100, (selectedSector.metrics.density / 60) * 100)}%` }}
@@ -500,7 +500,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
               {/* Solar potential Metric */}
               <div className="bg-white/50 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-150 dark:border-slate-850/40">
                 <div className="flex justify-between text-[9.5px] font-mono mb-1">
-                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <span className="text-slate-500 dark:text-slate-100 flex items-center gap-1">
                     <i className="fas fa-sun text-amber-500"></i>
                     {lang === 'th' ? 'ศักยภาพแผงโซลาร์เซลล์:' : 'Solar Irradiance (Rooftop):'}
                   </span>
@@ -509,7 +509,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
                   </span>
                 </div>
                 {/* Visual meter */}
-                <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-amber-500 transition-all duration-500"
                     style={{ width: `${(selectedSector.metrics.solar / 500) * 100}%` }}
@@ -520,7 +520,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
               {/* Carbon Footprint Metric */}
               <div className="bg-white/50 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-150 dark:border-slate-850/40">
                 <div className="flex justify-between text-[9.5px] font-mono mb-1">
-                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <span className="text-slate-500 dark:text-slate-100 flex items-center gap-1">
                     <i className="fas fa-leaf text-emerald-500"></i>
                     {lang === 'th' ? 'อัตราการปล่อยคาร์บอน:' : 'Carbon Footprint Index:'}
                   </span>
@@ -529,7 +529,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
                   </span>
                 </div>
                 {/* Visual meter */}
-                <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-emerald-500 transition-all duration-500"
                     style={{ width: `${Math.min(100, (selectedSector.metrics.carbon / 250) * 100)}%` }}
@@ -540,7 +540,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
               {/* Peak Risk Metric */}
               <div className="bg-white/50 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-150 dark:border-slate-850/40">
                 <div className="flex justify-between text-[9.5px] font-mono mb-1">
-                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                  <span className="text-slate-500 dark:text-slate-100 flex items-center gap-1">
                     <i className="fas fa-exclamation-triangle text-rose-500"></i>
                     {lang === 'th' ? 'ความเสี่ยงโหลดระบบเกินพิกัด:' : 'Peak Overload Danger:'}
                   </span>
@@ -549,7 +549,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
                   </span>
                 </div>
                 {/* Visual meter */}
-                <div className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div 
                     className={`h-full transition-all duration-500 ${selectedSector.metrics.risk > 70 ? 'bg-rose-500' : 'bg-rose-400/80'}`}
                     style={{ width: `${selectedSector.metrics.risk}%` }}
@@ -563,7 +563,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
           {/* Calibrate / Action Controls */}
           <div className="mt-5 pt-4 border-t border-dashed border-slate-200 dark:border-slate-800">
             <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between text-[9px] font-mono text-slate-500 dark:text-slate-400 mb-1">
+              <div className="flex items-center justify-between text-[9px] font-mono text-slate-500 dark:text-slate-100 mb-1">
                 <span>GRID CONTROLLER: LOCALIZED_TUNING</span>
                 <span>STATUS: {optimizedSectors[selectedSector.id] ? 'OPTIMIZED' : 'STANDARD'}</span>
               </div>

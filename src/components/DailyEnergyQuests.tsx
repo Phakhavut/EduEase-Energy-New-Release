@@ -224,11 +224,11 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                 {/* Header section with Timer & Wallet */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
                     <div>
-                        <h5 className="font-display font-black text-base md:text-lg mb-1 tracking-tight text-slate-900 dark:text-dark uppercase flex items-center gap-2">
+                        <h5 className="font-display font-black text-base md:text-lg mb-1 tracking-tight text-slate-900 dark:text-slate-100 uppercase flex items-center gap-2">
                             <i className="fas fa-tasks text-emerald-500 animate-pulse"></i>
                             {lang === 'th' ? 'ภารกิจประหยัดพลังงานรายวัน' : 'Daily Energy Quests'}
                         </h5>
-                        <p className="text-[10px] text-slate-600 dark:text-muted mb-0 font-mono tracking-wider">
+                        <p className="text-[10px] text-slate-600 dark:text-slate-100 mb-0 font-mono tracking-wider">
                             {lang === 'th' ? 'เคลมโทเค็น GT จากพฤติกรรมประหยัดรักษ์โลกประจำวัน' : 'Complete expiring targets to earn premium GT rewards.'}
                         </p>
                     </div>
@@ -298,10 +298,10 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                                             <i className={`fas ${quest.icon} ${isCompleted && !isClaimed ? 'animate-bounce' : ''}`}></i>
                                         </div>
                                         <div>
-                                            <h6 className="font-black text-xs md:text-sm mb-0.5 text-slate-900 dark:text-dark uppercase tracking-tight">
+                                            <h6 className="font-black text-xs md:text-sm mb-0.5 text-slate-900 dark:text-slate-100 uppercase tracking-tight">
                                                 {lang === 'th' ? quest.titleTh : quest.titleEn}
                                             </h6>
-                                            <p className="text-[10px] text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2 md:line-clamp-1">
+                                            <p className="text-[10px] text-slate-600 dark:text-slate-100 leading-relaxed line-clamp-2 md:line-clamp-1">
                                                 {lang === 'th' ? quest.descTh : quest.descEn}
                                             </p>
                                         </div>
@@ -312,7 +312,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                                         <span className="font-mono font-black text-xs text-amber-700 dark:text-amber-600 block">
                                             +{quest.reward} GT
                                         </span>
-                                        <span className="text-[8px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-widest font-mono">
+                                        <span className="text-[8px] text-slate-500 dark:text-slate-100 uppercase font-bold tracking-widest font-mono">
                                             {isClaimed ? (lang === 'th' ? 'เคลมแล้ว' : 'CLAIMED') : (lang === 'th' ? 'แต้ม' : 'REWARD')}
                                         </span>
                                     </div>
@@ -329,7 +329,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                                             />
                                         </div>
                                         {/* Progress Value label */}
-                                        <span className="font-mono font-black text-[10px] text-slate-850 dark:text-slate-300 shrink-0">
+                                        <span className="font-mono font-black text-[10px] text-slate-800 dark:text-slate-100 shrink-0">
                                             {progress}%
                                         </span>
                                     </div>
@@ -339,7 +339,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                                         {isClaimed ? (
                                             <button 
                                                 disabled 
-                                                className="btn btn-xs py-1.5 px-3 bg-slate-100 dark:bg-slate-900 border-0 text-slate-400 font-bold text-[9px] uppercase tracking-wider rounded-xl w-full sm:w-auto"
+                                                className="btn btn-xs py-1.5 px-3 bg-slate-100 dark:bg-slate-900 border-0 text-slate-400 dark:text-slate-100 font-bold text-[9px] uppercase tracking-wider rounded-xl w-full sm:w-auto"
                                             >
                                                 <i className="fas fa-check-circle mr-1"></i>
                                                 {lang === 'th' ? 'รับแล้ว' : 'Claimed'}
@@ -357,7 +357,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                                         ) : (
                                             <button 
                                                 onClick={() => handlePerformAction(quest.id, quest.actionSuccessEn, quest.actionSuccessTh)}
-                                                className="btn btn-xs py-1.5 px-3 bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 font-bold text-[9px] uppercase tracking-wider rounded-xl cursor-pointer w-full sm:w-auto whitespace-nowrap hover:border-slate-350 transition-colors shadow-sm"
+                                                className="btn btn-xs py-1.5 px-3 bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 dark:!text-white dark:border-slate-700 dark:bg-slate-800 font-bold text-[9px] uppercase tracking-wider rounded-xl cursor-pointer w-full sm:w-auto whitespace-nowrap hover:border-slate-350 transition-colors shadow-sm"
                                             >
                                                 {lang === 'th' ? quest.actionLabelTh : quest.actionLabelEn}
                                             </button>
@@ -371,11 +371,11 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
             </div>
 
             {/* Bottom Admin Control for developers / testing */}
-            <div className="flex justify-between items-center pt-5 border-t border-dashed border-slate-200/50 mt-6 font-mono text-[8px] text-slate-500 dark:text-muted">
+            <div className="flex justify-between items-center pt-5 border-t border-dashed border-slate-200/50 mt-6 font-mono text-[8px] text-slate-500 dark:text-slate-200">
                 <span>DAILY RESET CYCLE SYSTEM: ON</span>
                 <button 
                     onClick={handleResetAll} 
-                    className="p-1 px-2.5 rounded bg-slate-100 hover:bg-slate-200 border-0 text-[8px] text-slate-600 dark:text-muted hover:text-dark uppercase font-bold cursor-pointer transition-colors shadow-sm"
+                    className="p-1 px-2.5 rounded bg-slate-100 hover:bg-slate-200 border-0 text-[8px] text-slate-600 dark:text-slate-100 hover:text-slate-900 dark:hover:text-white uppercase font-bold cursor-pointer transition-colors shadow-sm"
                 >
                     <i className="fas fa-sync mr-1"></i> {lang === 'th' ? 'รีเซ็ตเควสใหม่' : 'Reset Quests'}
                 </button>

@@ -43,42 +43,53 @@ async function startServer() {
       const key = process.env.GEMINI_API_KEY;
       const { devices, history } = req.body;
 
-      if (key) {
-        const ai = getAiClient();
-        const prompt = `Analyze the following energy grid data for anomalies, malfunctions, or security threats.
-        Devices: ${JSON.stringify(devices)}
-        7-Day History: ${JSON.stringify(history)}
-        
-        Identify potential equipment faults (e.g. erratic compressor), unusual spikes, or power-based security signatures (like cryptojacking).
-        Return a JSON array of maximum 2 anomalies. Each anomaly object must have:
-        - title (string, e.g. "Critical Fault Detected")
-        - description (string, concise details)
-        - severity (string, "danger" or "warning")
-        - icon (string, FontAwesome class like "fa-microchip")`;
+      let aiResponseData: any = null;
 
-        const response = await ai.models.generateContent({
-          model: "gemini-flash-latest",
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: Type.ARRAY,
-              items: {
-                type: Type.OBJECT,
-                properties: {
-                  title: { type: Type.STRING },
-                  description: { type: Type.STRING },
-                  severity: { type: Type.STRING },
-                  icon: { type: Type.STRING },
+      if (key) {
+        try {
+          const ai = getAiClient();
+          const prompt = `Analyze the following energy grid data for anomalies, malfunctions, or security threats.
+          Devices: ${JSON.stringify(devices)}
+          7-Day History: ${JSON.stringify(history)}
+          
+          Identify potential equipment faults (e.g. erratic compressor), unusual spikes, or power-based security signatures (like cryptojacking).
+          Return a JSON array of maximum 2 anomalies. Each anomaly object must have:
+          - title (string, e.g. "Critical Fault Detected")
+          - description (string, concise details)
+          - severity (string, "danger" or "warning")
+          - icon (string, FontAwesome class like "fa-microchip")`;
+
+          const response = await ai.models.generateContent({
+            model: "gemini-flash-latest",
+            contents: prompt,
+            config: {
+              responseMimeType: "application/json",
+              responseSchema: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    title: { type: Type.STRING },
+                    description: { type: Type.STRING },
+                    severity: { type: Type.STRING },
+                    icon: { type: Type.STRING },
+                  },
+                  required: ["title", "description", "severity", "icon"],
                 },
-                required: ["title", "description", "severity", "icon"],
               },
             },
-          },
-        });
+          });
 
-        const text = response.text || "[]";
-        return res.json(JSON.parse(text));
+          const text = response.text || "[]";
+          aiResponseData = JSON.parse(text);
+        } catch (apiError: any) {
+          console.warn("Gemini API unavailable for anomaly scan (high demand), falling back to local heuristic scanner.");
+          aiResponseData = null;
+        }
+      }
+
+      if (aiResponseData) {
+        return res.json(aiResponseData);
       } else {
         // High-Intelligence Expert Heuristic Real-time Scanner Fallback
         const anomalies = [];

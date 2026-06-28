@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduEase Energy | Management Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: ['class', '[data-theme="dark"]'],
+      }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,7 +33,7 @@
             --sidebar-bg: #111c44; 
             --card-bg: #111c44;
             --text-main: #ffffff; 
-            --text-gray: #cbd5e1; /* highly readable slate-300 in dark mode */
+            --text-gray: #f8fafc; /* high-contrast white/light-gray in dark mode */
             --border: #334155; /* distinct border in dark mode */
             --input-bg: #1b254b;
             --accent: #34d399;
@@ -123,11 +128,11 @@
             color: #f8fafc !important; /* Force beautiful light gray text, eliminating invisible dark texts on dark background */
         }
         [data-theme="dark"] .text-muted {
-            color: #cbd5e1 !important; /* Highly readable light gray */
+            color: #f1f5f9 !important; /* High contrast light gray/white */
         }
         [data-theme="dark"] .text-slate-400,
         [data-theme="dark"] .text-gray-400 {
-            color: #cbd5e1 !important; /* Lighter gray for excellent readability in dark mode */
+            color: #f1f5f9 !important; /* Lighter gray for excellent readability in dark mode */
         }
         [data-theme="dark"] .bg-white {
             background-color: var(--card-bg) !important;

@@ -78,7 +78,7 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
       </div>
 
       {/* Description details */}
-      <p className="text-[10.5px] leading-relaxed text-slate-500 dark:text-slate-450">
+      <p className="text-[10.5px] leading-relaxed text-slate-500 dark:text-slate-100">
         {lang === 'th' ? rec.descTh : rec.descEn}
       </p>
 
@@ -90,7 +90,7 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
           className={`px-3 py-1.5 rounded-xl text-[9.5px] font-bold font-display transition-all flex items-center gap-1.5 ${
             isCommitted 
               ? 'bg-emerald-500 text-white hover:bg-emerald-600' 
-              : 'bg-slate-200/50 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-600 dark:text-slate-350'
+              : 'bg-slate-200/50 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-600 dark:text-slate-200'
           }`}
         >
           <CheckCircle className={`w-3.5 h-3.5 ${isCommitted ? 'animate-bounce' : ''}`} />

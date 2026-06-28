@@ -57,6 +57,11 @@ const App: React.FC = () => {
     const body = document.body;
     
     body.setAttribute('data-theme', currentDarkMode ? 'dark' : 'light');
+    if (currentDarkMode) {
+      body.classList.add('dark');
+    } else {
+      body.classList.remove('dark');
+    }
     
     // Apply specific background colors to prevent flickering or inconsistent gaps
     if (isLoggedIn) {
@@ -111,6 +116,7 @@ const App: React.FC = () => {
         isDarkMode={dashboardDarkMode} 
         onToggleTheme={toggleDashboardTheme} 
         onLogout={handleLogout} 
+        activeHouse={activeHouse}
       />
     );
   }
@@ -233,8 +239,8 @@ const App: React.FC = () => {
 
       {/* Onboarding Welcome Prompt (Modal dialog visible on startup) */}
       {showWelcomeTourPrompt && (
-        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4 animate-fade-in">
-          <div className={`w-full max-w-lg p-6 md:p-8 rounded-[2.5rem] border shadow-2xl transition-all duration-300 transform scale-100 ${
+        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4 animate-fade-in overflow-y-auto">
+          <div className={`w-full max-w-lg p-6 md:p-8 rounded-[2.5rem] border shadow-2xl transition-all duration-300 transform scale-100 my-auto max-h-[95vh] overflow-y-auto ${
             loginDarkMode 
               ? 'bg-slate-900 border-emerald-500/30 text-white' 
               : 'bg-white border-emerald-200 text-slate-800'

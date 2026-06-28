@@ -324,9 +324,9 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
       {/* Onboarding Dialog Prompt (Welcome Modal) */}
       <AnimatePresence>
         {showPrompt && (
-          <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4 overflow-y-auto">
             <motion.div 
-              className={`w-full max-w-lg p-6 md:p-8 rounded-[2.5rem] border shadow-2xl ${
+              className={`w-full max-w-lg p-6 md:p-8 rounded-[2.5rem] border shadow-2xl my-auto max-h-[95vh] overflow-y-auto ${
                 isDarkMode 
                   ? 'bg-slate-900 border-emerald-500/30 text-white shadow-emerald-950/40' 
                   : 'bg-white border-emerald-250 text-slate-800 shadow-slate-100'

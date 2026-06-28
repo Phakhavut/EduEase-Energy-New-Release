@@ -118,7 +118,7 @@ export const SmartSavingsCalculator: React.FC<SmartSavingsCalculatorProps> = ({
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-18 right-8 z-50 bg-slate-900/90 dark:bg-sky-500/90 text-white dark:text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg border border-slate-700/50 flex items-center gap-2 backdrop-blur-md"
           >
-            <Sparkles className="w-4 h-4 text-amber-300 dark:text-slate-900 animate-pulse" />
+            <Sparkles className="w-4 h-4 text-amber-300 dark:text-slate-100 animate-pulse" />
             <span>{toastMessage}</span>
           </motion.div>
         )}
@@ -132,7 +132,7 @@ export const SmartSavingsCalculator: React.FC<SmartSavingsCalculatorProps> = ({
               {lang === 'th' ? 'เครื่องคำนวณการใช้ไฟอัจฉริยะ' : 'AI-Powered Smart Savings Calculator'}
             </span>
           </h4>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-[10px] text-slate-500 dark:text-slate-100 mt-0.5">
             {lang === 'th'
               ? 'กรอกพฤติกรรมการใช้อุปกรณ์ไฟฟ้าส่วนตัวเพื่อสร้างแผนประหยัดค่าไฟระดับนาโนวินาทีวิเคราะห์โดย AI'
               : 'Profile your custom appliance schedule & usage habits to compile a bespoke, AI-optimized cost reduction blueprint.'}
@@ -183,12 +183,12 @@ export const SmartSavingsCalculator: React.FC<SmartSavingsCalculatorProps> = ({
 
       <AnimatePresence>
         {showAddCustomModal && (
-          <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-2xl p-6 max-w-sm w-full"
+              className="bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-2xl p-6 max-w-sm w-full my-auto max-h-[95vh] overflow-y-auto"
             >
               <h5 className="text-sm font-bold font-display text-slate-800 dark:text-slate-100 flex items-center gap-2 mb-4">
                 <Plus className="w-5 h-5 text-sky-500" />
@@ -214,7 +214,7 @@ export const SmartSavingsCalculator: React.FC<SmartSavingsCalculatorProps> = ({
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <label htmlFor="custom-hours-range">{lang === 'th' ? 'ระยะเวลาใช้ต่อวัน:' : 'Active Hours:'}</label>
-                    <span className="font-mono text-slate-600 dark:text-slate-300">{customHours} ชม./วัน</span>
+                    <span className="font-mono text-slate-600 dark:text-slate-100">{customHours} ชม./วัน</span>
                   </div>
                   <input
                     id="custom-hours-range"
@@ -231,7 +231,7 @@ export const SmartSavingsCalculator: React.FC<SmartSavingsCalculatorProps> = ({
                 <div className="flex flex-col gap-1.5">
                   <div className="flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                     <label htmlFor="custom-count-input">{lang === 'th' ? 'จำนวน:' : 'Count / Quantity:'}</label>
-                    <span className="font-mono text-slate-600 dark:text-slate-300">{customCount}</span>
+                    <span className="font-mono text-slate-600 dark:text-slate-100">{customCount}</span>
                   </div>
                   <input
                     id="custom-count-input"
@@ -274,7 +274,7 @@ export const SmartSavingsCalculator: React.FC<SmartSavingsCalculatorProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowAddCustomModal(false)}
-                    className="flex-1 py-2.5 rounded-xl text-[10px] font-bold font-display tracking-tight bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-650 dark:text-slate-300 transition-all"
+                    className="flex-1 py-2.5 rounded-xl text-[10px] font-bold font-display tracking-tight bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-600 dark:text-slate-100 transition-all"
                   >
                     {lang === 'th' ? 'ยกเลิก' : 'Cancel'}
                   </button>

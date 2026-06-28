@@ -1,5 +1,6 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
+import { LineChart, Line, ResponsiveContainer, Tooltip } from 'recharts';
 
 interface LoginFormProps {
   onLogin: (username: string) => void;
@@ -12,6 +13,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Generate deterministic 24-hour mock data based on house name so it looks consistent
+  const mockConsumptionData = useMemo(() => {
+    const seed = selectedHouseName.length;
+    return Array.from({ length: 24 }, (_, i) => {
+      const base = 20 + (seed % 10);
+      const peak = (i > 8 && i < 22) ? 40 : 0;
+      const randomVariance = Math.sin(i + seed) * 15;
+      return {
+        time: `${i}:00`,
+        energy: Math.max(10, Math.floor(base + peak + randomVariance))
+      };
+    });
+  }, [selectedHouseName]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,17 +51,51 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
   const subHeadingColor = isDarkMode ? 'text-white/60' : 'text-slate-600';
 
   return (
-    <div className={`w-full max-w-[320px] mx-auto relative z-20 theme-transition ${error ? 'animate-shake' : ''}`}>
+    <div className={`w-full max-w-[360px] mx-auto relative z-20 theme-transition ${error ? 'animate-shake' : ''}`}>
       <div className={`${glassClass} p-8 rounded-[2.5rem] relative overflow-hidden theme-transition`}>
         {/* Animated accent light */}
         <div className={`absolute -top-24 -right-24 w-48 h-48 ${isDarkMode ? 'bg-emerald-500/10' : 'bg-emerald-500/15'} blur-[80px] rounded-full pointer-events-none`} />
         
         <div className="relative z-10">
-          <div className="mb-6 text-center">
+          <div className="mb-4 text-center">
             <h2 className={`text-2xl font-semibold ${headingColor} mb-1 tracking-tight font-display transition-colors`}>Welcome Back</h2>
             <p className={`${subHeadingColor} text-[10px] font-medium uppercase tracking-[0.15em] transition-colors`}>
               Node: <span className="text-emerald-500">{selectedHouseName}</span>
             </p>
+          </div>
+
+          {/* 24-Hour Energy Trend Graph */}
+          <div className="mb-6 h-24 w-full opacity-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={mockConsumptionData}>
+                <Line 
+                  type="monotone" 
+                  dataKey="energy" 
+                  stroke="#10b981" 
+                  strokeWidth={2} 
+                  dot={false}
+                  activeDot={{ r: 4, fill: "#10b981", stroke: isDarkMode ? "#1e293b" : "#ffffff", strokeWidth: 2 }}
+                />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '10px',
+                    color: isDarkMode ? '#e2e8f0' : '#1e293b',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }}
+                  itemStyle={{ color: '#10b981', fontWeight: 'bold' }}
+                  labelStyle={{ color: labelColor, marginBottom: '4px' }}
+                  cursor={{ stroke: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}
+                  formatter={(value: number) => [`${value} kWh`, 'Usage']}
+                  labelFormatter={(label) => `${label}`}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+            <div className={`text-center text-[8px] uppercase tracking-widest mt-2 ${labelColor}`}>
+              24-Hour Consumption Trend
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">

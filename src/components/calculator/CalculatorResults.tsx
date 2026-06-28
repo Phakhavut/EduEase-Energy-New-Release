@@ -26,7 +26,7 @@ export const CalculatorResults: React.FC<CalculatorResultsProps> = ({
           exit={{ opacity: 0 }}
           className="p-8 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800 text-center flex flex-col items-center justify-center py-16 bg-slate-50/20 dark:bg-slate-900/5"
         >
-          <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-600 mb-4 shadow-sm">
+          <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-100 mb-4 shadow-sm">
             <Calculator className="w-10 h-10" />
           </div>
           <h5 className="text-sm font-bold font-display text-slate-700 dark:text-slate-200">
@@ -104,7 +104,7 @@ export const CalculatorResults: React.FC<CalculatorResultsProps> = ({
           </div>
 
           {/* plan overview text */}
-          <div className="p-4 rounded-2.5xl bg-emerald-500/5 border border-emerald-500/10 text-[10.5px] leading-relaxed text-slate-650 dark:text-slate-350 flex gap-2.5">
+          <div className="p-4 rounded-2.5xl bg-emerald-500/5 border border-emerald-500/10 text-[10.5px] leading-relaxed text-slate-600 dark:text-slate-100 flex gap-2.5">
             <Leaf className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
             <span>
               {lang === 'th' ? result.planSummaryTh : result.planSummaryEn}
@@ -113,7 +113,7 @@ export const CalculatorResults: React.FC<CalculatorResultsProps> = ({
 
           {/* Actionable recommendations list */}
           <div className="flex flex-col gap-3">
-            <h5 className="text-[11px] font-black font-display text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            <h5 className="text-[11px] font-black font-display text-slate-400 dark:text-slate-100 uppercase tracking-wider">
               {lang === 'th' ? 'ข้อแนะนำและพฤติกรรมประหยัดไฟฟ้า' : 'AI OPTIMIZATION CHECKLIST'}
             </h5>
 
@@ -143,7 +143,7 @@ export const CalculatorResults: React.FC<CalculatorResultsProps> = ({
                 <span className="text-xs font-black uppercase tracking-wider block font-display">
                   {lang === 'th' ? 'นักรบกริดประหยัดพลังงาน!' : 'GRID CONSERVATION HERO!'}
                 </span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold block mt-0.5">
+                <span className="text-[10px] text-slate-500 dark:text-slate-100 font-semibold block mt-0.5">
                   {lang === 'th' 
                     ? `คุณได้สัญญาทำตามคู่มือแล้ว ${committedHabits.length} ข้อ รับเหรียญสะสมรางวัลรวม ${committedHabits.length * 50} Green Tokens! 🏆`
                     : `You committed to ${committedHabits.length} dynamic saving action(s). Accrued ${committedHabits.length * 50} Green Tokens! 🏆`}

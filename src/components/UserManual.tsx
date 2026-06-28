@@ -304,7 +304,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                   <div className="space-y-2">
                     <span className="font-bold text-xs text-primary">{lang === 'th' ? '✅ ระบบที่ผ่านการยืนยันแล้วจะได้รับ:' : '✅ Validated operators retrieve:'}</span>
-                    <ul className="list-disc ps-4 space-y-1 font-semibold text-slate-700 dark:text-slate-300">
+                    <ul className="list-disc ps-4 space-y-1 font-semibold text-slate-700 dark:text-slate-100">
                       <li>{lang === 'th' ? 'ระดับสิทธิ์ผู้ควบคุมระดับสูง (Master Admin Token)' : 'Master Admin Operations Token'}</li>
                       <li>{lang === 'th' ? 'การเข้าใช้เซิร์ฟเวอร์ระบบประมวลผล Gemini AI' : 'Exhaustive server-side Gemini AI nodes access'}</li>
                       <li>{lang === 'th' ? 'สิทธิ์จดสถิติ Telemetry และปรับงบประมาณโครงการ' : 'Full telemetry logging & budget modification status'}</li>
@@ -343,7 +343,7 @@ const UserManual: React.FC<UserManualProps> = ({
               </p>
 
               {/* THREE COLUMN PREMIUM BREAKDOWN OF CARD METRICS */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-semibold text-slate-800 dark:text-slate-300">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-semibold text-slate-800 dark:text-slate-100">
                 <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-1">
                   <span className="badge bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase">Burn Rate (฿/Day)</span>
                   <p className={`font-black text-sm pt-1.5 ${textClass}`}>{lang === 'th' ? 'อัตราค่าไฟเฉลี่ยรายวัน' : 'Dynamic Daily Burn (฿)'}</p>
@@ -413,7 +413,7 @@ const UserManual: React.FC<UserManualProps> = ({
                   : 'On the main Control Hub, you can find 4 dynamic toggle switches that simulate core peak-shaving tactics on educational grid systems:'}
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-semibold text-slate-800 dark:text-slate-300">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-semibold text-slate-800 dark:text-slate-100">
                 {/* Switch 1 */}
                 <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900/60 border-indigo-950/40' : 'bg-slate-50 border-slate-200'} space-y-1`}>
                   <p className="font-extrabold text-blue-600 dark:text-blue-450 text-xs">❄️ {lang === 'th' ? '1. ปรับอุณหภูมิ AC อัจฉริยะ (Smart AC Optimization)' : '1. Smart AC Optimization'}</p>
@@ -533,7 +533,7 @@ const UserManual: React.FC<UserManualProps> = ({
                           ? 'วิธีการหาข้อมูลและป้อนค่ากำลังไพ่อุปกรณ์ เพื่อให้ระบบคำนวณและประดิษฐ์สถิติเสถียรภาพได้แม่นยำสูงสุด มีคำแนะนำดังต่อไปนี้:'
                           : 'To maintain the highest fidelity across financial projections and grid safety modeling, follow these parameters:'}
                       </p>
-                      <ul className="list-disc ps-4 space-y-1.5 font-bold text-slate-800 dark:text-slate-300">
+                      <ul className="list-disc ps-4 space-y-1.5 font-bold text-slate-800 dark:text-slate-100">
                         <li>
                           {lang === 'th'
                             ? 'กำลังวัตต์ (Wattage): ค้นหาค่ากำลังไฟบนแบรนด์ผลิตภัณฑ์ (เช่น สติกเกอร์หลังเครื่อง) เช่น แอร์ 9000-18000 BTU (~800W - 1800W), เครื่องทำน้ำอุ่น (~3000W - 4500W), ตู้เย็นอัจฉริยะ (~100W - 220W)'
@@ -684,7 +684,7 @@ const UserManual: React.FC<UserManualProps> = ({
 
               {/* CRITICAL WARNING ADMONITION BAR */}
               <div className="p-5.5 rounded-2.5xl border border-dashed border-rose-500/30 bg-rose-500/5 space-y-2">
-                <p className="font-extrabold text-rose-800 dark:text-rose-450 text-xs flex items-center gap-1.5">
+                <p className="font-extrabold text-rose-800 dark:text-rose-400 text-xs flex items-center gap-1.5">
                   <i className="fas fa-triangle-exclamation text-rose-500 animate-pulse text-sm"></i>
                   {t.warning_title}
                 </p>
@@ -724,7 +724,7 @@ const UserManual: React.FC<UserManualProps> = ({
               </div>
 
               {/* DETAILED ORDERED STEP-BY-STEP CHECKPOINTS */}
-              <div className="space-y-3 pt-2 text-[11px] font-bold text-slate-900 dark:text-slate-300">
+              <div className="space-y-3 pt-2 text-[11px] font-bold text-slate-900 dark:text-slate-100">
                 <div className={`p-4 rounded-xl border ${cardBg} flex gap-3.5 items-center`}>
                   <span className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center font-black flex-shrink-0 text-[10px]">1</span>
                   <span>
