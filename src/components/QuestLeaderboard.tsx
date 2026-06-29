@@ -498,7 +498,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                             <h5 className="font-display font-black text-base md:text-lg mb-0.5 uppercase">
                                                 {lang === 'th' ? 'ภารกิจประหยัดพลังงานกรีนกริต' : 'Smart Grid Saving Quests'}
                                             </h5>
-                                            <p className="text-[10px] text-muted mb-0">{lang === 'th' ? 'รันโหมดพลังงานประหยัดเพื่อจบเควสสะสมคะแนนกริตและคาร์บอนชีวภาพ' : 'Complete sandbox requirements to earn green points and unlock bonus tokens.'}</p>
+                                            <p className="text-[0.75rem] text-muted mb-0">{lang === 'th' ? 'รันโหมดพลังงานประหยัดเพื่อจบเควสสะสมคะแนนกริตและคาร์บอนชีวภาพ' : 'Complete sandbox requirements to earn green points and unlock bonus tokens.'}</p>
                                         </div>
                                         <div className="text-end shrink-0">
                                             <span className="text-xs font-black text-emerald-500 font-mono bg-emerald-500/10 px-3 py-1.5 rounded-xl">
@@ -544,7 +544,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                             <p className="text-xs text-muted leading-relaxed mb-2 max-w-xl">
                                                                 {lang === 'th' ? quest.descTh : quest.descEn}
                                                             </p>
-                                                            <span className="badge bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[9px] font-bold py-1 px-2.5 rounded-lg font-mono">
+                                                            <span className="badge bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[0.7rem] font-bold py-1 px-2.5 rounded-lg font-mono">
                                                                 🏆 {lang === 'th' ? quest.rewardTh : quest.rewardEn} (+50 GT)
                                                             </span>
                                                         </div>
@@ -619,10 +619,10 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                             <i className={`fas ${badge.icon}`}></i>
                                                         </div>
                                                         <div>
-                                                            <div className="font-black text-[10px] tracking-tight text-dark uppercase">
+                                                            <div className="font-black text-[0.75rem] tracking-tight text-dark uppercase">
                                                                 {lang === 'th' ? badge.nameTh : badge.nameEn}
                                                             </div>
-                                                            <span className="text-[8px] text-muted font-bold font-mono uppercase tracking-wider block">
+                                                            <span className="text-[0.65rem] text-muted font-bold font-mono uppercase tracking-wider block">
                                                                 {isUnlocked ? (lang === 'th' ? "ปลดล็อคแล้ว ✓" : "Unlocked ✓") : badge.label}
                                                             </span>
                                                         </div>
@@ -653,7 +653,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                         <h5 className="font-display font-black text-base md:text-lg mb-0 tracking-tight text-dark uppercase">
                                             {lang === 'th' ? 'ข้อมูลโหนด & รูปลักษณ์ประจำตัว' : 'Guardian Profile Identity'}
                                         </h5>
-                                        <div className="badge bg-primary/10 text-primary border border-primary/20 text-[10px] font-bold py-1 px-2.5 rounded-lg font-mono">
+                                        <div className="badge bg-primary/10 text-primary border border-primary/20 text-[0.75rem] font-bold py-1 px-2.5 rounded-lg font-mono">
                                             LVL {lvl}
                                         </div>
                                     </div>
@@ -671,7 +671,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                         ? PLATFORM_SKINS.find(s => s.id === currentAvatar)?.nameTh 
                                                         : PLATFORM_SKINS.find(s => s.id === currentAvatar)?.nameEn)}
                                             </h6>
-                                            <p className="text-[10px] text-muted mb-3 font-mono uppercase tracking-wider">
+                                            <p className="text-[0.75rem] text-muted mb-3 font-mono uppercase tracking-wider">
                                                 {lang === 'th' ? 'สกินที่ติดตั้งในปัจจุบัน' : 'Currently Equipped Skin'}
                                             </p>
                                             <div className="flex flex-wrap items-center justify-center gap-2">
@@ -695,7 +695,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                 <i className="fas fa-coins"></i>
                                             </div>
                                             <div>
-                                                <span className="text-[8px] text-muted font-bold uppercase tracking-widest font-mono block">
+                                                <span className="text-[0.65rem] text-muted font-bold uppercase tracking-widest font-mono block">
                                                     {lang === 'th' ? 'โทเค็นสะสมของคุณ' : 'Your Token Wallet'}
                                                 </span>
                                                 <span className="font-mono font-black text-xl text-amber-600 block">
@@ -710,7 +710,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                 showNotification(lang === 'th' ? `💰 เคลมเหรียญโบนัสประหยัดสำเร็จ +${bonus} GT!` : `💰 Claimed level energy bonus +${bonus} GT!`);
                                                 if (triggerConfetti) triggerConfetti();
                                             }}
-                                            className="btn btn-xs py-2 px-3 bg-amber-500 hover:bg-amber-600 border-0 text-white font-black text-[9px] uppercase tracking-wider rounded-xl shadow-md cursor-pointer transition-transform active:scale-95 whitespace-nowrap"
+                                            className="btn btn-xs py-2 px-3 bg-amber-500 hover:bg-amber-600 border-0 text-white font-black text-[0.7rem] uppercase tracking-wider rounded-xl shadow-md cursor-pointer transition-transform active:scale-95 whitespace-nowrap"
                                         >
                                             <i className="fas fa-plus mr-1"></i> {lang === 'th' ? 'เคลมโบนัสรายวัน' : 'Claim Daily Bonus'}
                                         </button>
@@ -718,7 +718,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
 
                                     {/* Custom URL Option */}
                                     <form onSubmit={handleApplyCustomLogo} className="space-y-2 mb-2">
-                                        <label className="text-[10px] font-bold text-muted uppercase tracking-wider block">
+                                        <label className="text-[0.75rem] font-bold text-muted uppercase tracking-wider block">
                                             {lang === 'th' ? '🔗 ระบุรูปภาพโหนดของคุณเอง (Image URL)' : '🔗 Custom Node Image Logo URL'}
                                         </label>
                                         <div className="flex gap-2">
@@ -737,12 +737,12 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                             </button>
                                         </div>
                                         {imageError && (
-                                            <p className="text-[10px] text-red-500 mt-1">*{lang === 'th' ? 'กรุณากรอก URL ลิงก์รูปภาพที่ถูกต้อง' : 'Please input a valid image url link'}</p>
+                                            <p className="text-[0.75rem] text-red-500 mt-1">*{lang === 'th' ? 'กรุณากรอก URL ลิงก์รูปภาพที่ถูกต้อง' : 'Please input a valid image url link'}</p>
                                         )}
                                     </form>
                                 </div>
 
-                                <span className="text-[9px] text-muted italic mt-4 block">
+                                <span className="text-[0.7rem] text-muted italic mt-4 block">
                                     {lang === 'th' ? '💡 คุณจะได้รับ 200 โทเค็นโดยอัตโนมัติ ทุกครั้งที่เลเวลอัป!' : '💡 Earn 200 Grid Tokens automatically on every single level-up!'}
                                 </span>
                             </div>
@@ -757,11 +757,11 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                             <h5 className="font-display font-black text-base md:text-lg mb-0.5 tracking-tight text-dark uppercase">
                                                 {lang === 'th' ? 'คลังสะสมดิจิทัลสกินผู้พิทักษ์ 🛡️' : 'My Earned Digital Skins Vault 🛡️'}
                                             </h5>
-                                            <p className="text-[10px] text-muted mb-0">{lang === 'th' ? 'เลือกสวมใส่สกินตัวละครที่ปลดล็อกแล้วเป็นภาพโหนดโปรไฟล์ของคุณ' : 'Browse earned character skins and equip unlocked ones as your profile avatar.'}</p>
+                                            <p className="text-[0.75rem] text-muted mb-0">{lang === 'th' ? 'เลือกสวมใส่สกินตัวละครที่ปลดล็อกแล้วเป็นภาพโหนดโปรไฟล์ของคุณ' : 'Browse earned character skins and equip unlocked ones as your profile avatar.'}</p>
                                         </div>
                                         <button 
                                             onClick={() => setHubTab('shop')}
-                                            className="btn btn-sm text-primary font-black text-[10px] uppercase tracking-wider rounded-xl bg-primary/10 hover:bg-primary/20 border-0 flex items-center gap-1.5 cursor-pointer py-2 px-3"
+                                            className="btn btn-sm text-primary font-black text-[0.75rem] uppercase tracking-wider rounded-xl bg-primary/10 hover:bg-primary/20 border-0 flex items-center gap-1.5 cursor-pointer py-2 px-3"
                                         >
                                             <i className="fas fa-shopping-bag"></i>
                                             {lang === 'th' ? 'ไปร้านค้าสกิน' : 'Visit Skin Shop'}
@@ -789,19 +789,19 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                                 <div className="font-black text-xs tracking-tight text-dark uppercase">
                                                                     {lang === 'th' ? skin.nameTh : skin.nameEn}
                                                                 </div>
-                                                                <span className="text-[8px] text-muted font-bold font-mono uppercase tracking-wider block">
+                                                                <span className="text-[0.65rem] text-muted font-bold font-mono uppercase tracking-wider block">
                                                                     {isUnlocked ? (lang === 'th' ? 'ปลดล็อกแล้ว' : 'UNLOCKED') : (lang === 'th' ? 'ยังไม่ปลดล็อก' : 'LOCKED')}
                                                                 </span>
                                                             </div>
                                                         </div>
 
                                                         <div>
-                                                            <p className="text-[10px] text-muted leading-relaxed mb-3">
+                                                            <p className="text-[0.75rem] text-muted leading-relaxed mb-3">
                                                                 {lang === 'th' ? skin.descTh : skin.descEn}
                                                             </p>
 
                                                             {isSelected ? (
-                                                                <button disabled className="btn btn-xs w-full py-1.5 text-[9px] font-black uppercase text-emerald-500 bg-emerald-500/10 border-0 rounded-xl">
+                                                                <button disabled className="btn btn-xs w-full py-1.5 text-[0.7rem] font-black uppercase text-emerald-500 bg-emerald-500/10 border-0 rounded-xl">
                                                                     <i className="fas fa-check-circle mr-1"></i> {lang === 'th' ? 'สวมใส่อยู่ ✓' : 'Currently Equipped ✓'}
                                                                 </button>
                                                             ) : isUnlocked ? (
@@ -810,16 +810,16 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                                         saveCurrentAvatar(skin.id);
                                                                         showNotification(lang === 'th' ? `ติดตั้ง "${skin.nameTh}" สำเร็จ!` : `Successfully equipped "${skin.nameEn}"!`);
                                                                     }}
-                                                                    className="btn btn-xs w-full py-1.5 text-[9px] font-black uppercase btn-primary text-white rounded-xl cursor-pointer"
+                                                                    className="btn btn-xs w-full py-1.5 text-[0.7rem] font-black uppercase btn-primary text-white rounded-xl cursor-pointer"
                                                                 >
                                                                     {lang === 'th' ? 'ติดตั้งใช้งาน' : 'Equip Character'}
                                                                 </button>
                                                             ) : (
                                                                 <button 
                                                                     onClick={() => setHubTab('shop')}
-                                                                    className="btn btn-xs w-full py-1.5 text-[9px] font-black uppercase bg-slate-200 text-slate-500 border-0 rounded-xl cursor-pointer hover:bg-slate-300"
+                                                                    className="btn btn-xs w-full py-1.5 text-[0.7rem] font-black uppercase bg-slate-200 text-slate-500 border-0 rounded-xl cursor-pointer hover:bg-slate-300"
                                                                 >
-                                                                    <i className="fas fa-lock text-[8px] mr-1"></i> {lang === 'th' ? 'ซื้อสกินโชว์รูม' : 'Unlock in Shop'}
+                                                                    <i className="fas fa-lock text-[0.65rem] mr-1"></i> {lang === 'th' ? 'ซื้อสกินโชว์รูม' : 'Unlock in Shop'}
                                                                 </button>
                                                             )}
                                                         </div>
@@ -842,19 +842,19 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                             <div className="font-black text-xs tracking-tight text-dark uppercase">
                                                                 {lang === 'th' ? 'โลโก้ที่อัปโหลดเอง' : 'Custom Upload'}
                                                             </div>
-                                                            <span className="text-[8px] text-muted font-bold font-mono uppercase tracking-wider block">
+                                                            <span className="text-[0.65rem] text-muted font-bold font-mono uppercase tracking-wider block">
                                                                 EXTERNAL URL
                                                             </span>
                                                         </div>
                                                     </div>
 
                                                     <div>
-                                                        <p className="text-[10px] text-muted leading-relaxed mb-3">
+                                                        <p className="text-[0.75rem] text-muted leading-relaxed mb-3">
                                                             {lang === 'th' ? 'สลับมาใช้งานรูปโลโก้ภาพที่คุณระบุลิงก์ไว้ด้วยตัวเอง' : 'Switch back to your custom-linked web graphics.'}
                                                         </p>
 
                                                         {currentAvatar === 'image' ? (
-                                                            <button disabled className="btn btn-xs w-full py-1.5 text-[9px] font-black uppercase text-emerald-500 bg-emerald-500/10 border-0 rounded-xl">
+                                                            <button disabled className="btn btn-xs w-full py-1.5 text-[0.7rem] font-black uppercase text-emerald-500 bg-emerald-500/10 border-0 rounded-xl">
                                                                 <i className="fas fa-check-circle mr-1"></i> {lang === 'th' ? 'สวมใส่อยู่ ✓' : 'Currently Equipped ✓'}
                                                             </button>
                                                         ) : (
@@ -863,7 +863,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                                     saveCurrentAvatar('image');
                                                                     showNotification(lang === 'th' ? 'สลับมาใช้โลโก้อัปโหลดสำเร็จ!' : 'Switched to custom upload logo!');
                                                                 }}
-                                                                className="btn btn-xs w-full py-1.5 text-[9px] font-black uppercase btn-primary text-white rounded-xl cursor-pointer"
+                                                                className="btn btn-xs w-full py-1.5 text-[0.7rem] font-black uppercase btn-primary text-white rounded-xl cursor-pointer"
                                                             >
                                                                 {lang === 'th' ? 'ติดตั้งใช้งาน' : 'Equip Custom'}
                                                             </button>
@@ -892,7 +892,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                     <h5 className="font-display font-black text-base md:text-lg mb-0.5 tracking-tight text-dark uppercase">
                                         {lang === 'th' ? 'ตู้เสี่ยงทาย & โชว์รูมสกินใหม่ 🎰' : 'Lucky Draw & Character Shop 🎰'}
                                     </h5>
-                                    <p className="text-[10px] text-muted mb-0">{lang === 'th' ? 'สุ่มรับดิจิทัลสกินตัวละครแบบ Limited Edition หรือเลือกซื้อสกินที่คุณถูกใจได้ทันที!' : 'Roll for special character overlays or unlock specific premium skins using GT.'}</p>
+                                    <p className="text-[0.75rem] text-muted mb-0">{lang === 'th' ? 'สุ่มรับดิจิทัลสกินตัวละครแบบ Limited Edition หรือเลือกซื้อสกินที่คุณถูกใจได้ทันที!' : 'Roll for special character overlays or unlock specific premium skins using GT.'}</p>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="text-xs font-mono font-black text-amber-600 bg-amber-500/10 px-3 py-2 rounded-xl border border-amber-500/20">
@@ -900,7 +900,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                     </div>
                                     <button 
                                         onClick={rollRandomSkin}
-                                        className="btn btn-sm text-white font-black text-[10px] uppercase tracking-wider rounded-xl shadow-md py-2.5 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 flex items-center gap-1.5 cursor-pointer animate-bounce"
+                                        className="btn btn-sm text-white font-black text-[0.75rem] uppercase tracking-wider rounded-xl shadow-md py-2.5 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 border-0 flex items-center gap-1.5 cursor-pointer animate-bounce"
                                     >
                                         <i className="fas fa-dice animate-spin [animation-duration:3s]"></i>
                                         {lang === 'th' ? 'เสี่ยงสุ่มสกิน (120 GT)' : 'Lucky Roll (120 GT)'}
@@ -929,20 +929,20 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                         <div className="font-black text-xs tracking-tight text-dark uppercase">
                                                             {lang === 'th' ? skin.nameTh : skin.nameEn}
                                                         </div>
-                                                        <span className="text-[8px] text-muted font-bold font-mono block">
+                                                        <span className="text-[0.65rem] text-muted font-bold font-mono block">
                                                             {skin.cost === 0 ? 'DEFAULT (FREE)' : `COST: ${skin.cost} GT`}
                                                         </span>
                                                     </div>
                                                 </div>
 
-                                                <p className="text-[10px] text-muted leading-relaxed mb-4">
+                                                <p className="text-[0.75rem] text-muted leading-relaxed mb-4">
                                                     {lang === 'th' ? skin.descTh : skin.descEn}
                                                 </p>
 
                                                 <div>
                                                     {isUnlocked ? (
                                                         <div className="flex gap-2">
-                                                            <button disabled className="btn btn-xs w-1/2 py-1.5 text-[9px] font-black uppercase text-emerald-500 bg-emerald-500/10 border-0 rounded-xl">
+                                                            <button disabled className="btn btn-xs w-1/2 py-1.5 text-[0.7rem] font-black uppercase text-emerald-500 bg-emerald-500/10 border-0 rounded-xl">
                                                                 {lang === 'th' ? 'เป็นเจ้าของแล้ว' : 'Owned ✓'}
                                                             </button>
                                                             <button 
@@ -950,7 +950,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                                     setHubTab('rewards');
                                                                     showNotification(lang === 'th' ? 'ไปที่แท็บคลังสกินเพื่อสวมใส่!' : 'Go to My Rewards tab to equip!');
                                                                 }}
-                                                                className="btn btn-xs w-1/2 py-1.5 text-[9px] font-black uppercase btn-outline-primary rounded-xl cursor-pointer"
+                                                                className="btn btn-xs w-1/2 py-1.5 text-[0.7rem] font-black uppercase btn-outline-primary rounded-xl cursor-pointer"
                                                             >
                                                                 {lang === 'th' ? 'ไปคลัง' : 'Vault'}
                                                             </button>
@@ -958,9 +958,9 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                     ) : (
                                                         <button 
                                                             onClick={() => buySkin(skin)}
-                                                            className="btn btn-xs w-full py-1.5 text-[9px] font-black uppercase bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+                                                            className="btn btn-xs w-full py-1.5 text-[0.7rem] font-black uppercase bg-amber-500 hover:bg-amber-600 border-0 text-white rounded-xl cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
                                                         >
-                                                            <i className="fas fa-shopping-cart text-[8px]"></i>
+                                                            <i className="fas fa-shopping-cart text-[0.65rem]"></i>
                                                             {lang === 'th' ? `ปลดล็อค (${skin.cost} GT)` : `Unlock (${skin.cost} GT)`}
                                                         </button>
                                                     )}
@@ -986,10 +986,10 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                             <h4 className="font-display font-black text-lg md:text-xl mb-0.5 tracking-tight text-dark uppercase">
                                 {lang === 'th' ? 'ทำเนียบขุนพลผู้พิทักษ์คาร์บอนสุทธิเป็นศูนย์' : 'Zero-Carbon Microgrid Leaderboard'}
                             </h4>
-                            <p className="text-[10px] text-amber-500 font-bold uppercase tracking-wider font-mono mb-0">Local Microgrid Sandbox Rankings</p>
+                            <p className="text-[0.75rem] text-amber-500 font-bold uppercase tracking-wider font-mono mb-0">Local Microgrid Sandbox Rankings</p>
                         </div>
                     </div>
-                    <span className="text-[9px] text-muted font-bold font-mono bg-light px-3 py-1.5 rounded-full border">
+                    <span className="text-[0.7rem] text-muted font-bold font-mono bg-light px-3 py-1.5 rounded-full border">
                         <i className="fas fa-satellite mr-1"></i> {lang === 'th' ? 'อัปเดตสถิติจริงผ่านระบบ IoT' : 'REAL-TIME IOT SENSOR NODE NETWORK'}
                     </span>
                 </div>
@@ -1043,36 +1043,36 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                 {node.name}
                                             </h6>
                                             {isSelf && (
-                                                <span className="text-[8px] font-mono font-black bg-primary text-white uppercase px-1.5 py-0.5 rounded-lg animate-pulse shrink-0">
+                                                <span className="text-[0.65rem] font-mono font-black bg-primary text-white uppercase px-1.5 py-0.5 rounded-lg animate-pulse shrink-0">
                                                     {lang === 'th' ? 'โหนดของคุณ' : 'YOUR NODE'}
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="text-[11px] text-muted leading-relaxed mb-0 mt-0.5 max-w-xl line-clamp-1">
+                                        <p className="text-[0.8rem] text-muted leading-relaxed mb-0 mt-0.5 max-w-xl line-clamp-1">
                                             {lang === 'th' ? node.descTh : node.descEn}
                                         </p>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto border-t md:border-t-0 border-light pt-3.5 md:pt-0">
-                                    <div className="flex gap-4 text-left md:text-right font-mono text-[10px] text-muted">
+                                    <div className="flex gap-4 text-left md:text-right font-mono text-[0.75rem] text-muted">
                                         <div>
-                                            <span className="block uppercase tracking-wider text-[8px] font-bold">{lang === 'th' ? 'ประสิทธิผลไฟฟ้า' : 'GRID EFFICIENCY'}</span>
+                                            <span className="block uppercase tracking-wider text-[0.65rem] font-bold">{lang === 'th' ? 'ประสิทธิผลไฟฟ้า' : 'GRID EFFICIENCY'}</span>
                                             <span className="font-bold text-dark text-xs block">{node.efficiency}</span>
                                         </div>
                                         <div>
-                                            <span className="block uppercase tracking-wider text-[8px] font-bold">POWER FACTOR</span>
+                                            <span className="block uppercase tracking-wider text-[0.65rem] font-bold">POWER FACTOR</span>
                                             <span className="font-bold text-emerald-500 text-xs block">PF {node.pf}</span>
                                         </div>
                                         <div>
-                                            <span className="block uppercase tracking-wider text-[8px] font-bold">{lang === 'th' ? 'เคลมเควส' : 'QUESTS'}</span>
+                                            <span className="block uppercase tracking-wider text-[0.65rem] font-bold">{lang === 'th' ? 'เคลมเควส' : 'QUESTS'}</span>
                                             <span className="font-bold text-indigo-500 text-xs block">{node.quests} / 7</span>
                                         </div>
                                     </div>
 
                                     <div className="text-right shrink-0">
                                         <div className="font-mono font-black text-sm text-dark">{node.xp} XP</div>
-                                        <span className="text-[8px] text-muted font-bold font-mono tracking-wider block">GREEN POINTS</span>
+                                        <span className="text-[0.65rem] text-muted font-bold font-mono tracking-wider block">GREEN POINTS</span>
                                     </div>
                                 </div>
                             </motion.div>
@@ -1103,7 +1103,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                     <i className="fas fa-microchip"></i>
                                 </div>
                                 <h5 className="font-display font-black text-lg mb-1">{selectedCompetitor.name}</h5>
-                                <span className="text-[9px] text-muted font-bold font-mono uppercase tracking-widest bg-light px-2.5 py-1 rounded-full border">
+                                <span className="text-[0.7rem] text-muted font-bold font-mono uppercase tracking-widest bg-light px-2.5 py-1 rounded-full border">
                                     NODE TELEMETRY METRIC SIGNATURE
                                 </span>
                             </div>

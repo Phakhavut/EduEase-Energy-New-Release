@@ -41,9 +41,9 @@ export const WeatherCard = ({ isDarkMode, locationName }: { isDarkMode: boolean;
       <div className="flex items-center justify-between mb-4 relative z-10">
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4 text-sky-500" />
-          <span className="text-[10px] font-bold uppercase tracking-widest opacity-80">{locationName || 'Bangkok'}</span>
+          <span className="text-[0.75rem] font-bold uppercase tracking-widest opacity-80">{locationName || 'Bangkok'}</span>
         </div>
-        <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded">Open-Meteo Live</span>
+        <span className="text-[0.7rem] font-bold uppercase tracking-widest text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded">Open-Meteo Live</span>
       </div>
 
       <div className="flex items-center justify-between relative z-10">
@@ -55,7 +55,7 @@ export const WeatherCard = ({ isDarkMode, locationName }: { isDarkMode: boolean;
             <div className="text-3xl font-light font-display tracking-tighter">
               {loading ? "--" : weather.temp}°<span className="text-xl text-slate-400">C</span>
             </div>
-            <div className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
+            <div className="text-[0.8rem] font-bold uppercase tracking-widest text-slate-400">
               {loading ? "Loading..." : (weather.isClear ? "Clear" : "Cloudy/Rain")}
             </div>
           </div>
@@ -64,11 +64,11 @@ export const WeatherCard = ({ isDarkMode, locationName }: { isDarkMode: boolean;
         <div className="flex flex-col gap-2 border-l border-dashed border-slate-200 dark:border-slate-800 pl-4">
            <div className="flex items-center gap-2">
              <Droplets className="w-3.5 h-3.5 text-sky-400" />
-             <span className="text-[10px] font-bold text-slate-500">{loading ? "--" : weather.humidity}% RH</span>
+             <span className="text-[0.75rem] font-bold text-slate-500">{loading ? "--" : weather.humidity}% RH</span>
            </div>
            <div className="flex items-center gap-2">
              <Wind className="w-3.5 h-3.5 text-slate-400" />
-             <span className="text-[10px] font-bold text-slate-500">{loading ? "--" : weather.wind} km/h</span>
+             <span className="text-[0.75rem] font-bold text-slate-500">{loading ? "--" : weather.wind} km/h</span>
            </div>
         </div>
       </div>

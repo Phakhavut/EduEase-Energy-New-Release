@@ -299,7 +299,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
         >
           {/* Neon Pointer Arrow/Badge floating at the bottom right of the spotlight with spring scaling */}
           <motion.div 
-            className={`absolute -bottom-6 -right-6 flex items-center gap-1.5 text-white font-mono text-[9px] uppercase font-black p-1.5 px-3.5 rounded-full shadow-lg border`}
+            className={`absolute -bottom-6 -right-6 flex items-center gap-1.5 text-white font-mono text-[0.7rem] uppercase font-black p-1.5 px-3.5 rounded-full shadow-lg border`}
             style={{
               background: isPaused 
                 ? 'linear-gradient(to right, #f59e0b, #d97706)' 
@@ -316,7 +316,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white"></span>
             </span>
             <span>{isPaused ? (lang === 'th' ? 'ทดลองอิสระ' : 'PAUSED') : (lang === 'th' ? 'จุดเด่นตรงนี้' : 'LOOK HERE')}</span>
-            <i className={`fas ${isPaused ? 'fa-pen-square' : 'fa-hand-pointer'} text-[10px] animate-pulse`}></i>
+            <i className={`fas ${isPaused ? 'fa-pen-square' : 'fa-hand-pointer'} text-[0.75rem] animate-pulse`}></i>
           </motion.div>
         </motion.div>
       )}
@@ -348,7 +348,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                   <h4 className="font-display font-black text-lg md:text-xl leading-tight">
                     {lang === 'th' ? 'ระบบช่วยนำสอนรูปแบบ Spotlight!' : 'EduEase Spotlight Guided Tour'}
                   </h4>
-                  <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest font-mono">Interactive Tutorial</p>
+                  <p className="text-[0.75rem] text-emerald-500 font-bold uppercase tracking-widest font-mono">Interactive Tutorial</p>
                 </div>
               </div>
 
@@ -370,7 +370,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    <span className="text-[10px] tracking-widest font-black uppercase text-emerald-500 font-mono">
+                    <span className="text-[0.75rem] tracking-widest font-black uppercase text-emerald-500 font-mono">
                       {lang === 'th' ? "สาระน่ารู้อนุรักษ์พลังงาน (QUICK TIPS)" : "ENERGY SAVING FACTS"}
                     </span>
                   </div>
@@ -405,10 +405,10 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                       <i className={`fas ${ENERGY_TIPS[activeTipIndex].icon} text-sm`}></i>
                     </div>
                     <div>
-                      <h6 className="text-[11px] font-black tracking-tight mb-1 font-display">
+                      <h6 className="text-[0.8rem] font-black tracking-tight mb-1 font-display">
                         {lang === 'th' ? ENERGY_TIPS[activeTipIndex].titleTh : ENERGY_TIPS[activeTipIndex].titleEn}
                       </h6>
-                      <p className={`text-[10px] leading-relaxed mb-0 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                      <p className={`text-[0.75rem] leading-relaxed mb-0 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                         {lang === 'th' ? ENERGY_TIPS[activeTipIndex].descTh : ENERGY_TIPS[activeTipIndex].descEn}
                       </p>
                     </div>
@@ -458,10 +458,10 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
               transition={{ type: "spring", stiffness: 100, damping: 15 }}
             >
               <div className="flex items-center gap-2 overflow-hidden mr-2">
-                <span className="w-6 h-6 rounded-xl bg-emerald-500 text-[10px] text-white flex items-center justify-center font-black shrink-0 animate-pulse">
+                <span className="w-6 h-6 rounded-xl bg-emerald-500 text-[0.75rem] text-white flex items-center justify-center font-black shrink-0 animate-pulse">
                   {stepIndex + 1}
                 </span>
-                <span className="text-[11px] font-bold truncate">
+                <span className="text-[0.8rem] font-bold truncate">
                   {lang === 'th' ? currentStep.titleTh : currentStep.titleEn}
                 </span>
               </div>
@@ -469,9 +469,9 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsMinimized(false)}
-                  className="p-1.5 px-3 bg-emerald-500 hover:bg-emerald-600 transition-all text-white rounded-xl text-[10px] font-black flex items-center gap-1 hover:scale-105 active:scale-95"
+                  className="p-1.5 px-3 bg-emerald-500 hover:bg-emerald-600 transition-all text-white rounded-xl text-[0.75rem] font-black flex items-center gap-1 hover:scale-105 active:scale-95"
                 >
-                  <i className="fas fa-expand-alt text-[10px]"></i>
+                  <i className="fas fa-expand-alt text-[0.75rem]"></i>
                   <span>{lang === 'th' ? 'ขยายคำสอน' : 'Expand'}</span>
                 </button>
                 <button 
@@ -515,7 +515,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
 
                 {/* Header */}
                 <div className="flex justify-between items-center mb-3">
-                  <span className={`text-[9px] md:text-[10px] uppercase font-mono font-black tracking-wider ${
+                  <span className={`text-[0.7rem] md:text-[0.75rem] uppercase font-mono font-black tracking-wider ${
                     isPaused ? 'text-amber-500' : 'text-emerald-500'
                   }`}>
                     {lang === 'th' 
@@ -571,7 +571,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                     </h5>
                     
                     {isPaused ? (
-                      <div className={`p-3 rounded-xl border text-[10px] md:text-xs leading-relaxed transition-all ${
+                      <div className={`p-3 rounded-xl border text-[0.75rem] md:text-xs leading-relaxed transition-all ${
                         isDarkMode 
                           ? 'bg-amber-500/10 border-amber-500/20 text-amber-300' 
                           : 'bg-amber-50/90 border-amber-200 text-amber-900 shadow-sm'
@@ -580,21 +580,21 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                           <i className="fas fa-user-edit animate-pulse text-amber-500"></i>
                           <span>{lang === 'th' ? 'เปิดระบบทดลองเล่นอิสระ!' : 'Free Interaction Mode Active!'}</span>
                         </div>
-                        <p className="text-[10px] md:text-[11px] opacity-90 leading-relaxed">
+                        <p className="text-[0.75rem] md:text-[0.8rem] opacity-90 leading-relaxed">
                           {lang === 'th'
                             ? 'เราซ่อนม่านแสงบล็อคชั่วคราวแล้ว คุณสามารถสลับเมนู คลิกสวิตช์ หรือทดลองปรับหน้าเว็บได้อย่างสะดวกรวดเร็ว! เมื่อพร้อมไปขั้นตอนถัดไป ให้กด [เล่นทัวร์ต่อ] หรือคลิก [ถัดไป] แฟลชสปอตไลท์จะกลับมาส่องทันที'
                             : 'Deactivated dark blocking overlays! You may now toggle breakers inside the table, type variables, or play with sliders interactively. Click [Resume Spotlight] or [Next] to bring back active focus.'}
                         </p>
                       </div>
                     ) : (
-                      <p className={`text-[11px] md:text-xs leading-relaxed select-all-text transition-all duration-300 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                      <p className={`text-[0.8rem] md:text-xs leading-relaxed select-all-text transition-all duration-300 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
                         {lang === 'th' ? currentStep.descTh : currentStep.descEn}
                       </p>
                     )}
 
                     {/* Page indicator & Pause pill wrapper */}
                     <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                      <div className={`p-1 md:p-1.5 px-2 md:px-2.5 rounded-lg md:rounded-xl inline-flex items-center gap-1.5 text-[8px] md:text-[9px] font-mono font-bold uppercase ${
+                      <div className={`p-1 md:p-1.5 px-2 md:px-2.5 rounded-lg md:rounded-xl inline-flex items-center gap-1.5 text-[0.65rem] md:text-[0.7rem] font-mono font-bold uppercase ${
                         isDarkMode ? 'bg-slate-900/85 text-emerald-400' : 'bg-slate-100 text-emerald-800'
                       }`}>
                         <i className="fas fa-eye"></i>
@@ -605,7 +605,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                       <button
                         type="button"
                         onClick={() => setIsPaused(!isPaused)}
-                        className={`p-1 md:p-1.5 px-2 md:px-2.5 rounded-lg md:rounded-xl inline-flex items-center gap-1.5 text-[8px] md:text-[9px] font-mono font-black uppercase transition-all duration-300 border hover:scale-105 active:scale-95 ${
+                        className={`p-1 md:p-1.5 px-2 md:px-2.5 rounded-lg md:rounded-xl inline-flex items-center gap-1.5 text-[0.65rem] md:text-[0.7rem] font-mono font-black uppercase transition-all duration-300 border hover:scale-105 active:scale-95 ${
                           isPaused
                             ? 'bg-amber-500/20 border-amber-400/50 text-amber-500 hover:bg-amber-500/30 font-extrabold'
                             : 'bg-primary/10 border-primary/20 text-primary hover:bg-primary/20 shadow-sm'
@@ -628,7 +628,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                   <button
                     type="button"
                     onClick={handleSkipTour}
-                    className="text-[8px] md:text-[9px] uppercase font-bold tracking-wider text-slate-400 hover:text-rose-500 transition-colors"
+                    className="text-[0.65rem] md:text-[0.7rem] uppercase font-bold tracking-wider text-slate-400 hover:text-rose-500 transition-colors"
                   >
                     {lang === 'th' ? 'ข้ามทั้งหมด' : 'Skip Tour'}
                   </button>
@@ -638,23 +638,23 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                       type="button"
                       onClick={handlePrev}
                       disabled={stepIndex === 0}
-                      className={`p-1 px-2 md:p-2 md:px-3 rounded-lg md:rounded-xl text-[10px] md:text-xs font-black transition-all ${
+                      className={`p-1 px-2 md:p-2 md:px-3 rounded-lg md:rounded-xl text-[0.75rem] md:text-xs font-black transition-all ${
                         stepIndex === 0 
                           ? 'opacity-30 cursor-not-allowed text-slate-500 border border-transparent' 
                           : 'bg-primary/10 text-primary hover:bg-primary/20 border border-primary/10'
                       }`}
                     >
-                      <i className="fas fa-chevron-left me-1 text-[9px] md:text-[10px]"></i>
+                      <i className="fas fa-chevron-left me-1 text-[0.7rem] md:text-[0.75rem]"></i>
                       {lang === 'th' ? 'ย้อนคง' : 'Back'}
                     </button>
 
                     <button
                       type="button"
                       onClick={handleNext}
-                      className="p-1 px-2.5 md:p-2 md:px-3.5 bg-primary hover:bg-primary/95 text-white rounded-lg md:rounded-xl text-[10px] md:text-xs font-black transition-all shadow-md shadow-primary/25 hover:scale-105 flex items-center gap-1"
+                      className="p-1 px-2.5 md:p-2 md:px-3.5 bg-primary hover:bg-primary/95 text-white rounded-lg md:rounded-xl text-[0.75rem] md:text-xs font-black transition-all shadow-md shadow-primary/25 hover:scale-105 flex items-center gap-1"
                     >
                       <span>{stepIndex === TOUR_STEPS.length - 1 ? (lang === 'th' ? 'เสร็จสิ้น' : 'Finish') : (lang === 'th' ? 'ถัดไป' : 'Next')}</span>
-                      <i className="fas fa-chevron-right text-[9px] md:text-[10px]"></i>
+                      <i className="fas fa-chevron-right text-[0.7rem] md:text-[0.75rem]"></i>
                     </button>
                   </div>
                 </div>

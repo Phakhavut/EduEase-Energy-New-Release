@@ -16,6 +16,7 @@ const getStoredTheme = (key: string, defaultValue: boolean): boolean => {
 
 const App: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [isManualOpen, setIsManualOpen] = useState(false);
@@ -151,7 +152,7 @@ const App: React.FC = () => {
 
       {/* Main UI */}
       <div className="relative z-10 h-screen flex flex-col">
-        <header className="px-8 py-8 md:px-16 flex justify-between items-center">
+        <header className="px-6 py-6 md:px-12 lg:px-16 flex justify-between items-center relative z-50">
           <div className="flex items-center gap-3 group cursor-pointer">
             <div className={`w-8 h-8 flex items-center justify-center border-2 ${loginDarkMode ? 'border-emerald-500/40 group-hover:border-emerald-400' : 'border-emerald-600 group-hover:border-emerald-700'} transition-all duration-500`}>
                <div className={`w-2 h-2 ${loginDarkMode ? 'bg-emerald-400' : 'bg-emerald-600'} animate-pulse`} />
@@ -162,9 +163,16 @@ const App: React.FC = () => {
           <div className="flex items-center gap-4">
             <nav className="hidden lg:flex gap-8">
               {['Systems', 'Nodes', 'Emergency'].map((link) => (
-                <a key={link} href="#" className={`${navTextColor} transition-all text-[9px] font-bold uppercase tracking-[0.3em]`}>{link}</a>
+                <a key={link} href="#" className={`${navTextColor} transition-all text-[0.7rem] font-bold uppercase tracking-[0.3em]`}>{link}</a>
               ))}
             </nav>
+
+            <button 
+              className={`lg:hidden p-2 rounded-xl transition-all ${loginDarkMode ? 'text-white/70 hover:bg-white/10' : 'text-slate-600 hover:bg-slate-200/50'}`}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'} text-lg`}></i>
+            </button>
 
             {/* Language Switcher */}
             <button
@@ -177,7 +185,7 @@ const App: React.FC = () => {
             {/* Quick Access User Manual Button */}
             <button
               onClick={() => setIsManualOpen(true)}
-              className={`flex items-center gap-2 px-3.5 py-1.5 text-[10px] uppercase tracking-wider font-bold rounded-xl border transition-all duration-300 ${loginDarkMode ? 'border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-450' : 'border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700'} shadow-sm`}
+              className={`flex items-center gap-2 px-3.5 py-1.5 text-[0.75rem] uppercase tracking-wider font-bold rounded-xl border transition-all duration-300 ${loginDarkMode ? 'border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-450' : 'border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700'} shadow-sm`}
             >
               <i className="fas fa-book-open"></i>
               <span>{lang === 'th' ? 'คู่มือการใช้งาน' : 'User Manual'}</span>
@@ -197,7 +205,16 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        <main className="flex-grow flex items-center justify-center px-4">
+        {/* Mobile Menu Dropdown */}
+        <div className={`lg:hidden absolute top-0 left-0 w-full bg-slate-900/95 backdrop-blur-xl border-b border-white/10 shadow-2xl transition-all duration-500 z-40 overflow-hidden ${isMobileMenuOpen ? 'max-h-[400px] opacity-100 py-24' : 'max-h-0 opacity-0 py-0'}`}>
+           <nav className="flex flex-col items-center gap-6">
+              {['Systems', 'Nodes', 'Emergency'].map((link) => (
+                <a key={link} href="#" className="text-white/80 hover:text-emerald-400 transition-all text-sm font-bold uppercase tracking-[0.3em]">{link}</a>
+              ))}
+           </nav>
+        </div>
+
+        <main className="flex-grow flex items-center justify-center px-4 relative z-30">
            <LoginForm 
               selectedHouseName={activeHouse.name} 
               onLogin={handleLoginSuccess}
@@ -208,9 +225,9 @@ const App: React.FC = () => {
         <footer className="px-8 pb-12 md:px-16 flex justify-between items-end">
           <div className="max-w-md">
             <div key={activeHouse.id} className="animate-fade-in">
-              <h3 className={`${loginDarkMode ? 'text-emerald-500/40' : 'text-emerald-600'} text-[8px] uppercase tracking-[0.4em] font-bold mb-1`}>SECTOR ID: {activeHouse.id}</h3>
+              <h3 className={`${loginDarkMode ? 'text-emerald-500/40' : 'text-emerald-600'} text-[0.65rem] uppercase tracking-[0.4em] font-bold mb-1`}>SECTOR ID: {activeHouse.id}</h3>
               <p className={`${textColor} font-display text-2xl font-light tracking-tight mb-1`}>{activeHouse.name}</p>
-              <p className={`${loginDarkMode ? 'text-white/30' : 'text-slate-500'} text-[9px] font-medium tracking-[0.2em] uppercase italic`}>{activeHouse.location}</p>
+              <p className={`${loginDarkMode ? 'text-white/30' : 'text-slate-500'} text-[0.7rem] font-medium tracking-[0.2em] uppercase italic`}>{activeHouse.location}</p>
             </div>
           </div>
           
@@ -253,7 +270,7 @@ const App: React.FC = () => {
                 <h4 className="font-display font-black text-lg md:text-xl leading-tight">
                   {lang === 'th' ? 'ระบบช่วยนำสอนรูปแบบ Spotlight!' : 'EduEase Spotlight Guided Tour'}
                 </h4>
-                <p className="text-[10px] text-emerald-500 font-bold uppercase tracking-widest font-mono">Interactive Onboarding</p>
+                <p className="text-[0.75rem] text-emerald-500 font-bold uppercase tracking-widest font-mono">Interactive Onboarding</p>
               </div>
             </div>
 

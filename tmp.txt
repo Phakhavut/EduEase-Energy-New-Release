@@ -1,0 +1,8 @@
+src/components/Dashboard.tsx:w-[200px]
+src/components/Dashboard.tsx:w-[44px]
+src/components/Dashboard.tsx:w-[130px]
+src/components/Dashboard.tsx:w-[44px]
+src/components/Dashboard.tsx:w-[390px]
+src/components/LoginForm.tsx:w-[360px]
+src/components/PropertyDistributionMap.tsx:w-[480px]
+src/components/PropertyDistributionMap.tsx:w-[420px]

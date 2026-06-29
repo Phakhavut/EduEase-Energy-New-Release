@@ -64,7 +64,7 @@ export const EnergyTipWidget = ({
               <h3 className="font-display font-bold text-xl leading-tight text-slate-800 dark:text-white">
                 {lang === "th" ? "เคล็ดลับพลังงาน" : "Energy Tip"}
               </h3>
-              <p className="text-[10px] uppercase tracking-widest text-emerald-500 font-bold">
+              <p className="text-[0.75rem] uppercase tracking-widest text-emerald-500 font-bold">
                 {lang === "th" ? "คำแนะนำที่นำไปใช้ได้" : "Actionable Advice"}
               </p>
             </div>
@@ -86,7 +86,7 @@ export const EnergyTipWidget = ({
         </div>
         
         <div className="mt-5 flex justify-end">
-          <button className="text-[11px] font-bold uppercase tracking-wider text-emerald-500 hover:text-emerald-600 transition-colors flex items-center gap-1">
+          <button className="text-[0.8rem] font-bold uppercase tracking-wider text-emerald-500 hover:text-emerald-600 transition-colors flex items-center gap-1">
             {lang === "th" ? "ดูเคล็ดลับเพิ่มเติม" : "View More Tips"} <i className="fas fa-arrow-right"></i>
           </button>
         </div>

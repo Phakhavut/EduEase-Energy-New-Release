@@ -138,7 +138,7 @@ export const GridCharacterSkin: React.FC<GridCharacterSkinProps> = ({
                                 </div>
                             </div>
                             {/* Cute leafy smile */}
-                            <div className="text-[10px] font-black leading-none text-slate-900 mt-[-2px]">✿</div>
+                            <div className="text-[0.75rem] font-black leading-none text-slate-900 mt-[-2px]">✿</div>
                         </div>
                     </div>
 
@@ -203,8 +203,8 @@ export const GridCharacterSkin: React.FC<GridCharacterSkinProps> = ({
 
                     {/* Spinning Golden Tiara Orbit */}
                     <div className="absolute w-4/5 h-4/5 border-2 border-dotted border-white/35 rounded-full animate-spin [animation-duration:12s] pointer-events-none">
-                        <div className="absolute -top-1.5 left-1/3 text-[10px] text-yellow-300">✨</div>
-                        <div className="absolute bottom-0 right-1/4 text-[8px] text-white">★</div>
+                        <div className="absolute -top-1.5 left-1/3 text-[0.75rem] text-yellow-300">✨</div>
+                        <div className="absolute bottom-0 right-1/4 text-[0.65rem] text-white">★</div>
                     </div>
                 </div>
             );
@@ -278,8 +278,8 @@ export const GridCharacterSkin: React.FC<GridCharacterSkinProps> = ({
                     </div>
 
                     {/* Electric particles */}
-                    <div className="absolute top-1 right-2 text-[8px] text-cyan-300 animate-pulse">⚡</div>
-                    <div className="absolute bottom-1 left-2 text-[8px] text-cyan-300 animate-pulse delay-100">⚡</div>
+                    <div className="absolute top-1 right-2 text-[0.65rem] text-cyan-300 animate-pulse">⚡</div>
+                    <div className="absolute bottom-1 left-2 text-[0.65rem] text-cyan-300 animate-pulse delay-100">⚡</div>
                 </div>
             );
     }

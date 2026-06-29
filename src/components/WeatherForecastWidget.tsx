@@ -127,7 +127,7 @@ export const WeatherForecastWidget: React.FC<WeatherForecastWidgetProps> = ({ is
           <Zap className="w-4 h-4 fill-current" />
         </div>
         <div>
-          <div className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${isDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>
+          <div className={`text-[0.75rem] font-bold uppercase tracking-widest mb-1 ${isDarkMode ? "text-indigo-400" : "text-indigo-600"}`}>
             {lang === "th" ? "AI วิเคราะห์แผนการใช้ไฟ (อ้างอิง Open-Meteo)" : "AI Dispatch Analysis (Powered by Open-Meteo)"}
           </div>
           <div className={`text-sm leading-relaxed ${isDarkMode ? "text-slate-200" : "text-slate-700"}`}>
@@ -147,7 +147,7 @@ export const WeatherForecastWidget: React.FC<WeatherForecastWidgetProps> = ({ is
 
           return (
             <div key={dateStr} className={`flex flex-col items-center p-3 rounded-2xl border transition-all ${isDarkMode ? "bg-slate-800/60 border-slate-700 hover:bg-slate-700" : "bg-white border-slate-200 hover:bg-slate-50 shadow-sm"}`}>
-              <div className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+              <div className="text-[0.8rem] font-bold uppercase tracking-widest text-slate-500 mb-2">
                 {idx === 0 ? (lang === "th" ? "วันนี้" : "Today") : dayName}
               </div>
               
@@ -155,7 +155,7 @@ export const WeatherForecastWidget: React.FC<WeatherForecastWidgetProps> = ({ is
                 {getWeatherIcon(wCode, "w-8 h-8")}
               </div>
               
-              <div className="text-[10px] font-medium text-center text-slate-400 mb-3 line-clamp-1 min-h-[15px]">
+              <div className="text-[0.75rem] font-medium text-center text-slate-400 mb-3 line-clamp-1 min-h-[15px]">
                 {getWeatherLabel(wCode, lang)}
               </div>
               
@@ -166,7 +166,7 @@ export const WeatherForecastWidget: React.FC<WeatherForecastWidgetProps> = ({ is
                 </div>
                 
                 {rainProb > 20 && (
-                  <div className="flex items-center gap-1 text-[9px] font-bold text-sky-500 mt-1 bg-sky-500/10 px-1.5 py-0.5 rounded-full w-full justify-center">
+                  <div className="flex items-center gap-1 text-[0.7rem] font-bold text-sky-500 mt-1 bg-sky-500/10 px-1.5 py-0.5 rounded-full w-full justify-center">
                     <CloudRain className="w-2.5 h-2.5" />
                     {rainProb}%
                   </div>
@@ -179,7 +179,7 @@ export const WeatherForecastWidget: React.FC<WeatherForecastWidgetProps> = ({ is
 
       {/* Temperature Trend Chart */}
       <div className={`flex-1 min-h-[160px] p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-800/40 border-slate-700/50' : 'bg-slate-50 border-slate-200/50'}`}>
-        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4 flex items-center justify-between">
+        <div className="text-[0.75rem] font-bold uppercase tracking-widest text-slate-500 mb-4 flex items-center justify-between">
           <span>{lang === "th" ? "แนวโน้มอุณหภูมิ (°C)" : "Temperature Trend (°C)"}</span>
           <span className="flex items-center gap-2">
             <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-orange-500"></div> Max</span>

@@ -1,0 +1,7 @@
+     89 text-[10px]
+     54 text-[9px]
+     28 text-[8px]
+     15 text-[11px]
+      2 text-[150px]
+      1 text-[13px]
+      1 text-[120px]

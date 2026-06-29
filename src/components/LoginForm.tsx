@@ -59,7 +59,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
         <div className="relative z-10">
           <div className="mb-4 text-center">
             <h2 className={`text-2xl font-semibold ${headingColor} mb-1 tracking-tight font-display transition-colors`}>Welcome Back</h2>
-            <p className={`${subHeadingColor} text-[10px] font-medium uppercase tracking-[0.15em] transition-colors`}>
+            <p className={`${subHeadingColor} text-[0.75rem] font-medium uppercase tracking-[0.15em] transition-colors`}>
               Node: <span className="text-emerald-500">{selectedHouseName}</span>
             </p>
           </div>
@@ -93,14 +93,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
                 />
               </LineChart>
             </ResponsiveContainer>
-            <div className={`text-center text-[8px] uppercase tracking-widest mt-2 ${labelColor}`}>
+            <div className={`text-center text-[0.65rem] uppercase tracking-widest mt-2 ${labelColor}`}>
               24-Hour Consumption Trend
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label className={`text-[9px] font-bold ${labelColor} uppercase tracking-[0.2em] ml-1`}>Identity</label>
+              <label className={`text-[0.7rem] font-bold ${labelColor} uppercase tracking-[0.2em] ml-1`}>Identity</label>
               <input
                 required
                 type="text"
@@ -112,7 +112,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
             </div>
 
             <div className="space-y-1.5">
-              <label className={`text-[9px] font-bold ${labelColor} uppercase tracking-[0.2em] ml-1`}>Passkey</label>
+              <label className={`text-[0.7rem] font-bold ${labelColor} uppercase tracking-[0.2em] ml-1`}>Passkey</label>
               <input
                 required
                 type="password"
@@ -124,7 +124,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
             </div>
 
             {error && (
-              <p className="text-red-500 text-[10px] text-center font-bold tracking-wide">
+              <p className="text-red-500 text-[0.75rem] text-center font-bold tracking-wide">
                 {error}
               </p>
             )}
@@ -137,12 +137,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
               {isLoading ? (
                 <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                <span className="tracking-widest text-[10px]">AUTHORIZE ACCESS</span>
+                <span className="tracking-widest text-[0.75rem]">AUTHORIZE ACCESS</span>
               )}
             </button>
             
             <div className="text-center">
-               <button type="button" className={`text-[9px] ${labelColor} hover:text-emerald-500 transition-colors tracking-tighter uppercase font-bold`}>
+               <button type="button" className={`text-[0.7rem] ${labelColor} hover:text-emerald-500 transition-colors tracking-tighter uppercase font-bold`}>
                  Secure Authentication Required
                </button>
             </div>

@@ -122,11 +122,11 @@ const UserManual: React.FC<UserManualProps> = ({
       <div className={`p-6 md:p-8 border-b border-dashed ${borderThinClass} bg-gradient-to-tr ${isDarkMode ? 'from-slate-900 via-slate-950 to-slate-900/80' : 'from-emerald-500/5 via-slate-50 to-slate-100/50'} flex flex-col md:flex-row justify-between items-start md:items-center gap-6 flex-shrink-0`}>
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 animate-pulse">
-              <i className="fas fa-landmark text-[9px]"></i>
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[0.75rem] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/25 animate-pulse">
+              <i className="fas fa-landmark text-[0.7rem]"></i>
               {lang === 'th' ? 'ระดับมาตรฐานความปลอดภัยสากล' : 'OPERATOR SHIELD STANDARDS'}
             </span>
-            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[10px] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
+            <span className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[0.75rem] font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
               v4.0 Live
             </span>
           </div>
@@ -173,7 +173,7 @@ const UserManual: React.FC<UserManualProps> = ({
           )}
         </div>
         <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-          <span className={`text-[11px] font-mono font-bold ${mutedTextClass}`}>
+          <span className={`text-[0.8rem] font-mono font-bold ${mutedTextClass}`}>
             <i className="fas fa-book-reader text-primary me-1.5"></i>
             {t.total_chapters}
           </span>
@@ -198,7 +198,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 onClick={() => {
                   setActiveTab(tab.id as any);
                 }}
-                className={`flex items-center justify-center gap-2 px-3 py-3 text-[11px] font-black rounded-2xl border transition-all text-center cursor-pointer ${
+                className={`flex items-center justify-center gap-2 px-3 py-3 text-[0.8rem] font-black rounded-2xl border transition-all text-center cursor-pointer ${
                   isSelected 
                     ? (isDarkMode ? 'bg-primary border-primary text-white shadow-lg shadow-primary/30 scale-102' : 'bg-primary border-primary text-white shadow-md shadow-primary/20 scale-101')
                     : (isDarkMode ? 'border-slate-800 text-slate-300 hover:bg-slate-800 bg-slate-900/60 shadow-xs' : 'border-slate-250 text-slate-800 bg-white hover:bg-slate-100 shadow-xs')
@@ -233,7 +233,7 @@ const UserManual: React.FC<UserManualProps> = ({
                     <p className={`text-xs ${paragraphClass} opacity-90`}>{t.credentials_desc}</p>
                   </div>
                 </div>
-                <span className="badge bg-emerald-500 text-white rounded-lg font-bold px-3 py-1 text-[9px] uppercase tracking-wider">
+                <span className="badge bg-emerald-500 text-white rounded-lg font-bold px-3 py-1 text-[0.7rem] uppercase tracking-wider">
                   {lang === 'th' ? 'รองรับการกดคัดลอก' : 'Copy-To-Clipboard Ready'}
                 </span>
               </div>
@@ -243,7 +243,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 {/* Username credential */}
                 <div className={`p-4 rounded-2.5xl border transition-all ${cardBg} flex items-center justify-between gap-4`}>
                   <div className="space-y-1.5">
-                    <span className={`text-[10px] font-bold ${mutedTextClass}`}>{t.username}</span>
+                    <span className={`text-[0.75rem] font-bold ${mutedTextClass}`}>{t.username}</span>
                     <div className="flex items-center gap-2">
                       <strong className={`px-2.5 py-1.5 rounded-lg text-xs font-mono border ${codeBg}`}>
                         Namyen
@@ -252,7 +252,7 @@ const UserManual: React.FC<UserManualProps> = ({
                   </div>
                   <button 
                     onClick={() => handleCopy('user', 'Namyen')}
-                    className={`px-3.5 py-2.5 rounded-xl text-[10px] font-black transition-all flex items-center gap-1.5 ${
+                    className={`px-3.5 py-2.5 rounded-xl text-[0.75rem] font-black transition-all flex items-center gap-1.5 ${
                       copiedField === 'user'
                         ? 'bg-emerald-500 text-white shadow-md'
                         : 'bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/10'
@@ -266,7 +266,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 {/* Password credential */}
                 <div className={`p-4 rounded-2.5xl border transition-all ${cardBg} flex items-center justify-between gap-4`}>
                   <div className="space-y-1.5">
-                    <span className={`text-[10px] font-bold ${mutedTextClass}`}>{t.password}</span>
+                    <span className={`text-[0.75rem] font-bold ${mutedTextClass}`}>{t.password}</span>
                     <div className="flex items-center gap-2">
                       <strong className={`px-2.5 py-1.5 rounded-lg text-xs font-mono border ${codeBg}`}>
                         12345
@@ -275,7 +275,7 @@ const UserManual: React.FC<UserManualProps> = ({
                   </div>
                   <button 
                     onClick={() => handleCopy('pass', '12345')}
-                    className={`px-3.5 py-2.5 rounded-xl text-[10px] font-black transition-all flex items-center gap-1.5 ${
+                    className={`px-3.5 py-2.5 rounded-xl text-[0.75rem] font-black transition-all flex items-center gap-1.5 ${
                       copiedField === 'pass'
                         ? 'bg-emerald-500 text-white shadow-md'
                         : 'bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/10'
@@ -345,9 +345,9 @@ const UserManual: React.FC<UserManualProps> = ({
               {/* THREE COLUMN PREMIUM BREAKDOWN OF CARD METRICS */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-semibold text-slate-800 dark:text-slate-100">
                 <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-1">
-                  <span className="badge bg-primary text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase">Burn Rate (฿/Day)</span>
+                  <span className="badge bg-primary text-white text-[0.7rem] font-bold px-2 py-0.5 rounded uppercase">Burn Rate (฿/Day)</span>
                   <p className={`font-black text-sm pt-1.5 ${textClass}`}>{lang === 'th' ? 'อัตราค่าไฟเฉลี่ยรายวัน' : 'Dynamic Daily Burn (฿)'}</p>
-                  <p className="text-[11px] opacity-85 leading-normal">
+                  <p className="text-[0.8rem] opacity-85 leading-normal">
                     {lang === 'th' 
                       ? 'คำนวณจาก กำลังวัตต์จริงทั้งหมด × ชั่วโมงเฉลี่ย × อัตราหน่วย เพื่อพยากรณ์เงินหมุนเวียนออกรายวันทันเวลา' 
                       : 'Calculated from cumulative node wattage times hours, converting actual Wh to cash outflows instantly.'}
@@ -355,9 +355,9 @@ const UserManual: React.FC<UserManualProps> = ({
                 </div>
 
                 <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20 space-y-1">
-                  <span className="badge bg-amber-500 text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase">TOU Load Division</span>
+                  <span className="badge bg-amber-500 text-white text-[0.7rem] font-bold px-2 py-0.5 rounded uppercase">TOU Load Division</span>
                   <p className={`font-black text-sm pt-1.5 ${textClass}`}>{lang === 'th' ? 'สัดส่วนชาร์จไฟช่วง On-Peak' : 'Peak Ratio Tracking'}</p>
-                  <p className="text-[11px] opacity-85 leading-normal">
+                  <p className="text-[0.8rem] opacity-85 leading-normal">
                     {lang === 'th' 
                       ? 'อัตราแบ่งช่วงเวลา On-Peak (ค่าไฟแพงพิเศษ) และ Off-Peak (ค่าไฟลด 50%) ช่วยผู้ดูแลพิจารณาย้ายโหลดไปช่วงคืนวันหยุด' 
                       : 'Monitors exposure to Peak hour rates (high-tariff windows). Identifies potential for shifting heavy grid loads to midnight windows.'}
@@ -365,9 +365,9 @@ const UserManual: React.FC<UserManualProps> = ({
                 </div>
 
                 <div className="p-4 rounded-2xl bg-indigo-500/5 border border-indigo-500/20 space-y-1">
-                  <span className="badge bg-indigo-500 text-white text-[9px] font-bold px-2 py-0.5 rounded uppercase">Grid Stress Rating</span>
+                  <span className="badge bg-indigo-500 text-white text-[0.7rem] font-bold px-2 py-0.5 rounded uppercase">Grid Stress Rating</span>
                   <p className={`font-black text-sm pt-1.5 ${textClass}`}>{lang === 'th' ? 'ความเครียดและประสิทธิภาพเฟส' : 'System Stress Rating'}</p>
-                  <p className="text-[11px] opacity-85 leading-normal">
+                  <p className="text-[0.8rem] opacity-85 leading-normal">
                     {lang === 'th' 
                       ? 'คะแนนเป็น % จากผลรวมกำลังไฟฟ้ารวมหารด้วยปริมาณรองรับของเซกเตอร์ หากขึ้นสีส้ม สภาพกริดเริ่มตึงเครียดเสี่ยงโอเวอร์โหลด' 
                       : 'Displays total load relative to substation supply capacity. Saffron warning prompts shedding secondary devices before grid dropouts.'}
@@ -417,7 +417,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 {/* Switch 1 */}
                 <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900/60 border-indigo-950/40' : 'bg-slate-50 border-slate-200'} space-y-1`}>
                   <p className="font-extrabold text-blue-600 dark:text-blue-450 text-xs">❄️ {lang === 'th' ? '1. ปรับอุณหภูมิ AC อัจฉริยะ (Smart AC Optimization)' : '1. Smart AC Optimization'}</p>
-                  <p className={`${paragraphClass} text-[11px] opacity-85 leading-normal`}>
+                  <p className={`${paragraphClass} text-[0.8rem] opacity-85 leading-normal`}>
                     {lang === 'th'
                       ? 'จำลองปรับอุณหภูมิแอร์ขึ้น 1 องศาเซลเซียสเฉพาะเวลาที่ระบบกำลังเผชิญโหลดสูงสุด ช่วยบีบยอดใช้กระแสไฟระบบทำความเย็นลงรวดเร็วถึง 8%'
                       : 'Simulates automatic thermostat offsets by elevating heavy cooling systems 1°C during peak intervals, shaving active cooling drains up to 8% instantly.'}
@@ -427,7 +427,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 {/* Switch 2 */}
                 <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900/60 border-teal-950/40' : 'bg-slate-50 border-slate-200'} space-y-1`}>
                   <p className="font-extrabold text-teal-600 dark:text-teal-450 text-xs">🔌 {lang === 'th' ? '2. ตัดสแตนด์บายสอยกระแส (Eco Standby Mitigation)' : '2. Eco Standby Mitigation'}</p>
-                  <p className={`${paragraphClass} text-[11px] opacity-85 leading-normal`}>
+                  <p className={`${paragraphClass} text-[0.8rem] opacity-85 leading-normal`}>
                     {lang === 'th'
                       ? 'กำจัดไฟตกค้าง (Phantom Load) จากปลั๊กพ่วง คอมพิวเตอร์ หรือเครื่องปรับอากาศวิทยาลััยวิจัยในช่วงออฟฟิศปิดการสะสม'
                       : 'Safely shuts off idle lab hardware, stand-by server terminals, and classroom plugs during non-operating hours to eliminate parasitic phantom loads.'}
@@ -437,7 +437,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 {/* Switch 3 */}
                 <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900/60 border-amber-950/40' : 'bg-slate-50 border-slate-200'} space-y-1`}>
                   <p className="font-extrabold text-amber-600 dark:text-amber-450 text-xs">⏳ {lang === 'th' ? '3. โยกย้ายชั่วโมงโหลดสูง (Smart Load Shift)' : '3. Smart Load Shift'}</p>
-                  <p className={`${paragraphClass} text-[11px] opacity-85 leading-normal`}>
+                  <p className={`${paragraphClass} text-[0.8rem] opacity-85 leading-normal`}>
                     {lang === 'th'
                       ? 'โยกเวลาของงานประมวลผลหนัก หรือระบบสูบน้ำขัดตาน ไปเปิดทำการในช่วงค่ำคืนหรือวันหยุด ซึ่งอัตราค่าไฟตกลงต่ำสุด'
                       : 'Shifts high-consumption processes, battery recharge cycles, or heavy pumps to off-peak tariff periods (e.g. night shifts and weekends).'}
@@ -447,7 +447,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 {/* Switch 4 */}
                 <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900/60 border-purple-950/40' : 'bg-slate-50 border-slate-200'} space-y-1`}>
                   <p className="font-extrabold text-purple-600 dark:text-purple-450 text-xs">⚡ {lang === 'th' ? '4. ชดเชยตัวประกอบกำลังไฟฟ้า (PF Automatic Tuning)' : '4. PF Automatic Tuning'}</p>
-                  <p className={`${paragraphClass} text-[11px] opacity-85 leading-normal`}>
+                  <p className={`${paragraphClass} text-[0.8rem] opacity-85 leading-normal`}>
                     {lang === 'th'
                       ? 'จำลองการต่อตู้คาปาซิเตอร์ชดเชยเฟสเพื่อพยุงคะแนนตัวประกอบกำลังไฟ (Power Factor) ขึ้นให้เข้าใกล้ 1.0 ตลอดวันและคืน'
                       : 'Simulates dynamic capacitor bank activation to suppress phase-shifted power distortion, optimizing efficiency and stabilizing voltage.'}
@@ -484,7 +484,7 @@ const UserManual: React.FC<UserManualProps> = ({
                   <div className="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-black flex-shrink-0 text-xs shadow-md">1</div>
                   <div className="space-y-1">
                     <p className={`font-black text-sm ${textClass}`}>{lang === 'th' ? 'การเพิ่มอุปกรณ์โหนดคูณค่ากำลังไฟ (Dynamic Insertion)' : 'Adding Custom High-Power Equipment'}</p>
-                    <p className={`${paragraphClass} text-[11px] leading-relaxed`}>
+                    <p className={`${paragraphClass} text-[0.8rem] leading-relaxed`}>
                       {lang === 'th'
                         ? 'คลิกปุ่มสว่าง "เพิ่มอุปกรณ์ใหม่" (Add Appliance) ป้อนข้อมูลชื่ออุปกรณ์จำลองพฤติกรรม, พิกัดกำลังวัตต์จริง (Wattage เช่น แอร์: 1800W) และสัดส่วนชั่วโมงใช้งานรายวัน ระบบจะแปรข้อมูลชุดแรกและกระจายสู่กราฟต่างๆ อย่างฉับไวแบบไร้การหน่วง'
                         : 'Navigate to "Device Registry" and trigger "Add New Asset". Feed details like descriptive device identification (e.g. Cinema Sub Server), absolute run load (Wattage, like 3500 Watts), and duty hours. The system updates corresponding loads immediately across other sub-metrics.'}
@@ -497,7 +497,7 @@ const UserManual: React.FC<UserManualProps> = ({
                   <div className="w-9 h-9 rounded-xl bg-cyan-500 text-white flex items-center justify-center font-black flex-shrink-0 text-xs shadow-md">2</div>
                   <div className="space-y-1">
                     <p className={`font-black text-sm ${textClass}`}>{lang === 'th' ? 'สัมประสิทธิ์เลื่อนสวิตช์พลังงาน (Dynamic Splicing Bypass)' : 'Active Dynamic Phase Splitting'}</p>
-                    <p className={`${paragraphClass} text-[11px] leading-relaxed`}>
+                    <p className={`${paragraphClass} text-[0.8rem] leading-relaxed`}>
                       {lang === 'th'
                         ? 'การปรับตารางสวิตช์คันโยก (Toggle Switch) บนตารางเครื่องใช้ไฟฟ้าทำหน้าที่จำลองการสวมคัตเอาต์ไฟฟ้าจริง เมื่อเลื่อนปิด (คันโยกเป็นสีเทา) ค่าพลังงานจะตกเหลือเป็นศูนย์หลัก และผลรวมค่าใช้จ่ายของทั้งวิทยาเขตจะร่วงหล่นทันที เหมาะสำหรับวิเคราะห์กรณีปิดอุปกรณ์ช่วงเวลาชั่วคราว'
                         : 'Utilize the grid status switches on each row. Flicking the switch acts as an immediate physical cut-out circuit. It forces the load profile contribution to zero. Operators instantly evaluate utility bills saving variables with or without selected commercial sub-systems.'}
@@ -510,7 +510,7 @@ const UserManual: React.FC<UserManualProps> = ({
                   <div className="w-9 h-9 rounded-xl bg-purple-600 text-white flex items-center justify-center font-black flex-shrink-0 text-xs shadow-md">3</div>
                   <div className="space-y-1">
                     <p className={`font-black text-sm text-purple-700 dark:text-purple-300`}>{lang === 'th' ? 'การประยุกต์ใช้ปัญญาประดิษฐ์ตรวจสุขภาพอุปกรณ์จำเพาะ (AI Diagnosis Report Modal)' : 'Invoking Advanced Multi-Variable Gemini Diagnostics'}</p>
-                    <p className={`${paragraphClass} text-[11px] leading-relaxed`}>
+                    <p className={`${paragraphClass} text-[0.8rem] leading-relaxed`}>
                       {lang === 'th'
                         ? 'หากคลิกปุ่มสัญลักษณ์ แว่นขยาย หลังสวิตช์ปิด-เปิด อุปกรณ์ ระบบจะเปิดโมดัลควบคุมเจาะลึกแสดงตัวเลขเชิงฟิสิกส์ (Uptime, Power Factor, Harmonics Distortion) หลังจากนั้นให้คุณทำการคลิกความเห็นสำคัญพนักงาน "วิเคราะห์อุปกรณ์ด้วย AI" เพื่อส่งข้อมูลดิบไปถอดรหัสวิศวกรรมด้วย Google Gemini AI คุณจะได้รับข้อแนะนำบำรุงรักษาอย่างมืออาชีพพร้อมคะแนนความมีเสถียรภาพ (Health Score) แผนป้องกันความพังทลายอย่างสมบูณ์'
                         : 'Examine detailed technician indicators like relative efficiency phase metrics by picking the magnifier file handle in the action row. Tap "Analyze via Gemini" to translate system uptime log strings and harmonic distortion indicators into server-side Gemini intelligence models. A dynamic diagnostic bulletin will generate, showing safe limits suggestions, component wearing rates, and security ratings.'}
@@ -527,7 +527,7 @@ const UserManual: React.FC<UserManualProps> = ({
                     <p className={`font-black text-sm text-amber-700 dark:text-amber-400`}>
                       {lang === 'th' ? '💡 คู่มือหลักในการตั้งค่าและการระบุรายละเอียดกำลังไฟอุปกรณ์ (Device Electricity Setup Guide)' : '💡 Device Electricity & Tariff Configuration Formula Guide'}
                     </p>
-                    <div className={`${paragraphClass} text-[11px] leading-relaxed space-y-2`}>
+                    <div className={`${paragraphClass} text-[0.8rem] leading-relaxed space-y-2`}>
                       <p>
                         {lang === 'th'
                           ? 'วิธีการหาข้อมูลและป้อนค่ากำลังไพ่อุปกรณ์ เพื่อให้ระบบคำนวณและประดิษฐ์สถิติเสถียรภาพได้แม่นยำสูงสุด มีคำแนะนำดังต่อไปนี้:'
@@ -550,7 +550,7 @@ const UserManual: React.FC<UserManualProps> = ({
                             : 'Power Factor (PF Rating): Typical components carry 0.85 to 0.95 PF. A system running at 1.0 operates with absolutely zero phase-shift energy waste.'}
                         </li>
                       </ul>
-                      <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-slate-400' : 'bg-slate-100/90 border-slate-200 text-slate-600'} text-[10px] font-mono leading-normal space-y-1`}>
+                      <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-slate-400' : 'bg-slate-100/90 border-slate-200 text-slate-600'} text-[0.75rem] font-mono leading-normal space-y-1`}>
                         <div><strong>● สูตรพลังงานสะสม (Energy Consumption Formula):</strong> หน่วยไฟฟ้า (kWh) = (กำลังไฟฟ้าวัตต์ × ชั่วโมงใช้งาน × จำนวนวันสะสม) ÷ 1,000</div>
                         <div><strong>● สูตรคำนวณบิลค่าไฟฟ้า (Billing Calculator Formula):</strong> ค่าไฟฟ้าสุทธิ (บาท ฿) = หน่วยไฟฟ้า (kWh) × อัตราค่าบริการเฉลี่ย (บาทต่อหน่วย)</div>
                       </div>
@@ -567,7 +567,7 @@ const UserManual: React.FC<UserManualProps> = ({
                     <p className={`font-black text-sm text-teal-700 dark:text-teal-400`}>
                       {lang === 'th' ? 'การเปรียบเทียบข้อมูลระหว่างโหนดเคียงข้างกัน (Side-by-Side Comparison Board)' : 'Multi-Node Side-by-Side Comparison Engine'}
                     </p>
-                    <p className={`${paragraphClass} text-[11px] leading-relaxed`}>
+                    <p className={`${paragraphClass} text-[0.8rem] leading-relaxed`}>
                       {lang === 'th'
                         ? 'หากเลื่อนติ๊กกล่องหน้าอุปกรณ์ตั้งแต่ 2 รายการขึ้นไป แล้วคลิกปุ่ม "เปรียบเทียบที่เลือก (Compare Selected)" ระบบจะเปิดแผงบอร์ดเปรียบข้อมูลทางเทคนิคของแต่ละอุปกรณ์พร้อมระบุไฮไลต์ อุปกรณ์ที่สิ้นเปลืองไฟสูงสุด (Worst Consumer) และอุปกรณ์ที่มีตัวประกอบกำลังดีที่สุด (Best Power Factor) อย่างตื่นตาทันใจและชัดเจนแบบสากล!'
                         : 'Simply toggle the checkboxes on the left margin of any two or more device rows and select "Compare Selected". The evaluation system renders side-by-side load cards with automated highlights identifying the highest active drain ("Worst Consumer") versus the cleanest Phase factor stability ("Best Power Factor") on immediate comparative dials.'}
@@ -665,7 +665,7 @@ const UserManual: React.FC<UserManualProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                 <div className="p-4.5 rounded-2xl bg-indigo-500/5 border border-indigo-500/20 space-y-2">
                   <p className="font-black text-indigo-650 dark:text-indigo-400 text-xs">💰 {lang === 'th' ? 'การตั้งค่าเป้าหมายงบวงเงินรวม (Budget modifier)' : '1. Adjusting Credit Threshold (฿):'}</p>
-                  <p className={`${paragraphClass} text-[11px]`}>
+                  <p className={`${paragraphClass} text-[0.8rem]`}>
                     {lang === 'th'
                       ? 'ป้อนเงินทุนของวิทยาเขตสุทธิ ลงในกล่องสแกนงบประมาณ ระบบจะสืบดูการกินวัตต์ของโหนดยื่นเปิดใช้งานทั้งหมด และจัดหารวิเคราะห์เพื่อค้นหาสถิติสุขภาพ'
                       : 'Provide custom investment bounds (฿) in the primary modifier box. This acts as the total credit pool before the subgrid shuts down.'}
@@ -674,7 +674,7 @@ const UserManual: React.FC<UserManualProps> = ({
 
                 <div className="p-4.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 space-y-2">
                   <p className="font-black text-emerald-650 dark:text-emerald-400 text-xs">🚀 {lang === 'th' ? 'ตัวชี้วัดวันทำงานพยากรณ์รอดชีวิต (Days Remaining HUD)' : '2. Active Days Survival Rate indicator:'}</p>
-                  <p className={`${paragraphClass} text-[11px]`}>
+                  <p className={`${paragraphClass} text-[0.8rem]`}>
                     {lang === 'th'
                       ? 'ตัวเลขขนาดใหญ่เด่นชัด (Grid Days Remaining) บอกว่าเครื่องจักรคุณจะทำงานได้กี่สิบกี่ร้อยวันจนกว่าเงินจะละลายหมดตามการกินโหลดพิกัดนี้'
                       : 'The jumbo metric panel displays exactly how many days the substation will run before running into credit overdraft under the current load.'}
@@ -688,7 +688,7 @@ const UserManual: React.FC<UserManualProps> = ({
                   <i className="fas fa-triangle-exclamation text-rose-500 animate-pulse text-sm"></i>
                   {t.warning_title}
                 </p>
-                <p className={`${paragraphClass} text-[11px] leading-relaxed`}>
+                <p className={`${paragraphClass} text-[0.8rem] leading-relaxed`}>
                   {lang === 'th'
                     ? 'กรณีเงินรอดชีวิต (Grid Days Remaining) ต่ำกว่า 30 วัน ขอแนะนำอย่างสูงให้คุณเข้าสู่เมนู "อุปกรณ์ทั้งหมด" และทำการสลับปิดคันโยกโหนดที่ระบายความร้อนสูง (เช่น โหนด High-Watt AC หรือ Gaming Rig) เพื่อบีบแรงกดดันในการสูญเสียเงินค่าส่วย ดันจำนวนวันกรีดไฟฟ้าไปรอดชีวิตเพิ่มขึ้นเป็นร้อยวันได้อย่างสวรรค์สร้าง!'
                     : 'If the projection days indicator drops below 30 days of safe operations, operators must instantly enter "Node Asset Control" and leverage physical bypass switches on active HVAC loops or servers. Halting continuous high-load nodes immediately decreases total system demand, expanding system survival rates by up to 500%!'}
@@ -724,9 +724,9 @@ const UserManual: React.FC<UserManualProps> = ({
               </div>
 
               {/* DETAILED ORDERED STEP-BY-STEP CHECKPOINTS */}
-              <div className="space-y-3 pt-2 text-[11px] font-bold text-slate-900 dark:text-slate-100">
+              <div className="space-y-3 pt-2 text-[0.8rem] font-bold text-slate-900 dark:text-slate-100">
                 <div className={`p-4 rounded-xl border ${cardBg} flex gap-3.5 items-center`}>
-                  <span className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center font-black flex-shrink-0 text-[10px]">1</span>
+                  <span className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center font-black flex-shrink-0 text-[0.75rem]">1</span>
                   <span>
                     {lang === 'th' 
                       ? 'คลิกป้ายบอกควบคุมเมนูล่างซ้ายสัญญลักษณ์กระดาษ "การแจ้งเตือน" (Alerts / Activity Log Center)' 
@@ -735,7 +735,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 </div>
 
                 <div className={`p-4 rounded-xl border ${cardBg} flex gap-3.5 items-center`}>
-                  <span className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center font-black flex-shrink-0 text-[10px]">2</span>
+                  <span className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center font-black flex-shrink-0 text-[0.75rem]">2</span>
                   <span>
                     {lang === 'th' 
                       ? 'เลื่อนตรวจจอฟังก์ชันลงมาสู่ล่างสุดในหน้ากิจกรรม จะพบโมดูล "AI ระบบความมั่นคงปลอดภัยกริดและตรวจสอบประวัติล็อก"' 
@@ -744,7 +744,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 </div>
 
                 <div className={`p-4 rounded-xl border ${cardBg} flex gap-3.5 items-center`}>
-                  <span className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center font-black flex-shrink-0 text-[10px]">3</span>
+                  <span className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center font-black flex-shrink-0 text-[0.75rem]">3</span>
                   <span>
                     {lang === 'th' 
                       ? 'กดปุ่มสีม่วงส่องแสงดนตรี "สแกน AI วิเคราะห์ล็อก (Run AI Log Integrity Scan)"' 
@@ -753,7 +753,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 </div>
 
                 <div className={`p-4 rounded-xl border ${cardBg} flex gap-3.5 items-center`}>
-                  <span className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center font-black flex-shrink-0 text-[10px]">4</span>
+                  <span className="w-6 h-6 rounded-lg bg-purple-600 text-white flex items-center justify-center font-black flex-shrink-0 text-[0.75rem]">4</span>
                   <span>
                     {lang === 'th' 
                       ? 'ระบบจะส่งข้อมูลวิศวกรรมไฟฟ้าวิเคราะห์กับ Gemini AI เพื่อสรุปผลแบ่งเกณฑ์สีเฉลยพฤติกรรม เช่น (ลักขุดคริปโต, ความสูญเสียแรงดัน, การบิดเบือนสัญญาณ)' 
@@ -779,7 +779,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className={`p-4.5 rounded-2xl border ${isDarkMode ? 'border-indigo-950 bg-indigo-950/20' : 'border-slate-200 bg-slate-50'} space-y-1`}>
                     <p className="font-extrabold text-primary mb-1">🌿 {lang === 'th' ? 'เกณฑ์รับสิทธิภาษีประหยัดพลังงาน' : 'Rebate Eligibility (Green Credit)'}</p>
-                    <p className={`${paragraphClass} text-[11px] leading-normal opacity-90`}>
+                    <p className={`${paragraphClass} text-[0.8rem] leading-normal opacity-90`}>
                       {lang === 'th' 
                         ? 'หากค่าใช้จ่ายน้อยกว่าค่าเฉลี่ยเซกเตอร์เกิน 15% จะปลดล็อกเกียรติยศระดับสถานะ "ยอดเยี่ยม (Elite Status)" มีสิทธิ์รับเงินเยียวยา' 
                         : 'If consumption levels are over 15% cleaner than the local average, we offer Green Grid certification rewards.'}
@@ -787,7 +787,7 @@ const UserManual: React.FC<UserManualProps> = ({
                   </div>
                   <div className={`p-4.5 rounded-2xl border ${isDarkMode ? 'border-purple-950 bg-purple-950/20' : 'border-slate-200 bg-slate-50'} space-y-1`}>
                     <p className="font-extrabold text-purple-600 dark:text-purple-400 mb-1">🤖 {lang === 'th' ? 'โมเดลทำความเย็นอัจฉริยะ (Strategic Cooling AC Offset)' : 'Intelligent Cooling Strategies'}</p>
-                    <p className={`${paragraphClass} text-[11px] leading-normal opacity-90`}>
+                    <p className={`${paragraphClass} text-[0.8rem] leading-normal opacity-90`}>
                       {lang === 'th' 
                         ? 'รับทราบวิธีคิดของระบบปัญญาประดิษฐ์ในการปรับ AC ขึ้น 1°C ช่วงชั่วโมงเร่งด่วนเพื่อตัดยอดความต้องการไฟฟ้าแบบฉับไว' 
                         : 'Learn how to handle real thermal power spikes and configure precise machine offsets via Gemini tips.'}
@@ -805,7 +805,7 @@ const UserManual: React.FC<UserManualProps> = ({
       <div className={`p-6 border-t ${borderThinClass} flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-100/40 dark:bg-slate-900/60 flex-shrink-0`}>
         <div className="flex items-center gap-2">
           <i className="fas fa-graduation-cap text-primary text-xs"></i>
-          <span className={`text-[10px] ${mutedTextClass} tracking-wider font-mono font-bold uppercase`}>
+          <span className={`text-[0.75rem] ${mutedTextClass} tracking-wider font-mono font-bold uppercase`}>
             © 2026 EduEase Energy Security Hub - Technician Operations Panel
           </span>
         </div>

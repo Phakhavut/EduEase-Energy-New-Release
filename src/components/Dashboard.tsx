@@ -2080,7 +2080,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       <div
         className={`p-4 rounded-3xl border shadow-2xl backdrop-blur-md min-w-[200px] transition-all text-xs duration-250 ${tooltipBg}`}
       >
-        <div className="mb-2 font-display font-bold uppercase tracking-wider text-[9px] opacity-70">
+        <div className="mb-2 font-display font-bold uppercase tracking-wider text-[0.7rem] opacity-70">
           {data.name || label}
         </div>
         {isPerformance ? (
@@ -2248,12 +2248,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                   EduEase
                 </h4>
               </div>
-              <span className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">
+              <span className="text-[0.7rem] text-gray-400 uppercase tracking-widest font-bold">
                 {t("sys_sub_title")}
               </span>
             </div>
             <button
-              className="btn d-lg-none text-muted h-[44px] w-[44px] flex items-center justify-center"
+              className="btn lg:hidden text-muted h-[44px] w-[44px] flex items-center justify-center"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               <i className="fas fa-times"></i>
@@ -2267,7 +2267,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 onClick={() => navigateTo(item.id)}
               >
                 <i className={item.icon}></i>{" "}
-                <span className="text-[13px]">{t(item.key)}</span>
+                <span className="text-sm">{t(item.key)}</span>
               </button>
             ))}
           </nav>
@@ -2287,7 +2287,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
           <div className="flex items-center gap-3">
             <button
-              className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 d-lg-none shadow-sm rounded-xl p-3 border-0 bg-white"
+              className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 lg:hidden shadow-sm rounded-xl p-3 border-0 bg-white"
               onClick={() => setIsMobileMenuOpen(true)}
             >
               <i className="fas fa-bars text-primary"></i>
@@ -2296,7 +2296,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               <h2 className="font-bold mb-0 font-display text-2xl md:text-3xl tracking-tight">
                 {t(navItems.find((n) => n.id === currentPage)?.key || "m1")}
               </h2>
-              <p className="text-muted text-[10px] font-bold uppercase tracking-[0.2em]">
+              <p className="text-muted text-[0.75rem] font-bold uppercase tracking-[0.2em]">
                 {isDarkMode ? t("terminal") : t("global_access")}
               </p>
             </div>
@@ -2308,14 +2308,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
+              <span className="text-[0.7rem] font-bold uppercase tracking-widest text-emerald-700 dark:text-emerald-400">
                 {lang === 'th' ? 'AI ปรับแต่งอัตโนมัติ' : 'AI Engine Active'}
               </span>
             </div>
             
             <div className="flex items-center gap-2 px-3 py-2 bg-light rounded-2xl border shadow-sm whitespace-nowrap shrink-0">
               <span className="neural-pulse"></span>
-              <span className="text-[9px] font-bold uppercase tracking-widest text-muted">
+              <span className="text-[0.7rem] font-bold uppercase tracking-widest text-muted">
                 {t("db_health")}
               </span>
             </div>
@@ -2397,7 +2397,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         ? "เครื่องมือปรับแต่งเลย์เอาต์แผงทำงาน"
                         : "Grid Layout Customizer"}
                     </h6>
-                    <p className="text-[10px] text-slate-600 dark:text-slate-100 mb-0">
+                    <p className="text-[0.75rem] text-slate-600 dark:text-slate-100 mb-0">
                       {lang === "th"
                         ? "ท่านสามารถลากวางที่หัวข้อการ์ดเพื่อจัดเรียงตำแหน่งวิดเจ็ตสถิติ หรือคลิกลูกศรเลื่อนหน้าต่างได้ตามที่ต้องการ"
                         : "Drag any widget title bar to rearrange or use standard arrow controllers to personalize your Workspace."}
@@ -2423,7 +2423,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         );
                       } catch {}
                     }}
-                    className="btn btn-xs bg-slate-200 text-slate-800 border border-slate-300 hover:bg-slate-300 dark:bg-white/10 dark:text-white dark:border-transparent dark:hover:bg-slate-800 text-[10px] font-bold uppercase tracking-wider rounded-xl px-3 py-2 flex items-center gap-1.5"
+                    className="btn btn-xs bg-slate-200 text-slate-800 border border-slate-300 hover:bg-slate-300 dark:bg-white/10 dark:text-white dark:border-transparent dark:hover:bg-slate-800 text-[0.75rem] font-bold uppercase tracking-wider rounded-xl px-3 py-2 flex items-center gap-1.5"
                     type="button"
                   >
                     <i className="fas fa-history text-xs text-primary"></i>
@@ -2446,7 +2446,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         ? "เมนูทางเลือกและคำสั่งด่วน"
                         : "Quick Questions & Actions"}
                     </h6>
-                    <p className="text-[10px] text-slate-600 dark:text-slate-100 mb-0">
+                    <p className="text-[0.75rem] text-slate-600 dark:text-slate-100 mb-0">
                       {lang === "th"
                         ? "รวมปุ่มลัดคำสั่งยอดนิยมเพื่อช่วยสแกนสถิติพลังงานของท่าน แสร้งส่งรายงานปัญหาไฟฟ้าขัดข้อง หรือตรวจสอบระบบประหยัดเร่งด่วนทันทีในคลิกเดียว"
                         : "Pre-defined action shortcuts to analyze consumption patterns, report anomalies, or fine-tune active grid settings in one click."}
@@ -2474,7 +2474,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           ? "รายงานใช้ไฟรายเดือน"
                           : "View Monthly Consumption"}
                       </div>
-                      <p className="text-[9px] text-slate-600 dark:text-slate-200 mb-0 line-clamp-1">
+                      <p className="text-[0.7rem] text-slate-600 dark:text-slate-200 mb-0 line-clamp-1">
                         {lang === "th"
                           ? "สลับข้อมูลสถิติของชาร์ตแสดงผลเป็นรายเดือนทันที"
                           : "Switch live charts to monthly telemetry context."}
@@ -2514,7 +2514,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           ? "แจ้งรายงานปัญหาไฟฟ้า"
                           : "Report Power Issue"}
                       </div>
-                      <p className="text-[9px] text-slate-600 dark:text-slate-200 mb-0 line-clamp-1">
+                      <p className="text-[0.7rem] text-slate-600 dark:text-slate-200 mb-0 line-clamp-1">
                         {lang === "th"
                           ? "จำลองแจ้งเหตุกระแสไฟฟ้าตกหรือแรงดันผิดปกติ"
                           : "File standard voltage drop warning into alerts center"}
@@ -2558,7 +2558,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           ? "เปิดทุกฟังก์ชันประหยัดทันที"
                           : "Optimize Energy Settings"}
                       </div>
-                      <p className="text-[9px] text-slate-600 dark:text-slate-200 mb-0 line-clamp-1">
+                      <p className="text-[0.7rem] text-slate-600 dark:text-slate-200 mb-0 line-clamp-1">
                         {lang === "th"
                           ? "เปิดสวิตช์ฟังก์ชันประหยัดพลังงานอัจฉริยะครบ 4 ระบบในคลิกเดียว"
                           : "Activate all 4 power regulatory smart-toggles"}
@@ -2568,7 +2568,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </div>
               </div>
 
-              <motion.div variants={containerVariants} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 grid-flow-row-dense gap-4 xl:gap-6 mb-8">
+              <motion.div variants={containerVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 grid-flow-row-dense gap-4 lg:gap-6 mb-8">
                 {widgetOrder.map((widgetId, index) => {
                   if (widgetId === "current-weather") {
                     return (
@@ -2579,19 +2579,19 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="md:col-span-1 xl:col-span-4 transition-all duration-300 h-full"
+                        className="md:col-span-1 lg:col-span-4 transition-all duration-300 h-full"
                       >
                         <div className="h-full group">
                           {/* Draggable header (invisible by default, shows on hover/drag) */}
                           <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity mb-2 px-2">
                              <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-400">
                                <i className="fas fa-grip-horizontal"></i>
-                               <span className="text-[9px] uppercase tracking-wider font-bold">DRAG TO MOVE</span>
+                               <span className="text-[0.7rem] uppercase tracking-wider font-bold">DRAG TO MOVE</span>
                              </div>
                              <div className="flex items-center gap-2">
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[8px]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === 0}
                               >
@@ -2599,7 +2599,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </button>
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[8px]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
                               >
@@ -2621,7 +2621,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="md:col-span-2 xl:col-span-12 transition-all duration-300 h-full"
+                        className="md:col-span-2 lg:col-span-12 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-500/5 backdrop-blur-sm shadow-sm animate-fade-in">
                           
@@ -2668,7 +2668,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                 >
                                   <div className="dashboard-card border border-slate-200 dark:border-0 p-4 p-md-5 bg-slate-50 dark:bg-white/5 shadow-sm">
                                     <div className="flex justify-between items-start mb-4">
-                                      <span className="label text-[10px] font-bold text-slate-700 dark:text-slate-100">
+                                      <span className="label text-[0.75rem] font-bold text-slate-700 dark:text-slate-100">
                                         {stat.label}
                                       </span>
                                       <i
@@ -2701,11 +2701,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="md:col-span-2 xl:col-span-8 transition-all duration-300 h-full"
+                        className="md:col-span-2 lg:col-span-8 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm rounded-[2rem] hover:shadow-lg transition-all duration-300">
                           {/* Header */}
-                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[9px] tracking-wider text-slate-600 dark:text-slate-100 font-bold">
+                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[0.7rem] tracking-wider text-slate-600 dark:text-slate-100 font-bold">
                             <div className="flex items-center gap-1.5 cursor-grab active:cursor-grabbing text-slate-500 dark:text-slate-200">
                               <i className="fas fa-grip-horizontal text-sky-500 animate-pulse"></i>
                               <span className="uppercase text-slate-800 dark:text-slate-100">
@@ -2717,7 +2717,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             <div className="flex items-center gap-2">
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[8px]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === 0}
                               >
@@ -2725,7 +2725,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </button>
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[8px]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
                               >
@@ -2750,10 +2750,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="md:col-span-2 xl:col-span-12 transition-all duration-300 h-full"
+                        className="md:col-span-2 lg:col-span-12 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm h-full flex flex-col hover:shadow-lg transition-all duration-300 rounded-[2rem]">
-                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[9px] tracking-wider text-slate-600 dark:text-slate-100 font-bold">
+                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[0.7rem] tracking-wider text-slate-600 dark:text-slate-100 font-bold">
                             <div className="flex items-center gap-1.5 cursor-grab active:cursor-grabbing text-slate-500 dark:text-slate-200">
                               <i className="fas fa-grip-horizontal text-emerald-500 animate-pulse"></i>
                               <span className="uppercase text-slate-800 dark:text-slate-100">
@@ -2765,7 +2765,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             <div className="flex items-center gap-2">
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-emerald-500 hover:text-white transition-all text-[8px]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-emerald-500 hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === 0}
                               >
@@ -2773,7 +2773,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </button>
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-emerald-500 hover:text-white transition-all text-[8px]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-emerald-500 hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
                               >
@@ -2785,7 +2785,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           <div className="p-6 md:p-10 flex-1 flex flex-col justify-center max-w-3xl mx-auto w-full">
                             <div className="flex justify-between items-end mb-2">
                               <div>
-                                <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">
+                                <div className="text-[0.75rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">
                                   {lang === "th" ? "พลังงานที่ประหยัดได้" : "Energy Saved"}
                                 </div>
                                 <div className="text-3xl font-display font-light text-emerald-600 dark:text-emerald-400">
@@ -2793,7 +2793,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                 </div>
                               </div>
                               <div className="text-right">
-                                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                                <div className="text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest mb-1">
                                   {lang === "th" ? "เส้นฐานคาดการณ์" : "Projected Baseline"}
                                 </div>
                                 <div className="text-lg font-mono font-bold text-slate-700 dark:text-slate-300">
@@ -2803,7 +2803,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             </div>
                             
                             <div className="mt-4">
-                              <div className="flex justify-between text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-wider">
+                              <div className="flex justify-between text-[0.75rem] font-bold text-slate-500 mb-2 uppercase tracking-wider">
                                 <span>0%</span>
                                 <span className="text-emerald-500">
                                   {lang === "th" ? "เป้าหมาย: ประหยัด 25%" : "Goal: 25% Reduction"}
@@ -2819,7 +2819,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                   <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMSI+PC9yZWN0Pgo8cGF0aCBkPSJNMCAwTDggOFpNOCAwTDAgOFoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9IjAuMSIgc3Ryb2tlLXdpZHRoPSIxIj48L3BhdGg+Cjwvc3ZnPg==')] opacity-20"></div>
                                 </motion.div>
                               </div>
-                              <div className="mt-3 text-center text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                              <div className="mt-3 text-center text-[0.75rem] text-slate-500 dark:text-slate-400 font-medium">
                                 {lang === "th" 
                                   ? <span>ตอนนี้ประหยัดไปแล้ว <AnimatedCounter value={dailySavingsData.progress} fractionDigits={1} />% ของเป้าหมาย</span>
                                   : <span>You've achieved <AnimatedCounter value={dailySavingsData.progress} fractionDigits={1} />% of your daily savings goal!</span>}
@@ -2840,10 +2840,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="md:col-span-1 xl:col-span-4 transition-all duration-300 h-full"
+                        className="md:col-span-1 lg:col-span-4 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden shadow-sm h-full bg-white dark:bg-white/5 relative flex flex-col">
-                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[9px] tracking-wider text-slate-600 dark:text-slate-100 font-bold z-20 relative">
+                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[0.7rem] tracking-wider text-slate-600 dark:text-slate-100 font-bold z-20 relative">
                             <div className="flex items-center gap-2">
                               <i className="fas fa-grip-horizontal text-emerald-500 animate-pulse"></i>
                               <span className="uppercase text-slate-800 dark:text-slate-100">
@@ -2855,7 +2855,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             <div className="flex items-center gap-2">
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-emerald-500 hover:text-white transition-all text-[8px]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-emerald-500 hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === 0}
                               >
@@ -2863,7 +2863,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </button>
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-emerald-500 hover:text-white transition-all text-[8px]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-emerald-500 hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
                               >
@@ -2893,7 +2893,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
                         id="tour-step-charts"
-                        className="md:col-span-2 xl:col-span-8 transition-all duration-300 h-full"
+                        className="md:col-span-2 lg:col-span-8 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden h-100 flex flex-col shadow-sm bg-white dark:bg-white/5">
                           
@@ -2903,7 +2903,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                 <h5 className="font-bold mb-1 font-display text-lg tracking-tight">
                                   {t("chart_performance_title")}
                                 </h5>
-                                <p className="text-[10px] text-muted font-bold uppercase tracking-widest">
+                                <p className="text-[0.75rem] text-muted font-bold uppercase tracking-widest">
                                   System KPIs & Uptime Telemetry
                                 </p>
                               </div>
@@ -2913,7 +2913,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     <button
                                       key={range}
                                       onClick={() => setPerfRange(range)}
-                                      className={`btn btn-xs flex-grow md:flex-none px-4 rounded-xl font-bold uppercase text-[9px] tracking-widest ${perfRange === range ? "btn-primary shadow-md" : "text-muted dark:opacity-100 opacity-60"}`}
+                                      className={`btn btn-xs flex-grow md:flex-none px-4 rounded-xl font-bold uppercase text-[0.7rem] tracking-widest ${perfRange === range ? "btn-primary shadow-md" : "text-muted dark:opacity-100 opacity-60"}`}
                                     >
                                       {t(
                                         range === "daily"
@@ -3058,7 +3058,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="md:col-span-1 xl:col-span-4 flex flex-col transition-all duration-300 h-full"
+                        className="md:col-span-1 lg:col-span-4 flex flex-col transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden shadow-sm h-100 flex flex-col bg-white dark:bg-white/5">
                           
@@ -3114,7 +3114,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     )}
                                     %
                                   </span>
-                                  <span className="text-[7.5px] font-bold text-slate-405 dark:text-slate-100 tracking-wider uppercase">
+                                  <span className="text-[0.65rem] font-bold text-slate-405 dark:text-slate-100 tracking-wider uppercase">
                                     {lang === "th"
                                       ? "ประสิทธิภาพ"
                                       : "Efficiency"}
@@ -3137,7 +3137,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                       )}
                                       %
                                     </span>
-                                    <span className="text-[9px] font-bold text-emerald-400 animate-pulse font-mono">
+                                    <span className="text-[0.7rem] font-bold text-emerald-400 animate-pulse font-mono">
                                       <i className="fas fa-caret-up"></i> LIVE
                                     </span>
                                   </div>
@@ -3146,12 +3146,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                                 {/* Badge Status */}
                                 <div className="flex flex-col gap-1.5 items-center sm:items-start">
                                   <span
-                                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[9px] font-black rounded-full uppercase tracking-wider w-fit ${aiOptimizationMetrics.confidenceLevelColor}`}
+                                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[0.7rem] font-black rounded-full uppercase tracking-wider w-fit ${aiOptimizationMetrics.confidenceLevelColor}`}
                                   >
                                     <span className="w-1 h-1 rounded-full bg-current animate-ping"></span>
                                     {aiOptimizationMetrics.confidenceLevelLabel}
                                   </span>
-                                  <div className="text-[9px] font-bold text-slate-500 dark:text-slate-200">
+                                  <div className="text-[0.7rem] font-bold text-slate-500 dark:text-slate-200">
                                     {lang === "th"
                                       ? "โหมดปัจจุบัน: "
                                       : "Operation: "}
@@ -3167,7 +3167,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                             {/* Sub-features active indicator channel lists */}
                             <div className="border-t border-slate-300/30 dark:border-slate-500/10 pt-3.5 mt-3.5">
-                              <div className="text-[9px] text-slate-405 dark:text-slate-200 font-bold block mb-1.5 uppercase tracking-wide">
+                              <div className="text-[0.7rem] text-slate-405 dark:text-slate-200 font-bold block mb-1.5 uppercase tracking-wide">
                                 {lang === "th"
                                   ? "ช่องทางมีส่วนร่วมเพื่อเสถียรกริด"
                                   : "Active AI Resource Toggles"}
@@ -3267,18 +3267,18 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="md:col-span-2 xl:col-span-8 transition-all duration-300 h-full"
+                        className="md:col-span-2 lg:col-span-8 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm h-full flex flex-col hover:shadow-lg transition-all duration-300 rounded-[2rem]">
-                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[9px] tracking-wider text-slate-600 dark:text-slate-100 font-bold opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity">
+                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[0.7rem] tracking-wider text-slate-600 dark:text-slate-100 font-bold opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity">
                             <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-400">
                                <i className="fas fa-grip-horizontal"></i>
-                               <span className="text-[9px] uppercase tracking-wider font-bold">DRAG TO MOVE (SOLAR GRID)</span>
+                               <span className="text-[0.7rem] uppercase tracking-wider font-bold">DRAG TO MOVE (SOLAR GRID)</span>
                              </div>
                              <div className="flex items-center gap-2">
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[8px]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === 0}
                               >
@@ -3286,7 +3286,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </button>
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[8px]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
                               >
@@ -3311,18 +3311,18 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="md:col-span-2 xl:col-span-12 transition-all duration-300 h-full"
+                        className="md:col-span-2 lg:col-span-12 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm h-full flex flex-col hover:shadow-lg transition-all duration-300 rounded-[2rem]">
-                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[9px] tracking-wider text-slate-600 dark:text-slate-100 font-bold opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity">
+                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[0.7rem] tracking-wider text-slate-600 dark:text-slate-100 font-bold opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity">
                             <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-400">
                                <i className="fas fa-grip-horizontal"></i>
-                               <span className="text-[9px] uppercase tracking-wider font-bold">DRAG TO MOVE</span>
+                               <span className="text-[0.7rem] uppercase tracking-wider font-bold">DRAG TO MOVE</span>
                              </div>
                              <div className="flex items-center gap-2">
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[8px]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === 0}
                               >
@@ -3330,7 +3330,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </button>
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[8px]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
                               >
@@ -3381,11 +3381,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                                       : "AI Grid Control Center"}
                                   </span>
                                 </h6>
-                                <span className="badge bg-emerald-555/20 text-emerald-300 font-mono text-[9px] font-bold p-1 px-2.5 rounded-full uppercase">
+                                <span className="badge bg-emerald-555/20 text-emerald-300 font-mono text-[0.7rem] font-bold p-1 px-2.5 rounded-full uppercase">
                                   Interactive Live
                                 </span>
                               </div>
-                              <p className="text-[11px] text-muted mb-6 leading-relaxed">
+                              <p className="text-[0.8rem] text-muted mb-6 leading-relaxed">
                                 {lang === "th"
                                   ? "คลิปรับฟังข้อมูลและควบคุมสวิตช์ระบบประหยัด เพื่อคาดคำนวณและโกนยอดโหลดสูงสุดในการบริหารงบล่วงหน้าแบบเรียลไทม์"
                                   : "Toggle active subgrid features inside the simulator core to adjust real-time peak-shaving forecasts."}
@@ -3416,7 +3416,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     </div>
                                     <div>
                                       <div
-                                        className={`text-[11px] font-black ${aiSmartAc ? "text-white/95" : "text-slate-400"}`}
+                                        className={`text-[0.8rem] font-black ${aiSmartAc ? "text-white/95" : "text-slate-400"}`}
                                       >
                                         {lang === "th"
                                           ? "1. ปรับอุณหภูมิ AC แบบประหยัด"
@@ -3461,7 +3461,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     </div>
                                     <div>
                                       <div
-                                        className={`text-[11px] font-black ${aiEcoStandby ? "text-white/95" : "text-slate-400"}`}
+                                        className={`text-[0.8rem] font-black ${aiEcoStandby ? "text-white/95" : "text-slate-400"}`}
                                       >
                                         {lang === "th"
                                           ? "2. ระงับไฟรั่วสแตนด์บาย"
@@ -3506,7 +3506,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     </div>
                                     <div>
                                       <div
-                                        className={`text-[11px] font-black ${aiLoadShift ? "text-white/95" : "text-slate-400"}`}
+                                        className={`text-[0.8rem] font-black ${aiLoadShift ? "text-white/95" : "text-slate-400"}`}
                                       >
                                         {lang === "th"
                                           ? "3. อัลกอริทึมสลับเวลา TOU"
@@ -3551,7 +3551,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     </div>
                                     <div>
                                       <div
-                                        className={`text-[11px] font-black ${aiPfTuning ? "text-white/95" : "text-slate-400"}`}
+                                        className={`text-[0.8rem] font-black ${aiPfTuning ? "text-white/95" : "text-slate-400"}`}
                                       >
                                         {lang === "th"
                                           ? "4. ตัวจูน Power Factor โครงข่าย"
@@ -3579,7 +3579,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             <div className="border-t border-slate-500/10 pt-4 mt-auto w-full">
                               <div className="grid grid-cols-2 gap-3">
                                 <div className="p-3 bg-light rounded-2xl text-center md:text-start">
-                                  <span className="text-[9px] text-muted font-bold block mb-1 uppercase">
+                                  <span className="text-[0.7rem] text-muted font-bold block mb-1 uppercase">
                                     {lang === "th"
                                       ? "จำลองมูลค่าประหยัด"
                                       : "Est. Savings Amount"}
@@ -3589,7 +3589,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                   </span>
                                 </div>
                                 <div className="p-3 bg-light rounded-2xl text-center md:text-start">
-                                  <span className="text-[9px] text-muted font-bold block mb-1 uppercase">
+                                  <span className="text-[0.7rem] text-muted font-bold block mb-1 uppercase">
                                     {lang === "th"
                                       ? "ยอดจ่ายจำลองสุทธิ"
                                       : "Optimized Estimate"}
@@ -3611,7 +3611,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         ? "⚡ เครื่องยิงประจุจำลองโหลดด่วน"
                         : "⚡ Virtual Load Stress Injector"}
                     </h6>
-                    <p className="text-[10px] text-muted mb-0">
+                    <p className="text-[0.75rem] text-muted mb-0">
                       {lang === "th"
                         ? "จำลองเครื่องใช้กำลังวัตต์สูงเข้าระบบเพื่อทดสอบพีคเทเลเมทรี"
                         : "Inject transient multi-kilowatt load into the sandbox to test pricing peaks."}
@@ -3620,13 +3620,13 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleInjectVirtualLoad(1500)}
-                      className="btn btn-xs btn-outline-warning text-[10px] uppercase font-bold py-2 px-3 rounded-xl border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-white transition-all"
+                      className="btn btn-xs btn-outline-warning text-[0.75rem] uppercase font-bold py-2 px-3 rounded-xl border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-white transition-all"
                     >
                       + 1.5kW
                     </button>
                     <button
                       onClick={() => handleInjectVirtualLoad(3000)}
-                      className="btn btn-xs btn-outline-danger text-[10px] uppercase font-bold py-2 px-3 rounded-xl border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white transition-all"
+                      className="btn btn-xs btn-outline-danger text-[0.75rem] uppercase font-bold py-2 px-3 rounded-xl border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white transition-all"
                     >
                       + 3.0kW
                     </button>
@@ -3639,7 +3639,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         ? "🔌 บล็อกสแตนด์บายตกค้างอัจฉริยะ"
                         : "🔌 Eco Standby Bulk Disconnect"}
                     </h6>
-                    <p className="text-[10px] text-muted mb-0">
+                    <p className="text-[0.75rem] text-muted mb-0">
                       {lang === "th"
                         ? "ปิดการใช้ขั้วแสตนด์บายทั้งหมดเพื่อตัดปัญหากระแสรั่ว"
                         : "Disconnect standby items in one go to instantly reduce idle leakage."}
@@ -3737,12 +3737,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                             className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${isSelected ? "bg-primary text-white shadow-md" : "bg-white/80 backdrop-blur-sm border-2 border-primary/20 text-primary hover:bg-primary hover:text-white"}`}
                           >
                             <i
-                              className={`fas ${isSelected ? "fa-check" : "fa-plus"} text-[10px]`}
+                              className={`fas ${isSelected ? "fa-check" : "fa-plus"} text-[0.75rem]`}
                             ></i>
                           </button>
                         </div>
                         <div
-                          className={`absolute top-0 right-0 p-3 text-[8px] font-bold uppercase tracking-widest ${dev.status === "active" ? "bg-emerald-500" : "bg-amber-500"} text-white`}
+                          className={`absolute top-0 right-0 p-3 text-[0.65rem] font-bold uppercase tracking-widest ${dev.status === "active" ? "bg-emerald-500" : "bg-amber-500"} text-white`}
                         >
                           {dev.status}
                         </div>
@@ -3752,14 +3752,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                           ></i>
                         </div>
                         <h6 className="font-bold text-lg mb-1">{dev.name}</h6>
-                        <p className="label text-[9px] mb-4 dark:opacity-100 opacity-60">
+                        <p className="label text-[0.7rem] mb-4 dark:opacity-100 opacity-60">
                           {dev.category}
                         </p>
                         <div className="flex justify-between items-end border-top border-light pt-4">
                           <div className="mono-font font-bold text-primary">
                             ฿{devCost.toFixed(0)}
                           </div>
-                          <div className="text-[10px] text-muted font-bold">
+                          <div className="text-[0.75rem] text-muted font-bold">
                             {dev.watt}W
                           </div>
                         </div>
@@ -3827,7 +3827,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       className="row g-3 transition-all duration-500"
                     >
                       <div className="col-12 col-md-6">
-                        <label className="label text-[10px] mb-2 block">
+                        <label className="label text-[0.75rem] mb-2 block">
                           {t("calc_rate")}
                         </label>
                         <div className="flex items-center p-3 md:p-4 bg-light rounded-3xl">
@@ -3841,7 +3841,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         </div>
                       </div>
                       <div className="col-12 col-md-6">
-                        <label className="label text-[10px] mb-2 block">
+                        <label className="label text-[0.75rem] mb-2 block">
                           {t("calc_days")}
                         </label>
                         <div className="flex items-center p-3 md:p-4 bg-light rounded-3xl">
@@ -3859,25 +3859,25 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                   <div className="flex gap-4 mb-6 border-bottom border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
                     <button
-                      className={`text-[10px] md:text-xs font-bold uppercase tracking-widest pb-2 transition-all ${calcTab === "detailed" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                      className={`text-[0.75rem] md:text-xs font-bold uppercase tracking-widest pb-2 transition-all ${calcTab === "detailed" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                       onClick={() => setCalcTab("detailed")}
                     >
                       {t("calc_detailed")}
                     </button>
                     <button
-                      className={`text-[10px] md:text-xs font-bold uppercase tracking-widest pb-2 transition-all ${calcTab === "batch" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                      className={`text-[0.75rem] md:text-xs font-bold uppercase tracking-widest pb-2 transition-all ${calcTab === "batch" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                       onClick={() => setCalcTab("batch")}
                     >
                       {t("calc_batch")}
                     </button>
                     <button
-                      className={`text-[10px] md:text-xs font-bold uppercase tracking-widest pb-2 transition-all ${calcTab === "tariff" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                      className={`text-[0.75rem] md:text-xs font-bold uppercase tracking-widest pb-2 transition-all ${calcTab === "tariff" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                       onClick={() => setCalcTab("tariff")}
                     >
                       {t("calc_tariff")}
                     </button>
                     <button
-                      className={`text-[10px] md:text-xs font-bold uppercase tracking-widest pb-2 transition-all ${calcTab === "budget" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                      className={`text-[0.75rem] md:text-xs font-bold uppercase tracking-widest pb-2 transition-all ${calcTab === "budget" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                       onClick={() => setCalcTab("budget")}
                     >
                       {lang === "th"
@@ -3901,7 +3901,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                 (aiAutopilotCapping ? "Active" : "Off") +
                                 ")"}
                           </h6>
-                          <p className="text-[10px] text-muted mb-0">
+                          <p className="text-[0.75rem] text-muted mb-0">
                             {lang === "th"
                               ? "ปรับรอบชั่วโมงการทำงานของแอร์และโหนวัตต์สูงโดยอัตโนมัติเมื่อคาดการณ์ยอดเงินจะบวมล้นงบรายเดือนที่คุณกำหนด"
                               : "Automatically trim and cycle high-wattage active loads if forecast exceeds budget constraints."}
@@ -3935,7 +3935,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           <div
                             className={`p-4 rounded-2xl ${analytics.budgetRemaining > 0 ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600"}`}
                           >
-                            <span className="text-[9px] uppercase font-bold tracking-widest block mb-1">
+                            <span className="text-[0.7rem] uppercase font-bold tracking-widest block mb-1">
                               {t("budget_remainder")}
                             </span>
                             <h3 className="text-xl md:text-2xl font-bold mono-font mb-0">
@@ -4018,7 +4018,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </div>
                             </div>
                             <div className="col-5 col-md-3">
-                              <label className="text-[8px] font-bold text-muted block uppercase">
+                              <label className="text-[0.65rem] font-bold text-muted block uppercase">
                                 {t("node_watt").split(" ")[0]}
                               </label>
                               <input
@@ -4031,7 +4031,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               />
                             </div>
                             <div className="col-5 col-md-3">
-                              <label className="text-[8px] font-bold text-muted block uppercase">
+                              <label className="text-[0.65rem] font-bold text-muted block uppercase">
                                 {t("node_hours").split(" ")[0]}
                               </label>
                               <input
@@ -4055,7 +4055,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         </div>
                       ))}
                       <button
-                        className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 w-100 py-3 rounded-[24px] border-2 border-dashed border-primary/20 text-primary font-bold text-[10px] uppercase tracking-[0.3em] hover:bg-primary/5 mt-4"
+                        className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 w-100 py-3 rounded-[24px] border-2 border-dashed border-primary/20 text-primary font-bold text-[0.75rem] uppercase tracking-[0.3em] hover:bg-primary/5 mt-4"
                         onClick={addDevice}
                       >
                         <i className="fas fa-plus-circle me-2"></i> {t("add")}
@@ -4066,7 +4066,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   {calcTab === "batch" && (
                     <div className="space-y-8 animate-fade-in">
                       <div>
-                        <h6 className="text-[10px] font-bold uppercase tracking-widest text-muted mb-4">
+                        <h6 className="text-[0.75rem] font-bold uppercase tracking-widest text-muted mb-4">
                           {t("batch_presets")}
                         </h6>
                         <div className="row g-3">
@@ -4081,14 +4081,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     <div className="font-bold text-xs">
                                       {t(set.key)}
                                     </div>
-                                    <div className="text-[9px] text-muted">
+                                    <div className="text-[0.7rem] text-muted">
                                       {set.items.length} nodes
                                     </div>
                                   </div>
                                 </div>
                                 <button
                                   onClick={() => addPresetSet(set)}
-                                  className="btn btn-primary btn-xs rounded-xl font-bold uppercase tracking-tighter text-[8px]"
+                                  className="btn btn-primary btn-xs rounded-xl font-bold uppercase tracking-tighter text-[0.65rem]"
                                 >
                                   {t("batch_add_set")}
                                 </button>
@@ -4098,7 +4098,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         </div>
                       </div>
                       <div>
-                        <h6 className="text-[10px] font-bold uppercase tracking-widest text-muted mb-4">
+                        <h6 className="text-[0.75rem] font-bold uppercase tracking-widest text-muted mb-4">
                           {t("batch_library")}
                         </h6>
                         <div className="row g-3">
@@ -4113,10 +4113,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     className={`fas ${item.icon} text-base md:text-lg`}
                                   ></i>
                                 </div>
-                                <div className="font-bold text-[10px] md:text-[11px] mb-1 leading-tight">
+                                <div className="font-bold text-[0.75rem] md:text-[0.8rem] mb-1 leading-tight">
                                   {item.name}
                                 </div>
-                                <div className="text-[8px] md:text-[9px] text-muted mono-font">
+                                <div className="text-[0.65rem] md:text-[0.7rem] text-muted mono-font">
                                   {item.watt}W | {item.hours}h
                                 </div>
                               </div>
@@ -4144,7 +4144,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                   {t("tou_peak")} (฿{TOU_ON_PEAK_RATE})
                                 </span>
                               </div>
-                              <p className="text-[10px] text-muted leading-relaxed mb-0">
+                              <p className="text-[0.75rem] text-muted leading-relaxed mb-0">
                                 {t("tou_peak_desc")}
                               </p>
                             </div>
@@ -4159,7 +4159,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                   {t("tou_off")} (฿{TOU_OFF_PEAK_RATE})
                                 </span>
                               </div>
-                              <p className="text-[10px] text-muted leading-relaxed mb-0">
+                              <p className="text-[0.75rem] text-muted leading-relaxed mb-0">
                                 {t("tou_off_desc")}
                               </p>
                             </div>
@@ -4198,10 +4198,10 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                         <div className="mt-8 p-5 bg-white rounded-[2rem] shadow-sm border border-primary/10">
                           <div className="flex justify-between mb-4">
-                            <h6 className="label text-[10px]">
+                            <h6 className="label text-[0.75rem]">
                               {t("calc_tou_breakdown")}
                             </h6>
-                            <span className="text-[10px] font-bold text-primary">
+                            <span className="text-[0.75rem] font-bold text-primary">
                               {onPeakShare}% On-Peak
                             </span>
                           </div>
@@ -4225,7 +4225,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                   style={{ width: `${onPeakShare}%` }}
                                 ></div>
                               </div>
-                              <div className="text-[9px] text-muted mt-1">
+                              <div className="text-[0.7rem] text-muted mt-1">
                                 {analytics.onPeakUnits.toFixed(1)} kWh
                               </div>
                             </div>
@@ -4248,7 +4248,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                   style={{ width: `${100 - onPeakShare}%` }}
                                 ></div>
                               </div>
-                              <div className="text-[9px] text-muted mt-1">
+                              <div className="text-[0.7rem] text-muted mt-1">
                                 {analytics.offPeakUnits.toFixed(1)} kWh
                               </div>
                             </div>
@@ -4267,7 +4267,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           </div>
                         </div>
 
-                        <p className="text-[10px] md:text-[11px] italic text-center opacity-70 mt-6 mb-0">
+                        <p className="text-[0.75rem] md:text-[0.8rem] italic text-center opacity-70 mt-6 mb-0">
                           "{t("tou_desc")}"
                         </p>
                       </div>
@@ -4286,7 +4286,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             { tier: 3, range: "400+", rate: "4.42", w: "100" },
                           ].map((tRow, i) => (
                             <div key={i}>
-                              <div className="flex justify-between text-[10px] font-bold mb-1">
+                              <div className="flex justify-between text-[0.75rem] font-bold mb-1">
                                 <span className="text-muted">
                                   {t("progressive_tier")} {tRow.tier}:{" "}
                                   {tRow.range} Units
@@ -4315,7 +4315,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 >
                   <div className="hologram-card h-100 p-6 md:p-8 flex flex-col justify-center">
                     <div className="mb-auto text-center">
-                      <span className="badge bg-white/20 px-4 py-2 rounded-full text-[8px] md:text-[9px] font-bold tracking-[0.3em] uppercase mb-4">
+                      <span className="badge bg-white/20 px-4 py-2 rounded-full text-[0.65rem] md:text-[0.7rem] font-bold tracking-[0.3em] uppercase mb-4">
                         Neural Data Projection
                       </span>
                       <h4 className="font-display font-bold text-white text-lg md:text-xl">
@@ -4325,7 +4325,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                     <div className="p-4 bg-white/10 rounded-[2rem] border border-white/20 mb-8 mt-4">
                       <div className="flex justify-between mb-2">
-                        <label className="text-[9px] font-bold uppercase text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all">
+                        <label className="text-[0.7rem] font-bold uppercase text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all">
                           {t("calc_on_peak_share")}
                         </label>
                         <span className="text-xs font-bold text-white mono-font">
@@ -4346,7 +4346,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <div className="text-center mb-8">
                       {calcMode === "hours" ? (
                         <div className="animate-fade-in">
-                          <span className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[9px] md:text-[10px] inline-block mb-2 uppercase font-bold">
+                          <span className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[0.7rem] md:text-[0.75rem] inline-block mb-2 uppercase font-bold">
                             {t("calc_est_cost")}
                           </span>
                           <h1 className="text-white font-display text-6xl md:text-8xl font-bold mono-font neon-glow mb-4">
@@ -4358,7 +4358,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                           <div className="mt-6 p-4 md:p-5 bg-white/10 border border-white/20 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-between group cursor-pointer hover:bg-white/20 transition-all">
                             <div className="text-start">
-                              <div className="text-emerald-400 text-[8px] uppercase font-bold mb-1">
+                              <div className="text-emerald-400 text-[0.65rem] uppercase font-bold mb-1">
                                 {t("calc_sim_tou")}
                               </div>
                               <div className="text-white font-bold text-xl md:text-2xl mono-font">
@@ -4369,7 +4369,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </div>
                             </div>
                             <div className="text-end">
-                              <div className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[8px] uppercase font-bold mb-1 inline-block">
+                              <div className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[0.65rem] uppercase font-bold mb-1 inline-block">
                                 {t("calc_grid_saving")}
                               </div>
                               <div
@@ -4387,7 +4387,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                           {analytics.touSavings > 0 && (
                             <div className="mt-4 animate-fade-in p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30">
-                              <div className="text-[10px] text-emerald-400 font-bold uppercase tracking-widest">
+                              <div className="text-[0.75rem] text-emerald-400 font-bold uppercase tracking-widest">
                                 {t("calc_savings_vs_std")}
                               </div>
                               <div className="text-white text-xl font-bold mono-font">
@@ -4402,7 +4402,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         </div>
                       ) : (
                         <div className="animate-fade-in">
-                          <span className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[10px] inline-block mb-4 uppercase font-bold">
+                          <span className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[0.75rem] inline-block mb-4 uppercase font-bold">
                             {t("budget_modify")}
                           </span>
                           <input
@@ -4417,7 +4417,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                 ? Math.floor(globalBudget / analytics.burnRate)
                                 : "∞"}
                             </h1>
-                            <span className="text-[10px] md:text-sm font-bold uppercase tracking-[0.4em] text-white drop-shadow-md bg-black/20 px-3 py-1.5 rounded-lg backdrop-blur-sm transition-all mt-2 inline-block">
+                            <span className="text-[0.75rem] md:text-sm font-bold uppercase tracking-[0.4em] text-white drop-shadow-md bg-black/20 px-3 py-1.5 rounded-lg backdrop-blur-sm transition-all mt-2 inline-block">
                               Grid Days Remaining
                             </span>
                           </div>
@@ -4426,7 +4426,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </div>
                     <div className="mt-auto pt-6 border-top border-white/10 flex justify-between">
                       <div className="text-start">
-                        <span className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[8px] inline-block font-bold uppercase mb-1">
+                        <span className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[0.65rem] inline-block font-bold uppercase mb-1">
                           {t("calc_daily_cost")}
                         </span>
                         <div className="text-white font-bold mono-font text-sm">
@@ -4434,7 +4434,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         </div>
                       </div>
                       <div className="text-end">
-                        <span className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[8px] inline-block font-bold uppercase mb-1">
+                        <span className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[0.65rem] inline-block font-bold uppercase mb-1">
                           {t("calc_node_avg")}
                         </span>
                         <div className="text-white font-bold mono-font text-sm">
@@ -4456,7 +4456,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               {/* Stats Page Sub-Tabs */}
               <div className="flex gap-4 mb-6 border-bottom border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
                 <button
-                  className={`text-[10px] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${statsTab === "telemetry" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${statsTab === "telemetry" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                   style={{
                     borderBottom:
                       statsTab === "telemetry" ? "2px solid" : "none",
@@ -4467,7 +4467,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   {lang === "th" ? "ข้อมูลคลื่นไฟฟ้าด่วน" : "Telemetry Logs"}
                 </button>
                 <button
-                  className={`text-[10px] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${statsTab === "benchmark" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${statsTab === "benchmark" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                   style={{
                     borderBottom:
                       statsTab === "benchmark" ? "2px solid" : "none",
@@ -4497,7 +4497,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             <p className="text-xs opacity-80 leading-relaxed mb-6 relative z-10">
                               {t("ai_scan_desc")}
                             </p>
-                            <button className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 w-100 rounded-2xl py-3 font-bold text-[10px] uppercase tracking-widest text-primary relative z-10">
+                            <button className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 w-100 rounded-2xl py-3 font-bold text-[0.75rem] uppercase tracking-widest text-primary relative z-10">
                               {t("ai_apply")}
                             </button>
 
@@ -4507,7 +4507,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                   <i className="fas fa-bolt text-xs"></i>
                                 </div>
                                 <div>
-                                  <div className="text-[10px] font-bold opacity-60 uppercase">
+                                  <div className="text-[0.75rem] font-bold opacity-60 uppercase">
                                     Real-time Efficiency
                                   </div>
                                   <div className="text-xl font-bold mono-font">
@@ -4520,7 +4520,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                   <i className="fas fa-microchip text-xs"></i>
                                 </div>
                                 <div>
-                                  <div className="text-[10px] font-bold opacity-60 uppercase">
+                                  <div className="text-[0.75rem] font-bold opacity-60 uppercase">
                                     System Health
                                   </div>
                                   <div className="text-xl font-bold mono-font">
@@ -4538,7 +4538,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           <div className="p-6 md:p-8">
                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                               <div>
-                                <span className="text-[9px] text-primary font-bold uppercase tracking-widest font-mono block mb-1">
+                                <span className="text-[0.7rem] text-primary font-bold uppercase tracking-widest font-mono block mb-1">
                                   <i className="fas fa-brain me-1.5 align-middle text-emerald-400"></i>{" "}
                                   AI-OPTIMIZED PATTERN VISUALIZER
                                 </span>
@@ -4555,7 +4555,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </div>
                               <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-2xl">
                                 <div className="text-end">
-                                  <span className="text-[9px] text-emerald-400 font-bold uppercase block">
+                                  <span className="text-[0.7rem] text-emerald-400 font-bold uppercase block">
                                     {lang === "th"
                                       ? "ประหยัดพลังงานรวม"
                                       : "Total Combined Savings"}
@@ -4774,7 +4774,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         <h4 className="font-display font-bold text-lg md:text-2xl tracking-tight">
                           {t("telemetry_perf_metrics")}
                         </h4>
-                        <p className="text-[10px] text-muted font-bold uppercase tracking-widest mt-1">
+                        <p className="text-[0.75rem] text-muted font-bold uppercase tracking-widest mt-1">
                           Uptime & Efficiency Telemetry
                         </p>
                       </div>
@@ -4784,7 +4784,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             <button
                               key={range}
                               onClick={() => setTelemetryPerfRange(range)}
-                              className={`btn btn-xs flex-grow md:flex-none px-4 rounded-xl font-bold uppercase text-[9px] tracking-widest ${telemetryPerfRange === range ? "btn-primary shadow-md" : "text-muted dark:opacity-100 opacity-60"}`}
+                              className={`btn btn-xs flex-grow md:flex-none px-4 rounded-xl font-bold uppercase text-[0.7rem] tracking-widest ${telemetryPerfRange === range ? "btn-primary shadow-md" : "text-muted dark:opacity-100 opacity-60"}`}
                             >
                               {t(
                                 range === "daily"
@@ -4943,7 +4943,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         <div className="overflow-auto max-h-[300px] w-full bg-transparent custom-scrollbar">
                           <table className="table table-hover align-middle text-sm text-slate-800 dark:text-slate-100">
                             <thead className="bg-light text-slate-600 dark:text-slate-100">
-                              <tr className="label text-[9px]">
+                              <tr className="label text-[0.7rem]">
                                 <th>{t("log_cycle")}</th>
                                 <th>{t("log_units")}</th>
                                 <th className="text-end">
@@ -5041,10 +5041,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                       </p>
                     </div>
                     <div
-                      className="p-6 md:p-8 bg-primary/5 border-2 border-primary/10 rounded-[30px] md:rounded-[40px] italic text-[11px] md:text-xs text-muted leading-relaxed animate-slide-up bg-card shadow-sm"
+                      className="p-6 md:p-8 bg-primary/5 border-2 border-primary/10 rounded-[30px] md:rounded-[40px] italic text-[0.8rem] md:text-xs text-muted leading-relaxed animate-slide-up bg-card shadow-sm"
                       style={{ animationDelay: "300ms" }}
                     >
-                      <h6 className="font-bold text-primary mb-2 uppercase tracking-[0.2em] text-[10px]">
+                      <h6 className="font-bold text-primary mb-2 uppercase tracking-[0.2em] text-[0.75rem]">
                         {t("bench_insight_title")}
                       </h6>
                       {t("bench_insight_desc")}
@@ -5060,7 +5060,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               {/* Grid Intelligence Sub-Tabs */}
               <div className="flex gap-4 mb-6 border-bottom border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
                 <button
-                  className={`text-[10px] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${notiTab === "alerts" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${notiTab === "alerts" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                   style={{
                     borderBottom:
                       notiTab === "alerts" ? "2px solid" : "none",
@@ -5073,7 +5073,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     : "Anomaly & Surge Reports"}
                 </button>
                 <button
-                  className={`text-[10px] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${notiTab === "quests" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${notiTab === "quests" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                   style={{
                     borderBottom:
                       notiTab === "quests" ? "2px solid" : "none",
@@ -5100,7 +5100,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       <button
                         disabled={isAiScanning}
                         onClick={runAiAnomalyScan}
-                        className={`btn flex-grow sm:flex-none rounded-xl font-bold text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 ${isAiScanning ? "btn-light" : "btn-primary shadow-lg shadow-primary/20"}`}
+                        className={`btn flex-grow sm:flex-none rounded-xl font-bold text-[0.75rem] uppercase tracking-widest flex items-center justify-center gap-2 ${isAiScanning ? "btn-light" : "btn-primary shadow-lg shadow-primary/20"}`}
                       >
                         {isAiScanning ? (
                           <>
@@ -5115,7 +5115,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         )}
                       </button>
                       <button
-                        className="btn btn-outline-primary border-0 font-bold text-[10px] uppercase tracking-widest"
+                        className="btn btn-outline-primary border-0 font-bold text-[0.75rem] uppercase tracking-widest"
                         onClick={() => setAiAlerts([])}
                       >
                         {t("alert_clear")}
@@ -5146,7 +5146,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         >
                           {n.isAi && (
                             <div className="absolute top-0 right-0 p-2">
-                              <span className="badge bg-primary/10 text-primary text-[8px] font-bold uppercase tracking-widest border border-primary/20">
+                              <span className="badge bg-primary/10 text-primary text-[0.65rem] font-bold uppercase tracking-widest border border-primary/20">
                                 <i className="fas fa-robot me-1"></i> AI
                                 Analysis
                               </span>
@@ -5162,11 +5162,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                               <h6 className="font-bold mb-0 text-base md:text-lg tracking-tight text-dark">
                                 {n.t}
                               </h6>
-                              <span className="text-[10px] font-bold text-muted uppercase tracking-widest">
+                              <span className="text-[0.75rem] font-bold text-muted uppercase tracking-widest">
                                 {n.time}
                               </span>
                             </div>
-                            <p className="text-muted text-[11px] md:text-xs leading-relaxed mb-0">
+                            <p className="text-muted text-[0.8rem] md:text-xs leading-relaxed mb-0">
                               {n.d}
                             </p>
                           </div>
@@ -5209,7 +5209,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               {/* Manual Page Sub-Tabs */}
               <div className="flex gap-4 mb-6 border-bottom border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
                 <button
-                  className={`text-[10px] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${manualTab === "guide" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${manualTab === "guide" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                   style={{
                     borderBottom:
                       manualTab === "guide" ? "2px solid" : "none",
@@ -5220,7 +5220,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   {lang === "th" ? "คู่มือผู้ใช้ระบบกริต" : "User Guide"}
                 </button>
                 <button
-                  className={`text-[10px] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${manualTab === "settings" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${manualTab === "settings" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                   style={{
                     borderBottom:
                       manualTab === "settings" ? "2px solid" : "none",
@@ -5257,7 +5257,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <h4 className="font-display font-bold text-2xl md:text-3xl mb-1 relative z-10">
                     Namyen Admin
                   </h4>
-                  <div className="badge bg-primary-subtle text-primary px-4 py-2 rounded-full text-[9px] md:text-[10px] uppercase tracking-widest font-bold mb-8 md:mb-10 relative z-10">
+                  <div className="badge bg-primary-subtle text-primary px-4 py-2 rounded-full text-[0.7rem] md:text-[0.75rem] uppercase tracking-widest font-bold mb-8 md:mb-10 relative z-10">
                     {t("set_authority")}
                   </div>
 
@@ -5313,7 +5313,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             />
                           </div>
                         ) : (
-                          <span className="text-emerald-500 font-bold text-[10px] md:text-xs uppercase tracking-widest">
+                          <span className="text-emerald-500 font-bold text-[0.75rem] md:text-xs uppercase tracking-widest">
                             {row.val}
                           </span>
                         )}
@@ -5321,7 +5321,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     ))}
                   </div>
                   <button
-                    className="btn btn-outline-danger w-full py-3.5 md:py-4 rounded-3xl font-bold text-[10px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.3em] mt-8 md:mt-10 transition-all hover:bg-danger hover:text-white shadow-lg border-rose-500/20 text-rose-500 cursor-pointer"
+                    className="btn btn-outline-danger w-full py-3.5 md:py-4 rounded-3xl font-bold text-[0.75rem] md:text-[0.8rem] uppercase tracking-[0.2em] md:tracking-[0.3em] mt-8 md:mt-10 transition-all hover:bg-danger hover:text-white shadow-lg border-rose-500/20 text-rose-500 cursor-pointer"
                     onClick={onLogout}
                   >
                     {t("set_terminate")}
@@ -5342,7 +5342,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <h3 className="font-display font-bold text-2xl md:text-3xl mb-1">
                   {t("comp_title")}
                 </h3>
-                <p className="text-[10px] text-muted font-bold uppercase tracking-widest">
+                <p className="text-[0.75rem] text-muted font-bold uppercase tracking-widest">
                   {t("node_comparing").replace(
                     "{n}",
                     compareDevices.length.toString(),
@@ -5381,7 +5381,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         >
                           {isBestPF && (
                             <div className="absolute top-4 right-4">
-                              <span className="badge bg-emerald-500 text-white rounded-full text-[8px] font-bold uppercase py-1.5 px-3">
+                              <span className="badge bg-emerald-500 text-white rounded-full text-[0.65rem] font-bold uppercase py-1.5 px-3">
                                 <i className="fas fa-star me-1"></i>{" "}
                                 {t("comp_best")}
                               </span>
@@ -5389,7 +5389,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           )}
                           {isWorstConsumer && (
                             <div className="absolute top-4 right-4">
-                              <span className="badge bg-danger text-white rounded-full text-[8px] font-bold uppercase py-1.5 px-3">
+                              <span className="badge bg-danger text-white rounded-full text-[0.65rem] font-bold uppercase py-1.5 px-3">
                                 {t("comp_worst")}
                               </span>
                             </div>
@@ -5401,13 +5401,13 @@ const Dashboard: React.FC<DashboardProps> = ({
                             ></i>
                           </div>
                           <h4 className="font-bold text-xl mb-1">{dev.name}</h4>
-                          <p className="text-[10px] text-muted uppercase font-bold tracking-widest mb-8">
+                          <p className="text-[0.75rem] text-muted uppercase font-bold tracking-widest mb-8">
                             {dev.category} Sector
                           </p>
 
                           <div className="space-y-6 mt-auto">
                             <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
-                              <span className="text-[9px] font-bold text-muted uppercase block mb-1">
+                              <span className="text-[0.7rem] font-bold text-muted uppercase block mb-1">
                                 {t("comp_metric_load")}
                               </span>
                               <div className="text-xl font-bold mono-font">
@@ -5415,7 +5415,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </div>
                             </div>
                             <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
-                              <span className="text-[9px] font-bold text-muted uppercase block mb-1">
+                              <span className="text-[0.7rem] font-bold text-muted uppercase block mb-1">
                                 {t("comp_metric_energy")}
                               </span>
                               <div className="text-xl font-bold mono-font text-primary">
@@ -5423,7 +5423,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </div>
                             </div>
                             <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
-                              <span className="text-[9px] font-bold text-muted uppercase block mb-1">
+                              <span className="text-[0.7rem] font-bold text-muted uppercase block mb-1">
                                 {t("comp_metric_cost")}
                               </span>
                               <div className="text-xl font-bold mono-font text-emerald-500">
@@ -5434,7 +5434,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </div>
                             </div>
                             <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
-                              <span className="text-[9px] font-bold text-muted uppercase block mb-1">
+                              <span className="text-[0.7rem] font-bold text-muted uppercase block mb-1">
                                 {t("comp_metric_pf")}
                               </span>
                               <div className="flex items-center gap-2">
@@ -5458,13 +5458,13 @@ const Dashboard: React.FC<DashboardProps> = ({
             <div className="p-8 bg-card border-top border-light flex justify-center">
               <div className="flex gap-4 p-2 bg-light rounded-full border shadow-inner">
                 <button
-                  className="btn btn-primary rounded-full px-10 py-3 font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20"
+                  className="btn btn-primary rounded-full px-10 py-3 font-bold text-[0.75rem] uppercase tracking-widest shadow-lg shadow-primary/20"
                   onClick={() => setShowComparisonView(false)}
                 >
                   Done
                 </button>
                 <button
-                  className="btn btn-outline-danger border-0 rounded-full px-6 py-3 font-bold text-[10px] uppercase"
+                  className="btn btn-outline-danger border-0 rounded-full px-6 py-3 font-bold text-[0.75rem] uppercase"
                   onClick={() => {
                     setCompareDeviceIds([]);
                     setShowComparisonView(false);
@@ -5501,7 +5501,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <div className="row g-4">
                       <div className="col-md-7">
                         <div className="p-5 bg-primary/5 rounded-[2rem] border border-primary/10">
-                          <label className="label text-[10px] block mb-3">
+                          <label className="label text-[0.75rem] block mb-3">
                             {t("node_id")}: {d.id}
                           </label>
                           <input
@@ -5515,7 +5515,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                           <div className="row g-3">
                             <div className="col-6">
-                              <label className="label text-[10px] block mb-2">
+                              <label className="label text-[0.75rem] block mb-2">
                                 {t("node_watt")}
                               </label>
                               <input
@@ -5528,7 +5528,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               />
                             </div>
                             <div className="col-6">
-                              <label className="label text-[10px] block mb-2">
+                              <label className="label text-[0.75rem] block mb-2">
                                 {t("node_hours")}
                               </label>
                               <input
@@ -5543,7 +5543,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           </div>
 
                           <div className="mt-4 pt-1">
-                            <label className="label text-[10px] block mb-2">
+                            <label className="label text-[0.75rem] block mb-2">
                               {lang === "th"
                                 ? "สถานะกริตไอโอที (Smart State)"
                                 : "Smart State Link"}
@@ -5555,7 +5555,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                   onClick={() =>
                                     updateDevice(d.id, "status", s)
                                   }
-                                  className={`btn btn-xs flex-grow py-2.5 rounded-xl border font-bold text-[9px] uppercase tracking-wider transition-all duration-200 ${
+                                  className={`btn btn-xs flex-grow py-2.5 rounded-xl border font-bold text-[0.7rem] uppercase tracking-wider transition-all duration-200 ${
                                     d.status === s
                                       ? s === "active"
                                         ? "bg-emerald-500 text-white border-emerald-500 shadow-md"
@@ -5584,24 +5584,24 @@ const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                       <div className="col-md-5">
                         <div className="p-5 bg-emerald-500/5 rounded-[2rem] border border-emerald-500/10 h-100">
-                          <h6 className="label text-[10px] mb-4">
+                          <h6 className="label text-[0.75rem] mb-4">
                             {t("node_tech_specs")}
                           </h6>
                           <div className="mb-4">
-                            <span className="text-[10px] font-bold text-muted uppercase block mb-1">
+                            <span className="text-[0.75rem] font-bold text-muted uppercase block mb-1">
                               {t("node_pf")}
                             </span>
                             <div className="flex items-center gap-2">
                               <div className="text-2xl font-bold text-emerald-500 mono-font">
                                 {d.pf}
                               </div>
-                              <div className="badge bg-emerald-500/10 text-emerald-500 text-[8px] px-2 py-1 rounded-full uppercase">
+                              <div className="badge bg-emerald-500/10 text-emerald-500 text-[0.65rem] px-2 py-1 rounded-full uppercase">
                                 Optimal
                               </div>
                             </div>
                           </div>
                           <div>
-                            <span className="text-[10px] font-bold text-muted uppercase block mb-1">
+                            <span className="text-[0.75rem] font-bold text-muted uppercase block mb-1">
                               Grid Compliance
                             </span>
                             <div className="text-xs font-bold text-main">
@@ -5627,7 +5627,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           </h6>
                         </div>
                         {deviceAnalysis && !deviceAnalysis.error && (
-                          <span className="badge bg-emerald-550/10 text-emerald-400 text-[8px] font-bold uppercase tracking-widest border border-emerald-500/20 py-1 px-2.5 rounded-full">
+                          <span className="badge bg-emerald-550/10 text-emerald-400 text-[0.65rem] font-bold uppercase tracking-widest border border-emerald-500/20 py-1 px-2.5 rounded-full">
                             <i className="fas fa-activity me-1"></i> Live Audit
                           </span>
                         )}
@@ -5635,7 +5635,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                       {!deviceAnalysis && !isAnalyzingDevice && (
                         <div className="relative z-10 py-2">
-                          <p className="text-[11px] text-slate-400 leading-relaxed mb-4">
+                          <p className="text-[0.8rem] text-slate-400 leading-relaxed mb-4">
                             Analyze telemetric power signatures, power factors,
                             and historical service logs of this node to diagnose
                             issues, estimate grid compliance anomalies, and
@@ -5643,7 +5643,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           </p>
                           <button
                             onClick={() => runIndividualDeviceAnalysis(d)}
-                            className="btn btn-primary w-100 rounded-2xl py-3 text-[10px] uppercase tracking-widest font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
+                            className="btn btn-primary w-100 rounded-2xl py-3 text-[0.75rem] uppercase tracking-widest font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
                           >
                             <i className="fas fa-brain text-xs"></i>{" "}
                             {t("ai_btn_diagnose")}
@@ -5654,7 +5654,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       {isAnalyzingDevice && (
                         <div className="relative z-10 text-center py-6">
                           <i className="fas fa-circle-notch animate-spin text-2xl text-primary mb-3 block"></i>
-                          <p className="text-[11px] font-bold text-slate-300 animate-pulse">
+                          <p className="text-[0.8rem] font-bold text-slate-300 animate-pulse">
                             {t("ai_analyzing")}
                           </p>
                           <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden mt-2">
@@ -5676,25 +5676,25 @@ const Dashboard: React.FC<DashboardProps> = ({
                               <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700/50">
                                 <div className="flex gap-4 items-center mb-3">
                                   <div className="flex flex-col">
-                                    <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block mb-1">
+                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-400 font-bold block mb-1">
                                       {t("ai_health_score")}
                                     </span>
                                     <div className="flex items-baseline gap-1">
                                       <span className="text-2xl font-display font-bold text-emerald-400">
                                         {deviceAnalysis.healthScore}
                                       </span>
-                                      <span className="text-[10px] text-slate-500">
+                                      <span className="text-[0.75rem] text-slate-500">
                                         /100
                                       </span>
                                     </div>
                                   </div>
                                   <div className="h-8 w-px bg-slate-705"></div>
                                   <div>
-                                    <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block mb-1">
+                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-400 font-bold block mb-1">
                                       {t("ai_health_status")}
                                     </span>
                                     <span
-                                      className={`inline-block font-bold py-0.5 px-2 bg-slate-900 rounded-md text-[10px] ${
+                                      className={`inline-block font-bold py-0.5 px-2 bg-slate-900 rounded-md text-[0.75rem] ${
                                         deviceAnalysis.healthStatus ===
                                         "Critical"
                                           ? "text-rose-400 border border-rose-500/20"
@@ -5708,7 +5708,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     </span>
                                   </div>
                                 </div>
-                                <p className="text-[11px] text-slate-300 leading-relaxed mb-0 italic">
+                                <p className="text-[0.8rem] text-slate-300 leading-relaxed mb-0 italic">
                                   "{deviceAnalysis.summary}"
                                 </p>
                               </div>
@@ -5717,7 +5717,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               {deviceAnalysis.technicalDetails &&
                                 deviceAnalysis.technicalDetails.length > 0 && (
                                   <div>
-                                    <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block mb-2">
+                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-400 font-bold block mb-2">
                                       {t("ai_tech_details")}
                                     </span>
                                     <div className="grid grid-cols-1 gap-1.5">
@@ -5727,8 +5727,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                                             key={idx}
                                             className="flex gap-2 items-start bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"
                                           >
-                                            <i className="fas fa-check text-emerald-500 text-[10px] mt-0.5"></i>
-                                            <span className="text-[10px] text-slate-300 leading-tight">
+                                            <i className="fas fa-check text-emerald-500 text-[0.75rem] mt-0.5"></i>
+                                            <span className="text-[0.75rem] text-slate-300 leading-tight">
                                               {detail}
                                             </span>
                                           </div>
@@ -5743,7 +5743,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                 deviceAnalysis.structuralOptimizations.length >
                                   0 && (
                                   <div>
-                                    <span className="text-[9px] uppercase tracking-wider text-slate-400 font-bold block mb-2">
+                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-400 font-bold block mb-2">
                                       {t("ai_onpeak_opt")}
                                     </span>
                                     <div className="grid grid-cols-1 gap-1.5">
@@ -5753,8 +5753,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                                             key={idx}
                                             className="flex gap-2 items-start bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"
                                           >
-                                            <i className="fas fa-lightbulb text-amber-400 text-[10px] mt-0.5 animate-pulse"></i>
-                                            <span className="text-[10px] text-slate-300 leading-tight">
+                                            <i className="fas fa-lightbulb text-amber-400 text-[0.75rem] mt-0.5 animate-pulse"></i>
+                                            <span className="text-[0.75rem] text-slate-300 leading-tight">
                                               {opt}
                                             </span>
                                           </div>
@@ -5767,11 +5767,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                               {/* Prescriptive advice */}
                               {deviceAnalysis.maintenanceAdvice && (
                                 <div className="p-4 bg-indigo-950/20 rounded-2xl border border-indigo-500/20 text-indigo-200">
-                                  <span className="text-[9px] uppercase tracking-wider text-indigo-400 font-bold block mb-1.5">
+                                  <span className="text-[0.7rem] uppercase tracking-wider text-indigo-400 font-bold block mb-1.5">
                                     <i className="fas fa-tools me-1"></i>{" "}
                                     {t("ai_maintenance_advice")}
                                   </span>
-                                  <p className="text-[11px] leading-relaxed mb-0">
+                                  <p className="text-[0.8rem] leading-relaxed mb-0">
                                     {deviceAnalysis.maintenanceAdvice}
                                   </p>
                                 </div>
@@ -5782,7 +5782,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                 <button
                                   onClick={() => runIndividualDeviceAnalysis(d)}
                                   disabled={isAnalyzingDevice}
-                                  className="text-primary hover:underline font-bold text-[9px] uppercase tracking-wider bg-transparent border-0"
+                                  className="text-primary hover:underline font-bold text-[0.7rem] uppercase tracking-wider bg-transparent border-0"
                                 >
                                   <i className="fas fa-sync me-1"></i> Run Live
                                   Diagnosis
@@ -5795,7 +5795,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </div>
 
                     <div className="p-6 bg-light rounded-[2.5rem]">
-                      <h6 className="label text-[10px] mb-6">
+                      <h6 className="label text-[0.75rem] mb-6">
                         {t("node_history_title")}
                       </h6>
                       <div className="h-[200px]">
@@ -5851,7 +5851,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </div>
 
                     <div className="p-6 bg-white border rounded-[2.5rem] shadow-sm">
-                      <h6 className="label text-[10px] mb-6">
+                      <h6 className="label text-[0.75rem] mb-6">
                         {t("node_maintenance")}
                       </h6>
                       <div className="space-y-4">
@@ -5862,15 +5862,15 @@ const Dashboard: React.FC<DashboardProps> = ({
                               className="flex justify-between items-center p-3 bg-light rounded-2xl border border-transparent hover:border-primary/20 transition-all"
                             >
                               <div>
-                                <div className="text-[11px] font-bold text-main mb-1">
+                                <div className="text-[0.8rem] font-bold text-main mb-1">
                                   {log.action}
                                 </div>
-                                <div className="text-[9px] font-bold text-muted uppercase tracking-widest">
+                                <div className="text-[0.7rem] font-bold text-muted uppercase tracking-widest">
                                   {log.date}
                                 </div>
                               </div>
                               <div
-                                className={`badge rounded-full px-3 py-1.5 text-[8px] font-bold uppercase ${log.status === "resolved" ? "bg-emerald-500/10 text-emerald-500" : "bg-amber-500/10 text-amber-500"}`}
+                                className={`badge rounded-full px-3 py-1.5 text-[0.65rem] font-bold uppercase ${log.status === "resolved" ? "bg-emerald-500/10 text-emerald-500" : "bg-amber-500/10 text-amber-500"}`}
                               >
                                 {log.status === "resolved"
                                   ? t("node_log_resolved")
@@ -5888,7 +5888,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                     <div className="pt-6 flex flex-col sm:flex-row gap-3">
                       <button
-                        className="btn btn-primary flex-grow rounded-[1.5rem] py-4 font-bold text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20"
+                        className="btn btn-primary flex-grow rounded-[1.5rem] py-4 font-bold text-[0.75rem] uppercase tracking-widest shadow-lg shadow-primary/20"
                         onClick={() => setSelectedDeviceId(null)}
                       >
                         {t("node_auth")}
@@ -5950,7 +5950,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               <div className="text-xs font-black tracking-wide text-white uppercase font-mono">
                 EnergyAI Assistant
               </div>
-              <div className="text-[10px] font-bold text-emerald-400 font-mono">
+              <div className="text-[0.75rem] font-bold text-emerald-400 font-mono">
                 ● Active Advisor
               </div>
             </div>
@@ -5971,7 +5971,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               className={`flex items-start gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
             >
               {msg.role !== "user" && (
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0 text-[10px]">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0 text-[0.75rem]">
                   <i className="fas fa-brain"></i>
                 </div>
               )}
@@ -6020,7 +6020,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               if (match) {
                                 content = trimmed.replace(/^(\d+\.)\s*/, "");
                                 bulletIcon = (
-                                  <span className="text-emerald-400 mr-2 font-mono font-bold text-[10px]">
+                                  <span className="text-emerald-400 mr-2 font-mono font-bold text-[0.75rem]">
                                     {match[1]}
                                   </span>
                                 );
@@ -6080,7 +6080,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               <button
                                 type="button"
                                 onClick={handleResolveSpike}
-                                className="btn btn-rose w-full py-2.5 rounded-xl font-bold uppercase tracking-wider text-[10px] bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30 border-0 cursor-pointer"
+                                className="btn btn-rose w-full py-2.5 rounded-xl font-bold uppercase tracking-wider text-[0.75rem] bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center gap-2 shadow-lg shadow-rose-600/30 border-0 cursor-pointer"
                               >
                                 <i className="fas fa-tools animate-spin text-xs"></i>
                                 <span>
@@ -6099,7 +6099,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           ))}
           {isSendingChat && (
             <div className="flex items-start gap-2.5 justify-start">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0 text-[10px]">
+              <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0 text-[0.75rem]">
                 <i className="fas fa-brain animate-spin"></i>
               </div>
               <div className="bg-slate-800/80 border border-slate-700/50 text-slate-400 rounded-2xl rounded-tl-none p-3 text-xs flex items-center gap-2">
@@ -6128,7 +6128,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <button
               type="button"
               onClick={() => setActiveFaqCategory("popular")}
-              className={`text-[9px] font-bold px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
+              className={`text-[0.7rem] font-bold px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 activeFaqCategory === "popular"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold"
                   : "bg-slate-800/60 text-slate-400 hover:bg-slate-800 border border-transparent"
@@ -6139,7 +6139,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <button
               type="button"
               onClick={() => setActiveFaqCategory("devices")}
-              className={`text-[9px] font-bold px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
+              className={`text-[0.7rem] font-bold px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 activeFaqCategory === "devices"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold"
                   : "bg-slate-800/60 text-slate-400 hover:bg-slate-800 border border-transparent"
@@ -6150,7 +6150,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <button
               type="button"
               onClick={() => setActiveFaqCategory("tou_bill")}
-              className={`text-[9px] font-bold px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
+              className={`text-[0.7rem] font-bold px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 activeFaqCategory === "tou_bill"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold"
                   : "bg-slate-800/60 text-slate-400 hover:bg-slate-800 border border-transparent"
@@ -6172,7 +6172,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "ขอวิเคราะห์การใช้พลังงานของแอร์และแนะนำวิธีเซฟบิลแอร์แบบเห็นผลด่วนที่สุดหน่อยครับ",
                     )
                   }
-                  className="text-[10px] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
                 >
                   ❄️{" "}
                   {lang === "th"
@@ -6187,7 +6187,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "ขอลดไฟ standby ของอุปกรณ์ที่ไม่ได้ใช้งานเพื่อเซฟค่าไฟเฉลี่ยหน่อยครับ",
                     )
                   }
-                  className="text-[10px] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
                 >
                   🔌 {lang === "th" ? "ตัดไฟ Standby" : "Standby Cutoff"}
                 </button>
@@ -6199,7 +6199,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "ขอแนะนำ 3 วิธีประหยัดค่าไฟด่วนที่สุดที่ลดบิลได้ทันทีในสัปดาห์นี้ครับ",
                     )
                   }
-                  className="text-[10px] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
                 >
                   💡{" "}
                   {lang === "th"
@@ -6219,7 +6219,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "ช่วยสแกนค่า Power Factor รวมและแนะนำวิธีการรักษาระดับประสิทธิภาพมอเตอร์ไฟฟ้าเพื่อความเสถียรหน่อยครับ",
                     )
                   }
-                  className="text-[10px] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
                 >
                   ⚡{" "}
                   {lang === "th"
@@ -6234,7 +6234,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "ทำไมค่ากระแสแอมป์ (Amperes) ของอุปกรณ์บางชนิดสูงขึ้นผิดปกติขณะโหลดเริ่มเปิดทำงาน และส่งผลต่อความเสถียรอย่างไร",
                     )
                   }
-                  className="text-[10px] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
                 >
                   📈{" "}
                   {lang === "th"
@@ -6249,7 +6249,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "แอร์ประหยัดไฟเบอร์ 5 แบบธรรมดา กับแอร์ระบบ Inverter ต่างกันอย่างไร คุ้มค่าที่จะเปลี่ยนเพื่อลดงบในระยะยาวหรือไม่ครับ",
                     )
                   }
-                  className="text-[10px] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
                 >
                   🔄{" "}
                   {lang === "th"
@@ -6269,7 +6269,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "ขอแผนควบคุมหรือย้ายเวลาใช้อุปกรณ์ไฟฟ้ายอดนิยมไปอยู่ในช่วง Off-Peak ของอัตรา TOU เพื่อประหยัดสูงสุด",
                     )
                   }
-                  className="text-[10px] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
                 >
                   ⏱️{" "}
                   {lang === "th" ? "จัดแผนเวลา TOU" : "Off-Peak Savings Plan"}
@@ -6282,7 +6282,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "อัตราค่าไฟฟ้า TOU คิดราคาและเวลาเหลื่อม On-Peak กับ Off-Peak อย่างไรในไทย และเหมาะกับบ้านแบบไหนบิลต่ำลง",
                     )
                   }
-                  className="text-[10px] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
                 >
                   📖{" "}
                   {lang === "th"
@@ -6297,7 +6297,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "มีคำแนะนำในการจำกัดงบประมาณรายวันเพื่อให้ไม่เกินงบบัดเจตพลังงานรายเดือนที่ 3,500 บาทอย่างไรบ้าง",
                     )
                   }
-                  className="text-[10px] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
                 >
                   🎯{" "}
                   {lang === "th"
@@ -6362,10 +6362,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-[10px] font-bold uppercase tracking-widest ${isDarkMode ? "text-rose-400" : "text-rose-600"}`}>
+                      <span className={`text-[0.75rem] font-bold uppercase tracking-widest ${isDarkMode ? "text-rose-400" : "text-rose-600"}`}>
                         {lang === "th" ? "การแจ้งเตือนสภาพอากาศรุนแรง" : "Severe Weather Alert"}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-500 text-[9px] font-bold tracking-widest uppercase animate-pulse">
+                      <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-500 text-[0.7rem] font-bold tracking-widest uppercase animate-pulse">
                         LIVE
                       </span>
                     </div>
