@@ -2283,7 +2283,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </button>
       </aside>
 
-      <main className="main-content-dashboard">
+      <main id="main-content" className="main-content-dashboard">
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
           <div className="flex items-center gap-3">
             <button
@@ -2568,7 +2568,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </div>
               </div>
 
-              <motion.div variants={containerVariants} className="row g-4 mb-8">
+              <motion.div variants={containerVariants} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-12 grid-flow-row-dense gap-4 xl:gap-6 mb-8">
                 {widgetOrder.map((widgetId, index) => {
                   if (widgetId === "current-weather") {
                     return (
@@ -2579,7 +2579,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="col-12 col-md-6 col-xl-4 transition-all duration-300"
+                        className="md:col-span-1 xl:col-span-4 transition-all duration-300 h-full"
                       >
                         <div className="h-full group">
                           {/* Draggable header (invisible by default, shows on hover/drag) */}
@@ -2621,7 +2621,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="col-12 transition-all duration-300"
+                        className="md:col-span-2 xl:col-span-12 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-500/5 backdrop-blur-sm shadow-sm animate-fade-in">
                           
@@ -2701,7 +2701,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="col-12 transition-all duration-300"
+                        className="md:col-span-2 xl:col-span-8 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm rounded-[2rem] hover:shadow-lg transition-all duration-300">
                           {/* Header */}
@@ -2750,7 +2750,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="col-12 col-xl-12 transition-all duration-300"
+                        className="md:col-span-2 xl:col-span-12 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm h-full flex flex-col hover:shadow-lg transition-all duration-300 rounded-[2rem]">
                           <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[9px] tracking-wider text-slate-600 dark:text-slate-100 font-bold">
@@ -2840,7 +2840,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="col-12 col-xl-4 transition-all duration-300"
+                        className="md:col-span-1 xl:col-span-4 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden shadow-sm h-full bg-white dark:bg-white/5 relative flex flex-col">
                           <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[9px] tracking-wider text-slate-600 dark:text-slate-100 font-bold z-20 relative">
@@ -2893,7 +2893,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
                         id="tour-step-charts"
-                        className="col-12 col-xl-8 transition-all duration-300"
+                        className="md:col-span-2 xl:col-span-8 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden h-100 flex flex-col shadow-sm bg-white dark:bg-white/5">
                           
@@ -3058,7 +3058,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="col-12 col-xl-4 flex flex-col transition-all duration-300"
+                        className="md:col-span-1 xl:col-span-4 flex flex-col transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden shadow-sm h-100 flex flex-col bg-white dark:bg-white/5">
                           
@@ -3257,6 +3257,94 @@ const Dashboard: React.FC<DashboardProps> = ({
                   
 
                   
+
+                  if (widgetId === "property-map") {
+                    return (
+                      <motion.div
+                        key="property-map"
+                        variants={itemVariants}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
+                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
+                        onDragEnd={handleDragEnd}
+                        className="md:col-span-2 xl:col-span-8 transition-all duration-300 h-full"
+                      >
+                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm h-full flex flex-col hover:shadow-lg transition-all duration-300 rounded-[2rem]">
+                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[9px] tracking-wider text-slate-600 dark:text-slate-100 font-bold opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-400">
+                               <i className="fas fa-grip-horizontal"></i>
+                               <span className="text-[9px] uppercase tracking-wider font-bold">DRAG TO MOVE (SOLAR GRID)</span>
+                             </div>
+                             <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[8px]"
+                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
+                                disabled={(typeof index !== 'undefined' ? index : 0) === 0}
+                              >
+                                <i className="fas fa-chevron-up"></i>
+                              </button>
+                              <button
+                                type="button"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[8px]"
+                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
+                                disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
+                              >
+                                <i className="fas fa-chevron-down"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div className="p-5 flex-grow">
+                            <PropertyDistributionMap lang={lang} isDarkMode={isDarkMode} />
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  }
+
+                  if (widgetId === "smart-savings") {
+                    return (
+                      <motion.div
+                        key="smart-savings"
+                        variants={itemVariants}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
+                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
+                        onDragEnd={handleDragEnd}
+                        className="md:col-span-2 xl:col-span-12 transition-all duration-300 h-full"
+                      >
+                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm h-full flex flex-col hover:shadow-lg transition-all duration-300 rounded-[2rem]">
+                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[9px] tracking-wider text-slate-600 dark:text-slate-100 font-bold opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-400">
+                               <i className="fas fa-grip-horizontal"></i>
+                               <span className="text-[9px] uppercase tracking-wider font-bold">DRAG TO MOVE</span>
+                             </div>
+                             <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[8px]"
+                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
+                                disabled={(typeof index !== 'undefined' ? index : 0) === 0}
+                              >
+                                <i className="fas fa-chevron-up"></i>
+                              </button>
+                              <button
+                                type="button"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[8px]"
+                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
+                                disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
+                              >
+                                <i className="fas fa-chevron-down"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <div className="p-5 flex-grow">
+                            <SmartSavingsCalculator isDarkMode={isDarkMode} lang={lang} currentRate={analytics.unitRate} baseCost={analytics.totalCost} onApplyPlan={() => {}} />
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  }
 
                   return null;
                 })}
