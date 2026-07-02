@@ -287,7 +287,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         
         {/* Left column: SVG Interactive Map Container */}
-        <div className="lg:col-span-7 flex flex-col justify-center items-center p-4 bg-slate-50 dark:bg-slate-950/20 border border-slate-150 dark:border-slate-850/60 rounded-[1.5rem] relative min-h-[300px]">
+        <div className="lg:col-span-7 flex flex-col justify-center items-center p-4 bg-slate-50 dark:bg-slate-950/20 border border-slate-150 dark:border-slate-800/60 rounded-[1.5rem] relative min-h-[300px]">
           
           {/* Compass grid background decorations */}
           <div className="absolute inset-0 opacity-[0.04] dark:opacity-[0.07] pointer-events-none select-none overflow-hidden">
@@ -299,7 +299,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
             </svg>
           </div>
 
-          <div className="absolute top-3 left-3 text-[0.7rem] font-mono font-black text-slate-400 dark:text-slate-100 tracking-wider">
+          <div className="absolute top-3 left-3 text-[0.7rem] font-mono font-black text-slate-500 dark:text-slate-100 tracking-wider">
             SCADA GEOSPATIAL MAP // ACTIVE_GRID: {activeMode.toUpperCase()}
           </div>
 
@@ -310,7 +310,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
                 initial={{ opacity: 0, y: -10, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                className="absolute top-10 left-4 right-4 z-20 p-3 bg-emerald-550 border border-emerald-400/30 text-white rounded-xl shadow-lg text-[0.75rem] font-bold flex items-center gap-2"
+                className="absolute top-10 left-4 right-4 z-20 p-3 bg-emerald-500 border border-emerald-400/30 text-white rounded-xl shadow-lg text-[0.75rem] font-bold flex items-center gap-2"
               >
                 <i className="fas fa-check-circle text-sm animate-bounce"></i>
                 <span className="flex-1 leading-normal">{toastMessage}</span>
@@ -448,7 +448,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
         </div>
 
         {/* Right column: Selected Sector Detailed Audit & Controls */}
-        <div className="lg:col-span-5 flex flex-col justify-between p-5 bg-slate-50/40 dark:bg-slate-900/45 border border-slate-200 dark:border-slate-850/60 rounded-[1.5rem] relative">
+        <div className="lg:col-span-5 flex flex-col justify-between p-5 bg-slate-50/40 dark:bg-slate-900/45 border border-slate-200 dark:border-slate-800/60 rounded-[1.5rem] relative">
           
           {/* Header Title with localized Sector Info */}
           <div>
@@ -461,7 +461,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
                   {lang === 'th' ? selectedSector.nameTh : selectedSector.nameEn}
                 </h5>
                 <p className="text-[0.7rem] font-semibold text-slate-500 dark:text-slate-100 flex items-center gap-1 mt-0.5">
-                  <i className="fas fa-map-marker-alt text-slate-400 text-[8.5px]"></i>
+                  <i className="fas fa-map-marker-alt text-slate-500 text-[8.5px]"></i>
                   {lang === 'th' ? selectedSector.locationTh : selectedSector.locationEn}
                 </p>
               </div>
@@ -470,7 +470,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
               </div>
             </div>
 
-            <p className="text-[0.75rem] text-slate-600 dark:text-slate-100 leading-relaxed bg-white dark:bg-slate-950/20 p-3 rounded-xl border border-slate-150 dark:border-slate-850/40">
+            <p className="text-[0.75rem] text-slate-600 dark:text-slate-100 leading-relaxed bg-white dark:bg-slate-950/20 p-3 rounded-xl border border-slate-150 dark:border-slate-800/40">
               {lang === 'th' ? selectedSector.detailsTh : selectedSector.detailsEn}
             </p>
 
@@ -478,7 +478,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
             <div className="space-y-3 mt-4.5">
               
               {/* Load Density Metric */}
-              <div className="bg-white/50 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-150 dark:border-slate-850/40">
+              <div className="bg-white/50 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-150 dark:border-slate-800/40">
                 <div className="flex justify-between text-[0.7rem] font-mono mb-1">
                   <span className="text-slate-500 dark:text-slate-100 flex items-center gap-1">
                     <i className="fas fa-bolt text-sky-500"></i>
@@ -498,7 +498,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
               </div>
 
               {/* Solar potential Metric */}
-              <div className="bg-white/50 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-150 dark:border-slate-850/40">
+              <div className="bg-white/50 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-150 dark:border-slate-800/40">
                 <div className="flex justify-between text-[0.7rem] font-mono mb-1">
                   <span className="text-slate-500 dark:text-slate-100 flex items-center gap-1">
                     <i className="fas fa-sun text-amber-500"></i>
@@ -518,7 +518,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
               </div>
 
               {/* Carbon Footprint Metric */}
-              <div className="bg-white/50 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-150 dark:border-slate-850/40">
+              <div className="bg-white/50 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-150 dark:border-slate-800/40">
                 <div className="flex justify-between text-[0.7rem] font-mono mb-1">
                   <span className="text-slate-500 dark:text-slate-100 flex items-center gap-1">
                     <i className="fas fa-leaf text-emerald-500"></i>
@@ -538,7 +538,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
               </div>
 
               {/* Peak Risk Metric */}
-              <div className="bg-white/50 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-150 dark:border-slate-850/40">
+              <div className="bg-white/50 dark:bg-slate-950/20 p-2.5 rounded-xl border border-slate-150 dark:border-slate-800/40">
                 <div className="flex justify-between text-[0.7rem] font-mono mb-1">
                   <span className="text-slate-500 dark:text-slate-100 flex items-center gap-1">
                     <i className="fas fa-exclamation-triangle text-rose-500"></i>

@@ -24,11 +24,11 @@ const UserManual: React.FC<UserManualProps> = ({
   // Modern UI color mapping with supreme accessibility contrast
   const bgClass = isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-300 shadow-2xl';
   const textClass = isDarkMode ? 'text-white' : 'text-slate-900 font-black';
-  const mutedTextClass = isDarkMode ? 'text-slate-400' : 'text-slate-600 font-extrabold';
+  const mutedTextClass = isDarkMode ? 'text-slate-500' : 'text-slate-600 font-extrabold';
   const paragraphClass = isDarkMode ? 'text-slate-300' : 'text-slate-900 font-semibold';
   const overlayClass = isDarkMode ? 'bg-black/80' : 'bg-slate-950/60';
   const codeBg = isDarkMode ? 'bg-slate-800 text-emerald-400 border-slate-700' : 'bg-slate-100 text-emerald-900 border-emerald-300 font-extrabold shadow-sm';
-  const cardBg = isDarkMode ? 'bg-slate-850/70 border-slate-800' : 'bg-white border-slate-300 shadow-md';
+  const cardBg = isDarkMode ? 'bg-slate-800/70 border-slate-800' : 'bg-white border-slate-300 shadow-md';
   const borderThinClass = isDarkMode ? 'border-slate-800' : 'border-slate-200';
 
   const t = {
@@ -151,7 +151,7 @@ const UserManual: React.FC<UserManualProps> = ({
       {/* FILTER SEARCH BAR & STATS BAR */}
       <div className={`px-6 md:px-8 py-4 border-b ${borderThinClass} bg-slate-100/80 dark:bg-slate-950/40 flex flex-col sm:flex-row gap-4 items-center justify-between`}>
         <div className="relative w-full sm:w-96 flex-shrink-0">
-          <i className="fas fa-search absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <i className="fas fa-search absolute left-4.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
           <input 
             type="text"
             className={`w-full text-xs font-bold pl-11 pr-4 py-3 rounded-2xl border transition-all focus:outline-none focus:ring-2 focus:ring-primary ${
@@ -166,7 +166,7 @@ const UserManual: React.FC<UserManualProps> = ({
           {searchTerm && (
             <button 
               onClick={() => setSearchTerm('')}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-200 transition-colors"
             >
               <i className="fas fa-times-circle"></i>
             </button>
@@ -416,7 +416,7 @@ const UserManual: React.FC<UserManualProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-semibold text-slate-800 dark:text-slate-100">
                 {/* Switch 1 */}
                 <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900/60 border-indigo-950/40' : 'bg-slate-50 border-slate-200'} space-y-1`}>
-                  <p className="font-extrabold text-blue-600 dark:text-blue-450 text-xs">❄️ {lang === 'th' ? '1. ปรับอุณหภูมิ AC อัจฉริยะ (Smart AC Optimization)' : '1. Smart AC Optimization'}</p>
+                  <p className="font-extrabold text-blue-600 dark:text-blue-400 text-xs">❄️ {lang === 'th' ? '1. ปรับอุณหภูมิ AC อัจฉริยะ (Smart AC Optimization)' : '1. Smart AC Optimization'}</p>
                   <p className={`${paragraphClass} text-[0.8rem] opacity-85 leading-normal`}>
                     {lang === 'th'
                       ? 'จำลองปรับอุณหภูมิแอร์ขึ้น 1 องศาเซลเซียสเฉพาะเวลาที่ระบบกำลังเผชิญโหลดสูงสุด ช่วยบีบยอดใช้กระแสไฟระบบทำความเย็นลงรวดเร็วถึง 8%'
@@ -426,7 +426,7 @@ const UserManual: React.FC<UserManualProps> = ({
 
                 {/* Switch 2 */}
                 <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900/60 border-teal-950/40' : 'bg-slate-50 border-slate-200'} space-y-1`}>
-                  <p className="font-extrabold text-teal-600 dark:text-teal-450 text-xs">🔌 {lang === 'th' ? '2. ตัดสแตนด์บายสอยกระแส (Eco Standby Mitigation)' : '2. Eco Standby Mitigation'}</p>
+                  <p className="font-extrabold text-teal-600 dark:text-teal-400 text-xs">🔌 {lang === 'th' ? '2. ตัดสแตนด์บายสอยกระแส (Eco Standby Mitigation)' : '2. Eco Standby Mitigation'}</p>
                   <p className={`${paragraphClass} text-[0.8rem] opacity-85 leading-normal`}>
                     {lang === 'th'
                       ? 'กำจัดไฟตกค้าง (Phantom Load) จากปลั๊กพ่วง คอมพิวเตอร์ หรือเครื่องปรับอากาศวิทยาลััยวิจัยในช่วงออฟฟิศปิดการสะสม'
@@ -436,7 +436,7 @@ const UserManual: React.FC<UserManualProps> = ({
 
                 {/* Switch 3 */}
                 <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900/60 border-amber-950/40' : 'bg-slate-50 border-slate-200'} space-y-1`}>
-                  <p className="font-extrabold text-amber-600 dark:text-amber-450 text-xs">⏳ {lang === 'th' ? '3. โยกย้ายชั่วโมงโหลดสูง (Smart Load Shift)' : '3. Smart Load Shift'}</p>
+                  <p className="font-extrabold text-amber-600 dark:text-amber-400 text-xs">⏳ {lang === 'th' ? '3. โยกย้ายชั่วโมงโหลดสูง (Smart Load Shift)' : '3. Smart Load Shift'}</p>
                   <p className={`${paragraphClass} text-[0.8rem] opacity-85 leading-normal`}>
                     {lang === 'th'
                       ? 'โยกเวลาของงานประมวลผลหนัก หรือระบบสูบน้ำขัดตาน ไปเปิดทำการในช่วงค่ำคืนหรือวันหยุด ซึ่งอัตราค่าไฟตกลงต่ำสุด'
@@ -446,7 +446,7 @@ const UserManual: React.FC<UserManualProps> = ({
 
                 {/* Switch 4 */}
                 <div className={`p-4 rounded-2xl border ${isDarkMode ? 'bg-slate-900/60 border-purple-950/40' : 'bg-slate-50 border-slate-200'} space-y-1`}>
-                  <p className="font-extrabold text-purple-600 dark:text-purple-450 text-xs">⚡ {lang === 'th' ? '4. ชดเชยตัวประกอบกำลังไฟฟ้า (PF Automatic Tuning)' : '4. PF Automatic Tuning'}</p>
+                  <p className="font-extrabold text-purple-600 dark:text-purple-400 text-xs">⚡ {lang === 'th' ? '4. ชดเชยตัวประกอบกำลังไฟฟ้า (PF Automatic Tuning)' : '4. PF Automatic Tuning'}</p>
                   <p className={`${paragraphClass} text-[0.8rem] opacity-85 leading-normal`}>
                     {lang === 'th'
                       ? 'จำลองการต่อตู้คาปาซิเตอร์ชดเชยเฟสเพื่อพยุงคะแนนตัวประกอบกำลังไฟ (Power Factor) ขึ้นให้เข้าใกล้ 1.0 ตลอดวันและคืน'
@@ -520,7 +520,7 @@ const UserManual: React.FC<UserManualProps> = ({
 
                 {/* Step 4: Electricity Parameter Input Guide */}
                 <div className={`p-5 rounded-2.5xl border border-amber-500/30 bg-amber-500/5 flex gap-4`}>
-                  <div className="w-9 h-9 rounded-xl bg-amber-550 text-white flex items-center justify-center font-black flex-shrink-0 text-xs shadow-md">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black flex-shrink-0 text-xs shadow-md">
                     <i className="fas fa-plug"></i>
                   </div>
                   <div className="space-y-2 w-full">
@@ -550,7 +550,7 @@ const UserManual: React.FC<UserManualProps> = ({
                             : 'Power Factor (PF Rating): Typical components carry 0.85 to 0.95 PF. A system running at 1.0 operates with absolutely zero phase-shift energy waste.'}
                         </li>
                       </ul>
-                      <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-slate-400' : 'bg-slate-100/90 border-slate-200 text-slate-600'} text-[0.75rem] font-mono leading-normal space-y-1`}>
+                      <div className={`p-4 rounded-xl border ${isDarkMode ? 'bg-slate-900/90 border-slate-800 text-slate-500' : 'bg-slate-100/90 border-slate-200 text-slate-600'} text-[0.75rem] font-mono leading-normal space-y-1`}>
                         <div><strong>● สูตรพลังงานสะสม (Energy Consumption Formula):</strong> หน่วยไฟฟ้า (kWh) = (กำลังไฟฟ้าวัตต์ × ชั่วโมงใช้งาน × จำนวนวันสะสม) ÷ 1,000</div>
                         <div><strong>● สูตรคำนวณบิลค่าไฟฟ้า (Billing Calculator Formula):</strong> ค่าไฟฟ้าสุทธิ (บาท ฿) = หน่วยไฟฟ้า (kWh) × อัตราค่าบริการเฉลี่ย (บาทต่อหน่วย)</div>
                       </div>

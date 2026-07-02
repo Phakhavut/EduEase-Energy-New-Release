@@ -6,6 +6,12 @@ export interface TourStep {
   titleEn: string;
   descTh: string;
   descEn: string;
+  whyMattersTh?: string;
+  whyMattersEn?: string;
+  whatHappensTh?: string;
+  whatHappensEn?: string;
+  nextActionTh?: string;
+  nextActionEn?: string;
   targetPage: string; // The dashboard page/tab to automatically load
   targetId?: string;  // ID of the target element to spotlight
 }
@@ -22,67 +28,112 @@ interface GuidedTourProps {
 
 export const TOUR_STEPS: TourStep[] = [
   {
-    titleTh: "ยินดีต้อนรับสู่ภารกิจควบคุม EduEase Smart Grid!",
-    titleEn: "Welcome to your EduEase Smart Grid Mission!",
-    descTh: "ระบบช่วยเหลือแบบกึ่ง Spotlight นี้จะพาคุณไปสำรวจควบคุมนวัตกรรมพลังงานแบบจับมือทำ โดยจะกึ่งหรี่หน้าจอในส่วนอื่นๆ และเน้นแสงสว่างไฟส่องอินเทอร์เฟซหลัก (Spotlight Element) เพื่อให้คุณเรียนรู้ทุกเครื่องมือสำคัญได้อย่างราบรื่นและมีสมาธิสูงสุด!",
-    descEn: "This guided Spotlight tour dims secondary container panels to beautifully illuminate key control HUD modules. Follow individual steps to master subgrid operations, automated energy-saving overrides, and server-side Gemini AI features.",
+    titleTh: "ยินดีต้อนรับสู่ EduEase Smart Grid",
+    titleEn: "Welcome to EduEase Smart Grid",
+    descTh: "แอปพลิเคชันนี้ช่วยให้คุณตรวจสอบ วิเคราะห์ และลดค่าไฟฟ้าในองค์กรหรือบ้านของคุณได้อย่างชาญฉลาด เรามาทำความรู้จักกับเครื่องมือหลักกัน!",
+    descEn: "This platform helps you monitor, analyze, and smartly reduce your energy costs. Let's get to know the core tools!",
+    whyMattersTh: "คุณจะสามารถควบคุมค่าใช้จ่าย ค้นหาจุดรั่วไหล และยืดอายุการใช้งานอุปกรณ์ไฟฟ้าได้",
+    whyMattersEn: "You can control costs, locate power leaks, and extend the lifespan of your electrical assets.",
+    whatHappensTh: "ระบบจะพาคุณสำรวจหน้าจอทีละส่วนเพื่อทำความเข้าใจการทำงาน",
+    whatHappensEn: "The system will guide you through the screens to help you understand the workflow.",
+    nextActionTh: "กดปุ่ม 'ถัดไป' เพื่อเริ่มเรียนรู้แดชบอร์ดหลัก",
+    nextActionEn: "Click 'Next' to explore the main dashboard.",
     targetPage: "dashboard"
   },
   {
-    titleTh: "1. แดชบอร์ดตรวจสอบและดัชนีโทรมาตรหลัก",
-    titleEn: "1. Real-time Telemetry KPI Indicators",
-    descTh: "ชี้วัดหัวใจสำคัญ: อัตราเผาผลาญงบ (Burn Rate ฿/วัน), สัดส่วนโหลดสะสมช่วงไฟฟ้าแพง (On-Peak TOU), และระดับความเครียดของหม้อแปลงกริด (Grid Stress %) ตรวจสอบสัญญาณเตือนทันทีเพื่อป้องกันระบบขัดข้องล่วงหน้า",
-    descEn: "Key indicators here show active subgrid properties: Financial Burn Rate (฿/Day), Peak pricing exposure under Time-of-Use hours, and cumulative Substation Stress. Observe telemetry carefully to avoid grid overloads.",
+    titleTh: "แดชบอร์ดสรุปข้อมูลพลังงาน",
+    titleEn: "Energy Overview Dashboard",
+    descTh: "ส่วนนี้คือจุดเริ่มต้นของคุณ แสดงสถานะสำคัญแบบเรียลไทม์ เช่น ค่าไฟสะสม โหลดปัจจุบัน และระดับความตึงเครียดของระบบ (Grid Stress)",
+    descEn: "This is your starting point. It displays crucial real-time data like cumulative costs, active loads, and grid stress levels.",
+    whyMattersTh: "ช่วยให้รู้ทันทีว่าการใช้ไฟ ณ ตอนนี้อยู่ในระดับที่ปลอดภัยหรือผิดปกติ",
+    whyMattersEn: "Instantly know if your current energy usage is healthy or critical.",
+    nextActionTh: "ดูตัวเลขสถานะด้านบน แล้วคลิก 'ถัดไป'",
+    nextActionEn: "Observe the key metrics at the top, then click 'Next'.",
     targetPage: "dashboard",
     targetId: "tour-step-stats"
   },
   {
-    titleTh: "2. กราฟพฤติกรรมข้อมูลพลังงานพร้อมประเมินราคาเรียลไทม์",
-    titleEn: "2. Interactive Analytics & Baht Conversion",
-    descTh: "วิเคราะห์กราฟเทคโนโลยีแบบสัมผัสสัมประสิทธิ์: สามารถเลื่อนเมาส์หรือจิ้มจุดหมุดข้อมูลเพื่อเปิดใช้งาน Custom Tooltip ระบบจะคำนวณกำลังวัตต์ชั่วโมงเฉลี่ย แปลงออกมาเป็นมูลค่าเงินบาท (฿) จริง ณ วินาทีนั้นๆ ให้โดยอัตโนมัติ!",
-    descEn: "Observe dynamic load shifts over 7 days. Hover or tap coordinates on the analytical charts to trigger custom tooltips, dynamically converting current active wattage loads directly into Baht (฿) currency metrics.",
+    titleTh: "กราฟวิเคราะห์และแปลงค่าไฟ",
+    titleEn: "Interactive Analytics & Cost Conversion",
+    descTh: "กราฟนี้แสดงพฤติกรรมการใช้ไฟตลอดสัปดาห์ คุณสามารถเอาเมาส์ชี้เพื่อดูว่าการใช้ไฟช่วงนั้นคิดเป็นเงินกี่บาทได้ทันที",
+    descEn: "This chart reveals your 7-day energy habits. Hover over any point to see the exact wattage converted directly into currency (฿).",
+    whyMattersTh: "คุณจะเห็นชัดเจนว่าช่วงเวลาใดที่ทำให้ค่าไฟแพงที่สุด",
+    whyMattersEn: "You will pinpoint the exact peak usage times that drive up your bill.",
+    whatHappensTh: "หากคลิกหรือชี้ที่กราฟ จะมีข้อมูลแบบละเอียด (Tooltip) ปรากฏขึ้น",
+    whatHappensEn: "Detailed insights appear when interacting with the chart.",
     targetPage: "dashboard",
     targetId: "tour-step-charts"
   },
   {
-    titleTh: "3. ระบบสวิตช์ AI ควบคุมและประหยัดพลังงานอัตโนมัติ",
-    titleEn: "3. Adaptive AI Override Switches",
-    descTh: "โมดูลล้ำสมัย: สลับเลื่อนสวิตช์เปิดใช้ระบบถนอมกำลังอัจฉริยะ (Smart AC Offset, Eco Standby, Smart Load Shift, PF Auto-Tuning) เพื่อสั่งการอัลกอริทึมจำลอง ปรับแต่งหรือโยกย้ายกำลังไฟในช่วงเวลาวิกฤตได้อย่างอัตโนมัติ",
-    descEn: "Control terminal switches for AI-driven subgrid optimization. Toggle Smart AC Tuning, Eco Standby protection, Smart Load Shifting, or Power Factor Auto-Tuning to let algorithms safely balance and shave Peak demands.",
+    titleTh: "สวิตช์ AI ควบคุมอัตโนมัติ",
+    titleEn: "Smart AI Override Switches",
+    descTh: "เปิดใช้งานระบบผู้ช่วย AI เช่น การตัดไฟแสตนด์บาย (Eco Standby) หรือปรับจูนแอร์ (Smart AC) โดยอัตโนมัติ",
+    descEn: "Activate AI assistants to automatically cut standby power (Eco Standby) or auto-tune AC temperatures.",
+    whyMattersTh: "ช่วยลดค่าไฟลง 10-30% ได้ทันทีโดยที่คุณไม่ต้องทำอะไรเพิ่ม",
+    whyMattersEn: "Effortlessly shave 10-30% off your bills without manual intervention.",
+    nextActionTh: "คุณสามารถเปิด-ปิดสวิตช์เหล่านี้ได้อิสระเมื่อจบทัวร์",
+    nextActionEn: "You can freely toggle these switches once the tour concludes.",
     targetPage: "dashboard",
     targetId: "tour-step-ai-switches"
   },
   {
-    titleTh: "4. ระบบบริหารอุปกรณ์และแผงเปรียบเทียบข้อมูลรายคู่",
-    titleEn: "4. Node Device Registry & Comparison Board",
-    descTh: "ควบคุมสวิตช์ ON/OFF บนตารางเครื่องใช้ไฟฟ้ารายคัตเอาต์เพื่อตัดไฟ หรือกดปุ่ม 'เพิ่มอุปกรณ์ใหม่' (Add Appliance) นอกจากนี้ยังสามารถเลือกเครื่องใช้ไฟฟ้าหลายชุดเพื่อกดปุ่ม 'เปรียบเทียบข้อมูล' เพื่อขึ้นจอสรุปผลสถิติเคียงคู่กันได้ทันที!",
-    descEn: "Toggle cut-out switches in the grid, add new appliances dynamically, or select multiple nodes and trigger the custom 'Side-by-Side Comparison Board' to evaluate load distribution, costs, and power factors on joint metrics.",
+    titleTh: "ทะเบียนควบคุมและจัดการอุปกรณ์",
+    titleEn: "Node Device Registry",
+    descTh: "หน้านี้คือที่รวบรวมเครื่องใช้ไฟฟ้าทั้งหมด คุณสามารถกดเปิด/ปิด (On/Off) ได้โดยตรงจากตาราง",
+    descEn: "This page catalogs all your appliances. You can directly turn devices On/Off from this table.",
+    whatHappensTh: "ตารางจะแสดงสถานะการกินไฟแบบ Real-time",
+    whatHappensEn: "The table reflects real-time power consumption statuses.",
+    nextActionTh: "หลังจบทัวร์ ลองติ๊กเลือกอุปกรณ์ 2 ตัว แล้วกดปุ่ม 'เปรียบเทียบข้อมูล' ด้านขวาบน",
+    nextActionEn: "Later, try selecting 2 devices and click the 'Side-by-Side' button at the top right.",
     targetPage: "devices",
     targetId: "tour-step-devices-grid"
   },
   {
-    titleTh: "5. ปัญญาประดิษฐ์ประเมินและวิเคราะห์เครื่องรายเครื่อง",
-    titleEn: "5. Individual Device Gemini AI Diagnostics",
-    descTh: "เจาะลึกระบบฟิสิกส์: กดปุ่ม แว่นขยาย หลังอุปกรณ์เพื่อดูตัวเลขละเอียด (Uptime, Distortion, Power Factor) แล้วคลิก 'วิเคราะห์อุปกรณ์ด้วย AI' เพื่อส่งประวัติบันทึกให้ Google Gemini AI วางแผนซ่อมบำรุงและออกคะแนนเสถียรภาพ (Health Score)",
-    descEn: "Examine detailed phase metrics by clicking the Magnifier icon in any device row. Tap 'Analyze via AI' to transmit active log strings to Google Gemini, retrieving real-time stability metrics, wears rates, and safety guidelines.",
+    titleTh: "ตรวจสุขภาพอุปกรณ์ด้วย Gemini AI",
+    titleEn: "Gemini AI Diagnostics",
+    descTh: "AI จะทำหน้าที่ตรวจสอบสัญญาณไฟฟ้าระดับลึก (Waveform) เพื่อหาความผิดปกติ ซ่อมบำรุง หรือแนะนำวิธีใช้งานที่ประหยัดขึ้น",
+    descEn: "AI analyzes deep electrical waveforms to catch anomalies, suggest maintenance, or optimize usage.",
+    whyMattersTh: "ช่วยป้องกันอุปกรณ์พังก่อนเวลา และรู้จุดที่ควรเปลี่ยนอุปกรณ์เก่า",
+    whyMattersEn: "Prevents premature equipment failure and identifies outdated energy-hogging appliances.",
+    nextActionTh: "กดปุ่ม 'แว่นขยาย' หลังอุปกรณ์ใดก็ได้ แล้วกดปุ่ม 'วิเคราะห์ด้วย AI'",
+    nextActionEn: "Click the 'Magnifier' icon on any device row, then select 'Analyze via AI'.",
     targetPage: "devices",
     targetId: "tour-step-devices-controls"
   },
   {
-    titleTh: "6. แผงจำลองอัตรา Sandbox และพยากรณ์งบนาน 1 ปี",
-    titleEn: "6. Tariff Sandbox & Financial Forecasting",
-    descTh: "หน้านี้อนุญาตให้คุณทดสอบปรับปรุงราคาอัตราค่าไฟต่อหน่วย (฿/kWh) และสไลด์ปฏิทินตั้งแต่ 1 วัน ถึง 365 วัน เพื่อพยากรณ์สัดส่วนการกินเงินค่าไฟล่วงหน้า พร้อมแยกแยะหมวดหมู่อุปกรณ์ผ่านกราฟวงกลมแยกสีอย่างเป็นระเบียบ",
-    descEn: "Venture into the sandbox. Edit base energy utility charges and glide the range slider from 1 to 365 days. Track multi-month financial projections based on active loads, and check the colorful category allocation charts.",
+    titleTh: "เครื่องมือคำนวณและวางแผนงบประมาณ",
+    titleEn: "Financial Power Calculator",
+    descTh: "ที่นี่คุณสามารถทดลองปรับอัตราค่าไฟ และเลื่อนปฏิทินเพื่อดูพยากรณ์งบประมาณล่วงหน้าได้สูงสุด 1 ปี",
+    descEn: "Here you can adjust energy tariff rates and slide the calendar to see budget forecasts up to 1 year ahead.",
+    whyMattersTh: "ให้คุณวางแผนการเงินล่วงหน้าได้อย่างแม่นยำ ไม่ตกใจเมื่อบิลค่าไฟมาถึง",
+    whyMattersEn: "Allows you to accurately plan your finances and avoid bill shock.",
+    whatHappensTh: "กราฟและตัวเลขทั้งหมดจะอัปเดตแบบเรียลไทม์ตามเงื่อนไขที่คุณตั้งค่า",
+    whatHappensEn: "All charts and metrics update in real-time based on your parameters.",
     targetPage: "calculator",
     targetId: "tour-step-calc-rates"
   },
   {
-    titleTh: "7. ความปลอดภัยทางไซเบอร์และสแกนประวัติล็อกด้วย AI",
-    titleEn: "7. Cyber Grid Audit & AI Waveform Scan",
-    descTh: "เกราะป้องกันกริดสูงสุด: ตรวจเช็คกล่องการแจ้งเตือนและรายการเควสประหยัดพลังงาน แต่อย่าลืมกดปุ่มส่องสว่างสีม่วงด้านล่างสุดของหน้านี้เพื่อรัน AI Log Integrity Scan ตรวจจับเครื่องใช้สวมรอยขุดเหมือง หรือการลักกระแสไฟในระบบ!",
-    descEn: "A secure subgrid is a stable one. View local alert logs and eco quests, and trigger the custom 'AI Log Integrity Scan' powered by Gemini on current waveforms to isolate anomalies, illegal power bypasses, or cryptojacking signatures.",
+    titleTh: "แจ้งเตือน & ระบบรักษาความปลอดภัย",
+    titleEn: "Alerts & Cyber Security",
+    descTh: "หน้านี้ใช้ติดตามการแจ้งเตือนความเสี่ยง เควสประหยัดไฟรายวัน และใช้ AI สแกนความปลอดภัยของระบบโครงข่าย",
+    descEn: "Use this page to monitor risk alerts, check daily eco-quests, and trigger AI scans for grid security.",
+    whyMattersTh: "ระบบที่ดีคือระบบที่ปลอดภัยจากการถูกขโมยไฟ หรือไฟตก ไฟกระชาก",
+    whyMattersEn: "A good grid is secure from power theft, brownouts, and surges.",
+    nextActionTh: "หลังจบทัวร์ ลองเลื่อนลงไปด้านล่างสุด แล้วกดปุ่มสีม่วง 'รันสแกนด้วย AI' (AI Log Scan)",
+    nextActionEn: "Later, scroll to the bottom and click the purple 'Run AI Scan' button.",
     targetPage: "noti",
     targetId: "tour-step-noti-header"
+  },
+  {
+    titleTh: "คุณพร้อมใช้งานแล้ว!",
+    titleEn: "You are ready to go!",
+    descTh: "คุณได้เรียนรู้ส่วนประกอบสำคัญทั้งหมดแล้ว เริ่มควบคุมและประหยัดพลังงานกับ EduEase ได้เลย",
+    descEn: "You have learned all the essential components. Start controlling and saving energy with EduEase.",
+    whatHappensTh: "หากมีข้อสงสัยเพิ่มเติม คุณสามารถกดเปิดเมนู 'คู่มือระบบ (Manual)' ได้ตลอดเวลา",
+    whatHappensEn: "If you need further help, you can open the 'User Manual' at any time.",
+    nextActionTh: "กดปุ่ม 'ปิด' ด้านบน หรือข้ามทัวร์ เพื่อเริ่มใช้งานจริง",
+    nextActionEn: "Click 'Close' or skip the tour to take control.",
+    targetPage: "dashboard"
   }
 ];
 
@@ -381,10 +432,10 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                         key={idx}
                         type="button"
                         onClick={() => setActiveTipIndex(idx)}
-                        className={`w-1.5 h-1.5 rounded-full transition-all duration-350 ${
+                        className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                           activeTipIndex === idx 
                             ? 'bg-emerald-500 w-3' 
-                            : isDarkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-slate-350 hover:bg-slate-400'
+                            : isDarkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-slate-300 hover:bg-slate-400'
                         }`}
                         title={`Tip ${idx + 1}`}
                       />
@@ -408,7 +459,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                       <h6 className="text-[0.8rem] font-black tracking-tight mb-1 font-display">
                         {lang === 'th' ? ENERGY_TIPS[activeTipIndex].titleTh : ENERGY_TIPS[activeTipIndex].titleEn}
                       </h6>
-                      <p className={`text-[0.75rem] leading-relaxed mb-0 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                      <p className={`text-[0.75rem] leading-relaxed mb-0 ${isDarkMode ? 'text-slate-500' : 'text-slate-500'}`}>
                         {lang === 'th' ? ENERGY_TIPS[activeTipIndex].descTh : ENERGY_TIPS[activeTipIndex].descEn}
                       </p>
                     </div>
@@ -477,7 +528,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                 <button 
                   type="button"
                   onClick={handleSkipTour} 
-                  className="text-slate-400 hover:text-rose-500 transition-colors p-1"
+                  className="text-slate-500 hover:text-rose-500 transition-colors p-1"
                   title={lang === 'th' ? 'ข้ามทั้งหมด' : 'Skip All'}
                 >
                   <i className="fas fa-times-circle text-sm"></i>
@@ -529,7 +580,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                     <button 
                       type="button"
                       onClick={() => setIsMinimized(true)}
-                      className="text-slate-400 hover:text-emerald-500 transition-colors text-xs p-1"
+                      className="text-slate-500 hover:text-emerald-500 transition-colors text-xs p-1"
                       title={lang === 'th' ? 'พับ/ย่อหน้าต่างบดบัง' : 'Minimize / Collapse Box'}
                     >
                       <i className="fas fa-compress-alt text-base"></i>
@@ -537,7 +588,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                     <button 
                       type="button"
                       onClick={handleSkipTour} 
-                      className="text-slate-400 hover:text-rose-500 transition-colors text-xs p-1"
+                      className="text-slate-500 hover:text-rose-500 transition-colors text-xs p-1"
                       title={lang === 'th' ? 'ข้ามทั้งหมด' : 'Skip All'}
                     >
                       <i className="fas fa-times-circle text-base"></i>
@@ -565,7 +616,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                     exit={{ opacity: 0, x: -15 }}
                     transition={{ duration: 0.25, ease: "easeInOut" }}
                   >
-                    <h5 className="font-display font-black text-xs md:text-base tracking-tight text-primary flex items-center gap-1.5">
+                    <h5 className="font-display font-black text-xs md:text-base tracking-tight text-primary flex items-center gap-1.5 mb-2">
                       <i className={`fas ${isPaused ? 'fa-pause-circle text-amber-500 animate-pulse' : 'fa-lightbulb text-emerald-400'}`}></i>
                       <span>{lang === 'th' ? currentStep.titleTh : currentStep.titleEn}</span>
                     </h5>
@@ -578,18 +629,43 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                       }`}>
                         <div className="flex items-center gap-1.5 font-bold mb-1">
                           <i className="fas fa-user-edit animate-pulse text-amber-500"></i>
-                          <span>{lang === 'th' ? 'เปิดระบบทดลองเล่นอิสระ!' : 'Free Interaction Mode Active!'}</span>
+                          <span>{lang === 'th' ? 'เปิดโหมดใช้งานอิสระ!' : 'Free Interaction Mode Active!'}</span>
                         </div>
                         <p className="text-[0.75rem] md:text-[0.8rem] opacity-90 leading-relaxed">
                           {lang === 'th'
-                            ? 'เราซ่อนม่านแสงบล็อคชั่วคราวแล้ว คุณสามารถสลับเมนู คลิกสวิตช์ หรือทดลองปรับหน้าเว็บได้อย่างสะดวกรวดเร็ว! เมื่อพร้อมไปขั้นตอนถัดไป ให้กด [เล่นทัวร์ต่อ] หรือคลิก [ถัดไป] แฟลชสปอตไลท์จะกลับมาส่องทันที'
-                            : 'Deactivated dark blocking overlays! You may now toggle breakers inside the table, type variables, or play with sliders interactively. Click [Resume Spotlight] or [Next] to bring back active focus.'}
+                            ? 'เราซ่อนม่านแสงไว้ชั่วคราว คุณสามารถทดลองใช้งาน คลิกหรือปรับค่าต่างๆ ได้อย่างอิสระ เมื่อพร้อมไปขั้นตอนถัดไป ให้กด [เล่นทัวร์ต่อ] หรือคลิก [ถัดไป]'
+                            : 'Deactivated blocking overlays! You may now interact freely with the UI. Click [Resume Spotlight] or [Next] to bring back active focus.'}
                         </p>
                       </div>
                     ) : (
-                      <p className={`text-[0.8rem] md:text-xs leading-relaxed select-all-text transition-all duration-300 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-                        {lang === 'th' ? currentStep.descTh : currentStep.descEn}
-                      </p>
+                      <div className="space-y-3">
+                        <p className={`text-[0.8rem] md:text-[0.85rem] leading-relaxed select-all-text transition-all duration-300 ${isDarkMode ? 'text-slate-200' : 'text-slate-700'}`}>
+                          {lang === 'th' ? currentStep.descTh : currentStep.descEn}
+                        </p>
+                        
+                        {(currentStep.whyMattersEn || currentStep.whatHappensEn || currentStep.nextActionEn) && (
+                          <div className={`mt-3 p-3 rounded-xl text-[0.75rem] border ${isDarkMode ? 'bg-slate-800/50 border-slate-700 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+                            {currentStep.whyMattersEn && (
+                              <div className="mb-2">
+                                <span className="font-bold text-emerald-500 dark:text-emerald-400 block mb-0.5"><i className="fas fa-bullseye me-1.5"></i>{lang === 'th' ? 'ทำไมสิ่งนี้ถึงสำคัญ?' : 'Why this matters:'}</span>
+                                <span className="leading-relaxed">{lang === 'th' ? currentStep.whyMattersTh : currentStep.whyMattersEn}</span>
+                              </div>
+                            )}
+                            {currentStep.whatHappensEn && (
+                              <div className="mb-2">
+                                <span className="font-bold text-indigo-500 dark:text-indigo-400 block mb-0.5"><i className="fas fa-bolt me-1.5"></i>{lang === 'th' ? 'เมื่อใช้งานแล้วจะเกิดอะไรขึ้น?' : 'What happens after:'}</span>
+                                <span className="leading-relaxed">{lang === 'th' ? currentStep.whatHappensTh : currentStep.whatHappensEn}</span>
+                              </div>
+                            )}
+                            {currentStep.nextActionEn && (
+                              <div>
+                                <span className="font-bold text-sky-500 dark:text-sky-400 block mb-0.5"><i className="fas fa-hand-pointer me-1.5"></i>{lang === 'th' ? 'คุณควรทำอะไรต่อไป:' : 'What to do next:'}</span>
+                                <span className="leading-relaxed">{lang === 'th' ? currentStep.nextActionTh : currentStep.nextActionEn}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     )}
 
                     {/* Page indicator & Pause pill wrapper */}
@@ -628,7 +704,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                   <button
                     type="button"
                     onClick={handleSkipTour}
-                    className="text-[0.65rem] md:text-[0.7rem] uppercase font-bold tracking-wider text-slate-400 hover:text-rose-500 transition-colors"
+                    className="text-[0.65rem] md:text-[0.7rem] uppercase font-bold tracking-wider text-slate-500 hover:text-rose-500 transition-colors"
                   >
                     {lang === 'th' ? 'ข้ามทั้งหมด' : 'Skip Tour'}
                   </button>

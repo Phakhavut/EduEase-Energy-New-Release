@@ -48,8 +48,8 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-4">
-      <div className="p-4 rounded-2.5xl bg-slate-50/50 dark:bg-slate-950/10 border border-slate-150 dark:border-slate-850/40">
-        <h5 className="text-[11px] font-black font-display text-slate-400 dark:text-slate-100 uppercase tracking-wider mb-3">
+      <div className="p-4 rounded-2.5xl bg-slate-50/50 dark:bg-slate-950/10 border border-slate-150 dark:border-slate-800/40">
+        <h5 className="text-[11px] font-black font-display text-slate-500 dark:text-slate-100 uppercase tracking-wider mb-3">
           {lang === 'th' ? 'ระบุระยะเวลาใช้อุปกรณ์ต่อวัน' : 'ACTIVE APPLIANCE PROFILES'}
         </h5>
 
@@ -59,7 +59,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
             return (
               <div 
                 key={app.id}
-                className="p-3.5 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-850 shadow-sm flex flex-col gap-3.5"
+                className="p-3.5 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 shadow-sm flex flex-col gap-3.5"
               >
                 {/* Header line for appliance */}
                 <div className="flex justify-between items-center">
@@ -71,7 +71,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                       <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
                         {lang === 'th' ? app.nameTh : app.name}
                       </span>
-                      <span className="text-[9px] font-mono font-semibold text-slate-400 block mt-0.5">
+                      <span className="text-[9px] font-mono font-semibold text-slate-500 block mt-0.5">
                         {app.count} {lang === 'th' ? 'เครื่อง' : 'unit(s)'}
                       </span>
                     </div>
@@ -97,7 +97,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
                     <button
                       type="button"
                       onClick={() => onDeleteAppliance(app.id)}
-                      className="p-1 text-slate-400 hover:text-rose-500 rounded transition-colors ml-1.5"
+                      className="p-1 text-slate-500 hover:text-rose-500 rounded transition-colors ml-1.5"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -181,8 +181,8 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
       </div>
 
       {/* Custom text-area context habits */}
-      <div className="p-4 rounded-2.5xl bg-slate-50/50 dark:bg-slate-950/10 border border-slate-150 dark:border-slate-850/40 flex flex-col gap-3">
-        <label htmlFor="custom-habits-textarea" className="text-[11px] font-black font-display text-slate-400 dark:text-slate-100 uppercase tracking-wider block">
+      <div className="p-4 rounded-2.5xl bg-slate-50/50 dark:bg-slate-950/10 border border-slate-150 dark:border-slate-800/40 flex flex-col gap-3">
+        <label htmlFor="custom-habits-textarea" className="text-[11px] font-black font-display text-slate-500 dark:text-slate-100 uppercase tracking-wider block">
           {lang === 'th' ? 'พฤติกรรมใช้ไฟเฉพาะบุคคล หรืออุปกรณ์เพิ่มเติม' : 'DESCRIBE CUSTOM HABITS OR EXTRA DEVICES'}
         </label>
         <textarea
@@ -193,7 +193,7 @@ export const CalculatorForm: React.FC<CalculatorFormProps> = ({
           placeholder={lang === 'th' 
             ? 'เช่น "ฉันเปิดพัดลมควบคู่แอร์ตอนเข้านอน" หรือ "มีการชาร์จรถไฟฟ้าสัปดาห์ละ 2 ครั้งตอนเที่ยงคืน"...' 
             : 'e.g. "I run a room fan simultaneously with the AC at night", "EV fast charging is triggered twice weekly off-peak"...'}
-          className="w-full text-xs p-3 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-850 focus:border-sky-500 focus:outline-none placeholder-slate-400 text-slate-700 dark:text-slate-100 transition-all resize-none"
+          className="w-full text-xs p-3 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 focus:border-sky-500 focus:outline-none placeholder-slate-400 text-slate-700 dark:text-slate-100 transition-all resize-none"
         />
       </div>
 

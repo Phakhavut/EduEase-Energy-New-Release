@@ -185,7 +185,7 @@ const App: React.FC = () => {
             {/* Quick Access User Manual Button */}
             <button
               onClick={() => setIsManualOpen(true)}
-              className={`flex items-center gap-2 px-3.5 py-1.5 text-[0.75rem] uppercase tracking-wider font-bold rounded-xl border transition-all duration-300 ${loginDarkMode ? 'border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-450' : 'border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700'} shadow-sm`}
+              className={`flex items-center gap-2 px-3.5 py-1.5 text-[0.75rem] uppercase tracking-wider font-bold rounded-xl border transition-all duration-300 ${loginDarkMode ? 'border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400' : 'border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700'} shadow-sm`}
             >
               <i className="fas fa-book-open"></i>
               <span>{lang === 'th' ? 'คู่มือการใช้งาน' : 'User Manual'}</span>

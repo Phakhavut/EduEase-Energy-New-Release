@@ -235,14 +235,14 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
 
                     <div className="flex items-center gap-2.5 w-full sm:w-auto">
                         {/* Expiration Timer badge */}
-                        <div className="badge bg-red-500/10 text-red-600 dark:text-red-500 border border-red-550/20 text-[0.75rem] font-bold py-1.5 px-3 rounded-xl font-mono flex items-center gap-1.5 shrink-0">
+                        <div className="badge bg-red-500/10 text-red-600 dark:text-red-500 border border-red-500/20 text-[0.75rem] font-bold py-1.5 px-3 rounded-xl font-mono flex items-center gap-1.5 shrink-0">
                             <i className="fas fa-clock animate-pulse"></i>
                             <span>{lang === 'th' ? 'หมดเวลาใน' : 'Expires in'} {formatTime(timeLeft)}</span>
                         </div>
                         
                         {/* Internal Mini Token Wallet display */}
-                        <div className="badge bg-amber-500/10 text-amber-700 dark:text-amber-600 border border-amber-550/20 text-[0.75rem] font-black py-1.5 px-3 rounded-xl font-mono flex items-center gap-1.5 shrink-0 shadow-sm">
-                            <i className="fas fa-coins text-amber-550 animate-spin [animation-duration:5s]"></i>
+                        <div className="badge bg-amber-500/10 text-amber-700 dark:text-amber-600 border border-amber-500/20 text-[0.75rem] font-black py-1.5 px-3 rounded-xl font-mono flex items-center gap-1.5 shrink-0 shadow-sm">
+                            <i className="fas fa-coins text-amber-500 animate-spin [animation-duration:5s]"></i>
                             <span>{walletTokens} GT</span>
                         </div>
                     </div>
@@ -339,7 +339,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                                         {isClaimed ? (
                                             <button 
                                                 disabled 
-                                                className="btn btn-xs py-1.5 px-3 bg-slate-100 dark:bg-slate-900 border-0 text-slate-400 dark:text-slate-100 font-bold text-[0.7rem] uppercase tracking-wider rounded-xl w-full sm:w-auto"
+                                                className="btn btn-xs py-1.5 px-3 bg-slate-100 dark:bg-slate-900 border-0 text-slate-500 dark:text-slate-100 font-bold text-[0.7rem] uppercase tracking-wider rounded-xl w-full sm:w-auto"
                                             >
                                                 <i className="fas fa-check-circle mr-1"></i>
                                                 {lang === 'th' ? 'รับแล้ว' : 'Claimed'}
@@ -357,7 +357,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                                         ) : (
                                             <button 
                                                 onClick={() => handlePerformAction(quest.id, quest.actionSuccessEn, quest.actionSuccessTh)}
-                                                className="btn btn-xs py-1.5 px-3 bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 dark:!text-white dark:border-slate-700 dark:bg-slate-800 font-bold text-[0.7rem] uppercase tracking-wider rounded-xl cursor-pointer w-full sm:w-auto whitespace-nowrap hover:border-slate-350 transition-colors shadow-sm"
+                                                className="btn btn-xs py-1.5 px-3 bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 dark:!text-white dark:border-slate-700 dark:bg-slate-800 font-bold text-[0.7rem] uppercase tracking-wider rounded-xl cursor-pointer w-full sm:w-auto whitespace-nowrap hover:border-slate-300 transition-colors shadow-sm"
                                             >
                                                 {lang === 'th' ? quest.actionLabelTh : quest.actionLabelEn}
                                             </button>

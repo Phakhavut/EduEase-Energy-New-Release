@@ -26,11 +26,14 @@ import { QuestLeaderboard } from "./QuestLeaderboard";
 import { GridCharacterSkin } from "./GridCharacterSkin";
 import { DailyEnergyQuests } from "./DailyEnergyQuests";
 import { PropertyDistributionMap } from "./PropertyDistributionMap";
-import { WeatherForecastWidget } from "./WeatherForecastWidget";
 import { WeatherCard } from "./WeatherCard";
 import { SmartSavingsCalculator } from "./SmartSavingsCalculator";
+import { ProjectedSavingsCard } from "./ProjectedSavingsCard";
 import { EnergyTipWidget } from "./EnergyTipWidget";
+import { EnergyMonitoringHub } from "./EnergyMonitoringHub";
 import { io } from "socket.io-client";
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 
 const AnimatedCounter = ({ value, duration = 1.5, fractionDigits = 2 }: { value: number, duration?: number, fractionDigits?: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -90,14 +93,14 @@ const langData = {
   th: {
     // Sidebar & Header
     m1: "แดชบอร์ดหลัก",
-    m2: "จัดการเครื่องใช้ไฟฟ้า",
-    m3: "คำนวณค่าไฟ & กำหนดงบ",
+    m2: "จัดการอุปกรณ์ (Nodes)",
+    m3: "วิเคราะห์ค่าไฟ & งบประมาณ",
     m4: "กำหนดงบประมาณ",
-    m5: "สถิติการใช้ไฟฟ้า",
-    m6: "ภารกิจประหยัดพลังงาน",
+    m5: "สถิติย้อนหลัง",
+    m6: "ความปลอดภัย & แจ้งเตือน",
     m7: "คำแนะนำจาก AI",
     m8: "เปรียบเทียบการใช้ไฟกับบ้านอื่น",
-    m9: "ตั้งค่าและคู่มือการใช้งาน",
+    m9: "คู่มือการใช้งาน (Manual)",
     m10: "คู่มือการใช้งานอย่างง่าย",
     logout: "ออกจากระบบ",
     sys_sub_title: "ระบบจัดการพลังงานอัจฉริยะ",
@@ -289,17 +292,17 @@ const langData = {
   },
   en: {
     // Sidebar & Header
-    m1: "Control Panel",
-    m2: "Smart Node Station",
-    m3: "TOU & Budgets Planner",
+    m1: "Overview",
+    m2: "Devices & Nodes",
+    m3: "Budget & Tariffs",
     m4: "Budgeting Limit",
-    m5: "Analytics & Benchmarks",
-    m6: "Grid Security & Quests",
+    m5: "Analytics",
+    m6: "Alerts & Security",
     m7: "AI Strategy Intel",
     m8: "Regional Benchmark",
-    m9: "Workspace Setup & Manual",
-    m10: "User Manual",
-    logout: "Terminate Session",
+    m9: "User Manual",
+    m10: "Quick Guide",
+    logout: "Log Out",
     sys_sub_title: "Grid Operation OS",
     terminal: "Encrypted Terminal",
     global_access: "Global Access Hub",
@@ -680,36 +683,38 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [widgetOrder, setWidgetOrder] = useState<string[]>(() => {
     const defaultOrder = [
       "current-weather",
-      "weather-forecast",
-      "stats",
-      "daily-savings-goal",
       "energy-tip",
-      "kpi-chart",
-      ];
+      "property-map",
+    ];
     try {
       const saved = localStorage.getItem("eudease_widget_order_v2");
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          const uniqueParsed = Array.from(new Set(parsed)).filter(
-            (item) => typeof item === "string",
+          const filtered = parsed.filter(
+            (item) =>
+              typeof item === "string" &&
+              ![
+                "stats",
+                "projected-savings",
+                "daily-savings-goal",
+                "kpi-chart",
+                "ai-optimization-gauge",
+                "smart-savings",
+                "weather-forecast",
+                "energy-monitoring-hub"
+              ].includes(item),
           );
-          if (!uniqueParsed.includes("daily-quests")) {
-            uniqueParsed.splice(1, 0, "daily-quests");
+          if (!filtered.includes("current-weather")) {
+            filtered.unshift("current-weather");
           }
-          if (!uniqueParsed.includes("daily-savings-goal")) {
-            uniqueParsed.splice(3, 0, "daily-savings-goal");
+          if (!filtered.includes("energy-tip")) {
+            filtered.push("energy-tip");
           }
-          if (!uniqueParsed.includes("smart-savings")) {
-            uniqueParsed.splice(4, 0, "smart-savings");
+          if (!filtered.includes("property-map")) {
+            filtered.push("property-map");
           }
-          if (!uniqueParsed.includes("property-map")) {
-            uniqueParsed.splice(5, 0, "property-map");
-          }
-          if (!uniqueParsed.includes("ai-optimization-gauge")) {
-            uniqueParsed.push("ai-optimization-gauge");
-          }
-          return uniqueParsed;
+          return Array.from(new Set(filtered));
         }
       }
       return defaultOrder;
@@ -719,6 +724,30 @@ const Dashboard: React.FC<DashboardProps> = ({
   });
 
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  const generatePDF = async () => {
+    setIsGeneratingPDF(true);
+    try {
+      const element = document.getElementById("exportable-content");
+      if (element) {
+        const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' });
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", "a4");
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+        pdf.save("energy-usage-report.pdf");
+      }
+    } catch (error) {
+      console.error("Failed to generate PDF:", error);
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     e.dataTransfer.effectAllowed = "move";
@@ -981,7 +1010,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       labelTh = "เสถียรภาพปานกลาง (Active)";
       labelEn = "Stable (AI Optimizing)";
       badgeColor =
-        "bg-indigo-500/10 text-indigo-505 dark:text-indigo-400 border border-indigo-500/20";
+        "bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border border-indigo-500/20";
       colorText = "text-indigo-500 dark:text-indigo-400";
       statusTagTh = "จำกัดขอบพิกัด";
       statusTagEn = "Grid Balanced";
@@ -991,7 +1020,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       labelEn = "Highly Reliable (Active)";
       badgeColor =
         "bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20";
-      colorText = "text-teal-600 dark:text-teal-405";
+      colorText = "text-teal-600 dark:text-teal-400";
       statusTagTh = "ประสิทธิภาพความเร็วสูง";
       statusTagEn = "Highly Efficient";
     } else if (activeSwitches === 4) {
@@ -2074,7 +2103,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       ? "bg-slate-900/95 border-slate-750"
       : "bg-white/95 border-slate-200";
     const textColorMain = isDarkMode ? "text-white" : "text-slate-900";
-    const textColorMuted = isDarkMode ? "text-slate-400" : "text-slate-500";
+    const textColorMuted = isDarkMode ? "text-slate-500" : "text-slate-500";
 
     return (
       <div
@@ -2148,7 +2177,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <i className="fas fa-coins text-amber-500 me-2"></i>
                   {t("log_settlement") || "Est. Cost"}
                 </span>
-                <span className="font-mono font-bold text-amber-550 dark:text-amber-400">
+                <span className="font-mono font-bold text-amber-500 dark:text-amber-400">
                   ฿
                   {costVal.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
@@ -2287,7 +2316,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
           <div className="flex items-center gap-3">
             <button
-              className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 lg:hidden shadow-sm rounded-xl p-3 border-0 bg-white"
+              className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 lg:hidden shadow-sm rounded-xl p-3 border-0 bg-white"
               onClick={() => setIsMobileMenuOpen(true)}
             >
               <i className="fas fa-bars text-primary"></i>
@@ -2320,27 +2349,34 @@ const Dashboard: React.FC<DashboardProps> = ({
               </span>
             </div>
             <button
-              className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 border-0 rounded-2xl px-4 shadow-sm font-bold text-xs text-primary bg-white h-[44px] shrink-0"
+              className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 border-0 rounded-2xl px-4 shadow-sm font-bold text-xs text-primary dark:text-purple-400 bg-white h-[44px] shrink-0"
               onClick={() => setLang(lang === "th" ? "en" : "th")}
             >
               {lang.toUpperCase()}
             </button>
 
-            {/* Print Report Link */}
+            {/* Download PDF Report Link */}
             <button
-              className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 border-0 rounded-2xl px-4 shadow-sm font-bold text-xs text-sky-600 bg-white h-[44px] flex items-center gap-2 shrink-0"
-              onClick={() => window.print()}
-              title={lang === "th" ? "พิมพ์รายงาน" : "Print Report"}
+              className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 border-0 rounded-2xl px-4 shadow-sm font-bold text-xs text-rose-500 dark:text-rose-400 bg-white h-[44px] flex items-center gap-2 shrink-0"
+              onClick={generatePDF}
+              disabled={isGeneratingPDF}
+              title={lang === "th" ? "บันทึกรายงาน PDF" : "Download PDF Report"}
             >
-              <i className="fas fa-print"></i>
+              {isGeneratingPDF ? (
+                <i className="fas fa-spinner fa-spin text-primary"></i>
+              ) : (
+                <i className="fas fa-file-pdf"></i>
+              )}
               <span className="hidden sm:inline">
-                {lang === "th" ? "พิมพ์รายงาน" : "Print Report"}
+                {isGeneratingPDF
+                  ? lang === "th" ? "กำลังสร้าง..." : "Generating..."
+                  : lang === "th" ? "บันทึก PDF" : "PDF Report"}
               </span>
             </button>
 
             {/* Quick User Manual Link */}
             <button
-              className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 border-0 rounded-2xl px-4 shadow-sm font-bold text-xs text-emerald-600 bg-white h-[44px] flex items-center gap-2 shrink-0"
+              className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 border-0 rounded-2xl px-4 shadow-sm font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-white h-[44px] flex items-center gap-2 shrink-0"
               onClick={() => setCurrentPage("manual")}
               title={lang === "th" ? "คู่มือการใช้งาน" : "User Manual"}
             >
@@ -2352,7 +2388,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
             {/* Interactive Guided Tour Link */}
             <button
-              className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 border-0 rounded-2xl px-4 shadow-sm font-bold text-xs text-amber-550 bg-white h-[44px] flex items-center gap-2 shrink-0"
+              className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 border-0 rounded-2xl px-4 shadow-sm font-bold text-xs text-amber-500 dark:text-amber-400 bg-white h-[44px] flex items-center gap-2 shrink-0"
               onClick={() => setIsTourActive(true)}
               title={
                 lang === "th"
@@ -2367,7 +2403,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             </button>
 
             <button
-              className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 border-0 rounded-2xl shadow-sm px-3 bg-white h-[44px] shrink-0"
+              className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 border-0 rounded-2xl shadow-sm px-3 bg-white h-[44px] shrink-0"
               onClick={onToggleTheme}
             >
               <i
@@ -2377,16 +2413,17 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
         </header>
 
-        <div className="page-content">
+        <div className="page-content" id="exportable-content">
           {currentPage === "dashboard" && (
             <motion.div
               variants={containerVariants}
               initial="hidden"
               animate="visible"
               className="space-y-6"
+              id="dashboard-report-area"
             >
               {/* Layout Customization Information Panel */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200 dark:border-transparent gap-3 mb-2 shadow-sm">
+              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200 dark:border-transparent gap-3 mb-2 shadow-sm">
                 <div className="flex items-center gap-3">
                   <div className="p-2.5 bg-primary/15 rounded-xl text-primary text-xs">
                     <i className="fas fa-layer-group text-base"></i>
@@ -2409,12 +2446,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                     onClick={() => {
                       const defaultOrder = [
                         "current-weather",
-                        "weather-forecast",
-                        "stats",
-                        "daily-savings-goal",
+                        "energy-monitoring-hub",
                         "energy-tip",
-                        "kpi-chart",
-                        ];
+                        "property-map",
+                      ];
                       setWidgetOrder(defaultOrder);
                       try {
                         localStorage.setItem(
@@ -2432,10 +2467,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </span>
                   </button>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Quick Questions & Common Energy Actions Component */}
-              <div className="p-5 rounded-3xl border border-primary/20 bg-gradient-to-r from-primary/5 via-teal-500/5 to-emerald-500/5 shadow-md flex flex-col gap-4 mb-6">
+              <motion.div variants={itemVariants} className="p-5 rounded-3xl border border-primary/20 bg-gradient-to-r from-primary/5 via-teal-500/5 to-emerald-500/5 shadow-md flex flex-col gap-4 mb-6">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/15 flex items-center justify-center text-lg shadow-sm shrink-0">
                     <i className="fas fa-question-circle"></i>
@@ -2566,7 +2601,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </div>
                   </button>
                 </div>
-              </div>
+              </motion.div>
 
               <motion.div variants={containerVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 grid-flow-row-dense gap-4 lg:gap-6 mb-8">
                 {widgetOrder.map((widgetId, index) => {
@@ -2579,144 +2614,18 @@ const Dashboard: React.FC<DashboardProps> = ({
                         onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
                         onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
-                        className="md:col-span-1 lg:col-span-4 transition-all duration-300 h-full"
+                        className="md:col-span-2 lg:col-span-12 transition-all duration-300 h-full"
                       >
                         <div className="h-full group">
                           {/* Draggable header (invisible by default, shows on hover/drag) */}
                           <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity mb-2 px-2">
-                             <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-400">
+                             <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-500">
                                <i className="fas fa-grip-horizontal"></i>
                                <span className="text-[0.7rem] uppercase tracking-wider font-bold">DRAG TO MOVE</span>
                              </div>
                              <div className="flex items-center gap-2">
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === 0}
-                              >
-                                <i className="fas fa-chevron-up"></i>
-                              </button>
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
-                              >
-                                <i className="fas fa-chevron-down"></i>
-                              </button>
-                            </div>
-                          </div>
-                          <WeatherCard isDarkMode={isDarkMode} locationName={activeHouse?.name || 'Local Property'} />
-                        </div>
-                      </motion.div>
-                    );
-                  }
-                  if (widgetId === "stats") {
-                    return (
-                      <motion.div
-                        key="stats"
-                        variants={itemVariants}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragEnd={handleDragEnd}
-                        className="md:col-span-2 lg:col-span-12 transition-all duration-300 h-full"
-                      >
-                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-500/5 backdrop-blur-sm shadow-sm animate-fade-in">
-                          
-                          <div className="p-4">
-                            <div
-                              id="tour-step-stats"
-                              className="row g-3 g-md-4 transition-all duration-500"
-                            >
-                              {[
-                                {
-                                  label: t("stat_est_monthly"),
-                                  val: `฿${analytics.totalCost.toLocaleString()}`,
-                                  icon: "fa-coins",
-                                  color: "text-primary",
-                                },
-                                {
-                                  label: t("stat_burn_daily"),
-                                  val: `฿${analytics.burnRate.toFixed(1)}`,
-                                  icon: "fa-fire",
-                                  color: "text-amber-500",
-                                },
-                                {
-                                  label: t("stat_total_load"),
-                                  val: `${analytics.totalUnits.toFixed(1)} kWh`,
-                                  icon: "fa-bolt",
-                                  color: "text-emerald-500",
-                                },
-                                {
-                                  label: t("stat_credit_health"),
-                                  val:
-                                    analytics.budgetRemaining > 0
-                                      ? t("stat_optimal")
-                                      : t("stat_deficit"),
-                                  icon: "fa-shield-alt",
-                                  color:
-                                    analytics.budgetRemaining > 0
-                                      ? "text-emerald-500"
-                                      : "text-danger",
-                                },
-                              ].map((stat, i) => (
-                                <div
-                                  key={i}
-                                  className="col-12 col-sm-6 col-xl-3"
-                                >
-                                  <div className="dashboard-card border border-slate-200 dark:border-0 p-4 p-md-5 bg-slate-50 dark:bg-white/5 shadow-sm">
-                                    <div className="flex justify-between items-start mb-4">
-                                      <span className="label text-[0.75rem] font-bold text-slate-700 dark:text-slate-100">
-                                        {stat.label}
-                                      </span>
-                                      <i
-                                        className={`fas ${stat.icon} ${stat.color} opacity-40`}
-                                      ></i>
-                                    </div>
-                                    <span
-                                      className={`text-xl md:text-2xl font-display font-bold ${stat.color} mono-font`}
-                                    >
-                                      {stat.val}
-                                    </span>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  }
-
-                  
-
-                  if (widgetId === "weather-forecast") {
-                    return (
-                      <motion.div
-                        key="weather-forecast"
-                        variants={itemVariants}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragEnd={handleDragEnd}
-                        className="md:col-span-2 lg:col-span-8 transition-all duration-300 h-full"
-                      >
-                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm rounded-[2rem] hover:shadow-lg transition-all duration-300">
-                          {/* Header */}
-                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[0.7rem] tracking-wider text-slate-600 dark:text-slate-100 font-bold">
-                            <div className="flex items-center gap-1.5 cursor-grab active:cursor-grabbing text-slate-500 dark:text-slate-200">
-                              <i className="fas fa-grip-horizontal text-sky-500 animate-pulse"></i>
-                              <span className="uppercase text-slate-800 dark:text-slate-100">
-                                {lang === "th"
-                                  ? "ระบบวางแผนไฟพยากรณ์อากาศ 5 วัน (DRAG & DROP)"
-                                  : "5-DAY CLIMATE FORECAST & POWER DISPATCH (DRAG & DROP)"}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
                                 className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === 0}
@@ -2733,103 +2642,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </button>
                             </div>
                           </div>
-                          <div className="p-5">
-                            <WeatherForecastWidget lang={lang} isDarkMode={isDarkMode} />
-                          </div>
+                          <WeatherCard lang={lang} isDarkMode={isDarkMode} locationName={activeHouse?.name || 'Local Property'} />
                         </div>
                       </motion.div>
                     );
                   }
 
-                  if (widgetId === "daily-savings-goal") {
-                    return (
-                      <motion.div
-                        key="daily-savings-goal"
-                        variants={itemVariants}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragEnd={handleDragEnd}
-                        className="md:col-span-2 lg:col-span-12 transition-all duration-300 h-full"
-                      >
-                        <div className="dashboard-card border border-slate-200 dark:border-slate-800 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm h-full flex flex-col hover:shadow-lg transition-all duration-300 rounded-[2rem]">
-                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[0.7rem] tracking-wider text-slate-600 dark:text-slate-100 font-bold">
-                            <div className="flex items-center gap-1.5 cursor-grab active:cursor-grabbing text-slate-500 dark:text-slate-200">
-                              <i className="fas fa-grip-horizontal text-emerald-500 animate-pulse"></i>
-                              <span className="uppercase text-slate-800 dark:text-slate-100">
-                                {lang === "th"
-                                  ? "เป้าหมายการประหยัดพลังงานรายวัน"
-                                  : "Daily Energy Savings Goal"}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-emerald-500 hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === 0}
-                              >
-                                <i className="fas fa-chevron-up"></i>
-                              </button>
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-emerald-500 hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
-                              >
-                                <i className="fas fa-chevron-down"></i>
-                              </button>
-                            </div>
-                          </div>
-                          
-                          <div className="p-6 md:p-10 flex-1 flex flex-col justify-center max-w-3xl mx-auto w-full">
-                            <div className="flex justify-between items-end mb-2">
-                              <div>
-                                <div className="text-[0.75rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">
-                                  {lang === "th" ? "พลังงานที่ประหยัดได้" : "Energy Saved"}
-                                </div>
-                                <div className="text-3xl font-display font-light text-emerald-600 dark:text-emerald-400">
-                                  <AnimatedCounter value={dailySavingsData.saved} fractionDigits={2} /> <span className="text-sm text-slate-400">kWh</span>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <div className="text-[0.7rem] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                                  {lang === "th" ? "เส้นฐานคาดการณ์" : "Projected Baseline"}
-                                </div>
-                                <div className="text-lg font-mono font-bold text-slate-700 dark:text-slate-300">
-                                  <AnimatedCounter value={dailySavingsData.baseline} fractionDigits={2} /> <span className="text-xs opacity-70">kWh</span>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div className="mt-4">
-                              <div className="flex justify-between text-[0.75rem] font-bold text-slate-500 mb-2 uppercase tracking-wider">
-                                <span>0%</span>
-                                <span className="text-emerald-500">
-                                  {lang === "th" ? "เป้าหมาย: ประหยัด 25%" : "Goal: 25% Reduction"}
-                                </span>
-                              </div>
-                              <div className="h-4 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner flex">
-                                <motion.div 
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${dailySavingsData.progress}%` }}
-                                  transition={{ duration: 1.5, ease: "easeOut" }}
-                                  className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 relative overflow-hidden"
-                                >
-                                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMSI+PC9yZWN0Pgo8cGF0aCBkPSJNMCAwTDggOFpNOCAwTDAgOFoiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9IjAuMSIgc3Ryb2tlLXdpZHRoPSIxIj48L3BhdGg+Cjwvc3ZnPg==')] opacity-20"></div>
-                                </motion.div>
-                              </div>
-                              <div className="mt-3 text-center text-[0.75rem] text-slate-500 dark:text-slate-400 font-medium">
-                                {lang === "th" 
-                                  ? <span>ตอนนี้ประหยัดไปแล้ว <AnimatedCounter value={dailySavingsData.progress} fractionDigits={1} />% ของเป้าหมาย</span>
-                                  : <span>You've achieved <AnimatedCounter value={dailySavingsData.progress} fractionDigits={1} />% of your daily savings goal!</span>}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  }
 
                   if (widgetId === "energy-tip") {
                     return (
@@ -2883,374 +2701,9 @@ const Dashboard: React.FC<DashboardProps> = ({
                     );
                   }
 
-                  if (widgetId === "kpi-chart") {
-                    return (
-                      <motion.div
-                        key="kpi-chart"
-                        variants={itemVariants}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragEnd={handleDragEnd}
-                        id="tour-step-charts"
-                        className="md:col-span-2 lg:col-span-8 transition-all duration-300 h-full"
-                      >
-                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden h-100 flex flex-col shadow-sm bg-white dark:bg-white/5">
-                          
-                          <div className="p-6 md:p-8 flex-grow flex flex-col justify-between">
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                              <div>
-                                <h5 className="font-bold mb-1 font-display text-lg tracking-tight">
-                                  {t("chart_performance_title")}
-                                </h5>
-                                <p className="text-[0.75rem] text-muted font-bold uppercase tracking-widest">
-                                  System KPIs & Uptime Telemetry
-                                </p>
-                              </div>
-                              <div className="p-1 bg-light rounded-2xl flex gap-1 w-full md:w-auto">
-                                {(["daily", "weekly", "monthly"] as const).map(
-                                  (range) => (
-                                    <button
-                                      key={range}
-                                      onClick={() => setPerfRange(range)}
-                                      className={`btn btn-xs flex-grow md:flex-none px-4 rounded-xl font-bold uppercase text-[0.7rem] tracking-widest ${perfRange === range ? "btn-primary shadow-md" : "text-muted dark:opacity-100 opacity-60"}`}
-                                    >
-                                      {t(
-                                        range === "daily"
-                                          ? "telemetry_daily"
-                                          : range === "weekly"
-                                            ? "weekly"
-                                            : "telemetry_monthly",
-                                      )}
-                                    </button>
-                                  ),
-                                )}
-                              </div>
-                            </div>
-                            <div className="h-[300px] md:h-[350px]">
-                              <ResponsiveContainer>
-                                <ComposedChart data={performanceChartData}>
-                                  <defs>
-                                    <linearGradient
-                                      id="upColor"
-                                      x1="0"
-                                      y1="0"
-                                      x2="0"
-                                      y2="1"
-                                    >
-                                      <stop
-                                        offset="5%"
-                                        stopColor="#10b981"
-                                        stopOpacity={0.2}
-                                      />
-                                      <stop
-                                        offset="95%"
-                                        stopColor="#10b981"
-                                        stopOpacity={0}
-                                      />
-                                    </linearGradient>
-                                    <linearGradient
-                                      id="effColor"
-                                      x1="0"
-                                      y1="0"
-                                      x2="0"
-                                      y2="1"
-                                    >
-                                      <stop
-                                        offset="5%"
-                                        stopColor="var(--primary)"
-                                        stopOpacity={0.2}
-                                      />
-                                      <stop
-                                        offset="95%"
-                                        stopColor="var(--primary)"
-                                        stopOpacity={0}
-                                      />
-                                    </linearGradient>
-                                  </defs>
-                                  <CartesianGrid
-                                    strokeDasharray="3 3"
-                                    vertical={false}
-                                    stroke={isDarkMode ? "#1b254b" : "#eee"}
-                                  />
-                                  <XAxis
-                                    dataKey="name"
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fontSize: 9, fontWeight: "bold" }}
-                                  />
-                                  <YAxis
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fontSize: 9 }}
-                                    domain={[80, 100]}
-                                  />
-                                  <Tooltip
-                                    contentStyle={{
-                                      borderRadius: "16px",
-                                      border: "none",
-                                      boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
-                                    }}
-                                  />
-                                  <Legend
-                                    align="right"
-                                    verticalAlign="top"
-                                    iconType="circle"
-                                    wrapperStyle={{
-                                      paddingBottom: "20px",
-                                      fontSize: "10px",
-                                      fontWeight: "bold",
-                                    }}
-                                  />
-                                  <Area
-                                    name={t("perf_uptime")}
-                                    type="monotone"
-                                    dataKey="uptime"
-                                    stroke="#10b981"
-                                    strokeWidth={3}
-                                    fill="url(#upColor)"
-                                  />
-                                  <Line
-                                    name={t("perf_efficiency")}
-                                    type="monotone"
-                                    dataKey="efficiency"
-                                    stroke="var(--primary)"
-                                    strokeWidth={3}
-                                    dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
-                                    activeDot={{ r: 6 }}
-                                  />
-                                </ComposedChart>
-                              </ResponsiveContainer>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  }
 
-                  if (widgetId === "ai-optimization-gauge") {
-                    const gaugeData = [
-                      {
-                        name: "Optimized",
-                        value: aiOptimizationMetrics.efficiencyIndex,
-                      },
-                      {
-                        name: "Remaining",
-                        value: 100 - aiOptimizationMetrics.efficiencyIndex,
-                      },
-                    ];
 
-                    const currentThemeTrackColor = isDarkMode
-                      ? "rgba(255, 255, 255, 0.06)"
-                      : "rgba(15, 23, 42, 0.08)";
-                    const activeColor =
-                      aiOptimizationMetrics.activeCount === 4
-                        ? "#10b981"
-                        : aiOptimizationMetrics.activeCount >= 2
-                          ? "#3b82f6"
-                          : "#f59e0b";
 
-                    return (
-                      <motion.div
-                        key="ai-optimization-gauge"
-                        variants={itemVariants}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragEnd={handleDragEnd}
-                        className="md:col-span-1 lg:col-span-4 flex flex-col transition-all duration-300 h-full"
-                      >
-                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden shadow-sm h-100 flex flex-col bg-white dark:bg-white/5">
-                          
-
-                          <div className="p-6 flex-grow flex flex-col justify-between bg-slate-905/40">
-                            <div className="flex flex-col sm:flex-row items-center gap-5">
-                              {/* Circle gauge progress */}
-                              <div className="relative w-[130px] h-[130px] flex-shrink-0 flex items-center justify-center">
-                                <ResponsiveContainer width={130} height={130}>
-                                  <PieChart width={130} height={130}>
-                                    <defs>
-                                      <linearGradient
-                                        id="aiGaugeGrad"
-                                        x1="0"
-                                        y1="0"
-                                        x2="1"
-                                        y2="1"
-                                      >
-                                        <stop
-                                          offset="0%"
-                                          stopColor={activeColor}
-                                          stopOpacity={1}
-                                        />
-                                        <stop
-                                          offset="100%"
-                                          stopColor="#06b6d4"
-                                          stopOpacity={0.8}
-                                        />
-                                      </linearGradient>
-                                    </defs>
-                                    <Pie
-                                      data={gaugeData}
-                                      cx="50%"
-                                      cy="50%"
-                                      innerRadius={44}
-                                      outerRadius={58}
-                                      startAngle={90}
-                                      endAngle={-270}
-                                      paddingAngle={0}
-                                      dataKey="value"
-                                    >
-                                      <Cell fill="url(#aiGaugeGrad)" />
-                                      <Cell fill={currentThemeTrackColor} />
-                                    </Pie>
-                                  </PieChart>
-                                </ResponsiveContainer>
-
-                                {/* Center text overlays */}
-                                <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                                  <span className="text-lg font-black font-mono text-slate-800 dark:text-white tracking-tighter">
-                                    {aiOptimizationMetrics.efficiencyIndex.toFixed(
-                                      1,
-                                    )}
-                                    %
-                                  </span>
-                                  <span className="text-[0.65rem] font-bold text-slate-405 dark:text-slate-100 tracking-wider uppercase">
-                                    {lang === "th"
-                                      ? "ประสิทธิภาพ"
-                                      : "Efficiency"}
-                                  </span>
-                                </div>
-                              </div>
-
-                              {/* Stat descriptions */}
-                              <div className="flex-grow space-y-2 w-full text-center sm:text-left">
-                                <div>
-                                  <span className="text-[8.5px] text-indigo-400 font-bold block uppercase tracking-wider mb-0.5">
-                                    {lang === "th"
-                                      ? "คะแนนเสถียรความเชื่อมั่น"
-                                      : "AI CONFIDENCE LEVEL"}
-                                  </span>
-                                  <div className="flex items-baseline justify-center sm:justify-start gap-1.5">
-                                    <span className="text-xl font-black text-slate-800 dark:text-white font-mono tracking-tight">
-                                      {aiOptimizationMetrics.confidenceLevel.toFixed(
-                                        1,
-                                      )}
-                                      %
-                                    </span>
-                                    <span className="text-[0.7rem] font-bold text-emerald-400 animate-pulse font-mono">
-                                      <i className="fas fa-caret-up"></i> LIVE
-                                    </span>
-                                  </div>
-                                </div>
-
-                                {/* Badge Status */}
-                                <div className="flex flex-col gap-1.5 items-center sm:items-start">
-                                  <span
-                                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-[0.7rem] font-black rounded-full uppercase tracking-wider w-fit ${aiOptimizationMetrics.confidenceLevelColor}`}
-                                  >
-                                    <span className="w-1 h-1 rounded-full bg-current animate-ping"></span>
-                                    {aiOptimizationMetrics.confidenceLevelLabel}
-                                  </span>
-                                  <div className="text-[0.7rem] font-bold text-slate-500 dark:text-slate-200">
-                                    {lang === "th"
-                                      ? "โหมดปัจจุบัน: "
-                                      : "Operation: "}
-                                    <span
-                                      className={`font-black ${aiOptimizationMetrics.confidenceColorText}`}
-                                    >
-                                      {aiOptimizationMetrics.statusTag}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Sub-features active indicator channel lists */}
-                            <div className="border-t border-slate-300/30 dark:border-slate-500/10 pt-3.5 mt-3.5">
-                              <div className="text-[0.7rem] text-slate-405 dark:text-slate-200 font-bold block mb-1.5 uppercase tracking-wide">
-                                {lang === "th"
-                                  ? "ช่องทางมีส่วนร่วมเพื่อเสถียรกริด"
-                                  : "Active AI Resource Toggles"}
-                              </div>
-                              <div className="grid grid-cols-2 gap-1.5">
-                                {/* AC */}
-                                <div
-                                  className={`p-1.5 px-2 rounded-xl flex items-center gap-2 border text-[8.5px] font-semibold ${
-                                    aiSmartAc
-                                      ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                                      : "bg-slate-555/5 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-100 line-through"
-                                  }`}
-                                >
-                                  <i
-                                    className={`fas ${aiSmartAc ? "fa-snowflake text-emerald-450" : "fa-times text-slate-400"}`}
-                                  ></i>
-                                  <span>
-                                    {lang === "th"
-                                      ? "1. ปรับความเย็น AC"
-                                      : "Smart AC"}
-                                  </span>
-                                </div>
-
-                                {/* Standby */}
-                                <div
-                                  className={`p-1.5 px-2 rounded-xl flex items-center gap-2 border text-[8.5px] font-semibold ${
-                                    aiEcoStandby
-                                      ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                                      : "bg-slate-555/5 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-100 line-through"
-                                  }`}
-                                >
-                                  <i
-                                    className={`fas ${aiEcoStandby ? "fa-plug text-emerald-450" : "fa-times text-slate-400"}`}
-                                  ></i>
-                                  <span>
-                                    {lang === "th"
-                                      ? "2. คุม Standby"
-                                      : "Eco Standby"}
-                                  </span>
-                                </div>
-
-                                {/* Load Shift */}
-                                <div
-                                  className={`p-1.5 px-2 rounded-xl flex items-center gap-2 border text-[8.5px] font-semibold ${
-                                    aiLoadShift
-                                      ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                                      : "bg-slate-555/5 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-100 line-through"
-                                  }`}
-                                >
-                                  <i
-                                    className={`fas ${aiLoadShift ? "fa-history text-emerald-450" : "fa-times text-slate-400"}`}
-                                  ></i>
-                                  <span>
-                                    {lang === "th"
-                                      ? "3. ย้ายชั่วโมงโหลด"
-                                      : "Load Shift"}
-                                  </span>
-                                </div>
-
-                                {/* PF Auto-Tuning */}
-                                <div
-                                  className={`p-1.5 px-2 rounded-xl flex items-center gap-2 border text-[8.5px] font-semibold ${
-                                    aiPfTuning
-                                      ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                                      : "bg-slate-555/5 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-100 line-through"
-                                  }`}
-                                >
-                                  <i
-                                    className={`fas ${aiPfTuning ? "fa-charging-station text-emerald-450" : "fa-times text-slate-400"}`}
-                                  ></i>
-                                  <span>
-                                    {lang === "th"
-                                      ? "4. จูนกำลังไฟ PF"
-                                      : "Power Factor"}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  }
 
                   
 
@@ -3270,15 +2723,15 @@ const Dashboard: React.FC<DashboardProps> = ({
                         className="md:col-span-2 lg:col-span-8 transition-all duration-300 h-full"
                       >
                         <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm h-full flex flex-col hover:shadow-lg transition-all duration-300 rounded-[2rem]">
-                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[0.7rem] tracking-wider text-slate-600 dark:text-slate-100 font-bold opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity">
-                            <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-400">
+                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[0.7rem] tracking-wider text-slate-600 dark:text-slate-100 font-bold opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity">
+                            <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-500">
                                <i className="fas fa-grip-horizontal"></i>
                                <span className="text-[0.7rem] uppercase tracking-wider font-bold">DRAG TO MOVE (SOLAR GRID)</span>
                              </div>
                              <div className="flex items-center gap-2">
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === 0}
                               >
@@ -3286,7 +2739,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </button>
                               <button
                                 type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
                                 onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
                                 disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
                               >
@@ -3302,53 +2755,42 @@ const Dashboard: React.FC<DashboardProps> = ({
                     );
                   }
 
-                  if (widgetId === "smart-savings") {
-                    return (
-                      <motion.div
-                        key="smart-savings"
-                        variants={itemVariants}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragEnd={handleDragEnd}
-                        className="md:col-span-2 lg:col-span-12 transition-all duration-300 h-full"
-                      >
-                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm h-full flex flex-col hover:shadow-lg transition-all duration-300 rounded-[2rem]">
-                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-850 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[0.7rem] tracking-wider text-slate-600 dark:text-slate-100 font-bold opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity">
-                            <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-400">
-                               <i className="fas fa-grip-horizontal"></i>
-                               <span className="text-[0.7rem] uppercase tracking-wider font-bold">DRAG TO MOVE</span>
-                             </div>
-                             <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === 0}
-                              >
-                                <i className="fas fa-chevron-up"></i>
-                              </button>
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
-                              >
-                                <i className="fas fa-chevron-down"></i>
-                              </button>
-                            </div>
-                          </div>
-                          <div className="p-5 flex-grow">
-                            <SmartSavingsCalculator isDarkMode={isDarkMode} lang={lang} currentRate={analytics.unitRate} baseCost={analytics.totalCost} onApplyPlan={() => {}} />
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  }
+
 
                   return null;
                 })}
               </motion.div>
+            </motion.div>
+          )}
+
+          {currentPage === "ai_hub" && (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="space-y-6 animate-fade-in"
+            >
+              <EnergyMonitoringHub
+                lang={lang}
+                isDarkMode={isDarkMode}
+                devices={multiDevices}
+                analytics={analytics}
+                dailySavingsData={dailySavingsData}
+                performanceChartData={performanceChartData}
+                aiOptimizationMetrics={aiOptimizationMetrics}
+                aiSmartAc={aiSmartAc}
+                setAiSmartAc={setAiSmartAc}
+                aiEcoStandby={aiEcoStandby}
+                setAiEcoStandby={setAiEcoStandby}
+                aiPfTuning={aiPfTuning}
+                setAiPfTuning={setAiPfTuning}
+                aiLoadShift={aiLoadShift}
+                setAiLoadShift={setAiLoadShift}
+                perfRange={perfRange}
+                setPerfRange={setPerfRange}
+                globalBudget={globalBudget}
+                unitRate={unitRate}
+              />
             </motion.div>
           )}
 
@@ -3400,7 +2842,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     aiSmartAc
                                       ? "bg-emerald-500/10 border-emerald-500/30"
                                       : isDarkMode
-                                        ? "bg-slate-900/60 border-slate-800 text-slate-400"
+                                        ? "bg-slate-900/60 border-slate-800 text-slate-500"
                                         : "bg-slate-100 border-slate-200 text-slate-500"
                                   }`}
                                 >
@@ -3409,14 +2851,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                                       className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs transition-colors ${
                                         aiSmartAc
                                           ? "bg-emerald-555 text-white shadow-sm"
-                                          : "bg-slate-800 text-slate-400"
+                                          : "bg-slate-800 text-slate-500"
                                       }`}
                                     >
                                       <i className="fas fa-temperature-low animate-pulse"></i>
                                     </div>
                                     <div>
                                       <div
-                                        className={`text-[0.8rem] font-black ${aiSmartAc ? "text-white/95" : "text-slate-400"}`}
+                                        className={`text-[0.8rem] font-black ${aiSmartAc ? "text-white/95" : "text-slate-500"}`}
                                       >
                                         {lang === "th"
                                           ? "1. ปรับอุณหภูมิ AC แบบประหยัด"
@@ -3445,7 +2887,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     aiEcoStandby
                                       ? "bg-emerald-500/10 border-emerald-500/30"
                                       : isDarkMode
-                                        ? "bg-slate-900/60 border-slate-800 text-slate-400"
+                                        ? "bg-slate-900/60 border-slate-800 text-slate-500"
                                         : "bg-slate-100 border-slate-200 text-slate-500"
                                   }`}
                                 >
@@ -3454,14 +2896,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                                       className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs transition-colors ${
                                         aiEcoStandby
                                           ? "bg-emerald-555 text-white shadow-sm"
-                                          : "bg-slate-800 text-slate-400"
+                                          : "bg-slate-800 text-slate-500"
                                       }`}
                                     >
                                       <i className="fas fa-power-off"></i>
                                     </div>
                                     <div>
                                       <div
-                                        className={`text-[0.8rem] font-black ${aiEcoStandby ? "text-white/95" : "text-slate-400"}`}
+                                        className={`text-[0.8rem] font-black ${aiEcoStandby ? "text-white/95" : "text-slate-500"}`}
                                       >
                                         {lang === "th"
                                           ? "2. ระงับไฟรั่วสแตนด์บาย"
@@ -3490,7 +2932,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     aiLoadShift
                                       ? "bg-emerald-500/10 border-emerald-500/30"
                                       : isDarkMode
-                                        ? "bg-slate-900/60 border-slate-800 text-slate-400"
+                                        ? "bg-slate-900/60 border-slate-800 text-slate-500"
                                         : "bg-slate-100 border-slate-200 text-slate-500"
                                   }`}
                                 >
@@ -3499,14 +2941,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                                       className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs transition-colors ${
                                         aiLoadShift
                                           ? "bg-emerald-555 text-white shadow-sm"
-                                          : "bg-slate-800 text-slate-400"
+                                          : "bg-slate-800 text-slate-500"
                                       }`}
                                     >
                                       <i className="fas fa-history"></i>
                                     </div>
                                     <div>
                                       <div
-                                        className={`text-[0.8rem] font-black ${aiLoadShift ? "text-white/95" : "text-slate-400"}`}
+                                        className={`text-[0.8rem] font-black ${aiLoadShift ? "text-white/95" : "text-slate-500"}`}
                                       >
                                         {lang === "th"
                                           ? "3. อัลกอริทึมสลับเวลา TOU"
@@ -3535,7 +2977,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     aiPfTuning
                                       ? "bg-emerald-500/10 border-emerald-500/30"
                                       : isDarkMode
-                                        ? "bg-slate-900/60 border-slate-800 text-slate-400"
+                                        ? "bg-slate-900/60 border-slate-800 text-slate-500"
                                         : "bg-slate-100 border-slate-200 text-slate-500"
                                   }`}
                                 >
@@ -3544,14 +2986,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                                       className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs transition-colors ${
                                         aiPfTuning
                                           ? "bg-emerald-555 text-white shadow-sm"
-                                          : "bg-slate-800 text-slate-400"
+                                          : "bg-slate-800 text-slate-500"
                                       }`}
                                     >
                                       <i className="fas fa-microchip"></i>
                                     </div>
                                     <div>
                                       <div
-                                        className={`text-[0.8rem] font-black ${aiPfTuning ? "text-white/95" : "text-slate-400"}`}
+                                        className={`text-[0.8rem] font-black ${aiPfTuning ? "text-white/95" : "text-slate-500"}`}
                                       >
                                         {lang === "th"
                                           ? "4. ตัวจูน Power Factor โครงข่าย"
@@ -3584,7 +3026,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                       ? "จำลองมูลค่าประหยัด"
                                       : "Est. Savings Amount"}
                                   </span>
-                                  <span className="text-sm font-black text-emerald-450 font-mono">
+                                  <span className="text-sm font-black text-emerald-400 font-mono">
                                     ฿{aiMonthlySavings.amount.toFixed(0)}
                                   </span>
                                 </div>
@@ -3700,7 +3142,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </button>
                   )}
                   <button
-                    className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 border-2 border-light rounded-2xl px-6 py-3 font-bold text-xs uppercase text-primary"
+                    className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 border-2 border-light rounded-2xl px-6 py-3 font-bold text-xs uppercase text-primary"
                     onClick={addDevice}
                   >
                     <i className="fas fa-plus me-2"></i> Node
@@ -3712,7 +3154,32 @@ const Dashboard: React.FC<DashboardProps> = ({
                 id="tour-step-devices-grid"
                 className="row g-3 g-md-4 transition-all duration-500"
               >
-                {filteredDevices.map((dev, i) => {
+                {filteredDevices.length === 0 ? (
+                  <div className="col-12">
+                    <div className="dashboard-card border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-10 text-center rounded-[2rem] flex flex-col items-center justify-center space-y-4">
+                      <div className="w-16 h-16 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center text-slate-500">
+                        <i className="fas fa-plug-circle-xmark text-2xl"></i>
+                      </div>
+                      <div>
+                        <h5 className="font-display font-bold text-slate-800 dark:text-slate-200 mb-2">
+                          {lang === "th" ? "ไม่พบอุปกรณ์" : "No Devices Found"}
+                        </h5>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm max-w-sm mx-auto mb-6">
+                          {lang === "th" 
+                            ? "คุณยังไม่ได้เพิ่มอุปกรณ์ในหมวดหมู่นี้ หรือการค้นหาไม่ตรงกับข้อมูลที่มี กดปุ่ม 'Add Node' ด้านบนเพื่อสร้างอุปกรณ์ใหม่"
+                            : "You haven't added any devices here, or your filter matches nothing. Click 'Add Node' to create a new appliance."}
+                        </p>
+                        <button
+                          className="btn btn-primary px-6 py-2.5 rounded-2xl font-bold text-xs uppercase shadow-lg hover:scale-[1.02] transition-all"
+                          onClick={addDevice}
+                        >
+                          <i className="fas fa-plus me-2"></i> {lang === "th" ? "เพิ่มอุปกรณ์เลย" : "Add Device Now"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  filteredDevices.map((dev, i) => {
                   const isSelected = compareDeviceIds.includes(dev.id);
                   const dailyKwh =
                     dev.status === "off"
@@ -3766,7 +3233,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                     </div>
                   );
-                })}
+                }))}
               </div>
             </div>
           )}
@@ -4055,7 +3522,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         </div>
                       ))}
                       <button
-                        className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 w-100 py-3 rounded-[24px] border-2 border-dashed border-primary/20 text-primary font-bold text-[0.75rem] uppercase tracking-[0.3em] hover:bg-primary/5 mt-4"
+                        className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 w-100 py-3 rounded-[24px] border-2 border-dashed border-primary/20 text-primary font-bold text-[0.75rem] uppercase tracking-[0.3em] hover:bg-primary/5 mt-4"
                         onClick={addDevice}
                       >
                         <i className="fas fa-plus-circle me-2"></i> {t("add")}
@@ -4497,7 +3964,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             <p className="text-xs opacity-80 leading-relaxed mb-6 relative z-10">
                               {t("ai_scan_desc")}
                             </p>
-                            <button className="btn btn-white dark:bg-slate-800 dark:!text-white dark:border-slate-700 w-100 rounded-2xl py-3 font-bold text-[0.75rem] uppercase tracking-widest text-primary relative z-10">
+                            <button className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 w-100 rounded-2xl py-3 font-bold text-[0.75rem] uppercase tracking-widest text-primary relative z-10">
                               {t("ai_apply")}
                             </button>
 
@@ -4560,7 +4027,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                       ? "ประหยัดพลังงานรวม"
                                       : "Total Combined Savings"}
                                   </span>
-                                  <span className="text-base font-black text-emerald-450 font-mono">
+                                  <span className="text-base font-black text-emerald-400 font-mono">
                                     -{aiMonthlySavings.percent.toFixed(1)}%
                                   </span>
                                 </div>
@@ -5613,7 +5080,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     </div>
 
                     {/* AI DIAGNOSTICS MODULE */}
-                    <div className="p-6 bg-slate-900 text-white rounded-[2.5rem] relative overflow-hidden shadow-xl border border-slate-850">
+                    <div className="p-6 bg-slate-900 text-white rounded-[2.5rem] relative overflow-hidden shadow-xl border border-slate-800">
                       <div className="absolute top-0 right-0 p-8 opacity-5 text-indigo-500">
                         <i className="fas fa-brain text-[120px]"></i>
                       </div>
@@ -5627,7 +5094,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           </h6>
                         </div>
                         {deviceAnalysis && !deviceAnalysis.error && (
-                          <span className="badge bg-emerald-550/10 text-emerald-400 text-[0.65rem] font-bold uppercase tracking-widest border border-emerald-500/20 py-1 px-2.5 rounded-full">
+                          <span className="badge bg-emerald-500/10 text-emerald-400 text-[0.65rem] font-bold uppercase tracking-widest border border-emerald-500/20 py-1 px-2.5 rounded-full">
                             <i className="fas fa-activity me-1"></i> Live Audit
                           </span>
                         )}
@@ -5635,7 +5102,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                       {!deviceAnalysis && !isAnalyzingDevice && (
                         <div className="relative z-10 py-2">
-                          <p className="text-[0.8rem] text-slate-400 leading-relaxed mb-4">
+                          <p className="text-[0.8rem] text-slate-500 leading-relaxed mb-4">
                             Analyze telemetric power signatures, power factors,
                             and historical service logs of this node to diagnose
                             issues, estimate grid compliance anomalies, and
@@ -5676,7 +5143,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700/50">
                                 <div className="flex gap-4 items-center mb-3">
                                   <div className="flex flex-col">
-                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-400 font-bold block mb-1">
+                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-1">
                                       {t("ai_health_score")}
                                     </span>
                                     <div className="flex items-baseline gap-1">
@@ -5690,7 +5157,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                   </div>
                                   <div className="h-8 w-px bg-slate-705"></div>
                                   <div>
-                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-400 font-bold block mb-1">
+                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-1">
                                       {t("ai_health_status")}
                                     </span>
                                     <span
@@ -5717,7 +5184,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               {deviceAnalysis.technicalDetails &&
                                 deviceAnalysis.technicalDetails.length > 0 && (
                                   <div>
-                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-400 font-bold block mb-2">
+                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-2">
                                       {t("ai_tech_details")}
                                     </span>
                                     <div className="grid grid-cols-1 gap-1.5">
@@ -5743,7 +5210,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                 deviceAnalysis.structuralOptimizations.length >
                                   0 && (
                                   <div>
-                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-400 font-bold block mb-2">
+                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-2">
                                       {t("ai_onpeak_opt")}
                                     </span>
                                     <div className="grid grid-cols-1 gap-1.5">
@@ -6102,7 +5569,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 flex-shrink-0 text-[0.75rem]">
                 <i className="fas fa-brain animate-spin"></i>
               </div>
-              <div className="bg-slate-800/80 border border-slate-700/50 text-slate-400 rounded-2xl rounded-tl-none p-3 text-xs flex items-center gap-2">
+              <div className="bg-slate-800/80 border border-slate-700/50 text-slate-500 rounded-2xl rounded-tl-none p-3 text-xs flex items-center gap-2">
                 <span
                   className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"
                   style={{ animationDelay: "0ms" }}
@@ -6131,7 +5598,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               className={`text-[0.7rem] font-bold px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 activeFaqCategory === "popular"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold"
-                  : "bg-slate-800/60 text-slate-400 hover:bg-slate-800 border border-transparent"
+                  : "bg-slate-800/60 text-slate-500 hover:bg-slate-800 border border-transparent"
               }`}
             >
               ⭐️ {lang === "th" ? "ยอดนิยม" : "Popular"}
@@ -6142,7 +5609,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               className={`text-[0.7rem] font-bold px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 activeFaqCategory === "devices"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold"
-                  : "bg-slate-800/60 text-slate-400 hover:bg-slate-800 border border-transparent"
+                  : "bg-slate-800/60 text-slate-500 hover:bg-slate-800 border border-transparent"
               }`}
             >
               🔌 อุปกรณ์
@@ -6153,7 +5620,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               className={`text-[0.7rem] font-bold px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 activeFaqCategory === "tou_bill"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold"
-                  : "bg-slate-800/60 text-slate-400 hover:bg-slate-800 border border-transparent"
+                  : "bg-slate-800/60 text-slate-500 hover:bg-slate-800 border border-transparent"
               }`}
             >
               ⏱️ ค่าไฟ & TOU
@@ -6352,7 +5819,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               <div className="p-4 sm:p-5 flex-1 relative">
                 <button
                   onClick={() => setSevereWeatherAlert({ ...severeWeatherAlert, show: false })}
-                  className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  className="absolute top-4 right-4 text-slate-500 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                 >
                   <i className="fas fa-times"></i>
                 </button>
@@ -6431,6 +5898,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
 const navItems = [
   { id: "dashboard", icon: "fas fa-th-large", key: "m1" },
+  { id: "ai_hub", icon: "fas fa-brain", key: "m7" },
   { id: "devices", icon: "fas fa-network-wired", key: "m2" },
   { id: "calculator", icon: "fas fa-calculator", key: "m3" },
   { id: "stats", icon: "fas fa-chart-line", key: "m5" },

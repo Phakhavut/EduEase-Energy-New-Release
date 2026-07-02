@@ -197,7 +197,7 @@ export const SmartSavingsCalculator: React.FC<SmartSavingsCalculatorProps> = ({
 
               <form onSubmit={handleAddCustomAppliance} className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="custom-appliance-name" className="text-[0.75rem] font-bold text-slate-400 uppercase tracking-wider">
+                  <label htmlFor="custom-appliance-name" className="text-[0.75rem] font-bold text-slate-500 uppercase tracking-wider">
                     {lang === 'th' ? 'ชื่อเครื่องใช้ไฟฟ้า:' : 'Device Name:'}
                   </label>
                   <input
@@ -207,12 +207,12 @@ export const SmartSavingsCalculator: React.FC<SmartSavingsCalculatorProps> = ({
                     value={customName}
                     onChange={(e) => setCustomName(e.target.value)}
                     placeholder="e.g. Microwave, Washing Machine"
-                    className="w-full text-xs p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-850 focus:border-sky-500 focus:outline-none"
+                    className="w-full text-xs p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-800 focus:border-sky-500 focus:outline-none"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <div className="flex justify-between items-center text-[0.75rem] font-bold text-slate-400 uppercase tracking-wider">
+                  <div className="flex justify-between items-center text-[0.75rem] font-bold text-slate-500 uppercase tracking-wider">
                     <label htmlFor="custom-hours-range">{lang === 'th' ? 'ระยะเวลาใช้ต่อวัน:' : 'Active Hours:'}</label>
                     <span className="font-mono text-slate-600 dark:text-slate-100">{customHours} ชม./วัน</span>
                   </div>
@@ -229,7 +229,7 @@ export const SmartSavingsCalculator: React.FC<SmartSavingsCalculatorProps> = ({
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <div className="flex justify-between items-center text-[0.75rem] font-bold text-slate-400 uppercase tracking-wider">
+                  <div className="flex justify-between items-center text-[0.75rem] font-bold text-slate-500 uppercase tracking-wider">
                     <label htmlFor="custom-count-input">{lang === 'th' ? 'จำนวน:' : 'Count / Quantity:'}</label>
                     <span className="font-mono text-slate-600 dark:text-slate-100">{customCount}</span>
                   </div>
@@ -240,7 +240,7 @@ export const SmartSavingsCalculator: React.FC<SmartSavingsCalculatorProps> = ({
                     max="50"
                     value={customCount}
                     onChange={(e) => setCustomCount(Math.max(1, parseInt(e.target.value, 10) || 1))}
-                    className="w-full text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-850 focus:border-sky-500 focus:outline-none font-mono"
+                    className="w-full text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-800 focus:border-sky-500 focus:outline-none font-mono"
                   />
                 </div>
 

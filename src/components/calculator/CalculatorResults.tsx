@@ -26,13 +26,13 @@ export const CalculatorResults: React.FC<CalculatorResultsProps> = ({
           exit={{ opacity: 0 }}
           className="p-8 rounded-[2rem] border border-dashed border-slate-200 dark:border-slate-800 text-center flex flex-col items-center justify-center py-16 bg-slate-50/20 dark:bg-slate-900/5"
         >
-          <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-900 text-slate-400 dark:text-slate-100 mb-4 shadow-sm">
+          <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-900 text-slate-500 dark:text-slate-100 mb-4 shadow-sm">
             <Calculator className="w-10 h-10" />
           </div>
           <h5 className="text-sm font-bold font-display text-slate-700 dark:text-slate-200">
             {lang === 'th' ? 'พร้อมวิเคราะห์ประสิทธิภาพ' : 'Awaiting Profile Submission'}
           </h5>
-          <p className="text-[10.5px] leading-relaxed text-slate-400 max-w-xs mt-2">
+          <p className="text-[10.5px] leading-relaxed text-slate-500 max-w-xs mt-2">
             {lang === 'th'
               ? 'ปรับเปลี่ยนค่าใช้จ่ายของอุปกรณ์ใช้ไฟที่ด่านซ้าย จากนั้นกดปุ่มประหยัดไฟโดย AI ด้านล่างเพื่อรับรายงานผลตรวจประหยัดพลังงานนาโนวินาทีเต็มรูปแบบ'
               : 'Modify your appliance ratings and count on the left sidebar. Press the compute button to run regression savings estimations.'}
@@ -46,7 +46,7 @@ export const CalculatorResults: React.FC<CalculatorResultsProps> = ({
           className="flex flex-col gap-4"
         >
           {/* Financial overview card */}
-          <div className="p-5.5 rounded-[2rem] bg-slate-950 text-white shadow-xl relative overflow-hidden border border-slate-850">
+          <div className="p-5.5 rounded-[2rem] bg-slate-950 text-white shadow-xl relative overflow-hidden border border-slate-800">
             <div className="absolute -right-4 -bottom-4 opacity-10 text-sky-400 select-none">
               <TrendingDown className="w-40 h-40" />
             </div>
@@ -60,7 +60,7 @@ export const CalculatorResults: React.FC<CalculatorResultsProps> = ({
               <span className="text-4xl font-black font-mono text-emerald-400">
                 ฿{result.monthlySavings.toLocaleString()}
               </span>
-              <span className="text-xs font-semibold text-slate-400">
+              <span className="text-xs font-semibold text-slate-500">
                 / {lang === 'th' ? 'เดือน' : 'month'}
               </span>
             </div>
@@ -68,7 +68,7 @@ export const CalculatorResults: React.FC<CalculatorResultsProps> = ({
             {/* Contrast comparison stats */}
             <div className="grid grid-cols-2 gap-4 mt-6 pt-5 border-t border-dashed border-slate-800">
               <div>
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
+                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">
                   {lang === 'th' ? 'ค่าไฟเดิมโดยประมาณ' : 'Current Estimated Cost'}
                 </span>
                 <span className="text-sm font-bold font-mono text-slate-200 mt-0.5 block">
@@ -77,7 +77,7 @@ export const CalculatorResults: React.FC<CalculatorResultsProps> = ({
               </div>
 
               <div>
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">
+                <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">
                   {lang === 'th' ? 'ค่าไฟใหม่หลังประหยัด' : 'Projected New Cost'}
                 </span>
                 <span className="text-sm font-bold font-mono text-sky-300 mt-0.5 block">
@@ -88,7 +88,7 @@ export const CalculatorResults: React.FC<CalculatorResultsProps> = ({
 
             {/* Savings progress indicator */}
             <div className="mt-5">
-              <div className="flex justify-between items-center text-[10px] font-bold text-slate-400 mb-1.5">
+              <div className="flex justify-between items-center text-[10px] font-bold text-slate-500 mb-1.5">
                 <span>{lang === 'th' ? 'สัดส่วนประหยัดเฉลี่ย:' : 'Expected Saving Offset:'}</span>
                 <span className="text-emerald-400 font-mono font-black">+{result.savingsPercentage}%</span>
               </div>
@@ -113,7 +113,7 @@ export const CalculatorResults: React.FC<CalculatorResultsProps> = ({
 
           {/* Actionable recommendations list */}
           <div className="flex flex-col gap-3">
-            <h5 className="text-[11px] font-black font-display text-slate-400 dark:text-slate-100 uppercase tracking-wider">
+            <h5 className="text-[11px] font-black font-display text-slate-500 dark:text-slate-100 uppercase tracking-wider">
               {lang === 'th' ? 'ข้อแนะนำและพฤติกรรมประหยัดไฟฟ้า' : 'AI OPTIMIZATION CHECKLIST'}
             </h5>
 

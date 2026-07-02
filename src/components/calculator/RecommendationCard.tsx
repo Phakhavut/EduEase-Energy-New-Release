@@ -37,14 +37,14 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
       className={`p-4 rounded-2.5xl border transition-all duration-300 flex flex-col gap-3 ${
         isCommitted 
           ? 'bg-emerald-500/5 border-emerald-500/20 shadow-sm' 
-          : 'bg-slate-50/50 dark:bg-slate-950/5 border-slate-150 dark:border-slate-850/50'
+          : 'bg-slate-50/50 dark:bg-slate-950/5 border-slate-150 dark:border-slate-800/50'
       }`}
     >
       {/* Header card info */}
       <div className="flex justify-between items-start gap-2">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[9.5px] font-black font-mono uppercase tracking-wider text-slate-400">
+            <span className="text-[9.5px] font-black font-mono uppercase tracking-wider text-slate-500">
               {rec.appliance}
             </span>
             
@@ -68,7 +68,7 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
 
         {/* Projected offset potential */}
         <div className="text-right shrink-0">
-          <span className="text-[9px] font-bold text-slate-400 block uppercase font-mono">
+          <span className="text-[9px] font-bold text-slate-500 block uppercase font-mono">
             {lang === 'th' ? 'ประหยัดสะสม' : 'OFFSET'}
           </span>
           <span className="text-xs font-black text-emerald-500 font-mono block mt-0.5">

@@ -530,7 +530,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                                     : 'bg-white text-muted border'
                                                         }`}>
                                                             {isClaimed ? (
-                                                                <i className="fas fa-check-double text-slate-400"></i>
+                                                                <i className="fas fa-check-double text-slate-500"></i>
                                                             ) : quest.completed ? (
                                                                 <i className="fas fa-gift text-white"></i>
                                                             ) : (
@@ -570,8 +570,8 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                                 {lang === 'th' ? "รับรางวัล 🎉" : "Claim Reward 🎉"}
                                                             </button>
                                                         ) : (
-                                                            <button disabled className="btn btn-light w-full md:w-auto rounded-xl px-4 py-2 text-xs font-black uppercase tracking-wider text-slate-400 border flex items-center justify-center gap-2">
-                                                                <span className="spinner-border spinner-border-sm text-slate-400" role="status" style={{ width: '10px', height: '10px', borderWidth: '1.5px' }} />
+                                                            <button disabled className="btn btn-light w-full md:w-auto rounded-xl px-4 py-2 text-xs font-black uppercase tracking-wider text-slate-500 border flex items-center justify-center gap-2">
+                                                                <span className="spinner-border spinner-border-sm text-slate-500" role="status" style={{ width: '10px', height: '10px', borderWidth: '1.5px' }} />
                                                                 {lang === 'th' ? "กำลังดำเนินการ..." : "In Progress..."}
                                                             </button>
                                                         )}
@@ -610,7 +610,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                         className={`flex items-center gap-3 px-3 py-2.5 rounded-2xl border transition-all ${
                                                             isUnlocked 
                                                                 ? `bg-${badge.color}-500/5 border-${badge.color}-500/25 text-dark` 
-                                                                : 'bg-slate-100/30 border-transparent text-slate-400 opacity-40'
+                                                                : 'bg-slate-100/30 border-transparent text-slate-500 opacity-40'
                                                         }`}
                                                     >
                                                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
@@ -727,7 +727,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                 value={imageUrlInput}
                                                 onChange={(e) => setImageUrlInput(e.target.value)}
                                                 placeholder="https://images.unsplash.com/photo-..." 
-                                                className="form-control rounded-xl text-xs bg-light border-slate-200 dark:border-slate-800 text-dark placeholder:text-slate-400 py-2"
+                                                className="form-control rounded-xl text-xs bg-light border-slate-200 dark:border-slate-800 text-dark placeholder:text-slate-500 py-2"
                                             />
                                             <button 
                                                 type="submit"
