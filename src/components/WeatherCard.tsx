@@ -398,7 +398,7 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ isDarkMode, locationNa
               </div>
             ) : (
               <div className="h-[200px] flex items-center justify-center border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
-                <span className="text-xs text-slate-500">Loading forecast data...</span>
+                <div className="flex gap-2 w-full px-4">{Array.from({ length: 5 }).map((_, i) => (<div key={i} className="flex-1 h-32 bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse" />))}</div>
               </div>
             )}
           </div>

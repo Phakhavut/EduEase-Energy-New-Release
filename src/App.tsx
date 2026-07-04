@@ -145,8 +145,8 @@ const App: React.FC = () => {
           />
         ))}
         {/* Visual Filters */}
-        <div className={`absolute inset-0 ${loginDarkMode ? 'bg-black/50' : 'bg-white/20'} backdrop-blur-[1px] transition-all duration-700`} />
-        <div className={`absolute inset-0 ${loginDarkMode ? 'bg-gradient-to-t from-black via-transparent to-black/60' : 'bg-gradient-to-t from-white/30 via-transparent to-white/70'} transition-all duration-500`} />
+        <div className={`absolute inset-0 ${loginDarkMode ? 'bg-black/60' : 'bg-white/40'} backdrop-blur-sm transition-all duration-700`} />
+        <div className={`absolute inset-0 ${loginDarkMode ? 'bg-gradient-to-t from-black via-transparent to-black/70' : 'bg-gradient-to-t from-white/40 via-transparent to-white/80'} transition-all duration-500`} />
         <div className={`absolute inset-0 ${loginDarkMode ? 'bg-[radial-gradient(circle_at_center,transparent_0%,rgba(0,0,0,0.5)_100%)]' : 'bg-[radial-gradient(circle_at_center,transparent_0%,rgba(255,255,255,0.05)_100%)]'} transition-all duration-500`} />
       </div>
 
@@ -214,12 +214,51 @@ const App: React.FC = () => {
            </nav>
         </div>
 
-        <main className="flex-grow flex items-center justify-center px-4 relative z-30">
-           <LoginForm 
+        <main className="flex-grow flex flex-col lg:flex-row items-center justify-center px-2 sm:px-6 lg:px-24 gap-8 lg:gap-12 py-8 lg:py-0 relative z-30 max-w-7xl mx-auto w-full">
+          <div className="flex-1 text-center lg:text-left pt-4 lg:pt-0">
+            <h1 className={`text-5xl md:text-6xl lg:text-7xl font-black font-display tracking-tighter mb-6 animate-slide-up ${loginDarkMode ? 'text-white' : 'text-slate-900'}`} style={{ animationDelay: '0.1s' }}>
+              Smart Energy Monitoring
+            </h1>
+            <p className={`text-lg md:text-xl font-medium tracking-wide mb-10 max-w-lg mx-auto lg:mx-0 animate-slide-up ${loginDarkMode ? 'text-slate-400' : 'text-slate-600'}`} style={{ animationDelay: '0.2s' }}>
+              Monitor, Predict, and Reduce Energy Cost
+            </p>
+            <div className="relative inline-flex items-center justify-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
+              {/* Subtle Circular Progress Rings */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+                <svg className="w-40 h-40 absolute animate-[spin_12s_linear_infinite]" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="1.5" className={`${loginDarkMode ? 'text-emerald-500/20' : 'text-emerald-600/20'}`} />
+                  <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2.5" strokeDasharray="80 200" strokeLinecap="round" className={`${loginDarkMode ? 'text-emerald-400/60' : 'text-emerald-500/60'}`} />
+                </svg>
+                <svg className="w-48 h-48 absolute animate-[spin_18s_linear_infinite_reverse]" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="1" className={`${loginDarkMode ? 'text-sky-500/10' : 'text-sky-600/10'}`} />
+                  <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="60 240" strokeLinecap="round" className={`${loginDarkMode ? 'text-sky-400/40' : 'text-sky-500/40'}`} />
+                </svg>
+                <svg className="w-56 h-56 absolute animate-[spin_24s_linear_infinite]" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="0.5" className={`${loginDarkMode ? 'text-purple-500/10' : 'text-purple-600/10'}`} />
+                  <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="40 260" strokeLinecap="round" className={`${loginDarkMode ? 'text-purple-400/30' : 'text-purple-500/30'}`} />
+                </svg>
+              </div>
+              
+              <button 
+                onClick={() => handleLoginSuccess('Demo User')}
+                className={`relative z-10 px-8 py-4 rounded-2xl font-bold text-lg shadow-lg hover:scale-105 transition-all duration-300 ${loginDarkMode ? 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-emerald-500/20' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/30'}`}
+              >
+                {lang === 'th' ? 'เริ่มใช้งานทันที' : 'Start Now'}
+              </button>
+            </div>
+            <div className={`mt-10 flex flex-wrap gap-5 items-center justify-center lg:justify-start text-[0.7rem] font-bold tracking-widest uppercase animate-slide-up ${loginDarkMode ? "text-slate-500" : "text-slate-500"}`} style={{ animationDelay: '0.4s' }}>
+              <span className="flex items-center gap-1.5"><i className="fas fa-microchip text-emerald-500"></i> {lang === 'th' ? 'ใช้ AI วิเคราะห์พฤติกรรม' : 'AI Behavior Analysis'}</span>
+              <span className="flex items-center gap-1.5"><i className="fas fa-satellite-dish text-sky-500"></i> {lang === 'th' ? 'รับข้อมูลสดจากเซนเซอร์' : 'Live Sensor Sync'}</span>
+            </div>
+          </div>
+          
+          <div className="flex-1 flex justify-center lg:justify-end w-full max-w-[400px]">
+            <LoginForm 
               selectedHouseName={activeHouse.name} 
               onLogin={handleLoginSuccess}
               isDarkMode={loginDarkMode}
-           />
+            />
+          </div>
         </main>
 
         <footer className="px-8 pb-12 md:px-16 flex justify-between items-end">

@@ -33,8 +33,8 @@ const UserManual: React.FC<UserManualProps> = ({
 
   const t = {
     th: {
-      title: '📚 คู่มือแนะนำการควบคุมระบบโครงข่ายไฟฟ้าอัจฉริยะ (EduEase Operations Manual)',
-      subtitle: 'ศึกษาขั้นตอนปฏิบัติงาน สิทธิ์การเข้าถึง และการใช้เครื่องมือประเมินระดับสากลด้วยสแกนเนอร์ปัญญาประดิษฐ์',
+      title: '📚 คู่มือการใช้งาน',
+      subtitle: 'เรียนรู้วิธีการใช้งานระบบ ตรวจสอบค่าไฟ และควบคุมอุปกรณ์ต่างๆ ในบ้าน',
       tab_intro: '🔑 เริ่มต้น & ล็อกอิน',
       tab_dashboard: '📊 แดชบอร์ด & ระบบเฝ้าระวัง',
       tab_nodes: '⚙️ บริหารอุปกรณ์โหนด',
@@ -42,8 +42,8 @@ const UserManual: React.FC<UserManualProps> = ({
       tab_budget: '💰 วางแผนงบประมาณ',
       tab_security: '🛡️ ความปลอดภัย & AI Log Scan',
       close: 'ปิดระเบียบผู้ช่วย',
-      credentials_title: '🔑 ข้อมูลบัญชีจำลองสำหรับเข้าคุมระบบ (Access Authorization Token)',
-      credentials_desc: 'ใช้รหัสผ่านสิทธิ์วิศวกรผู้ดูแลระบบในแถบหน้าแรกเพื่อปลดล็อกฟังก์ชัน:',
+      credentials_title: '🔑 รหัสผ่านสำหรับเข้าสู่ระบบ',
+      credentials_desc: 'ใช้ข้อมูลด้านล่างนี้เพื่อเข้าสู่ระบบ:',
       username: 'บัญชีใช้งาน (Username):',
       password: 'รหัสผ่านแรกเข้า (Password):',
       copied_username_tip: 'คัดลอกชื่อบัญชีเรียบร้อย!',
@@ -57,8 +57,8 @@ const UserManual: React.FC<UserManualProps> = ({
       total_chapters: 'โครงสร้างเนื้อหาทั้งหมด 6 หมวดจำลองสถานการณ์จริง',
     },
     en: {
-      title: '📚 Comprehensive Microgrid Control Center Manual (Operations Manual)',
-      subtitle: 'Examine detailed technician procedures, credentials, telemetry thresholds, and Google Gemini AI tools.',
+      title: '📚 User Manual',
+      subtitle: 'Learn how to use the dashboard, monitor energy, and control your devices.',
       tab_intro: '🔑 Onboarding & login',
       tab_dashboard: '📊 Dashboard & Monitoring',
       tab_nodes: '⚙️ Node Asset Controls',
@@ -66,8 +66,8 @@ const UserManual: React.FC<UserManualProps> = ({
       tab_budget: '💰 Budget Longevity',
       tab_security: '🛡️ Security & AI Log Scan',
       close: 'Close Handbook',
-      credentials_title: '🔑 Grid Supervisor Authorization Tokens (Keys)',
-      credentials_desc: 'Use the following verified terminal keys in the central login screen:',
+      credentials_title: '🔑 Demo Login Credentials',
+      credentials_desc: 'Use the following credentials to log in:',
       username: 'Credentials Account:',
       password: 'Security Passcode:',
       copied_username_tip: 'Username copied to clipboard!',
@@ -334,11 +334,11 @@ const UserManual: React.FC<UserManualProps> = ({
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-sm md:text-base ${textClass} flex items-center gap-2`}>
                 <i className="fas fa-desktop text-blue-500"></i>
-                {lang === 'th' ? 'หน้าแดชบอร์ดหลัก: อธิบายดัชชี้ว์วัดและระบบประมวลผล (Dashboard Telemetry Index)' : 'Main Control Center HUD & System Indicators'}
+                {lang === 'th' ? 'ภาพรวมการใช้พลังงาน (Dashboard)' : 'Main Control Center HUD & System Indicators'}
               </h5>
               <p className={paragraphClass}>
                 {lang === 'th'
-                  ? 'หน้าแรกเป็นศูนย์รวมสถานะสดของการกินไฟฟ้า ดัชนีเหล่านี้ไม่ได้มาจากการสุ่ม แต่มาจากการเฉลี่ยโหลดของอุปกรณ์จริงที่เปิดระบบควบคุมอยู่วินาทีนี้:'
+                  ? 'หน้าแรกจะแสดงข้อมูลสรุปค่าไฟ โหลดปัจจุบัน และการแจ้งเตือนจาก AI'
                   : 'The central active metrics represent accumulated live properties based on your active multi-node status:'}
               </p>
 
@@ -468,7 +468,7 @@ const UserManual: React.FC<UserManualProps> = ({
             <div className="space-y-4">
               <h5 className={`font-display font-black text-sm md:text-base ${textClass} flex items-center gap-2`}>
                 <i className="fas fa-folder-tree text-cyan-500"></i>
-                {lang === 'th' ? 'คำแนะนำขั้นตอนการคุม อุปกรณ์ และตัดโครงข่ายพลังงาน (Microgrid Switching Nodes)' : 'Asset Inventory Control & Diagnostic Steps'}
+                {lang === 'th' ? 'การควบคุมเครื่องใช้ไฟฟ้า' : 'Asset Inventory Control & Diagnostic Steps'}
               </h5>
               <p className={paragraphClass}>
                 {lang === 'th'
@@ -590,7 +590,7 @@ const UserManual: React.FC<UserManualProps> = ({
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-sm md:text-base ${textClass} flex items-center gap-2`}>
                 <i className="fas fa-calculator text-amber-500"></i>
-                {lang === 'th' ? 'โครงสร้างแบบทดสอบตัวแปรพลังงานภายนอก (Calculator Variables Configuration)' : 'Configuring the Utility Math Simulation Engine'}
+                {lang === 'th' ? 'การจำลองค่าไฟ (Calculator)' : 'Configuring the Utility Math Simulation Engine'}
               </h5>
               <p className={paragraphClass}>
                 {lang === 'th'
@@ -654,7 +654,7 @@ const UserManual: React.FC<UserManualProps> = ({
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-sm md:text-base ${textClass} flex items-center gap-2`}>
                 <i className="fas fa-sack-dollar text-indigo-500 animate-pulse"></i>
-                {lang === 'th' ? 'การพยากรณ์งบประมาณรักษาระบบ (Longevity Projections Model)' : 'The Advanced Grid Budget Longevity Math Model'}
+                {lang === 'th' ? 'การวางแผนงบประมาณ (Budget)' : 'The Advanced Grid Budget Longevity Math Model'}
               </h5>
               <p className={paragraphClass}>
                 {lang === 'th'
@@ -713,7 +713,7 @@ const UserManual: React.FC<UserManualProps> = ({
                 </div>
                 <div className="space-y-1">
                   <h5 className="font-display font-black text-sm md:text-base text-purple-700 dark:text-purple-300">
-                    {lang === 'th' ? 'การสั่งการ AI ตรวจสอบพฤติกรรมหลอกลวงและความผิดปกติล็อกระบบ' : 'Triggering Neural Grid Integrity Auditing Diagnostics'}
+                    {lang === 'th' ? 'การรักษาความปลอดภัยและตรวจสอบความผิดปกติ' : 'Triggering Neural Grid Integrity Auditing Diagnostics'}
                   </h5>
                   <p className={paragraphClass}>
                     {lang === 'th'

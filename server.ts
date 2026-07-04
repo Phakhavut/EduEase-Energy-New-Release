@@ -1,3 +1,6 @@
+import helmet from "helmet";
+import compression from "compression";
+import cors from "cors";
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
@@ -7,7 +10,14 @@ import { createServer as createHttpServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 
 async function startServer() {
+  
+
+
+
   const app = express();
+  app.use(helmet({ contentSecurityPolicy: false }));
+  app.use(compression());
+  app.use(cors());
   const httpServer = createHttpServer(app);
   const io = new SocketIOServer(httpServer, {
     cors: { origin: "*" },
@@ -15,7 +25,7 @@ async function startServer() {
 
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: "1mb" }));
 
   // Lazy initializer for GoogleGenAI to prevent startup crashes when API key is missing
   let aiClient: GoogleGenAI | null = null;

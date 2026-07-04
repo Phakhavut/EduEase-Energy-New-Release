@@ -37,7 +37,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
       if (username === 'Namyen' && password === '12345') {
         onLogin(username);
       } else {
-        setError('Verification Failed');
+        setError('ไม่สามารถตรวจสอบสิทธิ์ได้ กรุณาตรวจสอบข้อมูลและลองใหม่');
         setIsLoading(false);
       }
     }, 1000);
@@ -52,7 +52,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
 
   return (
     <div className={`w-full max-w-[360px] mx-auto relative z-20 theme-transition ${error ? 'animate-shake' : ''}`}>
-      <div className={`${glassClass} p-8 rounded-[2.5rem] relative overflow-hidden theme-transition`}>
+      <div className={`${glassClass} p-6 sm:p-8 rounded-[2.5rem] relative overflow-hidden theme-transition`}>
         {/* Animated accent light */}
         <div className={`absolute -top-24 -right-24 w-48 h-48 ${isDarkMode ? 'bg-emerald-500/10' : 'bg-emerald-500/15'} blur-[80px] rounded-full pointer-events-none`} />
         
@@ -135,7 +135,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
               className={`w-full bg-emerald-500 text-white font-bold py-3.5 rounded-2xl shadow-lg hover:bg-emerald-400 active:scale-[0.97] transition-all flex items-center justify-center gap-2 mt-2 ${isLoading ? 'animate-pulse cursor-wait' : ''}`}
             >
               {isLoading ? (
-                <div className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span className="tracking-widest text-[0.75rem]">กำลังตรวจสอบข้อมูล...</span>
               ) : (
                 <span className="tracking-widest text-[0.75rem]">AUTHORIZE ACCESS</span>
               )}

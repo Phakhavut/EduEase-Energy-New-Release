@@ -31,6 +31,8 @@ import { SmartSavingsCalculator } from "./SmartSavingsCalculator";
 import { ProjectedSavingsCard } from "./ProjectedSavingsCard";
 import { EnergyTipWidget } from "./EnergyTipWidget";
 import { EnergyMonitoringHub } from "./EnergyMonitoringHub";
+import { HistoricalTrendChart } from "./HistoricalTrendChart";
+import { SavingsCalculator } from "./SavingsCalculator";
 import { io } from "socket.io-client";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
@@ -2419,7 +2421,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="space-y-6"
+              className="space-y-8"
               id="dashboard-report-area"
             >
               {/* Layout Customization Information Panel */}
@@ -2649,6 +2651,67 @@ const Dashboard: React.FC<DashboardProps> = ({
                   }
 
 
+                  if (widgetId === "energy-monitoring-hub") {
+                    return (
+                      <motion.div
+                        key="energy-monitoring-hub"
+                        variants={itemVariants}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
+                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
+                        onDragEnd={handleDragEnd}
+                        className="md:col-span-2 lg:col-span-12 transition-all duration-300 h-full"
+                      >
+                        <div className="h-full group relative">
+                          <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity mb-2 px-2 absolute top-0 left-0 w-full z-10 pt-2"> 
+                             <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-500 bg-white/80 dark:bg-slate-900/80 px-2 py-1 rounded backdrop-blur">
+                               <i className="fas fa-grip-horizontal"></i>
+                               <span className="text-[0.7rem] uppercase tracking-wider font-bold">DRAG TO MOVE</span>
+                             </div>
+                             <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-900/80 p-1 rounded backdrop-blur">
+                              <button
+                                type="button"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
+                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
+                                disabled={(typeof index !== 'undefined' ? index : 0) === 0}
+                              >
+                                <i className="fas fa-chevron-up"></i>
+                              </button>
+                              <button
+                                type="button"
+                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
+                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
+                                disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
+                              >
+                                <i className="fas fa-chevron-down"></i>
+                              </button>
+                            </div>
+                          </div>
+                          <EnergyMonitoringHub
+                            lang={lang}
+                            isDarkMode={isDarkMode}
+                            devices={multiDevices}
+                            analytics={analytics}
+                            dailySavingsData={dailySavingsData}
+                            performanceChartData={performanceChartData}
+                            aiOptimizationMetrics={aiOptimizationMetrics}
+                            aiSmartAc={aiSmartAc}
+                            setAiSmartAc={setAiSmartAc}
+                            aiEcoStandby={aiEcoStandby}
+                            setAiEcoStandby={setAiEcoStandby}
+                            aiPfTuning={aiPfTuning}
+                            setAiPfTuning={setAiPfTuning}
+                            aiLoadShift={aiLoadShift}
+                            setAiLoadShift={setAiLoadShift}
+                            perfRange={perfRange}
+                            setPerfRange={setPerfRange}
+                            globalBudget={globalBudget}
+                            unitRate={unitRate}
+                          />
+                        </div>
+                      </motion.div>
+                    );
+                  }
                   if (widgetId === "energy-tip") {
                     return (
                       <motion.div
@@ -2759,7 +2822,14 @@ const Dashboard: React.FC<DashboardProps> = ({
 
                   return null;
                 })}
-              </motion.div>
+              
+              <div className="md:col-span-2 lg:col-span-12 w-full">
+<HistoricalTrendChart isDarkMode={isDarkMode} activeHouseName={activeHouse?.name || 'Local Property'} />
+</div>
+<div className="md:col-span-2 lg:col-span-12 w-full">
+<SavingsCalculator isDarkMode={isDarkMode} />
+</div>
+</motion.div>
             </motion.div>
           )}
 
@@ -2768,7 +2838,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="space-y-6 animate-fade-in"
+              className="space-y-8 animate-fade-in"
             >
               <EnergyMonitoringHub
                 lang={lang}
@@ -4595,12 +4665,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                         <i className="fas fa-check-circle text-emerald-500 text-4xl mb-4"></i>
                         <h6 className="font-bold text-lg">
                           {lang === "th"
-                            ? "ระบบจ่ายโหลดปลอดภัยและเสถียรสุดขอบ"
-                            : "System Safe and Grid Fully Stable"}
+                            ? "ระบบทำงานปกติ"
+                            : "System Operating Normally"}
                         </h6>
                         <p className="text-xs text-muted mb-0">
                           {lang === "th"
-                            ? "ตรวจไม่พบค่าวาบประจุขัดข้องและไม่มีความชำรุดในขณะนี้"
+                            ? "ยังไม่มีการแจ้งเตือนปัญหาการใช้ไฟในขณะนี้"
                             : "No spikes or thermal anomalies detected in the sandbox nodes."}
                         </p>
                       </div>
@@ -4798,6 +4868,28 @@ const Dashboard: React.FC<DashboardProps> = ({
             </div>
           )}
         </div>
+
+        {/* Global Footer */}
+        <footer className="mt-16 pt-8 pb-12 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6 text-[0.7rem] text-slate-500 dark:text-slate-400 font-medium">
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
+            <span className="font-bold tracking-widest uppercase text-slate-700 dark:text-slate-300">
+              EduEase Energy v2.4.0
+            </span>
+            <span className="hidden md:inline text-slate-300 dark:text-slate-600">|</span>
+            <div className="flex items-center gap-4">
+              <a href="#" className="hover:text-emerald-500 transition-colors">Documentation</a>
+              <a href="#" className="hover:text-emerald-500 transition-colors">API Status: 🟢 Online</a>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
+            <a href="#" className="hover:text-emerald-500 transition-colors flex items-center gap-1"><i className="fab fa-github text-xs"></i> GitHub</a>
+            <a href="#" className="hover:text-emerald-500 transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-emerald-500 transition-colors">Contact</a>
+            <a href="#" className="hover:text-emerald-500 transition-colors flex items-center gap-1"><i className="fas fa-comment-dots text-xs"></i> Feedback</a>
+            <a href="#" className="hover:text-rose-500 transition-colors flex items-center gap-1"><i className="fas fa-bug text-xs"></i> Report Bug</a>
+          </div>
+        </footer>
       </main>
 
       {/* Comparison View Overlay */}
