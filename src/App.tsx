@@ -206,7 +206,7 @@ const App: React.FC = () => {
         </header>
 
         {/* Mobile Menu Dropdown */}
-        <div className={`lg:hidden absolute top-0 left-0 w-full bg-slate-900/95 backdrop-blur-xl border-b border-white/10 shadow-2xl transition-all duration-500 z-40 overflow-hidden ${isMobileMenuOpen ? 'max-h-[400px] opacity-100 py-24' : 'max-h-0 opacity-0 py-0'}`}>
+        <div className={`lg:hidden absolute top-0 left-0 w-full bg-slate-900/95 backdrop-blur-xl border-b border-white/10 shadow-2xl transition-all duration-500 z-40 overflow-hidden ${isMobileMenuOpen ? 'h-auto max-h-[100dvh] opacity-100 py-24' : 'max-h-0 opacity-0 py-0'}`}>
            <nav className="flex flex-col items-center gap-6">
               {['Systems', 'Nodes', 'Emergency'].map((link) => (
                 <a key={link} href="#" className="text-white/80 hover:text-emerald-400 transition-all text-sm font-bold uppercase tracking-[0.3em]">{link}</a>
