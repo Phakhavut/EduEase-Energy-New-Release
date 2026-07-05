@@ -5,22 +5,40 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type, ThinkingLevel } from "@google/genai";
+import rateLimit from "express-rate-limit";
+import pino from "pino";
+import pinoHttp from "pino-http";
 
 import { createServer as createHttpServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 
+const logger = pino({ level: process.env.LOG_LEVEL || "info" });
+
 async function startServer() {
-  
-
-
-
   const app = express();
+  app.set('trust proxy', 1);
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(compression());
-  app.use(cors());
+  
+  // Whitelist CORS in production, allow '*' in dev/AI Studio
+  const corsOrigin = process.env.NODE_ENV === "production" ? (process.env.CORS_ORIGIN || false) : "*";
+  app.use(cors({ origin: corsOrigin }));
+  
+  app.use(pinoHttp({ logger }));
+
+  const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+    standardHeaders: true,
+    legacyHeaders: false,
+    validate: false,
+    message: { error: "Too many requests, please try again later." }
+  });
+  app.use("/api/", apiLimiter);
+
   const httpServer = createHttpServer(app);
   const io = new SocketIOServer(httpServer, {
-    cors: { origin: "*" },
+    cors: { origin: corsOrigin },
   });
 
   const PORT = 3000;

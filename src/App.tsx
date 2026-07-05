@@ -345,9 +345,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      <div className={`absolute inset-0 pointer-events-none ${loginDarkMode ? 'opacity-[0.03]' : 'opacity-[0.01]'} z-50 overflow-hidden`}>
-        <div className="h-full w-full bg-[linear-gradient(transparent_0%,rgba(255,255,255,0.5)_50%,transparent_100%)] bg-[length:100%_8px]" />
-      </div>
+
     </div>
   );
 };

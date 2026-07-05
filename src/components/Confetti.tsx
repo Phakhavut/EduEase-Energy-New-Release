@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 
 interface ConfettiProps {
     triggerCount: number; // Increment this to fire the confetti explosion
+    isDarkMode?: boolean;
 }
 
 interface Piece {
@@ -27,7 +28,7 @@ const COLORS = [
     '#f472b6', // Pink
 ];
 
-export const Confetti: React.FC<ConfettiProps> = ({ triggerCount }) => {
+export const Confetti: React.FC<ConfettiProps> = ({ triggerCount, isDarkMode = true }) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const piecesRef = useRef<Piece[]>([]);
     const animationFrameRef = useRef<number | null>(null);
@@ -187,7 +188,7 @@ export const Confetti: React.FC<ConfettiProps> = ({ triggerCount }) => {
         <canvas
             ref={canvasRef}
             className="fixed inset-0 w-full h-full pointer-events-none z-[99999]"
-            style={{ mixBlendMode: 'screen' }}
+            style={{ mixBlendMode: isDarkMode ? 'screen' : 'normal' }}
         />
     );
 };

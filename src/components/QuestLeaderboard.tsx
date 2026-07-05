@@ -1002,7 +1002,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
 
                 <div className="space-y-3.5">
                     {fullLeaderboard.map((node, index) => {
-                        const isSelf = !!node.isUser;
+                        const isSelf = node.id === 'user';
                         
                         const renderLeaderboardAvatar = () => {
                             if (isSelf) {

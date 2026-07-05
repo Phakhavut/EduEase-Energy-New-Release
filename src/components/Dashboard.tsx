@@ -86,7 +86,7 @@ const itemVariants = {
     scale: 1,
     transition: {
       duration: 0.6,
-      ease: [0.16, 1, 0.3, 1],
+      ease: [0.16, 1, 0.3, 1] as const,
     },
   },
 };
@@ -685,7 +685,6 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [widgetOrder, setWidgetOrder] = useState<string[]>(() => {
     const defaultOrder = [
       "current-weather",
-      "energy-tip",
       "property-map",
     ];
     try {
@@ -704,14 +703,12 @@ const Dashboard: React.FC<DashboardProps> = ({
                 "ai-optimization-gauge",
                 "smart-savings",
                 "weather-forecast",
-                "energy-monitoring-hub"
+                "energy-monitoring-hub",
+                "energy-tip"
               ].includes(item),
           );
           if (!filtered.includes("current-weather")) {
             filtered.unshift("current-weather");
-          }
-          if (!filtered.includes("energy-tip")) {
-            filtered.push("energy-tip");
           }
           if (!filtered.includes("property-map")) {
             filtered.push("property-map");
@@ -902,6 +899,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [notiTab, setNotiTab] = useState<"alerts" | "quests">("alerts");
   const [manualTab, setManualTab] = useState<"guide" | "settings">("guide");
   const [aiAutopilotCapping, setAiAutopilotCapping] = useState(false);
+  const [isSecondaryExpanded, setIsSecondaryExpanded] = useState(false);
   const [ecoStreak, setEcoStreak] = useState(() => {
     try {
       const saved = localStorage.getItem("eudease_eco_streak");
@@ -939,7 +937,9 @@ const Dashboard: React.FC<DashboardProps> = ({
     } catch (err: any) {
       console.error("Error fetching weather forecast:", err);
       setWeatherError(
-        err.message || "Failed to retrieve smart weather grounding.",
+        lang === "th"
+          ? "ไม่สามารถเชื่อมต่อ AI ได้ ข้อมูลของคุณไม่ได้สูญหาย ลองใหม่อีกครั้งในอีก 2 นาที"
+          : "Cannot connect to AI. Your data is not lost. Please try again in 2 minutes."
       );
     } finally {
       setIsWeatherLoading(false);
@@ -1050,12 +1050,32 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   // System Config
   const [calcDays, setCalcDays] = useState(30);
-  const [unitRate, setUnitRate] = useState(4.5);
-  const [globalBudget, setGlobalBudget] = useState(3500);
-  const [onPeakShare, setOnPeakShare] = useState(60); // Percentage of usage during on-peak hours
+  const [unitRate, setUnitRate] = useState(() => {
+    try {
+      const saved = localStorage.getItem("eudease_unitRate");
+      return saved ? parseFloat(saved) : 4.5;
+    } catch { return 4.5; }
+  });
+  const [globalBudget, setGlobalBudget] = useState(() => {
+    try {
+      const saved = localStorage.getItem("eudease_globalBudget");
+      return saved ? parseFloat(saved) : 3500;
+    } catch { return 3500; }
+  });
+  const [onPeakShare, setOnPeakShare] = useState(() => {
+    try {
+      const saved = localStorage.getItem("eudease_onPeakShare");
+      return saved ? parseFloat(saved) : 60;
+    } catch { return 60; }
+  });
 
   // Initial Data
-  const [multiDevices, setMultiDevices] = useState<Device[]>([
+  const [multiDevices, setMultiDevices] = useState<Device[]>(() => {
+    try {
+      const saved = localStorage.getItem("eudease_multiDevices");
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [
     {
       id: 1,
       name: "Air Conditioner",
@@ -1133,7 +1153,17 @@ const Dashboard: React.FC<DashboardProps> = ({
         },
       ],
     },
-  ]);
+  ];
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("eudease_multiDevices", JSON.stringify(multiDevices));
+      localStorage.setItem("eudease_unitRate", unitRate.toString());
+      localStorage.setItem("eudease_globalBudget", globalBudget.toString());
+      localStorage.setItem("eudease_onPeakShare", onPeakShare.toString());
+    } catch {}
+  }, [multiDevices, unitRate, globalBudget, onPeakShare]);
 
   // AI Floating Chatbot States and Logic
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -1226,8 +1256,8 @@ const Dashboard: React.FC<DashboardProps> = ({
       console.error("Chat error:", error);
       const errorMsg =
         lang === "th"
-          ? "ขออภัยอย่างสูงครับ ระบบเชื่อมต่อเครือข่าย AI ขัดข้องชั่วคราว กรุณากดส่งคำถามใหม่อีกครั้งนะครับ"
-          : "Apologies, there was an issue reaching the energy grid core. Please try again soon.";
+          ? "ไม่สามารถเชื่อมต่อ AI ได้ ข้อมูลของคุณไม่ได้สูญหาย ลองใหม่อีกครั้งในอีก 2 นาที"
+          : "Cannot connect to AI. Your data is not lost. Please try again in 2 minutes.";
 
       setChatMessages((prev) => [...prev, { role: "assistant", content: "" }]);
       let charIndex = 0;
@@ -1832,6 +1862,15 @@ const Dashboard: React.FC<DashboardProps> = ({
       setAiAlerts([...newAlerts, ...aiAlerts]);
     } catch (error) {
       console.error("AI Anomaly Scan failed", error);
+      setAiAlerts([{
+        id: "error-" + Date.now(),
+        title: lang === 'th' ? "ข้อผิดพลาดระบบ AI" : "AI System Error",
+        description: lang === 'th' ? "ไม่สามารถเชื่อมต่อ AI ได้ ข้อมูลของคุณไม่ได้สูญหาย ลองใหม่อีกครั้งในอีก 2 นาที" : "Cannot connect to AI. Your data is not lost. Please try again in 2 minutes.",
+        severity: "warning",
+        icon: "fa-triangle-exclamation",
+        isAi: true,
+        time: "Just now"
+      }, ...aiAlerts]);
     } finally {
       setIsAiScanning(false);
     }
@@ -1986,7 +2025,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         {
           date: "Just now",
           action: "Load Test Stress Injected",
-          status: "resolved",
+          status: "resolved" as const,
         },
       ],
     };
@@ -2076,8 +2115,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       console.error("Individual AI diagnosis failed", error);
       setDeviceAnalysis({
         error: true,
-        summary:
-          "Could not retrieve AI diagnostic suggestions. Please check if server is active and API keys are set up in Settings.",
+        summary: lang === 'th' ? "ไม่สามารถเชื่อมต่อ AI ได้ ข้อมูลของคุณไม่ได้สูญหาย ลองใหม่อีกครั้งในอีก 2 นาที" : "Cannot connect to AI. Your data is not lost. Please try again in 2 minutes."
       });
     } finally {
       setIsAnalyzingDevice(false);
@@ -2268,50 +2306,52 @@ const Dashboard: React.FC<DashboardProps> = ({
       />
 
       <aside
-        className={`sidebar flex flex-col justify-between ${isMobileMenuOpen ? "show" : ""}`}
+        className={`sidebar flex flex-col justify-between overflow-hidden max-w-full ${isMobileMenuOpen ? "show" : ""}`}
       >
-        <div>
-          <div className="mb-8 ps-2 flex justify-between items-center">
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                {renderSidebarLogo()}
-                <h4 className="font-bold text-primary mb-0 font-display text-xl tracking-tight">
-                  EduEase
-                </h4>
+        <div className="shrink-0 flex flex-col justify-between h-full">
+          <div>
+            <div className="mb-8 ps-2 flex justify-between items-center">
+              <div>
+                <div className="flex items-center gap-3 mb-1">
+                  {renderSidebarLogo()}
+                  <h4 className="font-bold text-primary mb-0 font-display text-xl tracking-tight">
+                    EduEase
+                  </h4>
+                </div>
+                <span className="text-[0.7rem] text-gray-400 uppercase tracking-widest font-bold">
+                  {t("sys_sub_title")}
+                </span>
               </div>
-              <span className="text-[0.7rem] text-gray-400 uppercase tracking-widest font-bold">
-                {t("sys_sub_title")}
-              </span>
-            </div>
-            <button
-              className="btn lg:hidden text-muted h-[44px] w-[44px] flex items-center justify-center"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              <i className="fas fa-times"></i>
-            </button>
-          </div>
-          <nav className="space-y-1">
-            {navItems.map((item) => (
               <button
-                key={item.id}
-                className={`nav-link ${currentPage === item.id ? "active" : ""}`}
-                onClick={() => navigateTo(item.id)}
+                className="btn lg:hidden text-muted h-[44px] w-[44px] flex items-center justify-center"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
-                <i className={item.icon}></i>{" "}
-                <span className="text-sm">{t(item.key)}</span>
+                <i className="fas fa-times"></i>
               </button>
-            ))}
-          </nav>
+            </div>
+            <nav className="space-y-1">
+              {navItems.map((item) => (
+                <button
+                  key={item.id}
+                  className={`nav-link ${currentPage === item.id ? "active" : ""}`}
+                  onClick={() => navigateTo(item.id)}
+                >
+                  <i className={item.icon}></i>{" "}
+                  <span className="text-sm">{t(item.key)}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+          <button
+            onClick={onLogout}
+            className="nav-link text-danger border-0 bg-transparent w-full text-start flex items-center gap-2 mt-auto p-4 hover:bg-danger/10 shrink-0"
+          >
+            <i className="fas fa-power-off"></i>{" "}
+            <span className="text-xs font-bold uppercase tracking-widest">
+              {t("logout")}
+            </span>
+          </button>
         </div>
-        <button
-          onClick={onLogout}
-          className="nav-link text-danger border-0 bg-transparent w-full text-start flex items-center gap-2 mt-auto p-4 hover:bg-danger/10"
-        >
-          <i className="fas fa-power-off"></i>{" "}
-          <span className="text-xs font-bold uppercase tracking-widest">
-            {t("logout")}
-          </span>
-        </button>
       </aside>
 
       <main id="main-content" className="main-content-dashboard">
@@ -2424,6 +2464,75 @@ const Dashboard: React.FC<DashboardProps> = ({
               className="space-y-8"
               id="dashboard-report-area"
             >
+              {/* PRIMARY HERO METRICS SECTION */}
+              <motion.div 
+                variants={itemVariants}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 mb-2"
+              >
+                {/* Metric 1: Total Savings */}
+                <div className="bg-gradient-to-br from-emerald-500/10 via-emerald-600/5 to-transparent border border-emerald-500/30 dark:border-emerald-500/20 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-300">
+                    <i className="fas fa-piggy-bank text-8xl text-emerald-500"></i>
+                  </div>
+                  <div className="relative z-10 flex flex-col justify-between h-full">
+                    <div>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mb-3">
+                        <i className="fas fa-coins text-emerald-500"></i>
+                        {lang === "th" ? "สถิติการประหยัดอัจฉริยะ" : "SMART SAVINGS DIRECTORY"}
+                      </span>
+                      <h4 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">
+                        {lang === "th" ? "ประมาณการประหยัดค่าไฟสะสม" : "Total Combined Savings"}
+                      </h4>
+                    </div>
+                    <div className="mt-4">
+                      <div className="text-4xl md:text-5xl font-black font-mono tracking-tight text-emerald-600 dark:text-emerald-400 flex items-baseline gap-2">
+                        ฿{Math.round(aiMonthlySavings.amount).toLocaleString()}
+                        <span className="text-sm font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-lg border border-emerald-500/10">
+                          -{aiMonthlySavings.percent.toFixed(1)}%
+                        </span>
+                      </div>
+                      <p className="text-[0.75rem] text-slate-500 dark:text-slate-300 mt-2 leading-relaxed mb-0">
+                        {lang === "th" 
+                          ? "ลดภาระค่าใช้จ่ายเครือข่ายจำลองแบบเรียลไทม์ ภายใต้การควบคุมระบบอัจฉริยะ" 
+                          : "Calculated monthly reduction across active smart-nodes under active AI calibration."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Metric 2: AI Score */}
+                <div className="bg-gradient-to-br from-purple-500/10 via-purple-600/5 to-transparent border border-purple-500/30 dark:border-purple-500/20 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-300">
+                    <i className="fas fa-brain text-8xl text-purple-500"></i>
+                  </div>
+                  <div className="relative z-10 flex flex-col justify-between h-full">
+                    <div>
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 mb-3">
+                        <i className="fas fa-bolt text-purple-500"></i>
+                        {lang === "th" ? "คะแนนเสถียรภาพและคุณภาพ" : "SYSTEM CALIBRATION STATUS"}
+                      </span>
+                      <h4 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">
+                        {lang === "th" ? "คะแนนการเพิ่มประสิทธิภาพด้วย AI" : "AI Efficiency Score"}
+                      </h4>
+                    </div>
+                    <div className="mt-4">
+                      <div className="text-4xl md:text-5xl font-black font-mono tracking-tight text-purple-600 dark:text-purple-400 flex items-baseline gap-2">
+                        {aiOptimizationMetrics.efficiencyIndex.toFixed(0)}
+                        <span className="text-lg font-bold text-slate-400">/ 100</span>
+                        <span className={`text-[0.7rem] font-bold px-2 py-0.5 rounded-lg border uppercase tracking-wider ${aiOptimizationMetrics.confidenceLevelColor}`}>
+                          {aiOptimizationMetrics.statusTag}
+                        </span>
+                      </div>
+                      <p className="text-[0.75rem] text-slate-500 dark:text-slate-300 mt-2 leading-relaxed mb-0">
+                        {lang === "th" 
+                          ? `เสถียรภาพระบบ: ${aiOptimizationMetrics.confidenceLevelLabel} (อัตราร่วม ${aiOptimizationMetrics.confidenceLevel.toFixed(1)}%)` 
+                          : `Calibration index: ${aiOptimizationMetrics.confidenceLevelLabel} (Precision ${aiOptimizationMetrics.confidenceLevel.toFixed(1)}%)`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+
               {/* Layout Customization Information Panel */}
               <motion.div variants={itemVariants} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200 dark:border-transparent gap-3 mb-2 shadow-sm">
                 <div className="flex items-center gap-3">
@@ -2448,8 +2557,6 @@ const Dashboard: React.FC<DashboardProps> = ({
                     onClick={() => {
                       const defaultOrder = [
                         "current-weather",
-                        "energy-monitoring-hub",
-                        "energy-tip",
                         "property-map",
                       ];
                       setWidgetOrder(defaultOrder);
@@ -2613,8 +2720,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                         key="current-weather"
                         variants={itemVariants}
                         draggable
-                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
+                        onDragStart={(e: any) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
+                        onDragOver={(e: any) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
                         onDragEnd={handleDragEnd}
                         className="md:col-span-2 lg:col-span-12 transition-all duration-300 h-full"
                       >
@@ -2652,116 +2759,10 @@ const Dashboard: React.FC<DashboardProps> = ({
 
 
                   if (widgetId === "energy-monitoring-hub") {
-                    return (
-                      <motion.div
-                        key="energy-monitoring-hub"
-                        variants={itemVariants}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragEnd={handleDragEnd}
-                        className="md:col-span-2 lg:col-span-12 transition-all duration-300 h-full"
-                      >
-                        <div className="h-full group relative">
-                          <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity mb-2 px-2 absolute top-0 left-0 w-full z-10 pt-2"> 
-                             <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-500 bg-white/80 dark:bg-slate-900/80 px-2 py-1 rounded backdrop-blur">
-                               <i className="fas fa-grip-horizontal"></i>
-                               <span className="text-[0.7rem] uppercase tracking-wider font-bold">DRAG TO MOVE</span>
-                             </div>
-                             <div className="flex items-center gap-2 bg-white/80 dark:bg-slate-900/80 p-1 rounded backdrop-blur">
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === 0}
-                              >
-                                <i className="fas fa-chevron-up"></i>
-                              </button>
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
-                              >
-                                <i className="fas fa-chevron-down"></i>
-                              </button>
-                            </div>
-                          </div>
-                          <EnergyMonitoringHub
-                            lang={lang}
-                            isDarkMode={isDarkMode}
-                            devices={multiDevices}
-                            analytics={analytics}
-                            dailySavingsData={dailySavingsData}
-                            performanceChartData={performanceChartData}
-                            aiOptimizationMetrics={aiOptimizationMetrics}
-                            aiSmartAc={aiSmartAc}
-                            setAiSmartAc={setAiSmartAc}
-                            aiEcoStandby={aiEcoStandby}
-                            setAiEcoStandby={setAiEcoStandby}
-                            aiPfTuning={aiPfTuning}
-                            setAiPfTuning={setAiPfTuning}
-                            aiLoadShift={aiLoadShift}
-                            setAiLoadShift={setAiLoadShift}
-                            perfRange={perfRange}
-                            setPerfRange={setPerfRange}
-                            globalBudget={globalBudget}
-                            unitRate={unitRate}
-                          />
-                        </div>
-                      </motion.div>
-                    );
+                    return null;
                   }
                   if (widgetId === "energy-tip") {
-                    return (
-                      <motion.div
-                        key="energy-tip"
-                        variants={itemVariants}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragEnd={handleDragEnd}
-                        className="md:col-span-1 lg:col-span-4 transition-all duration-300 h-full"
-                      >
-                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden shadow-sm h-full bg-white dark:bg-white/5 relative flex flex-col">
-                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800/50 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[0.7rem] tracking-wider text-slate-600 dark:text-slate-100 font-bold z-20 relative">
-                            <div className="flex items-center gap-2">
-                              <i className="fas fa-grip-horizontal text-emerald-500 animate-pulse"></i>
-                              <span className="uppercase text-slate-800 dark:text-slate-100">
-                                {lang === "th"
-                                  ? "เคล็ดลับประหยัดพลังงาน"
-                                  : "Energy Saving Tip"}
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-emerald-500 hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === 0}
-                              >
-                                <i className="fas fa-chevron-up"></i>
-                              </button>
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-emerald-500 hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
-                              >
-                                <i className="fas fa-chevron-down"></i>
-                              </button>
-                            </div>
-                          </div>
-                          <div className="flex-1 relative">
-                            <EnergyTipWidget
-                              activeHouse={activeHouse}
-                              isDarkMode={isDarkMode}
-                              lang={lang}
-                            />
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
+                    return null;
                   }
 
 
@@ -2775,47 +2776,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   
 
                   if (widgetId === "property-map") {
-                    return (
-                      <motion.div
-                        key="property-map"
-                        variants={itemVariants}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragOver={(e) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragEnd={handleDragEnd}
-                        className="md:col-span-2 lg:col-span-8 transition-all duration-300 h-full"
-                      >
-                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm h-full flex flex-col hover:shadow-lg transition-all duration-300 rounded-[2rem]">
-                          <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-800 px-4 py-2.5 border-b border-dashed border-slate-300/30 text-[0.7rem] tracking-wider text-slate-600 dark:text-slate-100 font-bold opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity">
-                            <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-500">
-                               <i className="fas fa-grip-horizontal"></i>
-                               <span className="text-[0.7rem] uppercase tracking-wider font-bold">DRAG TO MOVE (SOLAR GRID)</span>
-                             </div>
-                             <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === 0}
-                              >
-                                <i className="fas fa-chevron-up"></i>
-                              </button>
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
-                              >
-                                <i className="fas fa-chevron-down"></i>
-                              </button>
-                            </div>
-                          </div>
-                          <div className="p-5 flex-grow">
-                            <PropertyDistributionMap lang={lang} isDarkMode={isDarkMode} />
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
+                    return null;
                   }
 
 
@@ -2823,15 +2784,56 @@ const Dashboard: React.FC<DashboardProps> = ({
                   return null;
                 })}
               
-              <div className="md:col-span-2 lg:col-span-12 w-full">
-<HistoricalTrendChart isDarkMode={isDarkMode} activeHouseName={activeHouse?.name || 'Local Property'} />
-</div>
-<div className="md:col-span-2 lg:col-span-12 w-full">
-<SavingsCalculator isDarkMode={isDarkMode} />
-</div>
-</motion.div>
+
+
+              {/* ECO-QUESTS SECTION */}
+              <div className="md:col-span-2 lg:col-span-12 w-full mt-6">
+                <div className="dashboard-card border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 p-6 rounded-[2rem] shadow-sm transition-all duration-300">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/15 flex items-center justify-center text-lg shadow-sm shrink-0">
+                      <i className="fas fa-trophy text-amber-500 animate-bounce"></i>
+                    </div>
+                    <div>
+                      <h5 className="font-bold font-display text-sm md:text-base mb-0.5 text-slate-900 dark:text-white">
+                        {lang === "th" ? "ภารกิจกรีนเอเนอร์ยี่สะสมคะแนนแลกรางวัล" : "Active Eco-Quests & Smart Savings"}
+                      </h5>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-0">
+                        {lang === "th" 
+                          ? "ทำภารกิจจำลองเพื่อเพิ่มประสิทธิภาพ และปรับค่าเสถียรภาพการประหยัดไฟ" 
+                          : "Calibrate systems and complete live tasks to gain XP tokens and rewards."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <QuestLeaderboard
+                      lang={lang}
+                      totalClaimedXp={totalClaimedXp}
+                      claimedQuests={claimedQuests}
+                      ecoStreak={ecoStreak}
+                      activeQuests={activeQuests}
+                      handleClaimQuest={handleClaimQuest}
+                      triggerConfetti={() => setConfettiTrigger((t) => t + 1)}
+                    />
+
+                    <div className="w-full">
+                      <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-500/5 backdrop-blur-sm shadow-sm mb-0">
+                        <div className="p-1">
+                          <DailyEnergyQuests
+                            lang={lang}
+                            onTokenClaimed={(amount) => {
+                              setConfettiTrigger((t) => t + 1);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
-          )}
+          </motion.div>
+        )}
 
           {currentPage === "ai_hub" && (
             <motion.div
@@ -4216,6 +4218,10 @@ const Dashboard: React.FC<DashboardProps> = ({
                           </div>
                         </div>
 </div>
+
+                  <div className="w-full mb-8">
+                    <HistoricalTrendChart isDarkMode={isDarkMode} activeHouseName={activeHouse?.name || 'Local Property'} />
+                  </div>
                   <div
                     className="dashboard-card border-0 p-4 md:p-8 mb-8 shadow-xl animate-slide-up"
                     style={{ animationDelay: "50ms" }}
@@ -4713,30 +4719,29 @@ const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                 </div>
               ) : (
-<>
-                <QuestLeaderboard
-                  lang={lang}
-                  totalClaimedXp={totalClaimedXp}
-                  claimedQuests={claimedQuests}
-                  ecoStreak={ecoStreak}
-                  activeQuests={activeQuests}
-                  handleClaimQuest={handleClaimQuest}
-                  triggerConfetti={() => setConfettiTrigger((t) => t + 1)}
-                />
-<div className="w-full mb-6">
-                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-500/5 backdrop-blur-sm shadow-sm animate-fade-in mb-4">
-                          
-                          <div className="p-1">
-                            <DailyEnergyQuests
-                              lang={lang}
-                              onTokenClaimed={(amount) => {
-                                setConfettiTrigger((t) => t + 1);
-                              }}
-                            />
-                          </div>
-                        </div>
-</div>
-</>
+                <>
+                  <QuestLeaderboard
+                    lang={lang}
+                    totalClaimedXp={totalClaimedXp}
+                    claimedQuests={claimedQuests}
+                    ecoStreak={ecoStreak}
+                    activeQuests={activeQuests}
+                    handleClaimQuest={handleClaimQuest}
+                    triggerConfetti={() => setConfettiTrigger((t) => t + 1)}
+                  />
+                  <div className="w-full mb-6">
+                    <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-500/5 backdrop-blur-sm shadow-sm animate-fade-in mb-4">
+                      <div className="p-1">
+                        <DailyEnergyQuests
+                          lang={lang}
+                          onTokenClaimed={(amount) => {
+                            setConfettiTrigger((t) => t + 1);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           )}
@@ -5133,7 +5138,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                         ? "สแตนด์บาย"
                                         : "Standby"
                                       : lang === "th"
-                                        ? "ปิดสวิตช์"
+                                        ? "ปิด"
                                         : "Off"}
                                 </button>
                               ))}
@@ -5141,55 +5146,20 @@ const Dashboard: React.FC<DashboardProps> = ({
                           </div>
                         </div>
                       </div>
-                      <div className="col-md-5">
-                        <div className="p-5 bg-emerald-500/5 rounded-[2rem] border border-emerald-500/10 h-100">
-                          <h6 className="label text-[0.75rem] mb-4">
-                            {t("node_tech_specs")}
-                          </h6>
-                          <div className="mb-4">
-                            <span className="text-[0.75rem] font-bold text-muted uppercase block mb-1">
-                              {t("node_pf")}
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <div className="text-2xl font-bold text-emerald-500 mono-font">
-                                {d.pf}
-                              </div>
-                              <div className="badge bg-emerald-500/10 text-emerald-500 text-[0.65rem] px-2 py-1 rounded-full uppercase">
-                                Optimal
-                              </div>
-                            </div>
-                          </div>
-                          <div>
-                            <span className="text-[0.75rem] font-bold text-muted uppercase block mb-1">
-                              Grid Compliance
-                            </span>
-                            <div className="text-xs font-bold text-main">
-                              Phase A: 228.4V
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* AI DIAGNOSTICS MODULE */}
-                    <div className="p-6 bg-slate-900 text-white rounded-[2.5rem] relative overflow-hidden shadow-xl border border-slate-800">
-                      <div className="absolute top-0 right-0 p-8 opacity-5 text-indigo-500">
-                        <i className="fas fa-brain text-[120px]"></i>
-                      </div>
-                      <div className="flex justify-between items-center mb-4 relative z-10">
-                        <div className="flex items-center gap-2">
-                          <span className="p-1.5 px-2 bg-indigo-500/10 text-indigo-400 rounded-lg text-xs">
-                            <i className="fas fa-bolt"></i>
-                          </span>
-                          <h6 className="font-display font-bold text-sm tracking-tight mb-0">
-                            {t("ai_problem_title")}
-                          </h6>
-                        </div>
-                        {deviceAnalysis && !deviceAnalysis.error && (
-                          <span className="badge bg-emerald-500/10 text-emerald-400 text-[0.65rem] font-bold uppercase tracking-widest border border-emerald-500/20 py-1 px-2.5 rounded-full">
-                            <i className="fas fa-activity me-1"></i> Live Audit
-                          </span>
-                        )}
+                      <div className="col-md-5">
+                        <div className="p-5 bg-slate-900/40 rounded-[2rem] border border-slate-800 flex flex-col justify-between h-full relative overflow-hidden group">
+                          {/* Decorative background visual */}
+                          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent opacity-50"></div>
+                          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-2xl"></div>
+
+                          <div className="relative z-10 flex items-center justify-between mb-4">
+                            {d.status === "active" && (
+                              <span className="text-[0.65rem] text-emerald-500 font-bold uppercase tracking-widest border border-emerald-500/20 py-1 px-2.5 rounded-full">
+                                <i className="fas fa-activity me-1"></i> Live Audit
+                              </span>
+                            )}
+                          </div>
                       </div>
 
                       {!deviceAnalysis && !isAnalyzingDevice && (
@@ -5352,8 +5322,9 @@ const Dashboard: React.FC<DashboardProps> = ({
                         </div>
                       )}
                     </div>
+                  </div>
 
-                    <div className="p-6 bg-light rounded-[2.5rem]">
+                  <div className="p-6 bg-light rounded-[2.5rem]">
                       <h6 className="label text-[0.75rem] mb-6">
                         {t("node_history_title")}
                       </h6>
@@ -5483,47 +5454,47 @@ const Dashboard: React.FC<DashboardProps> = ({
       />
 
       {/* High performance Canvas Confetti celebration overlay */}
-      <Confetti triggerCount={confettiTrigger} />
+      <Confetti triggerCount={confettiTrigger} isDarkMode={isDarkMode} />
 
       {/* FLOATING AI CHATBOT DRAWER CONTAINER */}
       <div
         id="energy-ai-chatbot-drawer"
-        className={`fixed bottom-24 right-3 left-3 md:left-auto md:right-6 z-50 w-[calc(100vw-24px)] md:w-[390px] h-[520px] md:h-[580px] max-h-[calc(100vh-125px)] rounded-[2rem] border shadow-[0_20px_60px_rgba(0,0,0,0.35)] flex flex-col overflow-hidden transition-all duration-300 ${
+        className={`fixed bottom-24 right-3 left-3 md:left-auto md:right-6 z-50 w-[calc(100vw-24px)] md:w-[390px] h-[520px] md:h-[580px] max-h-[calc(100vh-125px)] rounded-[2rem] border shadow-[0_20px_60px_rgba(0,0,0,0.25)] flex flex-col overflow-hidden transition-all duration-300 ${
           isChatOpen
             ? "translate-y-0 opacity-100 scale-100"
             : "translate-y-12 opacity-0 scale-95 pointer-events-none"
         } ${
           isDarkMode
             ? "bg-slate-950/95 border-slate-800 text-white"
-            : "bg-slate-900 border-white/10 text-white"
+            : "bg-white/95 border-slate-200 text-slate-800"
         }`}
       >
         {/* Header of the drawer */}
-        <div className="p-4 bg-slate-900 border-b border-white/5 flex items-center justify-between shrink-0">
+        <div className={`p-4 border-b flex items-center justify-between shrink-0 ${isDarkMode ? 'bg-slate-900 border-white/5' : 'bg-slate-50 border-slate-150'}`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 relative">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center relative ${isDarkMode ? 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400' : 'bg-emerald-50 border border-emerald-200 text-emerald-600'}`}>
               <i className="fas fa-robot text-sm animate-bounce"></i>
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border border-slate-950" />
+              <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border ${isDarkMode ? 'bg-emerald-500 border-slate-950' : 'bg-emerald-500 border-white'}`} />
             </div>
             <div>
-              <div className="text-xs font-black tracking-wide text-white uppercase font-mono">
+              <div className={`text-xs font-black tracking-wide uppercase font-mono ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
                 EnergyAI Assistant
               </div>
-              <div className="text-[0.75rem] font-bold text-emerald-400 font-mono">
+              <div className={`text-[0.75rem] font-bold ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'} font-mono`}>
                 ● Active Advisor
               </div>
             </div>
           </div>
           <button
             onClick={() => setIsChatOpen(false)}
-            className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center transition-colors border border-transparent hover:border-white/10"
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors border ${isDarkMode ? 'bg-white/5 hover:bg-white/10 text-white border-transparent hover:border-white/10' : 'bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200'}`}
           >
             <i className="fas fa-chevron-down text-xs"></i>
           </button>
         </div>
 
         {/* Message logs section */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/10">
+        <div className={`flex-1 overflow-y-auto p-4 space-y-4 ${isDarkMode ? 'scrollbar-thin scrollbar-thumb-white/10' : 'scrollbar-thin scrollbar-thumb-slate-200'}`}>
           {chatMessages.map((msg, idx) => (
             <div
               key={idx}
@@ -5538,7 +5509,9 @@ const Dashboard: React.FC<DashboardProps> = ({
                 className={`max-w-[90%] md:max-w-[80%] rounded-2xl p-4 text-xs shadow-sm ${
                   msg.role === "user"
                     ? "bg-emerald-500 text-white font-medium rounded-tr-none"
-                    : "bg-slate-800/80 border border-slate-700/50 text-slate-200 rounded-tl-none leading-relaxed"
+                    : isDarkMode
+                      ? "bg-slate-800/80 border border-slate-700/50 text-slate-200 rounded-tl-none leading-relaxed"
+                      : "bg-slate-100 border border-slate-200 text-slate-800 rounded-tl-none leading-relaxed"
                 }`}
               >
                 {msg.role === "user"
@@ -5681,7 +5654,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
 
         {/* Quick Interactive Prompt Suggestions */}
-        <div className="p-3 bg-slate-900/60 border-t border-white/5 flex flex-col gap-2 shrink-0">
+        <div className={`p-3 border-t flex flex-col gap-2 shrink-0 ${isDarkMode ? 'bg-slate-900/60 border-white/5' : 'bg-slate-50 border-slate-150'}`}>
           {/* Category Tabs */}
           <div className="flex gap-1.5 pb-1 select-none overflow-x-auto scrollbar-none">
             <button
@@ -5690,7 +5663,9 @@ const Dashboard: React.FC<DashboardProps> = ({
               className={`text-[0.7rem] font-bold px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 activeFaqCategory === "popular"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold"
-                  : "bg-slate-800/60 text-slate-500 hover:bg-slate-800 border border-transparent"
+                  : isDarkMode
+                    ? "bg-slate-800/60 text-slate-500 hover:bg-slate-800 border border-transparent"
+                    : "bg-slate-200/50 text-slate-600 hover:bg-slate-200 border border-transparent"
               }`}
             >
               ⭐️ {lang === "th" ? "ยอดนิยม" : "Popular"}
@@ -5701,7 +5676,9 @@ const Dashboard: React.FC<DashboardProps> = ({
               className={`text-[0.7rem] font-bold px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 activeFaqCategory === "devices"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold"
-                  : "bg-slate-800/60 text-slate-500 hover:bg-slate-800 border border-transparent"
+                  : isDarkMode
+                    ? "bg-slate-800/60 text-slate-500 hover:bg-slate-800 border border-transparent"
+                    : "bg-slate-200/50 text-slate-600 hover:bg-slate-200 border border-transparent"
               }`}
             >
               🔌 อุปกรณ์
@@ -5712,7 +5689,9 @@ const Dashboard: React.FC<DashboardProps> = ({
               className={`text-[0.7rem] font-bold px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 activeFaqCategory === "tou_bill"
                   ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-extrabold"
-                  : "bg-slate-800/60 text-slate-500 hover:bg-slate-800 border border-transparent"
+                  : isDarkMode
+                    ? "bg-slate-800/60 text-slate-500 hover:bg-slate-800 border border-transparent"
+                    : "bg-slate-200/50 text-slate-600 hover:bg-slate-200 border border-transparent"
               }`}
             >
               ⏱️ ค่าไฟ & TOU
@@ -5731,7 +5710,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "ขอวิเคราะห์การใช้พลังงานของแอร์และแนะนำวิธีเซฟบิลแอร์แบบเห็นผลด่วนที่สุดหน่อยครับ",
                     )
                   }
-                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className={`text-[0.75rem] border font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-emerald-500 hover:text-white"
+                      : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-emerald-500 hover:text-white"
+                  }`}
                 >
                   ❄️{" "}
                   {lang === "th"
@@ -5746,7 +5729,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "ขอลดไฟ standby ของอุปกรณ์ที่ไม่ได้ใช้งานเพื่อเซฟค่าไฟเฉลี่ยหน่อยครับ",
                     )
                   }
-                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className={`text-[0.75rem] border font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-emerald-500 hover:text-white"
+                      : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-emerald-500 hover:text-white"
+                  }`}
                 >
                   🔌 {lang === "th" ? "ตัดไฟ Standby" : "Standby Cutoff"}
                 </button>
@@ -5758,7 +5745,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "ขอแนะนำ 3 วิธีประหยัดค่าไฟด่วนที่สุดที่ลดบิลได้ทันทีในสัปดาห์นี้ครับ",
                     )
                   }
-                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className={`text-[0.75rem] border font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-emerald-500 hover:text-white"
+                      : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-emerald-500 hover:text-white"
+                  }`}
                 >
                   💡{" "}
                   {lang === "th"
@@ -5778,7 +5769,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "ช่วยสแกนค่า Power Factor รวมและแนะนำวิธีการรักษาระดับประสิทธิภาพมอเตอร์ไฟฟ้าเพื่อความเสถียรหน่อยครับ",
                     )
                   }
-                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className={`text-[0.75rem] border font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-emerald-500 hover:text-white"
+                      : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-emerald-500 hover:text-white"
+                  }`}
                 >
                   ⚡{" "}
                   {lang === "th"
@@ -5793,7 +5788,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "ทำไมค่ากระแสแอมป์ (Amperes) ของอุปกรณ์บางชนิดสูงขึ้นผิดปกติขณะโหลดเริ่มเปิดทำงาน และส่งผลต่อความเสถียรอย่างไร",
                     )
                   }
-                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className={`text-[0.75rem] border font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-emerald-500 hover:text-white"
+                      : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-emerald-500 hover:text-white"
+                  }`}
                 >
                   📈{" "}
                   {lang === "th"
@@ -5808,7 +5807,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "แอร์ประหยัดไฟเบอร์ 5 แบบธรรมดา กับแอร์ระบบ Inverter ต่างกันอย่างไร คุ้มค่าที่จะเปลี่ยนเพื่อลดงบในระยะยาวหรือไม่ครับ",
                     )
                   }
-                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className={`text-[0.75rem] border font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-emerald-500 hover:text-white"
+                      : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-emerald-500 hover:text-white"
+                  }`}
                 >
                   🔄{" "}
                   {lang === "th"
@@ -5828,7 +5831,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "ขอแผนควบคุมหรือย้ายเวลาใช้อุปกรณ์ไฟฟ้ายอดนิยมไปอยู่ในช่วง Off-Peak ของอัตรา TOU เพื่อประหยัดสูงสุด",
                     )
                   }
-                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className={`text-[0.75rem] border font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-emerald-500 hover:text-white"
+                      : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-emerald-500 hover:text-white"
+                  }`}
                 >
                   ⏱️{" "}
                   {lang === "th" ? "จัดแผนเวลา TOU" : "Off-Peak Savings Plan"}
@@ -5841,7 +5848,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "อัตราค่าไฟฟ้า TOU คิดราคาและเวลาเหลื่อม On-Peak กับ Off-Peak อย่างไรในไทย และเหมาะกับบ้านแบบไหนบิลต่ำลง",
                     )
                   }
-                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className={`text-[0.75rem] border font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-emerald-500 hover:text-white"
+                      : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-emerald-500 hover:text-white"
+                  }`}
                 >
                   📖{" "}
                   {lang === "th"
@@ -5856,7 +5867,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                       "มีคำแนะนำในการจำกัดงบประมาณรายวันเพื่อให้ไม่เกินงบบัดเจตพลังงานรายเดือนที่ 3,500 บาทอย่างไรบ้าง",
                     )
                   }
-                  className="text-[0.75rem] bg-slate-800 hover:bg-emerald-500 hover:text-white border border-slate-705 text-slate-300 font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left"
+                  className={`text-[0.75rem] border font-bold px-2.5 py-1.5 rounded-xl transition-all flex items-center gap-1.5 text-left ${
+                    isDarkMode
+                      ? "bg-slate-800 border-slate-700 text-slate-300 hover:bg-emerald-500 hover:text-white"
+                      : "bg-slate-100 border-slate-200 text-slate-700 hover:bg-emerald-500 hover:text-white"
+                  }`}
                 >
                   🎯{" "}
                   {lang === "th"
@@ -5871,7 +5886,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         {/* Input panel form */}
         <form
           onSubmit={handleSendChatMessage}
-          className="p-3 bg-slate-950 border-t border-white/5 flex gap-2 items-center shrink-0"
+          className={`p-3 border-t flex gap-2 items-center shrink-0 ${isDarkMode ? 'bg-slate-950 border-white/5' : 'bg-slate-50 border-slate-150'}`}
         >
           <input
             type="text"
@@ -5882,7 +5897,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                 ? "ถามเรื่องเทคนิคพลังงานในแผงบอร์ด..."
                 : "Type here to ask regarding grid energy..."
             }
-            className="flex-grow bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 transition-colors font-sans"
+            className={`flex-grow border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500/50 transition-colors font-sans ${
+              isDarkMode 
+                ? "bg-slate-900 border-slate-800 text-white placeholder-slate-500" 
+                : "bg-white border-slate-200 text-slate-800 placeholder-slate-400"
+            }`}
           />
           <button
             type="submit"
@@ -5902,36 +5921,36 @@ const Dashboard: React.FC<DashboardProps> = ({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -50, scale: 0.95 }}
             transition={{ duration: 0.4, type: "spring", bounce: 0.4 }}
-            className={`fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-lg shadow-2xl rounded-2xl overflow-hidden backdrop-blur-xl border ${
-              isDarkMode ? "bg-rose-950/80 border-rose-900/50" : "bg-white/95 border-rose-200"
+            className={`fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-md shadow-2xl rounded-[1.5rem] overflow-hidden backdrop-blur-md border ${
+              isDarkMode ? "bg-rose-950/90 border-rose-900/50" : "bg-white/95 border-rose-200"
             }`}
           >
             <div className="flex items-stretch">
-              <div className="w-2 bg-rose-500 shrink-0"></div>
-              <div className="p-4 sm:p-5 flex-1 relative">
+              <div className="w-1.5 bg-rose-500 shrink-0"></div>
+              <div className="p-3.5 sm:p-4 flex-1 relative">
                 <button
                   onClick={() => setSevereWeatherAlert({ ...severeWeatherAlert, show: false })}
-                  className="absolute top-4 right-4 text-slate-500 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  className="absolute top-3.5 right-3.5 text-slate-500 hover:text-slate-600 dark:hover:text-slate-200 transition-colors border-0 bg-transparent cursor-pointer p-0.5"
                 >
                   <i className="fas fa-times"></i>
                 </button>
-                <div className="flex gap-4 items-start">
-                  <div className={`p-3 rounded-2xl shrink-0 flex items-center justify-center ${isDarkMode ? "bg-rose-900/50 text-rose-400" : "bg-rose-100 text-rose-600"}`}>
-                    <i className="fas fa-exclamation-triangle text-xl"></i>
+                <div className="flex gap-3 items-start">
+                  <div className={`p-2 rounded-xl shrink-0 flex items-center justify-center ${isDarkMode ? "bg-rose-900/50 text-rose-400" : "bg-rose-100 text-rose-600"}`}>
+                    <i className="fas fa-exclamation-triangle text-lg"></i>
                   </div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-[0.75rem] font-bold uppercase tracking-widest ${isDarkMode ? "text-rose-400" : "text-rose-600"}`}>
+                      <span className={`text-[0.7rem] font-black uppercase tracking-wider ${isDarkMode ? "text-rose-400" : "text-rose-600"}`}>
                         {lang === "th" ? "การแจ้งเตือนสภาพอากาศรุนแรง" : "Severe Weather Alert"}
                       </span>
-                      <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-500 text-[0.7rem] font-bold tracking-widest uppercase animate-pulse">
+                      <span className="px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-500 text-[0.6rem] font-bold tracking-widest uppercase animate-pulse">
                         LIVE
                       </span>
                     </div>
-                    <h3 className={`text-sm sm:text-base font-bold mb-2 font-display tracking-tight ${isDarkMode ? "text-white" : "text-slate-900"}`}>
+                    <h3 className={`text-xs sm:text-sm font-bold mb-1.5 font-display tracking-tight ${isDarkMode ? "text-white" : "text-slate-900"}`}>
                       {severeWeatherAlert.condition} <span className="opacity-50 font-normal">| {severeWeatherAlert.location}</span>
                     </h3>
-                    <p className={`text-xs leading-relaxed mb-4 ${isDarkMode ? "text-slate-300" : "text-slate-600"}`}>
+                    <p className={`text-[0.75rem] leading-relaxed mb-3.5 ${isDarkMode ? "text-slate-300" : "text-slate-600"}`}>
                       {severeWeatherAlert.recommendation}
                     </p>
                     <div className="flex gap-2">
@@ -5940,14 +5959,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                           setSevereWeatherAlert({ ...severeWeatherAlert, show: false });
                           setAiEcoStandby(true); // Automatically apply recommendation
                         }}
-                        className="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-rose-500/25"
+                        className="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-lg shadow-rose-500/25 border-0 cursor-pointer"
                       >
-                        <i className="fas fa-bolt"></i>
+                        <i className="fas fa-bolt text-[10px]"></i>
                         {lang === "th" ? "ใช้โหมดประหยัดพลังงานอัตโนมัติ" : "Apply Eco Mode"}
                       </button>
                       <button 
                         onClick={() => setSevereWeatherAlert({ ...severeWeatherAlert, show: false })}
-                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${isDarkMode ? "bg-slate-800 text-slate-300 hover:bg-slate-700" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border-0 cursor-pointer ${isDarkMode ? "bg-slate-800 text-slate-300 hover:bg-slate-700" : "bg-slate-100 text-slate-600 hover:bg-slate-200"}`}
                       >
                         {lang === "th" ? "ปิด" : "Dismiss"}
                       </button>
