@@ -30,31 +30,61 @@ export const TOUR_STEPS: TourStep[] = [
   {
     titleTh: "แดชบอร์ดหลัก",
     titleEn: "Main Dashboard",
-    descTh: "หน้านี้คือจุดเริ่มต้น ดูสรุปค่าไฟ โหลดปัจจุบัน และพยากรณ์พลังงานได้ทันที",
-    descEn: "This is your starting point. View cost summaries, current load, and energy forecasts instantly.",
-    nextActionTh: "คุณสามารถคลิกเลื่อนหน้าต่างได้ตามต้องการ แล้วไปดูกันต่อ!",
-    nextActionEn: "You can scroll around as needed. Let's move on!",
+    descTh: "หน้านี้คือจุดเริ่มต้น ดูสรุปค่าไฟ โหลดปัจจุบัน ได้ทันที",
+    descEn: "This is your starting point. View cost summaries and current load instantly.",
     targetPage: "dashboard",
-    targetId: "tour-step-stats"
+    targetId: "tour-step-dashboard",
   },
   {
-    titleTh: "ตรวจสอบอุปกรณ์",
-    titleEn: "Device Monitoring",
-    descTh: "ควบคุมสวิตช์เครื่องใช้ไฟฟ้า เช็คกระแสไฟเรียลไทม์ และให้ AI ช่วยวิเคราะห์ได้",
-    descEn: "Toggle appliance switches, check real-time draw, and let AI analyze them.",
-    whatHappensTh: "หากมีอุปกรณ์กินไฟผิดปกติ จะมีสัญญาณเตือนสีแดง",
-    whatHappensEn: "If an item draws abnormal power, a red alert will appear.",
+    titleTh: "สถิติย้อนหลัง",
+    titleEn: "Historical Stats",
+    descTh: "ดูแนวโน้มการใช้ไฟฟ้าย้อนหลังและเปรียบเทียบข้อมูลแบบละเอียด",
+    descEn: "View historical electricity consumption trends and compare detailed data.",
+    targetPage: "stats",
+    targetId: "tour-step-stats",
+  },
+  {
+    titleTh: "คำแนะนำจาก AI",
+    titleEn: "AI Hub",
+    descTh: "ใช้ปัญญาประดิษฐ์ (Gemini AI) เจาะลึกข้อมูลและแนะนำวิธีประหยัดพลังงาน",
+    descEn: "Use Gemini AI to analyze your usage and get deep insights on saving energy.",
+    targetPage: "ai_hub",
+    targetId: "tour-step-ai-hub",
+  },
+  {
+    titleTh: "จัดการอุปกรณ์",
+    titleEn: "Devices Control",
+    descTh: "ควบคุมสวิตช์เครื่องใช้ไฟฟ้า เช็คกระแสไฟเรียลไทม์ และจำลองปรับการตั้งค่าอุปกรณ์",
+    descEn: "Toggle appliance switches, check real-time draw, and simulate device settings.",
+    whatHappensTh: "ทดลองเปิดปิดสวิตช์อุปกรณ์เพื่อดูค่าใช้จ่ายที่เปลี่ยนไปทันที",
+    whatHappensEn: "Toggle device switches to see the immediate effect on your bills.",
     targetPage: "devices",
-    targetId: "tour-step-devices-grid"
+    targetId: "tour-step-devices-grid",
+  },
+  {
+    titleTh: "วิเคราะห์ค่าไฟ & งบประมาณ",
+    titleEn: "Calculator & Budget",
+    descTh: "คำนวณอัตรา TOU ย้อนหลัง และประเมินวันหมดงบประมาณด้วยระบบ Grid Budget",
+    descEn: "Calculate TOU rates and estimate when your budget runs out via Grid Budget.",
+    targetPage: "calculator",
+    targetId: "tour-step-calc-rates",
+  },
+  {
+    titleTh: "ความปลอดภัย & แจ้งเตือน",
+    titleEn: "Security & Alerts",
+    descTh: "ศูนย์รวมเหตุการณ์แจ้งเตือน รวมถึงการสแกนระบบรักษาความปลอดภัยจาก AI Log Scan",
+    descEn: "Your hub for event alerts, including AI Log Scans for grid security.",
+    targetPage: "noti",
+    targetId: "tour-step-noti-header",
   },
   {
     titleTh: "พร้อมใช้งาน!",
-    titleEn: "Ready to Go!",
-    descTh: "เรียนรู้ครบแล้ว! เริ่มควบคุมและประหยัดพลังงานกับ EduEase ได้เลย",
-    descEn: "You're all set! Start controlling and saving energy with EduEase.",
+    titleEn: "Ready to go!",
+    descTh: "เรียนรู้ครบแล้ว! คุณสามารถเปิด คู่มือการใช้งาน (Manual) จากเมนูด้านข้างได้ทุกเมื่อ",
+    descEn: "You're all set! You can open the User Manual from the sidebar anytime.",
     nextActionTh: "กดปุ่ม 'ปิด' เพื่อเริ่มต้นใช้งานจริง",
     nextActionEn: "Click 'Close' to take control.",
-    targetPage: "dashboard"
+    targetPage: "dashboard",
   }
 ];
 
@@ -225,15 +255,54 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
   return (
     <>
       <AnimatePresence>
-        {/* Global Darkened Masking Backdrop (active only when not paused) */}
+        {/* Blurred Masking Backdrops for spotlight focus (only when not paused) */}
         {!showPrompt && !isPaused && (
-          <motion.div
-            className="fixed inset-0 bg-slate-950/[0.02] z-[9985] pointer-events-none"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-          />
+          <>
+            {spotlightRect ? (
+              <>
+                {/* Top mask */}
+                <motion.div
+                  className="fixed z-[9985] pointer-events-none bg-slate-950/40 backdrop-blur-md"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1, top: 0, left: 0, right: 0, height: Math.max(0, spotlightRect.top - 12) }}
+                  exit={{ opacity: 0 }}
+                  transition={{ opacity: { duration: 0.4 }, height: { type: 'spring', stiffness: 120, damping: 18 } }}
+                />
+                {/* Bottom mask */}
+                <motion.div
+                  className="fixed z-[9985] pointer-events-none bg-slate-950/40 backdrop-blur-md"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1, top: spotlightRect.top + spotlightRect.height + 12, left: 0, right: 0, bottom: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ opacity: { duration: 0.4 }, top: { type: 'spring', stiffness: 120, damping: 18 } }}
+                />
+                {/* Left mask */}
+                <motion.div
+                  className="fixed z-[9985] pointer-events-none bg-slate-950/40 backdrop-blur-md"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1, top: Math.max(0, spotlightRect.top - 12), left: 0, width: Math.max(0, spotlightRect.left - 12), height: spotlightRect.height + 24 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ opacity: { duration: 0.4 }, top: { type: 'spring', stiffness: 120, damping: 18 }, left: { type: 'spring', stiffness: 120, damping: 18 }, width: { type: 'spring', stiffness: 120, damping: 18 }, height: { type: 'spring', stiffness: 120, damping: 18 } }}
+                />
+                {/* Right mask */}
+                <motion.div
+                  className="fixed z-[9985] pointer-events-none bg-slate-950/40 backdrop-blur-md"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1, top: Math.max(0, spotlightRect.top - 12), left: spotlightRect.left + spotlightRect.width + 12, right: 0, height: spotlightRect.height + 24 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ opacity: { duration: 0.4 }, top: { type: 'spring', stiffness: 120, damping: 18 }, left: { type: 'spring', stiffness: 120, damping: 18 }, height: { type: 'spring', stiffness: 120, damping: 18 } }}
+                />
+              </>
+            ) : (
+              <motion.div
+                className="fixed inset-0 bg-slate-950/40 backdrop-blur-md z-[9985] pointer-events-none"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+              />
+            )}
+          </>
         )}
       </AnimatePresence>
 
@@ -253,12 +322,12 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
             height: spotlightRect.height + 24,
             boxShadow: isPaused
               ? [
-                  "0 0 16px rgba(245, 158, 11, 0.6), 0 0 40px rgba(245, 158, 11, 0.3), 0 0 0 9999px rgba(15, 23, 42, 0.45)",
-                  "0 0 32px rgba(245, 158, 11, 0.9), 0 0 70px rgba(245, 158, 11, 0.5), 0 0 0 9999px rgba(15, 23, 42, 0.45)"
+                  "0 0 16px rgba(245, 158, 11, 0.6), 0 0 40px rgba(245, 158, 11, 0.3)",
+                  "0 0 32px rgba(245, 158, 11, 0.9), 0 0 70px rgba(245, 158, 11, 0.5)"
                 ]
               : [
-                  "0 0 0 8px rgba(16, 185, 129, 0.7), 0 0 45px rgba(52, 211, 153, 0.8), 0 0 0 9999px rgba(3, 7, 18, 0.68)",
-                  "0 0 0 20px rgba(16, 185, 129, 0.35), 0 0 75px rgba(52, 211, 153, 0.95), 0 0 0 9999px rgba(3, 7, 18, 0.68)"
+                  "0 0 0 8px rgba(16, 185, 129, 0.2), 0 0 45px rgba(52, 211, 153, 0.4)",
+                  "0 0 0 20px rgba(16, 185, 129, 0.1), 0 0 75px rgba(52, 211, 153, 0.5)"
                 ]
           }}
           transition={{
@@ -409,7 +478,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                   className="w-full py-3.5 bg-primary hover:bg-primary/90 text-white rounded-2xl text-xs font-black transition-all shadow-md shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <i className="fas fa-play-circle me-1.5 animate-pulse"></i>
-                  {lang === 'th' ? 'เริ่มต้นนำสอน' : 'Start Walkthrough'}
+                  {lang === 'th' ? 'เริ่มต้นนำสอน' : 'Start Tour'}
                 </button>
               </div>
             </motion.div>
@@ -417,52 +486,44 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Floating Tutorial Info Box Overlay */}
+      {/* Dynamic Instruction Box with Spring Positioning */}
       <AnimatePresence>
-        {!showPrompt && (
+        {isActive && !showPrompt && (
           isMinimized ? (
             <motion.div
-              key="minimized-tour"
-              className="fixed inset-x-4 bottom-4 md:bottom-8 md:right-8 md:left-auto z-[9999] max-w-sm w-full mx-auto md:mx-0 p-3 rounded-2xl border bg-slate-950/95 border-emerald-500/50 text-white flex items-center justify-between shadow-2xl backdrop-blur-md"
-              initial={{ y: 80, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 80, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 100, damping: 15 }}
+              className="fixed bottom-6 right-6 z-[9995] pointer-events-auto"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
             >
-              <div className="flex items-center gap-2 overflow-hidden mr-2">
-                <span className="w-6 h-6 rounded-xl bg-emerald-500 text-[0.75rem] text-white flex items-center justify-center font-black shrink-0 animate-pulse">
-                  {stepIndex + 1}
-                </span>
-                <span className="text-[0.8rem] font-bold truncate">
-                  {lang === 'th' ? currentStep.titleTh : currentStep.titleEn}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setIsMinimized(false)}
-                  className="p-1.5 px-3 bg-emerald-500 hover:bg-emerald-600 transition-all text-white rounded-xl text-[0.75rem] font-black flex items-center gap-1 hover:scale-105 active:scale-95"
-                >
-                  <i className="fas fa-expand-alt text-[0.75rem]"></i>
-                  <span>{lang === 'th' ? 'ขยายคำสอน' : 'Expand'}</span>
-                </button>
-                <button 
-                  type="button"
-                  onClick={handleSkipTour} 
-                  className="text-slate-500 hover:text-rose-500 transition-colors p-1"
-                  title={lang === 'th' ? 'ข้ามทั้งหมด' : 'Skip All'}
-                >
-                  <i className="fas fa-times-circle text-sm"></i>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setIsMinimized(false)}
+                className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white p-3 px-4 rounded-full shadow-lg border border-emerald-400 font-bold transition-all text-sm"
+              >
+                <i className="fas fa-eye animate-bounce"></i>
+                <span>{lang === 'th' ? 'แสดงคำแนะนำ' : 'Show Guide'}</span>
+              </button>
             </motion.div>
           ) : (
-            <motion.div 
-              key="expanded-tour"
-              className="fixed inset-x-4 bottom-4 md:bottom-8 md:right-8 md:left-auto z-[9999] max-w-md w-full mx-auto md:mx-0"
-              initial={{ y: 80, opacity: 0, scale: 0.95 }}
-              animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 80, opacity: 0, scale: 0.95 }}
+            <motion.div
+              className="fixed z-[9995] w-full max-w-sm pointer-events-auto px-4 sm:px-0"
+              style={{
+                top: spotlightRect 
+                  ? (typeof window !== 'undefined' && spotlightRect.top + spotlightRect.height + 24 > window.innerHeight - 300
+                      ? Math.max(16, spotlightRect.top - 260)
+                      : spotlightRect.top + spotlightRect.height + 16)
+                  : '35%',
+                left: spotlightRect
+                  ? (typeof window !== 'undefined'
+                      ? Math.min(window.innerWidth - 400, Math.max(16, spotlightRect.left + (spotlightRect.width / 2) - 192))
+                      : '50%')
+                  : '50%',
+                transform: spotlightRect ? 'none' : 'translate(-50%, -50%)',
+              }}
+              initial={{ opacity: 0, scale: 0.9, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 15 }}
               transition={{ type: "spring", stiffness: 100, damping: 15 }}
             >
               <div className={`p-4 md:p-6 rounded-[1.5rem] md:rounded-[2.5rem] border-2 shadow-2xl transition-all duration-300 relative ${
@@ -473,16 +534,16 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                 
                 {/* Pulsing floating index point with Dynamic Accent Ring */}
                 <div className="absolute -top-3 -left-3">
-                  <span className="flex h-7 w-7 relative">
-                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                  <div className="flex h-7 w-7 relative">
+                    <div className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
                       isPaused ? 'bg-amber-400' : 'bg-emerald-400'
-                    }`}></span>
-                    <span className={`relative inline-flex rounded-full h-7 w-7 items-center justify-center text-xs text-white font-black transition-colors duration-300 ${
+                    }`}></div>
+                    <div className={`relative inline-flex rounded-full h-7 w-7 items-center justify-center text-xs text-white font-black transition-colors duration-300 ${
                       isPaused ? 'bg-amber-500' : 'bg-emerald-500'
                     }`}>
                       {stepIndex + 1}
-                    </span>
-                  </span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Header */}
@@ -531,7 +592,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                 <AnimatePresence mode="wait">
                   <motion.div 
                     key={`${stepIndex}-${isPaused}`} 
-                    className="space-y-2 mb-4"
+                    className="space-y-2 mb-4 max-h-[42vh] overflow-y-auto pr-1 scrollbar-thin"
                     initial={{ opacity: 0, x: 15 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -15 }}
@@ -612,8 +673,8 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                         <i className={`fas ${isPaused ? 'fa-play' : 'fa-pause'}`}></i>
                         <span>
                           {isPaused
-                            ? (lang === 'th' ? 'เล่นสปอตไลท์ต่อ' : 'Resume Spotlight')
-                            : (lang === 'th' ? 'หยุดส่องชั่วคราวเพื่อเล่นเว็บ' : 'Pause Overlay')}
+                            ? (lang === 'th' ? 'เล่นทัวร์ต่อ' : 'Resume Spotlight')
+                            : (lang === 'th' ? 'ทดลองอิสระ' : 'Pause Overlay')}
                         </span>
                       </button>
                     </div>

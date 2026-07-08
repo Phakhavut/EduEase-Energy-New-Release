@@ -17,6 +17,25 @@ import {
   Line,
   ComposedChart,
 } from "recharts";
+import { 
+  Zap, 
+  Clock, 
+  AlertTriangle, 
+  Info, 
+  Calendar, 
+  ArrowRight, 
+  Lightbulb, 
+  TrendingDown, 
+  TrendingUp, 
+  CheckCircle, 
+  Flame, 
+  Shield, 
+  Award, 
+  Coins, 
+  Sliders, 
+  FileText, 
+  Plus 
+} from "lucide-react";
 import UserManual from "./UserManual";
 import { GuidedTour } from "./GuidedTour";
 import { Confetti } from "./Confetti";
@@ -28,6 +47,7 @@ import { DailyEnergyQuests } from "./DailyEnergyQuests";
 import { PropertyDistributionMap } from "./PropertyDistributionMap";
 import { WeatherCard } from "./WeatherCard";
 import { SmartSavingsCalculator } from "./SmartSavingsCalculator";
+import { BillingSimulator } from "./BillingSimulator";
 import { ProjectedSavingsCard } from "./ProjectedSavingsCard";
 import { EnergyTipWidget } from "./EnergyTipWidget";
 import { EnergyMonitoringHub } from "./EnergyMonitoringHub";
@@ -1062,6 +1082,13 @@ const Dashboard: React.FC<DashboardProps> = ({
       return saved ? parseFloat(saved) : 3500;
     } catch { return 3500; }
   });
+  const [sharedFtRate, setSharedFtRate] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem("eudease_ftRate");
+      return saved ? parseFloat(saved) : 0.3972;
+    } catch { return 0.3972; }
+  });
+  const [plannedKwh, setPlannedKwh] = useState<number>(350);
   const [onPeakShare, setOnPeakShare] = useState(() => {
     try {
       const saved = localStorage.getItem("eudease_onPeakShare");
@@ -1162,8 +1189,9 @@ const Dashboard: React.FC<DashboardProps> = ({
       localStorage.setItem("eudease_unitRate", unitRate.toString());
       localStorage.setItem("eudease_globalBudget", globalBudget.toString());
       localStorage.setItem("eudease_onPeakShare", onPeakShare.toString());
+      localStorage.setItem("eudease_ftRate", sharedFtRate.toString());
     } catch {}
-  }, [multiDevices, unitRate, globalBudget, onPeakShare]);
+  }, [multiDevices, unitRate, globalBudget, onPeakShare, sharedFtRate]);
 
   // AI Floating Chatbot States and Logic
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -2462,7 +2490,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               initial="hidden"
               animate="visible"
               className="space-y-8"
-              id="dashboard-report-area"
+              id="tour-step-dashboard"
             >
               {/* PRIMARY HERO METRICS SECTION */}
               <motion.div 
@@ -2841,6 +2869,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               initial="hidden"
               animate="visible"
               className="space-y-8 animate-fade-in"
+              id="tour-step-ai-hub"
             >
               <EnergyMonitoringHub
                 lang={lang}
@@ -2881,7 +2910,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 <div className="w-full mb-6">
                         <div
                           id="tour-step-ai-switches"
-                          className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden shadow-sm h-100 flex flex-col bg-white dark:bg-white/5"
+                          className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden shadow-sm h-full flex flex-col bg-white dark:bg-white/5"
                         >
                           
                           <div className="p-6 flex flex-col justify-between h-full bg-slate-900/40">
@@ -3294,7 +3323,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         <p className="label text-[0.7rem] mb-4 dark:opacity-100 opacity-60">
                           {dev.category}
                         </p>
-                        <div className="flex justify-between items-end border-top border-light pt-4">
+                        <div className="flex justify-between items-end border-t border-light pt-4">
                           <div className="mono-font font-bold text-primary">
                             ฿{devCost.toFixed(0)}
                           </div>
@@ -3312,690 +3341,435 @@ const Dashboard: React.FC<DashboardProps> = ({
 
           {currentPage === "calculator" && (
             <div className="animate-fade-in tech-grid p-4 md:p-6 rounded-[30px] md:rounded-[40px]">
-              <div className="row g-4 md:g-5">
-<div className="col-12">
-<div className="w-full mb-6">
-                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm rounded-[2rem] hover:shadow-lg transition-all duration-300">
-                          {/* Header */}
-                          
-                          <div className="p-5">
-                            <SmartSavingsCalculator 
-                              lang={lang} 
-                              isDarkMode={isDarkMode} 
-                              onTokensEarned={(amount) => {
-                                try {
-                                  const cur = parseInt(localStorage.getItem('eudease_grid_tokens') || '300', 10);
-                                  localStorage.setItem('eudease_grid_tokens', String(cur + amount));
-                                  // Dispatch a storage event to let DailyEnergyQuests update if it is listening
-                                  window.dispatchEvent(new Event('storage'));
-                                } catch {}
-                                setConfettiTrigger((t) => t + 1);
-                              }}
-                            />
-                          </div>
-                        </div>
-</div>
-</div>
-                <div
-                  className="col-12 col-xl-7 animate-slide-up"
-                  style={{ animationDelay: "100ms" }}
+              
+              {/* Sub Navigation Tabs */}
+              <div className="flex gap-4 mb-6 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                <button
+                  type="button"
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer flex items-center gap-1.5 ${calcTab === "detailed" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400 font-bold" : "text-muted dark:opacity-100 opacity-50"}`}
+                  onClick={() => setCalcTab("detailed")}
                 >
-                  <div className="dashboard-card border-0 p-4 md:p-6 mb-6">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-                      <h5 className="font-display font-bold text-lg md:text-xl">
-                        <i className="fas fa-microchip text-primary me-3"></i>
-                        {t("calc_planner_title")}
-                      </h5>
-                      <div className="p-1 bg-light rounded-2xl flex w-full sm:w-auto">
-                        <button
-                          className={`btn btn-xs flex-grow sm:flex-none px-4 rounded-xl font-bold ${calcMode === "hours" ? "btn-primary shadow-lg" : "text-muted"}`}
-                          onClick={() => setCalcMode("hours")}
-                        >
-                          {t("calc_mode_hour").toUpperCase()}
-                        </button>
-                        <button
-                          className={`btn btn-xs flex-grow sm:flex-none px-4 rounded-xl font-bold ${calcMode === "budget" ? "btn-primary shadow-lg" : "text-muted"}`}
-                          onClick={() => setCalcMode("budget")}
-                        >
-                          {t("calc_mode_budget").toUpperCase()}
-                        </button>
-                      </div>
-                    </div>
-                    <div
-                      id="tour-step-calc-rates"
-                      className="row g-3 transition-all duration-500"
-                    >
-                      <div className="col-12 col-md-6">
-                        <label className="label text-[0.75rem] mb-2 block">
-                          {t("calc_rate")}
-                        </label>
-                        <div className="flex items-center p-3 md:p-4 bg-light rounded-3xl">
-                          <i className="fas fa-tag text-primary opacity-40 me-3"></i>
-                          <input
-                            type="number"
-                            className="form-control border-0 bg-transparent p-0 font-bold text-xl md:text-2xl mono-font"
-                            value={unitRate}
-                            onChange={(e) => setUnitRate(+e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      <div className="col-12 col-md-6">
-                        <label className="label text-[0.75rem] mb-2 block">
-                          {t("calc_days")}
-                        </label>
-                        <div className="flex items-center p-3 md:p-4 bg-light rounded-3xl">
-                          <i className="fas fa-history text-primary opacity-40 me-3"></i>
-                          <input
-                            type="number"
-                            className="form-control border-0 bg-transparent p-0 font-bold text-xl md:text-2xl mono-font"
-                            value={calcDays}
-                            onChange={(e) => setCalcDays(+e.target.value)}
+                  <Sliders className="w-4 h-4 text-emerald-500" />
+                  <span>{lang === "th" ? "จำลองเครื่องใช้ไฟฟ้า & บิล" : "Appliance Sim & Billing"}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer flex items-center gap-1.5 ${calcTab === "tariff" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400 font-bold" : "text-muted dark:opacity-100 opacity-50"}`}
+                  onClick={() => setCalcTab("tariff")}
+                >
+                  <Clock className="w-4 h-4 text-sky-500" />
+                  <span>{lang === "th" ? "คู่มือระบบ TOU" : "TOU Tariff Guide"}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer flex items-center gap-1.5 ${calcTab === "budget" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400 font-bold" : "text-muted dark:opacity-100 opacity-50"}`}
+                  onClick={() => setCalcTab("budget")}
+                >
+                  <Shield className="w-4 h-4 text-amber-500" />
+                  <span>{lang === "th" ? "คุมงบประมาณพลังงาน" : "Budget Optimization"}</span>
+                </button>
+              </div>
+
+              {calcTab === "detailed" && (
+                <div className="row g-4 md:g-5">
+                  <div className="col-12">
+                    <div className="w-full mb-6">
+                      <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm rounded-[2rem] hover:shadow-lg transition-all duration-300">
+                        {/* Header */}
+                        <div className="p-5">
+                          <SmartSavingsCalculator 
+                            lang={lang} 
+                            isDarkMode={isDarkMode} 
+                            onTokensEarned={(amount) => {
+                              try {
+                                const cur = parseInt(localStorage.getItem('eudease_grid_tokens') || '300', 10);
+                                localStorage.setItem('eudease_grid_tokens', String(cur + amount));
+                                // Dispatch a storage event to let DailyEnergyQuests update if it is listening
+                                window.dispatchEvent(new Event('storage'));
+                              } catch {}
+                              setConfettiTrigger((t) => t + 1);
+                            }}
+                            rate={sharedFtRate}
+                            setRate={setSharedFtRate}
+                            days={calcDays}
+                            setDays={setCalcDays}
+                            targetBudget={globalBudget}
+                            setTargetBudget={setGlobalBudget}
+                            onTotalKwhChange={setPlannedKwh}
                           />
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex gap-4 mb-6 border-bottom border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                    <button
-                      className={`text-[0.75rem] md:text-xs font-bold uppercase tracking-widest pb-2 transition-all ${calcTab === "detailed" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
-                      onClick={() => setCalcTab("detailed")}
-                    >
-                      {t("calc_detailed")}
-                    </button>
-                    <button
-                      className={`text-[0.75rem] md:text-xs font-bold uppercase tracking-widest pb-2 transition-all ${calcTab === "batch" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
-                      onClick={() => setCalcTab("batch")}
-                    >
-                      {t("calc_batch")}
-                    </button>
-                    <button
-                      className={`text-[0.75rem] md:text-xs font-bold uppercase tracking-widest pb-2 transition-all ${calcTab === "tariff" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
-                      onClick={() => setCalcTab("tariff")}
-                    >
-                      {t("calc_tariff")}
-                    </button>
-                    <button
-                      className={`text-[0.75rem] md:text-xs font-bold uppercase tracking-widest pb-2 transition-all ${calcTab === "budget" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
-                      onClick={() => setCalcTab("budget")}
-                    >
-                      {lang === "th"
-                        ? "คุมงบและผู้คุม AI"
-                        : "Budgets & AI Governor"}
-                    </button>
+                  <div className="col-12 mb-6">
+                    <BillingSimulator 
+                      lang={lang} 
+                      isDarkMode={isDarkMode} 
+                      plannedKwh={plannedKwh}
+                      ftRate={sharedFtRate}
+                      setFtRate={setSharedFtRate}
+                    />
                   </div>
-
-                  {calcTab === "budget" && (
-                    <div className="space-y-4 animate-fade-in text-dark mb-6">
-                      {/* AI Autopilot Governor switch */}
-                      <div className="dashboard-card border-0 p-5 bg-primary/10 border-start border-[5px] border-primary rounded-3xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                        <div>
-                          <h6 className="font-extrabold text-sm mb-1 text-primary flex items-center gap-2">
-                            <i className="fas fa-brain animate-pulse"></i>
-                            {lang === "th"
-                              ? "ระบบผู้คุมกระแส AI Autopilot (" +
-                                (aiAutopilotCapping ? "เปิดใช้งาน" : "ปิด") +
-                                ")"
-                              : "AI Autopilot Governor (" +
-                                (aiAutopilotCapping ? "Active" : "Off") +
-                                ")"}
-                          </h6>
-                          <p className="text-[0.75rem] text-muted mb-0">
-                            {lang === "th"
-                              ? "ปรับรอบชั่วโมงการทำงานของแอร์และโหนวัตต์สูงโดยอัตโนมัติเมื่อคาดการณ์ยอดเงินจะบวมล้นงบรายเดือนที่คุณกำหนด"
-                              : "Automatically trim and cycle high-wattage active loads if forecast exceeds budget constraints."}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setAiAutopilotCapping((prev) => !prev)}
-                          className={`btn rounded-xl px-4 py-2 text-xs font-extrabold uppercase transition-all border-0 cursor-pointer ${aiAutopilotCapping ? "btn-primary text-white shadow-lg shadow-primary/20" : "btn-light border-2 text-dark"}`}
-                        >
-                          {aiAutopilotCapping ? "ON" : "OFF"}
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="dashboard-card border-0 p-5 shadow-sm text-center">
-                          <h6 className="font-bold text-xs mb-3 text-muted uppercase">
-                            {t("budget_limit_title")}
-                          </h6>
-                          <div className="flex items-center justify-center p-3 bg-light rounded-3xl mb-4">
-                            <span className="font-extrabold text-xl mr-2 text-muted">
-                              ฿
-                            </span>
-                            <input
-                              type="number"
-                              className="form-control border-0 bg-transparent p-0 font-bold text-2xl text-center mono-font w-32 focus:ring-0 focus:outline-none"
-                              value={globalBudget}
-                              onChange={(e) => setGlobalBudget(+e.target.value)}
-                            />
-                          </div>
-                          <div
-                            className={`p-4 rounded-2xl ${analytics.budgetRemaining > 0 ? "bg-emerald-500/10 text-emerald-600" : "bg-rose-500/10 text-rose-600"}`}
-                          >
-                            <span className="text-[0.7rem] uppercase font-bold tracking-widest block mb-1">
-                              {t("budget_remainder")}
-                            </span>
-                            <h3 className="text-xl md:text-2xl font-bold mono-font mb-0">
-                              ฿{analytics.budgetRemaining.toLocaleString()}
-                            </h3>
-                          </div>
-                        </div>
-
-                        <div className="dashboard-card border-0 p-5 shadow-sm overflow-y-auto max-h-[300px]">
-                          <h6 className="font-bold text-xs mb-4 text-muted uppercase">
-                            {t("budget_priority")}
-                          </h6>
-                          <div className="space-y-3">
-                            {multiDevices.map((dev) => {
-                              const devCost =
-                                (dev.watt / 1000) *
-                                dev.hours *
-                                calcDays *
-                                unitRate;
-                              const pct = (devCost / globalBudget) * 100;
-                              return (
-                                <div
-                                  key={dev.id}
-                                  className="p-2 border-b border-light"
-                                >
-                                  <div className="flex justify-between items-center mb-1">
-                                    <span className="font-bold text-xs">
-                                      {dev.name}
-                                    </span>
-                                    <span className="font-mono text-xs text-primary font-bold">
-                                      ฿{devCost.toFixed(0)}
-                                    </span>
-                                  </div>
-                                  <div
-                                    className="progress rounded-pill mb-1 bg-slate-200 dark:bg-white/10"
-                                    style={{ height: "8px" }}
-                                  >
-                                    <div
-                                      className={`progress-bar ${pct > 40 ? "bg-rose-500" : "bg-primary"}`}
-                                      style={{
-                                        width: `${Math.min(pct, 100)}%`,
-                                      }}
-                                    ></div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {calcTab === "detailed" && (
-                    <div className="space-y-4 animate-fade-in">
-                      {multiDevices.map((dev, i) => (
-                        <div
-                          key={dev.id}
-                          className="calculator-node p-4 animate-slide-up"
-                          style={{ animationDelay: `${i * 50}ms` }}
-                        >
-                          <div className="row g-3 align-items-center">
-                            <div className="col-12 col-md-4">
-                              <div className="flex items-center gap-3">
-                                <div className="w-2 h-2 rounded-full bg-primary shrink-0"></div>
-                                <div className="flex-grow">
-                                  <input
-                                    type="text"
-                                    className="form-control border-0 bg-transparent font-bold p-0 text-sm"
-                                    value={dev.name}
-                                    onChange={(e) =>
-                                      updateDevice(
-                                        dev.id,
-                                        "name",
-                                        e.target.value,
-                                      )
-                                    }
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                            <div className="col-5 col-md-3">
-                              <label className="text-[0.65rem] font-bold text-muted block uppercase">
-                                {t("node_watt").split(" ")[0]}
-                              </label>
-                              <input
-                                type="number"
-                                className="form-control bg-light border-0 rounded-xl py-1 px-3 font-bold mono-font text-xs h-[44px]"
-                                value={dev.watt}
-                                onChange={(e) =>
-                                  updateDevice(dev.id, "watt", +e.target.value)
-                                }
-                              />
-                            </div>
-                            <div className="col-5 col-md-3">
-                              <label className="text-[0.65rem] font-bold text-muted block uppercase">
-                                {t("node_hours").split(" ")[0]}
-                              </label>
-                              <input
-                                type="number"
-                                className="form-control bg-light border-0 rounded-xl py-1 px-3 font-bold mono-font text-xs h-[44px]"
-                                value={dev.hours}
-                                onChange={(e) =>
-                                  updateDevice(dev.id, "hours", +e.target.value)
-                                }
-                              />
-                            </div>
-                            <div className="col-2 col-md-2 text-end flex justify-end items-end">
-                              <button
-                                className="btn btn-outline-danger border-0 p-2 h-[44px] w-[44px] flex items-center justify-center ms-auto"
-                                onClick={() => removeDevice(dev.id)}
-                              >
-                                <i className="fas fa-trash-alt text-xs"></i>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                      <button
-                        className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 w-100 py-3 rounded-[24px] border-2 border-dashed border-primary/20 text-primary font-bold text-[0.75rem] uppercase tracking-[0.3em] hover:bg-primary/5 mt-4"
-                        onClick={addDevice}
-                      >
-                        <i className="fas fa-plus-circle me-2"></i> {t("add")}
-                      </button>
-                    </div>
-                  )}
-
-                  {calcTab === "batch" && (
-                    <div className="space-y-8 animate-fade-in">
-                      <div>
-                        <h6 className="text-[0.75rem] font-bold uppercase tracking-widest text-muted mb-4">
-                          {t("batch_presets")}
-                        </h6>
-                        <div className="row g-3">
-                          {PRESET_SETS.map((set) => (
-                            <div key={set.id} className="col-12 col-md-6">
-                              <div className="dashboard-card border-0 p-4 bg-light hover:shadow-md transition-all group flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <div className="p-3 bg-white rounded-2xl text-primary">
-                                    <i className={`fas ${set.icon}`}></i>
-                                  </div>
-                                  <div>
-                                    <div className="font-bold text-xs">
-                                      {t(set.key)}
-                                    </div>
-                                    <div className="text-[0.7rem] text-muted">
-                                      {set.items.length} nodes
-                                    </div>
-                                  </div>
-                                </div>
-                                <button
-                                  onClick={() => addPresetSet(set)}
-                                  className="btn btn-primary btn-xs rounded-xl font-bold uppercase tracking-tighter text-[0.65rem]"
-                                >
-                                  {t("batch_add_set")}
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <h6 className="text-[0.75rem] font-bold uppercase tracking-widest text-muted mb-4">
-                          {t("batch_library")}
-                        </h6>
-                        <div className="row g-3">
-                          {APPLIANCE_LIBRARY.map((item, i) => (
-                            <div key={i} className="col-6 col-sm-4">
-                              <div
-                                onClick={() => addApplianceFromLibrary(item)}
-                                className="p-3 md:p-4 bg-white border border-light rounded-3xl text-center cursor-pointer hover:border-primary hover:shadow-lg transition-all h-100 flex flex-col justify-center"
-                              >
-                                <div className="p-2 bg-primary/5 text-primary rounded-xl w-fit mx-auto mb-3">
-                                  <i
-                                    className={`fas ${item.icon} text-base md:text-lg`}
-                                  ></i>
-                                </div>
-                                <div className="font-bold text-[0.75rem] md:text-[0.8rem] mb-1 leading-tight">
-                                  {item.name}
-                                </div>
-                                <div className="text-[0.65rem] md:text-[0.7rem] text-muted mono-font">
-                                  {item.watt}W | {item.hours}h
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {calcTab === "tariff" && (
-                    <div className="animate-fade-in space-y-6">
-                      <div className="dashboard-card border-0 p-4 md:p-6 bg-light">
-                        <h6 className="font-display font-bold text-lg mb-4 text-primary">
-                          {t("tou_title")}
-                        </h6>
-                        <div className="row g-3 md:g-4 mb-6">
-                          <div className="col-12 col-md-6">
-                            <div className="p-4 bg-white rounded-[2rem] border-2 border-danger/10 shadow-sm h-100">
-                              <div className="flex items-center gap-3 mb-2">
-                                <div className="p-2 bg-danger/10 text-danger rounded-xl">
-                                  <i className="fas fa-sun text-sm"></i>
-                                </div>
-                                <span className="font-bold text-xs">
-                                  {t("tou_peak")} (฿{TOU_ON_PEAK_RATE})
-                                </span>
-                              </div>
-                              <p className="text-[0.75rem] text-muted leading-relaxed mb-0">
-                                {t("tou_peak_desc")}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="col-12 col-md-6">
-                            <div className="p-4 bg-white rounded-[2rem] border-2 border-emerald-500/10 shadow-sm h-100">
-                              <div className="flex items-center gap-3 mb-2">
-                                <div className="p-2 bg-emerald-500/10 text-emerald-500 rounded-xl">
-                                  <i className="fas fa-moon text-sm"></i>
-                                </div>
-                                <span className="font-bold text-xs">
-                                  {t("tou_off")} (฿{TOU_OFF_PEAK_RATE})
-                                </span>
-                              </div>
-                              <p className="text-[0.75rem] text-muted leading-relaxed mb-0">
-                                {t("tou_off_desc")}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="h-[200px] mb-4">
-                          <ResponsiveContainer>
-                            <LineChart data={touChartData}>
-                              <CartesianGrid
-                                strokeDasharray="3 3"
-                                vertical={false}
-                                strokeOpacity={0.1}
-                              />
-                              <XAxis
-                                dataKey="name"
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fontSize: 9 }}
-                              />
-                              <YAxis
-                                axisLine={false}
-                                tickLine={false}
-                                tick={{ fontSize: 9 }}
-                              />
-                              <Tooltip />
-                              <Line
-                                type="stepAfter"
-                                dataKey="val"
-                                stroke="var(--primary)"
-                                strokeWidth={3}
-                                dot={false}
-                              />
-                            </LineChart>
-                          </ResponsiveContainer>
-                        </div>
-
-                        <div className="mt-8 p-5 bg-white rounded-[2rem] shadow-sm border border-primary/10">
-                          <div className="flex justify-between mb-4">
-                            <h6 className="label text-[0.75rem]">
-                              {t("calc_tou_breakdown")}
-                            </h6>
-                            <span className="text-[0.75rem] font-bold text-primary">
-                              {onPeakShare}% On-Peak
-                            </span>
-                          </div>
-                          <div className="space-y-4">
-                            <div>
-                              <div className="flex justify-between items-center mb-1">
-                                <span className="text-xs font-bold text-muted">
-                                  {t("tou_peak")}
-                                </span>
-                                <span className="text-xs font-bold mono-font">
-                                  ฿
-                                  {analytics.onPeakCost.toLocaleString(
-                                    undefined,
-                                    { maximumFractionDigits: 1 },
-                                  )}
-                                </span>
-                              </div>
-                              <div className="progress h-3 rounded-full bg-light">
-                                <div
-                                  className="progress-bar bg-danger"
-                                  style={{ width: `${onPeakShare}%` }}
-                                ></div>
-                              </div>
-                              <div className="text-[0.7rem] text-muted mt-1">
-                                {analytics.onPeakUnits.toFixed(1)} kWh
-                              </div>
-                            </div>
-                            <div>
-                              <div className="flex justify-between items-center mb-1">
-                                <span className="text-xs font-bold text-muted">
-                                  {t("tou_off")}
-                                </span>
-                                <span className="text-xs font-bold mono-font">
-                                  ฿
-                                  {analytics.offPeakCost.toLocaleString(
-                                    undefined,
-                                    { maximumFractionDigits: 1 },
-                                  )}
-                                </span>
-                              </div>
-                              <div className="progress h-3 rounded-full bg-light">
-                                <div
-                                  className="progress-bar bg-emerald-500"
-                                  style={{ width: `${100 - onPeakShare}%` }}
-                                ></div>
-                              </div>
-                              <div className="text-[0.7rem] text-muted mt-1">
-                                {analytics.offPeakUnits.toFixed(1)} kWh
-                              </div>
-                            </div>
-
-                            <div className="pt-4 border-top border-light flex justify-between items-center">
-                              <span className="text-xs font-bold text-main">
-                                Total TOU Estimated
-                              </span>
-                              <span className="text-lg font-bold text-primary mono-font">
-                                ฿
-                                {analytics.touCost.toLocaleString(undefined, {
-                                  maximumFractionDigits: 0,
-                                })}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <p className="text-[0.75rem] md:text-[0.8rem] italic text-center opacity-70 mt-6 mb-0">
-                          "{t("tou_desc")}"
-                        </p>
-                      </div>
-
-                      <div className="dashboard-card border-0 p-4 md:p-6 bg-primary/5">
-                        <h6 className="font-display font-bold text-lg mb-3">
-                          {t("progressive_title")}
-                        </h6>
-                        <p className="text-xs text-muted mb-4 leading-relaxed">
-                          {t("progressive_desc")}
-                        </p>
-                        <div className="space-y-3">
-                          {[
-                            { tier: 1, range: "0-15", rate: "2.34", w: "20" },
-                            { tier: 2, range: "16-25", rate: "2.98", w: "40" },
-                            { tier: 3, range: "400+", rate: "4.42", w: "100" },
-                          ].map((tRow, i) => (
-                            <div key={i}>
-                              <div className="flex justify-between text-[0.75rem] font-bold mb-1">
-                                <span className="text-muted">
-                                  {t("progressive_tier")} {tRow.tier}:{" "}
-                                  {tRow.range} Units
-                                </span>
-                                <span className="text-primary">
-                                  ฿{tRow.rate}
-                                </span>
-                              </div>
-                              <div className="progress h-3 rounded-full bg-slate-200 dark:bg-white/20">
-                                <div
-                                  className={`progress-bar bg-primary w-[${tRow.w}%]`}
-                                  style={{ width: `${tRow.w}%` }}
-                                ></div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
+              )}
 
-                <div
-                  className="col-12 col-xl-5 animate-slide-up"
-                  style={{ animationDelay: "200ms" }}
-                >
-                  <div className="hologram-card h-100 p-6 md:p-8 flex flex-col justify-center">
-                    <div className="mb-auto text-center">
-                      <span className="badge bg-white/20 px-4 py-2 rounded-full text-[0.65rem] md:text-[0.7rem] font-bold tracking-[0.3em] uppercase mb-4">
-                        Neural Data Projection
-                      </span>
-                      <h4 className="font-display font-bold text-white text-lg md:text-xl">
-                        Power Projection Model
+              {calcTab === "tariff" && (
+                <div className="animate-fade-in flex flex-col gap-6">
+                  {/* Header Intro */}
+                  <div className="dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3.5 rounded-2xl bg-sky-500/10 text-sky-500 shrink-0">
+                        <Clock className="w-6 h-6 animate-pulse" />
+                      </div>
+                      <div>
+                        <h3 className="text-base font-black font-display text-slate-800 dark:text-white flex items-center gap-2">
+                          <span>{t("tou_title")}</span>
+                          <span className="text-[10px] uppercase font-mono bg-sky-500/15 text-sky-600 dark:text-sky-400 px-2.5 py-0.5 rounded-full font-black">
+                            {lang === "th" ? "อัตราประเภท 1.2" : "Tariff Type 1.2"}
+                          </span>
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                          {t("tou_desc")}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Fast info box */}
+                    <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-center font-bold min-w-[160px] self-stretch md:self-auto flex flex-col justify-center">
+                      <span className="text-[10px] uppercase tracking-wider">{lang === "th" ? "ส่วนประหยัดเฉลี่ย" : "Average TOU Savings"}</span>
+                      <span className="text-2xl font-mono font-black mt-1">~30% - 45%</span>
+                    </div>
+                  </div>
+
+                  {/* TOU Tariff Timeline Schedule Visualizer */}
+                  <div className="dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col gap-6">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-5 h-5 text-sky-500" />
+                      <h4 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
+                        {lang === "th" ? "ตารางเวลาและอัตราระบบค่าไฟ TOU ประเทศไทย" : "Thailand TOU Pricing & Time Slots"}
                       </h4>
                     </div>
 
-                    <div className="p-4 bg-white/10 rounded-[2rem] border border-white/20 mb-8 mt-4">
-                      <div className="flex justify-between mb-2">
-                        <label className="text-[0.7rem] font-bold uppercase text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all">
-                          {t("calc_on_peak_share")}
-                        </label>
-                        <span className="text-xs font-bold text-white mono-font">
-                          {onPeakShare}%
-                        </span>
-                      </div>
-                      <input
-                        type="range"
-                        className="form-range custom-range-slider"
-                        min="0"
-                        max="100"
-                        step="5"
-                        value={onPeakShare}
-                        onChange={(e) => setOnPeakShare(+e.target.value)}
-                      />
-                    </div>
-
-                    <div className="text-center mb-8">
-                      {calcMode === "hours" ? (
-                        <div className="animate-fade-in">
-                          <span className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[0.7rem] md:text-[0.75rem] inline-block mb-2 uppercase font-bold">
-                            {t("calc_est_cost")}
-                          </span>
-                          <h1 className="text-white font-display text-6xl md:text-8xl font-bold mono-font neon-glow mb-4">
-                            ฿
-                            {analytics.totalCost.toLocaleString(undefined, {
-                              maximumFractionDigits: 0,
-                            })}
-                          </h1>
-
-                          <div className="mt-6 p-4 md:p-5 bg-white/10 border border-white/20 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-between group cursor-pointer hover:bg-white/20 transition-all">
-                            <div className="text-start">
-                              <div className="text-emerald-400 text-[0.65rem] uppercase font-bold mb-1">
-                                {t("calc_sim_tou")}
-                              </div>
-                              <div className="text-white font-bold text-xl md:text-2xl mono-font">
-                                ฿
-                                {analytics.touCost.toLocaleString(undefined, {
-                                  maximumFractionDigits: 0,
-                                })}
-                              </div>
-                            </div>
-                            <div className="text-end">
-                              <div className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[0.65rem] uppercase font-bold mb-1 inline-block">
-                                {t("calc_grid_saving")}
-                              </div>
-                              <div
-                                className={`font-bold text-sm md:text-md ${analytics.touSavings > 0 ? "text-emerald-400" : "text-danger"}`}
-                              >
-                                {analytics.touSavings > 0 ? "-" : "+"}
-                                {Math.abs(
-                                  (analytics.touSavings / analytics.totalCost) *
-                                    100,
-                                ).toFixed(0)}
-                                %
-                              </div>
-                            </div>
-                          </div>
-
-                          {analytics.touSavings > 0 && (
-                            <div className="mt-4 animate-fade-in p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30">
-                              <div className="text-[0.75rem] text-emerald-400 font-bold uppercase tracking-widest">
-                                {t("calc_savings_vs_std")}
-                              </div>
-                              <div className="text-white text-xl font-bold mono-font">
-                                ฿
-                                {analytics.touSavings.toLocaleString(
-                                  undefined,
-                                  { maximumFractionDigits: 0 },
-                                )}
-                              </div>
-                            </div>
-                          )}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      
+                      {/* Weekdays Slot Bar */}
+                      <div className="flex flex-col gap-3">
+                        <div className="flex justify-between items-center text-xs font-bold">
+                          <span className="text-slate-700 dark:text-slate-200">📅 {lang === "th" ? "วันธรรมดา (จันทร์ - ศุกร์)" : "Weekdays (Mon - Fri)"}</span>
+                          <span className="text-muted dark:opacity-100 opacity-60">24 {lang === "th" ? "ชั่วโมง" : "Hours"}</span>
                         </div>
-                      ) : (
-                        <div className="animate-fade-in">
-                          <span className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[0.75rem] inline-block mb-4 uppercase font-bold">
-                            {t("budget_modify")}
-                          </span>
-                          <input
-                            type="number"
-                            className="form-control bg-transparent border-2 border-white/20 text-white text-center font-bold text-5xl md:text-7xl py-2 rounded-3xl mb-8 mono-font focus:border-white/50"
-                            value={globalBudget}
-                            onChange={(e) => setGlobalBudget(+e.target.value)}
-                          />
-                          <div className="flex flex-col items-center">
-                            <h1 className="text-white font-display text-7xl md:text-9xl font-bold neon-glow mono-font">
-                              {analytics.burnRate > 0
-                                ? Math.floor(globalBudget / analytics.burnRate)
-                                : "∞"}
-                            </h1>
-                            <span className="text-[0.75rem] md:text-sm font-bold uppercase tracking-[0.4em] text-white drop-shadow-md bg-black/20 px-3 py-1.5 rounded-lg backdrop-blur-sm transition-all mt-2 inline-block">
-                              Grid Days Remaining
-                            </span>
+                        
+                        <div className="relative h-12 w-full rounded-2xl overflow-hidden flex font-bold text-[9px] text-white">
+                          {/* 00:00 - 09:00 Off-Peak */}
+                          <div className="bg-emerald-500 h-full flex-grow hover:opacity-90 transition-opacity flex flex-col justify-center items-center text-center px-1" title="Off-Peak: 22.00 - 09.00">
+                            <span>00:00 - 09:00</span>
+                            <span className="text-[8px] opacity-90">{lang === "th" ? "Off-Peak" : "Off-Peak"}</span>
+                            <span className="text-[8px] font-mono">฿2.63</span>
+                          </div>
+                          {/* 09:00 - 22:00 On-Peak */}
+                          <div className="bg-rose-500 h-full w-[54%] hover:opacity-90 transition-opacity flex flex-col justify-center items-center text-center px-1" title="On-Peak: 09.00 - 22.00">
+                            <span>09:00 - 22:00</span>
+                            <span className="text-[8px] opacity-90">{lang === "th" ? "On-Peak" : "On-Peak"}</span>
+                            <span className="text-[8px] font-mono">฿5.79</span>
+                          </div>
+                          {/* 22:00 - 24:00 Off-Peak */}
+                          <div className="bg-emerald-500 h-full flex-grow hover:opacity-90 transition-opacity flex flex-col justify-center items-center text-center px-1" title="Off-Peak: 22.00 - 09.00">
+                            <span>22:00 - 24:00</span>
+                            <span className="text-[8px] opacity-90">{lang === "th" ? "Off-Peak" : "Off-Peak"}</span>
+                            <span className="text-[8px] font-mono">฿2.63</span>
                           </div>
                         </div>
-                      )}
-                    </div>
-                    <div className="mt-auto pt-6 border-top border-white/10 flex justify-between">
-                      <div className="text-start">
-                        <span className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[0.65rem] inline-block font-bold uppercase mb-1">
-                          {t("calc_daily_cost")}
-                        </span>
-                        <div className="text-white font-bold mono-font text-sm">
-                          ฿{analytics.burnRate.toFixed(2)}
+                      </div>
+
+                      {/* Weekends & Holidays Slot Bar */}
+                      <div className="flex flex-col gap-3">
+                        <div className="flex justify-between items-center text-xs font-bold">
+                          <span className="text-slate-700 dark:text-slate-200">🎉 {lang === "th" ? "วันเสาร์ - อาทิตย์ และวันหยุดราชการ" : "Weekends & Public Holidays"}</span>
+                          <span className="text-emerald-500 font-mono">Off-Peak {lang === "th" ? "ทั้งวัน!" : "All Day!"}</span>
+                        </div>
+                        
+                        <div className="relative h-12 w-full rounded-2xl overflow-hidden flex font-bold text-[9px] text-white">
+                          <div className="bg-emerald-500 w-full h-full hover:opacity-90 transition-opacity flex flex-col justify-center items-center text-center" title="Off-Peak: ตลอด 24 ชั่วโมง">
+                            <span className="text-xs">00:00 - 24:00 (ตลอดทั้งวัน)</span>
+                            <span className="text-[8px] opacity-90">{lang === "th" ? "นอกช่วงเร่งด่วนราคาพิเศษ" : "All-Day Low Rate Off-Peak"}</span>
+                            <span className="text-xs font-mono font-black">฿2.6369 / {lang === "th" ? "หน่วย" : "kWh"}</span>
+                          </div>
                         </div>
                       </div>
-                      <div className="text-end">
-                        <span className="text-white drop-shadow-md bg-black/20 px-2 py-1 rounded-md backdrop-blur-sm transition-all text-[0.65rem] inline-block font-bold uppercase mb-1">
-                          {t("calc_node_avg")}
-                        </span>
-                        <div className="text-white font-bold mono-font text-sm">
-                          ฿
-                          {(analytics.totalCost / multiDevices.length).toFixed(
-                            0,
-                          )}
+
+                    </div>
+
+                    {/* Peak/Off-peak details cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                      <div className="p-5 rounded-[2rem] bg-rose-500/5 border border-rose-500/10 flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                          <h5 className="text-xs font-black uppercase text-rose-500">{t("tou_peak")}</h5>
+                        </div>
+                        <p className="text-xs text-slate-500 dark:text-slate-300 leading-relaxed">
+                          {t("tou_peak_desc")}
+                        </p>
+                        <div className="mt-2 text-xs font-mono font-bold text-rose-600 dark:text-rose-400">
+                          {lang === "th" ? "อัตรา On-Peak: ~5.7982 บาท/หน่วย" : "On-Peak Rate: ~5.7982 Baht/kWh"}
+                        </div>
+                      </div>
+
+                      <div className="p-5 rounded-[2rem] bg-emerald-500/5 border border-emerald-500/10 flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <h5 className="text-xs font-black uppercase text-emerald-500">{t("tou_off")}</h5>
+                        </div>
+                        <p className="text-xs text-slate-500 dark:text-slate-300 leading-relaxed">
+                          {t("tou_off_desc")}
+                        </p>
+                        <div className="mt-2 text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                          {lang === "th" ? "อัตรา Off-Peak: ~2.6369 บาท/หน่วย" : "Off-Peak Rate: ~2.6369 Baht/kWh"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* TOU vs Progressive Tariff Structure comparison table */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Progressive explanation */}
+                    <div className="dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col gap-4">
+                      <div className="flex items-center gap-2 text-amber-500">
+                        <TrendingUp className="w-5 h-5" />
+                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
+                          {t("progressive_title")}
+                        </h4>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-slate-300 leading-relaxed">
+                        {t("progressive_desc")}
+                      </p>
+
+                      <div className="mt-2 flex flex-col gap-2 border-t border-slate-100 dark:border-slate-800/80 pt-4 text-xs font-mono">
+                        <div className="flex justify-between items-center text-muted">
+                          <span>{lang === "th" ? "15 หน่วยแรก (ประเภท 1.1.2)" : "First 15 Units (Type 1.1.2)"}</span>
+                          <span className="font-bold">฿3.2484 / {lang === "th" ? "หน่วย" : "kWh"}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-muted">
+                          <span>{lang === "th" ? "หน่วยที่ 16 - 150" : "Units 16 - 150"}</span>
+                          <span className="font-bold">฿3.2484 / {lang === "th" ? "หน่วย" : "kWh"}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-muted">
+                          <span>{lang === "th" ? "หน่วยที่ 151 - 400" : "Units 151 - 400"}</span>
+                          <span className="font-bold">฿4.2218 / {lang === "th" ? "หน่วย" : "kWh"}</span>
+                        </div>
+                        <div className="flex justify-between items-center text-slate-800 dark:text-white font-bold">
+                          <span>{lang === "th" ? "หน่วยที่ 401 ขึ้นไป (แพงสุด)" : "Over 400 Units (Maximum Tier)"}</span>
+                          <span className="font-bold text-rose-500">฿4.4217 / {lang === "th" ? "หน่วย" : "kWh"}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Smart TOU Actions and Optimization Tips */}
+                    <div className="dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col gap-4">
+                      <div className="flex items-center gap-2 text-emerald-500">
+                        <Lightbulb className="w-5 h-5 animate-bounce" />
+                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
+                          {lang === "th" ? "เทคนิคประหยัดเงินด้วย TOU" : "TOU Shift Load Strategies"}
+                        </h4>
+                      </div>
+
+                      <div className="flex flex-col gap-3.5 mt-1 text-xs">
+                        <div className="flex gap-3">
+                          <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 font-bold font-mono">1</div>
+                          <div>
+                            <span className="font-bold block text-slate-700 dark:text-slate-100">{lang === "th" ? "ชาร์จรถไฟฟ้า (EV) หลัง 4 ทุ่ม" : "Charge EV Cars After 10:00 PM"}</span>
+                            <span className="text-[11px] text-slate-400 mt-0.5 block leading-relaxed">{lang === "th" ? "ประหยัดขึ้นทันทีเกิน 50% ต่อหน่วย แนะนำให้ตั้ง Timer ชาร์จช่วง Off-Peak อัตโนมัติ" : "Save over 50% per kWh. Set an automatic timer to kick in during cheap night slots."}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                          <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 font-bold font-mono">2</div>
+                          <div>
+                            <span className="font-bold block text-slate-700 dark:text-slate-100">{lang === "th" ? "ย้ายกลุ่มเครื่องซักผ้า-อบผ้าไปซักวันหยุด" : "Shift Washers & Dryers to Weekends"}</span>
+                            <span className="text-[11px] text-slate-400 mt-0.5 block leading-relaxed">{lang === "th" ? "อุปกรณ์พลังงานสูงอย่างเครื่องอบผ้า ควรหลีกเลี่ยงการเปิดใช้งานในวันธรรมดากลางวัน ให้ทำในวันหยุดซึ่งเป็น Off-Peak ทั้งวัน" : "Heavy thermal devices like clothes dryers are perfect to run on Saturday or Sunday for all-day cheap rates."}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-3">
+                          <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 font-bold font-mono">3</div>
+                          <div>
+                            <span className="font-bold block text-slate-700 dark:text-slate-100">{lang === "th" ? "ตั้งแอร์เปิดโหมด Eco ร่วมกับพัดลม" : "Optimize AC Scheduling"}</span>
+                            <span className="text-[11px] text-slate-400 mt-0.5 block leading-relaxed">{lang === "th" ? "ช่วง On-Peak บ่ายร้อน แนะนำเปิดแอร์อุณหภูมิ 26°C คู่กับพัดลมสวิง จะช่วยประหยัดโหลดแอร์ได้มหาศาล" : "Set AC to 26°C with an oscillating fan during peak afternoons to reduce the compressor workload."}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {calcTab === "budget" && (
+                <div className="animate-fade-in flex flex-col gap-6">
+                  {/* Budget Configuration Card */}
+                  <div className="dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-6">
+                    <div className="flex items-start gap-4 flex-grow">
+                      <div className="p-3.5 rounded-2xl bg-amber-500/10 text-amber-500 shrink-0">
+                        <Shield className="w-6 h-6" />
+                      </div>
+                      <div className="flex-grow">
+                        <h3 className="text-base font-black font-display text-slate-800 dark:text-white flex items-center gap-2">
+                          <span>{t("budget_limit_title")}</span>
+                        </h3>
+                        <p className="text-xs text-slate-500 dark:text-slate-300 mt-1 max-w-xl leading-relaxed">
+                          {t("budget_modify")}
+                        </p>
+                        
+                        {/* Interactive Budget slider */}
+                        <div className="mt-4 flex items-center gap-4">
+                          <input 
+                            type="range"
+                            min="500"
+                            max="10000"
+                            step="250"
+                            value={globalBudget}
+                            onChange={(e) => setGlobalBudget(parseInt(e.target.value, 10))}
+                            className="w-full max-w-md accent-amber-500 bg-slate-100 dark:bg-slate-800 h-1.5 rounded cursor-pointer"
+                          />
+                          <input 
+                            type="number"
+                            min="500"
+                            max="50000"
+                            value={globalBudget}
+                            onChange={(e) => setGlobalBudget(Math.max(500, parseInt(e.target.value, 10) || 0))}
+                            className="w-24 text-xs font-mono font-bold text-center p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-800 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Quick Budget Health Indicator card */}
+                    <div className={`p-5 rounded-[2rem] border font-black flex flex-col justify-center min-w-[200px] text-center transition-all ${
+                      plannedKwh * 4 > globalBudget 
+                        ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' 
+                        : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
+                    }`}>
+                      <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
+                        {lang === "th" ? "สถานะการคุมบัดเจตค่าไฟ" : "Budget Tracking Status"}
+                      </span>
+                      <span className="text-xl font-mono">
+                        {plannedKwh * 4 > globalBudget 
+                          ? (lang === "th" ? "⚠️ เสี่ยงเกินงบประมาณ" : "⚠️ High Budget Risk")
+                          : (lang === "th" ? "🌿 ปลอดภัยและประหยัด" : "🌿 Within Target Range")}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Budget Allocation Analysis and Breakdown */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    {/* Budget Progress Meter */}
+                    <div className="lg:col-span-7 dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col gap-6">
+                      <div className="flex items-center gap-2">
+                        <Award className="w-5 h-5 text-amber-500" />
+                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
+                          {lang === "th" ? "วิเคราะห์เป้าหมายและสัดส่วนงบประมาณ" : "Budget Utilization Analysis"}
+                        </h4>
+                      </div>
+
+                      <div className="flex flex-col gap-4 mt-2">
+                        {/* Progressive estimation comparison */}
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-muted">{lang === "th" ? "งบประมาณจัดสรรสูงสุดของคุณ:" : "Your Target Allocation Limit:"}</span>
+                          <span className="font-mono font-black text-slate-800 dark:text-white">฿{globalBudget.toLocaleString()}</span>
+                        </div>
+
+                        {/* Actual progress bar */}
+                        <div>
+                          <div className="flex justify-between text-[10px] text-slate-400 mb-1">
+                            <span>{lang === "th" ? "ใช้งานจริงจากเครื่องจำลองอุปกรณ์:" : "Simulated Active Load Cost:"}</span>
+                            <span className="font-mono font-bold">
+                              {plannedKwh > 0 ? `~฿${Math.round(plannedKwh * 3.8).toLocaleString()}` : "฿0"}
+                            </span>
+                          </div>
+                          <div className="relative w-full h-3 bg-slate-100 dark:bg-slate-950 rounded-full overflow-hidden border border-slate-150 dark:border-slate-800/80">
+                            <div 
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                (plannedKwh * 3.8) > globalBudget ? "bg-rose-500" : "bg-emerald-500"
+                              }`}
+                              style={{ width: `${Math.min(100, ((plannedKwh * 3.8) / globalBudget) * 100)}%` }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-[9px] font-mono text-slate-400 mt-1">
+                            <span>0%</span>
+                            <span>{Math.round(((plannedKwh * 3.8) / globalBudget) * 100)}%</span>
+                            <span>100%</span>
+                          </div>
+                        </div>
+
+                        {/* Remainder metrics */}
+                        <div className="grid grid-cols-2 gap-4 mt-2 pt-4 border-t border-slate-100 dark:border-slate-800/60 text-xs">
+                          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-800">
+                            <span className="text-slate-400 text-[10px] block">{t("budget_remainder")}</span>
+                            <span className={`text-base font-mono font-black mt-1 block ${globalBudget - (plannedKwh * 3.8) < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                              ฿{(globalBudget - Math.round(plannedKwh * 3.8)).toLocaleString()}
+                            </span>
+                          </div>
+
+                          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-800">
+                            <span className="text-slate-400 text-[10px] block">{lang === "th" ? "ค่าไฟประหยัดแบบ TOU ร่วมด้วย" : "Estimated with TOU Strategy"}</span>
+                            <span className="text-base font-mono font-black mt-1 text-sky-500 block">
+                              +฿{Math.round(plannedKwh * 1.2).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* AI Advisor Card */}
+                    <div className="lg:col-span-5 dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col gap-4">
+                      <div className="flex items-center gap-2 text-emerald-500">
+                        <Coins className="w-5 h-5 text-emerald-500" />
+                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
+                          {lang === "th" ? "สัดส่วนและเป้าหมายผู้คุมงบ AI" : "AI Guardian Assessment"}
+                        </h4>
+                      </div>
+
+                      <div className="text-xs leading-relaxed text-slate-500 dark:text-slate-300 flex-grow">
+                        {plannedKwh * 3.8 > globalBudget ? (
+                          <div className="space-y-3">
+                            <p className="p-3 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20 font-bold text-[11px]">
+                              {lang === "th" 
+                                ? "⚠️ ขณะนี้การจำลองการกินไฟรวม เกินกว่างบสูงสุดที่คุณวางเป้าหมาย!" 
+                                : "⚠️ Your current simulated load is exceeding your target monthly budget!"}
+                            </p>
+                            <p>
+                              {lang === "th"
+                                ? "คำแนะนำ: ลองสลับไปใช้อุปกรณ์แอร์แบบ Inverter หรือปรับเวลาการซักผ้าและอบผ้าจำนวนมากไปทำในช่วงดึก (หลัง 22.00 น.) อัตราค่าไฟประเภท TOU จะถูกลงมากจนช่วยดึงคุณให้กลับเข้ามาอยู่ในกรอบงบประมาณสีเขียว"
+                                : "Pro-Tip: Try shifting massive laundry loads or EV charging sessions to late night slots (after 10:00 PM). This will drastically pull your net bill back into the safe green zone."}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            <p className="p-3 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-bold text-[11px]">
+                              {lang === "th" 
+                                ? "🌿 ยอดเยี่ยมมาก! การคำนวณการใช้พลังงานของคุณสอดคล้องและอยู่ในงบเป้าหมายอย่างปลอดภัย" 
+                                : "🌿 Excellent job! Your consumption profile fits perfectly within your budget goals."}
+                            </p>
+                            <p>
+                              {lang === "th"
+                                ? "คุณยังคงรักษาวินัยกริดได้อย่างยอดเยี่ยม เพื่อสะสมเหรียญรางวัลเพิ่มขึ้น แนะนำให้ตั้งเวลาประหยัดพลังงานเสริมสำหรับเครื่องปรับอากาศ และปิดสแตนด์บายเครื่องใช้ไฟฟ้าที่ไม่ได้ใช้งานเป็นประจำ"
+                                : "You are maintaining high green-grid status. To earn more sustainability tokens, schedule deep Eco modes for home cooling and completely unplug entertainment devices when dormant."}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
           {currentPage === "stats" && (
-            <div className="animate-fade-in text-dark">
+            <div className="animate-fade-in text-dark" id="tour-step-stats">
               {/* Stats Page Sub-Tabs */}
-              <div className="flex gap-4 mb-6 border-bottom border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
+              <div className="flex gap-4 mb-6 border-b border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
                 <button
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${statsTab === "telemetry" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${statsTab === "telemetry" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                   style={{
                     borderBottom:
                       statsTab === "telemetry" ? "2px solid" : "none",
@@ -4006,7 +3780,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   {lang === "th" ? "ข้อมูลคลื่นไฟฟ้าด่วน" : "Telemetry Logs"}
                 </button>
                 <button
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${statsTab === "benchmark" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${statsTab === "benchmark" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                   style={{
                     borderBottom:
                       statsTab === "benchmark" ? "2px solid" : "none",
@@ -4024,7 +3798,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <div className="space-y-4 animate-fade-in text-dark">
 
 <div className="w-full mb-6">
-                        <div className="dashboard-card border-0 overflow-hidden h-100 flex flex-col bg-primary text-white relative shadow-sm">
+                        <div className="dashboard-card border-0 overflow-hidden h-full flex flex-col bg-primary text-white relative shadow-sm">
                           
                           <div className="p-6 flex-grow flex flex-col justify-between relative">
                             <div className="absolute top-0 right-0 p-10 opacity-10">
@@ -4036,11 +3810,11 @@ const Dashboard: React.FC<DashboardProps> = ({
                             <p className="text-xs opacity-80 leading-relaxed mb-6 relative z-10">
                               {t("ai_scan_desc")}
                             </p>
-                            <button className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 w-100 rounded-2xl py-3 font-bold text-[0.75rem] uppercase tracking-widest text-primary relative z-10">
+                            <button className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 w-full rounded-2xl py-3 font-bold text-[0.75rem] uppercase tracking-widest text-primary relative z-10">
                               {t("ai_apply")}
                             </button>
 
-                            <div className="mt-auto relative z-10 pt-10 border-top border-white/10">
+                            <div className="mt-auto relative z-10 pt-10 border-t border-white/10">
                               <div className="flex items-center gap-3 mb-4">
                                 <div className="p-2 bg-white/10 rounded-xl">
                                   <i className="fas fa-bolt text-xs"></i>
@@ -4437,7 +4211,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       className="col-12 col-xl-6 animate-slide-up"
                       style={{ animationDelay: "200ms" }}
                     >
-                      <div className="dashboard-card border-0 p-6 md:p-8 h-100">
+                      <div className="dashboard-card border-0 p-6 md:p-8 h-full">
                         <h6 className="font-bold font-display text-lg mb-8">
                           {t("telemetry_dist")}
                         </h6>
@@ -4479,7 +4253,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       className="col-12 col-xl-6 animate-slide-up"
                       style={{ animationDelay: "300ms" }}
                     >
-                      <div className="dashboard-card border-0 p-6 md:p-8 h-100 overflow-hidden">
+                      <div className="dashboard-card border-0 p-6 md:p-8 h-full overflow-hidden">
                         <h6 className="font-bold font-display text-lg mb-8">
                           {t("telemetry_logs")}
                         </h6>
@@ -4517,7 +4291,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <div className="row g-4 md:g-5 animate-fade-in text-dark">
                   <div className="col-12 col-xl-7">
                     <div
-                      className="dashboard-card border-0 p-6 md:p-8 h-100 animate-slide-up bg-card"
+                      className="dashboard-card border-0 p-6 md:p-8 h-full animate-slide-up bg-card"
                       style={{ animationDelay: "100ms" }}
                     >
                       <h5 className="font-display font-bold text-xl md:text-2xl mb-10 tracking-tight">
@@ -4601,9 +4375,9 @@ const Dashboard: React.FC<DashboardProps> = ({
           {currentPage === "noti" && (
             <div className="animate-fade-in max-w-4xl mx-auto text-dark">
               {/* Grid Intelligence Sub-Tabs */}
-              <div className="flex gap-4 mb-6 border-bottom border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
+              <div className="flex gap-4 mb-6 border-b border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
                 <button
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${notiTab === "alerts" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${notiTab === "alerts" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                   style={{
                     borderBottom:
                       notiTab === "alerts" ? "2px solid" : "none",
@@ -4616,7 +4390,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     : "Anomaly & Surge Reports"}
                 </button>
                 <button
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${notiTab === "quests" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${notiTab === "quests" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                   style={{
                     borderBottom:
                       notiTab === "quests" ? "2px solid" : "none",
@@ -4749,9 +4523,9 @@ const Dashboard: React.FC<DashboardProps> = ({
           {currentPage === "manual" && (
             <div className="animate-fade-in max-w-4xl mx-auto text-dark">
               {/* Manual Page Sub-Tabs */}
-              <div className="flex gap-4 mb-6 border-bottom border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
+              <div className="flex gap-4 mb-6 border-b border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
                 <button
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${manualTab === "guide" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${manualTab === "guide" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                   style={{
                     borderBottom:
                       manualTab === "guide" ? "2px solid" : "none",
@@ -4762,7 +4536,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   {lang === "th" ? "คู่มือผู้ใช้ระบบกริต" : "User Guide"}
                 </button>
                 <button
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${manualTab === "settings" ? "text-primary dark:text-sky-400 border-bottom-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${manualTab === "settings" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
                   style={{
                     borderBottom:
                       manualTab === "settings" ? "2px solid" : "none",
@@ -4901,7 +4675,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       {showComparisonView && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[5000] flex items-center justify-center p-4">
           <div className="w-full max-w-6xl bg-body rounded-[3rem] shadow-2xl overflow-hidden animate-slide-up h-[90vh] flex flex-col">
-            <div className="p-6 md:p-10 flex justify-between items-center border-bottom border-light bg-card shadow-sm z-10">
+            <div className="p-6 md:p-10 flex justify-between items-center border-b border-light bg-card shadow-sm z-10">
               <div>
                 <h3 className="font-display font-bold text-2xl md:text-3xl mb-1">
                   {t("comp_title")}
@@ -4941,7 +4715,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         style={{ animationDelay: `${di * 75}ms` }}
                       >
                         <div
-                          className={`dashboard-card p-6 h-100 flex flex-col relative transition-all border-2 ${isBestPF ? "border-emerald-500/20 shadow-emerald-500/10" : di === 0 ? "border-primary/20" : "border-light"}`}
+                          className={`dashboard-card p-6 h-full flex flex-col relative transition-all border-2 ${isBestPF ? "border-emerald-500/20 shadow-emerald-500/10" : di === 0 ? "border-primary/20" : "border-light"}`}
                         >
                           {isBestPF && (
                             <div className="absolute top-4 right-4">
@@ -5019,7 +4793,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               </div>
             </div>
 
-            <div className="p-8 bg-card border-top border-light flex justify-center">
+            <div className="p-8 bg-card border-t border-light flex justify-center">
               <div className="flex gap-4 p-2 bg-light rounded-full border shadow-inner">
                 <button
                   className="btn btn-primary rounded-full px-10 py-3 font-bold text-[0.75rem] uppercase tracking-widest shadow-lg shadow-primary/20"
@@ -5064,45 +4838,47 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <div className="space-y-8">
                     <div className="row g-4">
                       <div className="col-md-7">
-                        <div className="p-5 bg-primary/5 rounded-[2rem] border border-primary/10">
-                          <label className="label text-[0.75rem] block mb-3">
-                            {t("node_id")}: {d.id}
-                          </label>
-                          <input
-                            type="text"
-                            className="form-control text-xl font-bold border-0 bg-transparent p-0 mb-4"
-                            value={d.name}
-                            onChange={(e) =>
-                              updateDevice(d.id, "name", e.target.value)
-                            }
-                          />
+                        <div className="p-5 bg-primary/5 rounded-[2rem] border border-primary/10 h-full flex flex-col justify-between">
+                          <div>
+                            <label className="label text-[0.75rem] block mb-3">
+                              {t("node_id")}: {d.id}
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control text-xl font-bold border-0 bg-transparent p-0 mb-4 focus:ring-0 focus:outline-none focus:border-b focus:border-primary/20 text-dark dark:text-white"
+                              value={d.name}
+                              onChange={(e) =>
+                                updateDevice(d.id, "name", e.target.value)
+                              }
+                            />
 
-                          <div className="row g-3">
-                            <div className="col-6">
-                              <label className="label text-[0.75rem] block mb-2">
-                                {t("node_watt")}
-                              </label>
-                              <input
-                                type="number"
-                                className="form-control border-2 rounded-2xl p-3 font-bold mono-font"
-                                value={d.watt}
-                                onChange={(e) =>
-                                  updateDevice(d.id, "watt", +e.target.value)
-                                }
-                              />
-                            </div>
-                            <div className="col-6">
-                              <label className="label text-[0.75rem] block mb-2">
-                                {t("node_hours")}
-                              </label>
-                              <input
-                                type="number"
-                                className="form-control border-2 rounded-2xl p-3 font-bold mono-font"
-                                value={d.hours}
-                                onChange={(e) =>
-                                  updateDevice(d.id, "hours", +e.target.value)
-                                }
-                              />
+                            <div className="row g-3">
+                              <div className="col-6">
+                                <label className="label text-[0.75rem] block mb-2">
+                                  {t("node_watt")}
+                                </label>
+                                <input
+                                  type="number"
+                                  className="form-control border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 text-slate-900 dark:text-white rounded-2xl p-3 font-bold mono-font focus:border-primary focus:ring-0"
+                                  value={d.watt}
+                                  onChange={(e) =>
+                                    updateDevice(d.id, "watt", +e.target.value)
+                                  }
+                                />
+                              </div>
+                              <div className="col-6">
+                                <label className="label text-[0.75rem] block mb-2">
+                                  {t("node_hours")}
+                                </label>
+                                <input
+                                  type="number"
+                                  className="form-control border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 text-slate-900 dark:text-white rounded-2xl p-3 font-bold mono-font focus:border-primary focus:ring-0"
+                                  value={d.hours}
+                                  onChange={(e) =>
+                                    updateDevice(d.id, "hours", +e.target.value)
+                                  }
+                                />
+                              </div>
                             </div>
                           </div>
 
@@ -5126,7 +4902,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                         : s === "standby"
                                           ? "bg-amber-500 text-white border-amber-500 shadow-md"
                                           : "bg-rose-500 text-white border-rose-500 shadow-md"
-                                      : "bg-light text-muted border-transparent hover:bg-slate-200"
+                                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700"
                                   }`}
                                 >
                                   {s === "active"
@@ -5148,7 +4924,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       </div>
 
                       <div className="col-md-5">
-                        <div className="p-5 bg-slate-900/40 rounded-[2rem] border border-slate-800 flex flex-col justify-between h-full relative overflow-hidden group">
+                        <div className="p-5 bg-slate-900/90 dark:bg-slate-950/60 rounded-[2rem] border border-slate-800 flex flex-col justify-between h-full relative overflow-hidden group">
                           {/* Decorative background visual */}
                           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent opacity-50"></div>
                           <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-2xl"></div>
@@ -5160,169 +4936,169 @@ const Dashboard: React.FC<DashboardProps> = ({
                               </span>
                             )}
                           </div>
-                      </div>
 
-                      {!deviceAnalysis && !isAnalyzingDevice && (
-                        <div className="relative z-10 py-2">
-                          <p className="text-[0.8rem] text-slate-500 leading-relaxed mb-4">
-                            Analyze telemetric power signatures, power factors,
-                            and historical service logs of this node to diagnose
-                            issues, estimate grid compliance anomalies, and
-                            output prescriptive fixes.
-                          </p>
-                          <button
-                            onClick={() => runIndividualDeviceAnalysis(d)}
-                            className="btn btn-primary w-100 rounded-2xl py-3 text-[0.75rem] uppercase tracking-widest font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
-                          >
-                            <i className="fas fa-brain text-xs"></i>{" "}
-                            {t("ai_btn_diagnose")}
-                          </button>
-                        </div>
-                      )}
-
-                      {isAnalyzingDevice && (
-                        <div className="relative z-10 text-center py-6">
-                          <i className="fas fa-circle-notch animate-spin text-2xl text-primary mb-3 block"></i>
-                          <p className="text-[0.8rem] font-bold text-slate-300 animate-pulse">
-                            {t("ai_analyzing")}
-                          </p>
-                          <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden mt-2">
-                            <div className="bg-primary h-full animate-pulse w-full rounded-full"></div>
-                          </div>
-                        </div>
-                      )}
-
-                      {deviceAnalysis && (
-                        <div className="relative z-10 space-y-5 animate-fade-in text-xs">
-                          {deviceAnalysis.error ? (
-                            <div className="text-rose-400 p-4 rounded-2xl bg-rose-500/5 border border-rose-500/15">
-                              <i className="fas fa-exclamation-circle text-sm me-2"></i>{" "}
-                              {deviceAnalysis.summary}
+                          {!deviceAnalysis && !isAnalyzingDevice && (
+                            <div className="relative z-10 py-2">
+                              <p className="text-[0.8rem] text-slate-300 dark:text-slate-400 leading-relaxed mb-4">
+                                Analyze telemetric power signatures, power factors,
+                                and historical service logs of this node to diagnose
+                                issues, estimate grid compliance anomalies, and
+                                output prescriptive fixes.
+                              </p>
+                              <button
+                                onClick={() => runIndividualDeviceAnalysis(d)}
+                                className="btn btn-primary w-full rounded-2xl py-3 text-[0.75rem] uppercase tracking-widest font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
+                              >
+                                <i className="fas fa-brain text-xs"></i>{" "}
+                                {t("ai_btn_diagnose")}
+                              </button>
                             </div>
-                          ) : (
-                            <>
-                              {/* Summary block */}
-                              <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700/50">
-                                <div className="flex gap-4 items-center mb-3">
-                                  <div className="flex flex-col">
-                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-1">
-                                      {t("ai_health_score")}
-                                    </span>
-                                    <div className="flex items-baseline gap-1">
-                                      <span className="text-2xl font-display font-bold text-emerald-400">
-                                        {deviceAnalysis.healthScore}
-                                      </span>
-                                      <span className="text-[0.75rem] text-slate-500">
-                                        /100
-                                      </span>
+                          )}
+
+                          {isAnalyzingDevice && (
+                            <div className="relative z-10 text-center py-6">
+                              <i className="fas fa-circle-notch animate-spin text-2xl text-primary mb-3 block"></i>
+                              <p className="text-[0.8rem] font-bold text-slate-300 animate-pulse">
+                                {t("ai_analyzing")}
+                              </p>
+                              <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden mt-2">
+                                <div className="bg-primary h-full animate-pulse w-full rounded-full"></div>
+                              </div>
+                            </div>
+                          )}
+
+                          {deviceAnalysis && (
+                            <div className="relative z-10 space-y-5 animate-fade-in text-xs">
+                              {deviceAnalysis.error ? (
+                                <div className="text-rose-400 p-4 rounded-2xl bg-rose-500/5 border border-rose-500/15">
+                                  <i className="fas fa-exclamation-circle text-sm me-2"></i>{" "}
+                                  {deviceAnalysis.summary}
+                                </div>
+                              ) : (
+                                <>
+                                  {/* Summary block */}
+                                  <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700/50">
+                                    <div className="flex gap-4 items-center mb-3">
+                                      <div className="flex flex-col">
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-1">
+                                          {t("ai_health_score")}
+                                        </span>
+                                        <div className="flex items-baseline gap-1">
+                                          <span className="text-2xl font-display font-bold text-emerald-400">
+                                            {deviceAnalysis.healthScore}
+                                          </span>
+                                          <span className="text-[0.75rem] text-slate-500">
+                                            /100
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <div className="h-8 w-px bg-slate-705"></div>
+                                      <div>
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-1">
+                                          {t("ai_health_status")}
+                                        </span>
+                                        <span
+                                          className={`inline-block font-bold py-0.5 px-2 bg-slate-900 rounded-md text-[0.75rem] ${
+                                            deviceAnalysis.healthStatus ===
+                                            "Critical"
+                                              ? "text-rose-400 border border-rose-500/20"
+                                              : deviceAnalysis.healthStatus ===
+                                                  "Needs Maintenance"
+                                                ? "text-amber-400 border border-amber-500/20"
+                                                : "text-emerald-400 border border-emerald-500/20"
+                                          }`}
+                                        >
+                                          {deviceAnalysis.healthStatus}
+                                        </span>
+                                      </div>
                                     </div>
+                                    <p className="text-[0.8rem] text-slate-300 leading-relaxed mb-0 italic">
+                                      "{deviceAnalysis.summary}"
+                                    </p>
                                   </div>
-                                  <div className="h-8 w-px bg-slate-705"></div>
-                                  <div>
-                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-1">
-                                      {t("ai_health_status")}
-                                    </span>
-                                    <span
-                                      className={`inline-block font-bold py-0.5 px-2 bg-slate-900 rounded-md text-[0.75rem] ${
-                                        deviceAnalysis.healthStatus ===
-                                        "Critical"
-                                          ? "text-rose-400 border border-rose-500/20"
-                                          : deviceAnalysis.healthStatus ===
-                                              "Needs Maintenance"
-                                            ? "text-amber-400 border border-amber-500/20"
-                                            : "text-emerald-400 border border-emerald-500/20"
-                                      }`}
+
+                                  {/* Tech Details checks */}
+                                  {deviceAnalysis.technicalDetails &&
+                                    deviceAnalysis.technicalDetails.length > 0 && (
+                                      <div>
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-2">
+                                          {t("ai_tech_details")}
+                                        </span>
+                                        <div className="grid grid-cols-1 gap-1.5">
+                                          {deviceAnalysis.technicalDetails.map(
+                                            (detail: string, idx: number) => (
+                                              <div
+                                                key={idx}
+                                                className="flex gap-2 items-start bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"
+                                              >
+                                                <i className="fas fa-check text-emerald-500 text-[0.75rem] mt-0.5"></i>
+                                                <span className="text-[0.75rem] text-slate-300 leading-tight">
+                                                  {detail}
+                                                </span>
+                                              </div>
+                                            ),
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                  {/* Onpeak grid optimization suggestions */}
+                                  {deviceAnalysis.structuralOptimizations &&
+                                    deviceAnalysis.structuralOptimizations.length >
+                                      0 && (
+                                      <div>
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-2">
+                                          {t("ai_onpeak_opt")}
+                                        </span>
+                                        <div className="grid grid-cols-1 gap-1.5">
+                                          {deviceAnalysis.structuralOptimizations.map(
+                                            (opt: string, idx: number) => (
+                                              <div
+                                                key={idx}
+                                                className="flex gap-2 items-start bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"
+                                              >
+                                                <i className="fas fa-lightbulb text-amber-400 text-[0.75rem] mt-0.5 animate-pulse"></i>
+                                                <span className="text-[0.75rem] text-slate-300 leading-tight">
+                                                  {opt}
+                                                </span>
+                                              </div>
+                                            ),
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                  {/* Prescriptive advice */}
+                                  {deviceAnalysis.maintenanceAdvice && (
+                                    <div className="p-4 bg-indigo-950/20 rounded-2xl border border-indigo-500/20 text-indigo-200">
+                                      <span className="text-[0.7rem] uppercase tracking-wider text-indigo-400 font-bold block mb-1.5">
+                                        <i className="fas fa-tools me-1"></i>{" "}
+                                        {t("ai_maintenance_advice")}
+                                      </span>
+                                      <p className="text-[0.8rem] leading-relaxed mb-0">
+                                        {deviceAnalysis.maintenanceAdvice}
+                                      </p>
+                                    </div>
+                                  )}
+
+                                  {/* Refresh action */}
+                                  <div className="text-end pt-1">
+                                    <button
+                                      onClick={() => runIndividualDeviceAnalysis(d)}
+                                      disabled={isAnalyzingDevice}
+                                      className="text-primary hover:underline font-bold text-[0.7rem] uppercase tracking-wider bg-transparent border-0"
                                     >
-                                      {deviceAnalysis.healthStatus}
-                                    </span>
+                                      <i className="fas fa-sync me-1"></i> Run Live
+                                      Diagnosis
+                                    </button>
                                   </div>
-                                </div>
-                                <p className="text-[0.8rem] text-slate-300 leading-relaxed mb-0 italic">
-                                  "{deviceAnalysis.summary}"
-                                </p>
-                              </div>
-
-                              {/* Tech Details checks */}
-                              {deviceAnalysis.technicalDetails &&
-                                deviceAnalysis.technicalDetails.length > 0 && (
-                                  <div>
-                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-2">
-                                      {t("ai_tech_details")}
-                                    </span>
-                                    <div className="grid grid-cols-1 gap-1.5">
-                                      {deviceAnalysis.technicalDetails.map(
-                                        (detail: string, idx: number) => (
-                                          <div
-                                            key={idx}
-                                            className="flex gap-2 items-start bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"
-                                          >
-                                            <i className="fas fa-check text-emerald-500 text-[0.75rem] mt-0.5"></i>
-                                            <span className="text-[0.75rem] text-slate-300 leading-tight">
-                                              {detail}
-                                            </span>
-                                          </div>
-                                        ),
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-
-                              {/* Onpeak grid optimization suggestions */}
-                              {deviceAnalysis.structuralOptimizations &&
-                                deviceAnalysis.structuralOptimizations.length >
-                                  0 && (
-                                  <div>
-                                    <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-2">
-                                      {t("ai_onpeak_opt")}
-                                    </span>
-                                    <div className="grid grid-cols-1 gap-1.5">
-                                      {deviceAnalysis.structuralOptimizations.map(
-                                        (opt: string, idx: number) => (
-                                          <div
-                                            key={idx}
-                                            className="flex gap-2 items-start bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"
-                                          >
-                                            <i className="fas fa-lightbulb text-amber-400 text-[0.75rem] mt-0.5 animate-pulse"></i>
-                                            <span className="text-[0.75rem] text-slate-300 leading-tight">
-                                              {opt}
-                                            </span>
-                                          </div>
-                                        ),
-                                      )}
-                                    </div>
-                                  </div>
-                                )}
-
-                              {/* Prescriptive advice */}
-                              {deviceAnalysis.maintenanceAdvice && (
-                                <div className="p-4 bg-indigo-950/20 rounded-2xl border border-indigo-500/20 text-indigo-200">
-                                  <span className="text-[0.7rem] uppercase tracking-wider text-indigo-400 font-bold block mb-1.5">
-                                    <i className="fas fa-tools me-1"></i>{" "}
-                                    {t("ai_maintenance_advice")}
-                                  </span>
-                                  <p className="text-[0.8rem] leading-relaxed mb-0">
-                                    {deviceAnalysis.maintenanceAdvice}
-                                  </p>
-                                </div>
+                                </>
                               )}
-
-                              {/* Refresh action */}
-                              <div className="text-end pt-1">
-                                <button
-                                  onClick={() => runIndividualDeviceAnalysis(d)}
-                                  disabled={isAnalyzingDevice}
-                                  className="text-primary hover:underline font-bold text-[0.7rem] uppercase tracking-wider bg-transparent border-0"
-                                >
-                                  <i className="fas fa-sync me-1"></i> Run Live
-                                  Diagnosis
-                                </button>
-                              </div>
-                            </>
+                            </div>
                           )}
                         </div>
-                      )}
+                      </div>
                     </div>
-                  </div>
 
                   <div className="p-6 bg-light rounded-[2.5rem]">
                       <h6 className="label text-[0.75rem] mb-6">

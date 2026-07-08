@@ -68,20 +68,45 @@ export const SmartSavingsCalculator: React.FC<{
   lang?: 'th' | 'en';
   isDarkMode?: boolean;
   onTokensEarned?: (tokens: number) => void;
+  rate?: number;
+  setRate?: (val: number) => void;
+  days?: number;
+  setDays?: (val: number) => void;
+  targetBudget?: number;
+  setTargetBudget?: (val: number) => void;
+  onTotalKwhChange?: (kwh: number) => void;
 }> = ({
   lang = 'th',
   isDarkMode = false,
-  onTokensEarned
+  onTokensEarned,
+  rate: propRate,
+  setRate: propSetRate,
+  days: propDays,
+  setDays: propSetDays,
+  targetBudget: propTargetBudget,
+  setTargetBudget: propSetSetBudget,
+  onTotalKwhChange,
 }) => {
-  // --- Form & Configuration States ---
-  const [rate, setRate] = useState<number>(4.5); // อัตราค่าไฟเฉลี่ยต่อหน่วย (บาท)
-  const [days, setDays] = useState<number>(30); // จำนวนวันที่ต้องการคำนวณ
+  // --- Form & Configuration States (Controlled or Fallback to Local) ---
+  const [localRate, setLocalRate] = useState<number>(0.3972);
+  const [localDays, setLocalDays] = useState<number>(30);
+  const [localTargetBudget, setLocalTargetBudget] = useState<number>(2000);
+
+  const rate = propRate !== undefined ? propRate : localRate;
+  const setRate = propSetRate !== undefined ? propSetRate : setLocalRate;
+
+  const days = propDays !== undefined ? propDays : localDays;
+  const setDays = propSetDays !== undefined ? propSetDays : setLocalDays;
+
+  const targetBudget = propTargetBudget !== undefined ? propTargetBudget : localTargetBudget;
+  const setTargetBudget = propSetSetBudget !== undefined ? propSetSetBudget : setLocalTargetBudget;
+
   const [onPeakPercent, setOnPeakPercent] = useState<number>(50); // ร้อยละใช้งานช่วง On-Peak
-  const [targetBudget, setTargetBudget] = useState<number>(2000); // งบประมาณควบคุม
   const [appliances, setAppliances] = useState<ApplianceItem[]>(INITIAL_APPLIANCES);
 
   // --- UI Layout States ---
   const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [showDetailedBreakdown, setShowDetailedBreakdown] = useState(false);
   const [customName, setCustomName] = useState('');
   const [customWatt, setCustomWatt] = useState(100);
   const [customHours, setCustomHours] = useState(4);
@@ -116,51 +141,105 @@ export const SmartSavingsCalculator: React.FC<{
     );
   };
 
-  // --- Calculation Logic ---
-  let normalCost = 0;
-  let touCost = 0;
-  let savings = 0;
-  let diffPercent = 0;
-  let dailyAvg = 0;
-  let applianceAvg = 0;
+  // --- Real Calculation Logic (MEA/PEA Progressive Block Tariff Type 1.1.2) ---
+  const calculateDetailedNormalBill = (totalKwh: number) => {
+    let remaining = totalKwh;
+    
+    // Block 1: 1 - 150 kWh
+    const block1 = Math.min(remaining, 150);
+    const block1Cost = block1 * 3.2484;
+    remaining -= block1;
+    
+    // Block 2: 151 - 400 kWh
+    const block2 = remaining > 0 ? Math.min(remaining, 250) : 0;
+    const block2Cost = block2 * 4.2218;
+    remaining -= block2;
+    
+    // Block 3: > 400 kWh
+    const block3 = remaining > 0 ? remaining : 0;
+    const block3Cost = block3 * 4.4217;
+    
+    const baseCost = block1Cost + block2Cost + block3Cost;
+    
+    // Service Charge (> 150 units = 24.62, otherwise 8.19)
+    const serviceCharge = totalKwh > 150 ? 24.62 : 8.19;
+    
+    // Ft Charge
+    const ftCost = totalKwh * rate; // Using `rate` state as Ft Rate
+    
+    const subtotal = baseCost + serviceCharge + ftCost;
+    
+    // VAT 7%
+    const vat = subtotal * 0.07;
+    
+    const totalCost = subtotal + vat;
+    
+    return {
+      kwh: totalKwh,
+      block1, block1Cost,
+      block2, block2Cost,
+      block3, block3Cost,
+      baseCost,
+      serviceCharge,
+      ftRate: rate, ftCost,
+      subtotal,
+      vat,
+      totalCost
+    };
+  };
 
-  if (isDefaultConfig()) {
-    // If exact user defaults are selected, output the user's exact values
-    normalCost = 2087;
-    touCost = 1947;
-    diffPercent = -7;
-    savings = 139;
-    dailyAvg = 69.55;
-    applianceAvg = 417;
-  } else {
-    // Otherwise calculate dynamically using standard math calibrated to defaults
-    // Total kWh calculation: Sum (W * Hours * Count) / 1000 * Days
-    const totalDailyKwh = appliances.reduce((acc, item) => {
-      return acc + ((item.watt * item.hoursPerDay * item.count) / 1000);
-    }, 0);
+  const calculateDetailedTouBill = (totalKwh: number, peakRatio: number) => {
+    const onPeakKwh = totalKwh * peakRatio;
+    const offPeakKwh = totalKwh * (1 - peakRatio);
+    
+    // TOU Rates (Type 1.2)
+    const onPeakCost = onPeakKwh * 5.7982;
+    const offPeakCost = offPeakKwh * 2.6369;
+    
+    const baseCost = onPeakCost + offPeakCost;
+    const serviceCharge = 312.24; // TOU service charge is 312.24
+    
+    // Ft Charge
+    const ftCost = totalKwh * rate; // Using `rate` state as Ft Rate
+    
+    const subtotal = baseCost + serviceCharge + ftCost;
+    const vat = subtotal * 0.07;
+    const totalCost = subtotal + vat;
+    
+    return {
+      onPeakKwh, onPeakCost,
+      offPeakKwh, offPeakCost,
+      baseCost,
+      serviceCharge,
+      ftRate: rate, ftCost,
+      subtotal,
+      vat,
+      totalCost
+    };
+  };
 
-    const totalKwh = totalDailyKwh * days;
+  const totalDailyKwh = appliances.reduce((acc, item) => {
+    return acc + ((item.watt * item.hoursPerDay * item.count) / 1000);
+  }, 0);
 
-    // Standard Normal electricity cost (Thailand's block rates or average multiplier)
-    // Calibration factor 0.855047 makes the default appliances total of 542.4 kWh * 4.5 Baht rate = 2087 Baht.
-    normalCost = Math.round(totalKwh * rate * 0.855047);
+  const totalKwh = totalDailyKwh * days;
+  
+  useEffect(() => {
+    if (onTotalKwhChange) {
+      onTotalKwhChange(totalKwh);
+    }
+  }, [totalKwh, onTotalKwhChange]);
+  
+  const normalBillDetails = calculateDetailedNormalBill(totalKwh);
+  const touBillDetails = calculateDetailedTouBill(totalKwh, onPeakPercent / 100);
 
-    // TOU Calculation:
-    // On-Peak rate is higher (usually rate * 1.29)
-    // Off-Peak rate is lower (usually rate * 0.58)
-    const onPeakRate = rate * 1.2889;
-    const offPeakRate = rate * 0.5778;
-    const peakRatio = onPeakPercent / 100;
-    const offPeakRatio = 1 - peakRatio;
-
-    const weightedTouRate = (onPeakRate * peakRatio) + (offPeakRate * offPeakRatio);
-    touCost = Math.round(totalKwh * weightedTouRate * 0.855047);
-
-    savings = normalCost - touCost;
-    diffPercent = normalCost > 0 ? -Math.round((savings / normalCost) * 100) : 0;
-    dailyAvg = days > 0 ? Number((normalCost / days).toFixed(2)) : 0;
-    applianceAvg = appliances.length > 0 ? Math.round(normalCost / appliances.length) : 0;
-  }
+  const normalCost = Math.round(normalBillDetails.totalCost);
+  const touCost = Math.round(touBillDetails.totalCost);
+  
+  const savings = normalCost - touCost;
+  const diffPercent = normalCost > 0 ? -Math.round((savings / normalCost) * 100) : 0;
+  const dailyAvg = days > 0 ? Number((normalCost / days).toFixed(2)) : 0;
+  const applianceAvg = appliances.length > 0 ? Math.round(normalCost / appliances.length) : 0;
 
   // --- AI Overseer Analysis / Advice ---
   const getAiOverseerStatus = () => {
@@ -198,23 +277,17 @@ export const SmartSavingsCalculator: React.FC<{
       return acc + ((item.watt * item.hoursPerDay * item.count) / 1000);
     }, 0);
 
-    let cumulativeNormal = 0;
-    let cumulativeTou = 0;
-
     // Days interval representation
     const step = days <= 15 ? 1 : Math.ceil(days / 15);
 
     for (let day = 1; day <= days; day++) {
-      const dailyNormalKwh = totalDailyKwh;
-      const dailyNormalCost = dailyNormalKwh * rate * 0.855047;
+      const dayKwh = totalDailyKwh * day;
+      
+      const dayNormalBill = calculateDetailedNormalBill(dayKwh);
+      const dayTouBill = calculateDetailedTouBill(dayKwh, onPeakPercent / 100);
 
-      const onPeakRate = rate * 1.2889;
-      const offPeakRate = rate * 0.5778;
-      const weightedTouRate = (onPeakRate * (onPeakPercent / 100)) + (offPeakRate * (1 - (onPeakPercent / 100)));
-      const dailyTouCost = dailyNormalKwh * weightedTouRate * 0.855047;
-
-      cumulativeNormal += dailyNormalCost;
-      cumulativeTou += dailyTouCost;
+      const cumulativeNormal = dayNormalBill.totalCost;
+      const cumulativeTou = dayTouBill.totalCost;
 
       if (day === 1 || day % step === 0 || day === days) {
         data.push({
@@ -288,7 +361,7 @@ export const SmartSavingsCalculator: React.FC<{
 
   const handleResetToDefault = () => {
     setAppliances(INITIAL_APPLIANCES);
-    setRate(4.5);
+    setRate(0.3972);
     setDays(30);
     setOnPeakPercent(50);
     setTargetBudget(2000);
@@ -357,19 +430,19 @@ export const SmartSavingsCalculator: React.FC<{
             {/* Config Fields */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               
-              {/* อัตราค่าไฟเฉลี่ยต่อหน่วย */}
+              {/* อัตราค่า Ft ต่อหน่วย */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1">
                   <DollarSign className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>{lang === 'th' ? 'อัตราค่าไฟเฉลี่ยต่อหน่วย (บาท)' : 'Avg. Electricity Rate (Baht)'}</span>
+                  <span>{lang === 'th' ? 'ค่า Ft ปัจจุบัน (บาท/หน่วย)' : 'Current Ft Rate (Baht)'}</span>
                 </label>
                 <input
                   type="number"
-                  step="0.1"
-                  min="1"
-                  max="15"
+                  step="0.0001"
+                  min="-1"
+                  max="10"
                   value={rate}
-                  onChange={(e) => setRate(Math.max(1, parseFloat(e.target.value) || 0))}
+                  onChange={(e) => setRate(parseFloat(e.target.value) || 0)}
                   className="w-full text-xs p-3 font-semibold font-mono rounded-xl bg-white dark:bg-slate-950 border border-slate-150 dark:border-slate-800 focus:ring-1 focus:ring-emerald-500 focus:outline-none"
                 />
               </div>
@@ -777,6 +850,151 @@ export const SmartSavingsCalculator: React.FC<{
             </div>
           </div>
 
+          {/* Detailed Calculation Breakdown */}
+          <div className="mt-2">
+            <button
+              onClick={() => setShowDetailedBreakdown(!showDetailedBreakdown)}
+              className="w-full p-4 rounded-[2rem] bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 flex justify-between items-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all focus:outline-none"
+            >
+              <div className="flex items-center gap-2">
+                <Layers className="w-4 h-4 text-emerald-500" />
+                <span className="text-[11px] font-black uppercase tracking-widest font-mono">
+                  {lang === 'th' ? 'โครงสร้างค่าไฟฟ้าแบบละเอียด (MEA/PEA)' : 'Detailed Bill Breakdown (MEA/PEA)'}
+                </span>
+              </div>
+              <span className="text-xs font-bold font-mono">
+                {showDetailedBreakdown ? (lang === 'th' ? 'ซ่อนรายละเอียด' : 'HIDE DETAILS') : (lang === 'th' ? 'แสดงรายละเอียด' : 'SHOW DETAILS')}
+              </span>
+            </button>
+
+            <AnimatePresence>
+              {showDetailedBreakdown && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden mt-3"
+                >
+                  <div className="p-6 rounded-[2rem] bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 space-y-6">
+                    
+                    {/* Normal Bill (Progressive) */}
+                    <div>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 font-mono mb-4 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                        {lang === 'th' ? '1. อัตราปกติแบบก้าวหน้า (ประเภท 1.1.2)' : '1. Progressive Rate (Type 1.1.2)'}
+                      </h4>
+                      <div className="space-y-3 font-mono text-[11px]">
+                        
+                        {/* Base Tariff Blocks */}
+                        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-150 dark:border-slate-800/80 space-y-2">
+                          <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span>{lang === 'th' ? 'ค่าพลังงานไฟฟ้า 150 หน่วยแรก' : 'Block 1 (1-150 kWh)'} (฿3.2484/kWh)</span>
+                            <span className="font-bold">{normalBillDetails.block1Cost.toFixed(2)}</span>
+                          </div>
+                          {normalBillDetails.block2 > 0 && (
+                            <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                              <span>{lang === 'th' ? 'ค่าพลังงานไฟฟ้า 250 หน่วยถัดไป' : 'Block 2 (151-400 kWh)'} (฿4.2218/kWh)</span>
+                              <span className="font-bold">{normalBillDetails.block2Cost.toFixed(2)}</span>
+                            </div>
+                          )}
+                          {normalBillDetails.block3 > 0 && (
+                            <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                              <span>{lang === 'th' ? 'ค่าพลังงานไฟฟ้าหน่วยที่เกิน 400' : 'Block 3 (> 400 kWh)'} (฿4.4217/kWh)</span>
+                              <span className="font-bold">{normalBillDetails.block3Cost.toFixed(2)}</span>
+                            </div>
+                          )}
+                          <div className="pt-2 border-t border-dashed border-slate-200 dark:border-slate-700 flex justify-between items-center text-slate-800 dark:text-slate-200 font-black">
+                            <span>{lang === 'th' ? 'รวมค่าไฟฟ้าฐาน (Base Tariff)' : 'Total Base Tariff'}</span>
+                            <span>฿{normalBillDetails.baseCost.toFixed(2)}</span>
+                          </div>
+                        </div>
+
+                        {/* Additional Fees */}
+                        <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-150 dark:border-slate-800/80 space-y-2">
+                          <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span>{lang === 'th' ? 'ค่าบริการรายเดือน' : 'Service Charge'}</span>
+                            <span className="font-bold">{normalBillDetails.serviceCharge.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span>{lang === 'th' ? `ค่า Ft (฿${normalBillDetails.ftRate}/kWh)` : `Ft Charge (฿${normalBillDetails.ftRate}/kWh)`}</span>
+                            <span className="font-bold">{normalBillDetails.ftCost.toFixed(2)}</span>
+                          </div>
+                          <div className="pt-2 border-t border-dashed border-slate-200 dark:border-slate-700 flex justify-between items-center text-slate-800 dark:text-slate-200 font-black">
+                            <span>{lang === 'th' ? 'รวมเงินก่อนภาษี (Subtotal)' : 'Subtotal'}</span>
+                            <span>฿{normalBillDetails.subtotal.toFixed(2)}</span>
+                          </div>
+                        </div>
+
+                        {/* VAT & Total */}
+                        <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2">
+                          <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span>{lang === 'th' ? 'ภาษีมูลค่าเพิ่ม 7% (VAT)' : 'VAT (7%)'}</span>
+                            <span className="font-bold">{normalBillDetails.vat.toFixed(2)}</span>
+                          </div>
+                          <div className="pt-2 border-t border-slate-300 dark:border-slate-600 flex justify-between items-center text-slate-900 dark:text-white font-black text-[13px]">
+                            <span>{lang === 'th' ? 'รวมเงินค่าไฟฟ้าทั้งสิ้น (Total Net Payable)' : 'Total Net Payable'}</span>
+                            <span>฿{normalBillDetails.totalCost.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* TOU Bill (Time of Use) */}
+                    <div>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-emerald-500 font-mono mb-4 flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        {lang === 'th' ? '2. อัตรา TOU (ประเภท 1.2)' : '2. TOU Rate (Type 1.2)'}
+                      </h4>
+                      <div className="space-y-3 font-mono text-[11px]">
+                        
+                        <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-2">
+                          <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span>On-Peak ({onPeakPercent}%) (฿5.7982/kWh)</span>
+                            <span className="font-bold">{touBillDetails.onPeakCost.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span>Off-Peak ({100 - onPeakPercent}%) (฿2.6369/kWh)</span>
+                            <span className="font-bold">{touBillDetails.offPeakCost.toFixed(2)}</span>
+                          </div>
+                          <div className="pt-2 border-t border-dashed border-emerald-500/20 flex justify-between items-center text-emerald-700 dark:text-emerald-400 font-black">
+                            <span>{lang === 'th' ? 'รวมค่าไฟฟ้าฐาน (Base Tariff)' : 'Total Base Tariff'}</span>
+                            <span>฿{touBillDetails.baseCost.toFixed(2)}</span>
+                          </div>
+                        </div>
+
+                        <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-2">
+                          <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span>{lang === 'th' ? 'ค่าบริการรายเดือน (TOU)' : 'Service Charge (TOU)'}</span>
+                            <span className="font-bold">{touBillDetails.serviceCharge.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
+                            <span>{lang === 'th' ? `ค่า Ft (฿${touBillDetails.ftRate}/kWh)` : `Ft Charge (฿${touBillDetails.ftRate}/kWh)`}</span>
+                            <span className="font-bold">{touBillDetails.ftCost.toFixed(2)}</span>
+                          </div>
+                          <div className="pt-2 border-t border-dashed border-emerald-500/20 flex justify-between items-center text-emerald-700 dark:text-emerald-400 font-black">
+                            <span>{lang === 'th' ? 'รวมเงินก่อนภาษี (Subtotal)' : 'Subtotal'}</span>
+                            <span>฿{touBillDetails.subtotal.toFixed(2)}</span>
+                          </div>
+                        </div>
+
+                        <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-2">
+                          <div className="flex justify-between items-center text-emerald-800 dark:text-emerald-300">
+                            <span>{lang === 'th' ? 'ภาษีมูลค่าเพิ่ม 7% (VAT)' : 'VAT (7%)'}</span>
+                            <span className="font-bold">{touBillDetails.vat.toFixed(2)}</span>
+                          </div>
+                          <div className="pt-2 border-t border-emerald-500/30 flex justify-between items-center text-emerald-600 dark:text-emerald-400 font-black text-[13px]">
+                            <span>{lang === 'th' ? 'รวมเงินค่าไฟฟ้าทั้งสิ้น (Total Net Payable)' : 'Total Net Payable'}</span>
+                            <span>฿{touBillDetails.totalCost.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
       </div>

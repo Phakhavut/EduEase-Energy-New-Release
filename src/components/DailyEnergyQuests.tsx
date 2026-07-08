@@ -215,7 +215,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
     };
 
     return (
-        <div className="dashboard-card border border-slate-200 dark:border-0 p-6 md:p-8 bg-white dark:bg-card text-dark rounded-[2.5rem] shadow-sm relative overflow-hidden h-100 flex flex-col justify-between">
+        <div className="dashboard-card border border-slate-200 dark:border-0 p-6 md:p-8 bg-white dark:bg-card text-dark rounded-[2.5rem] shadow-sm relative overflow-hidden h-full flex flex-col justify-between">
             {/* Ambient subtle decorative lights */}
             <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-emerald-500/5 blur-[60px] pointer-events-none"></div>
             <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-primary/5 blur-[60px] pointer-events-none"></div>

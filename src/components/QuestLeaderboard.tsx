@@ -585,7 +585,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
 
                             {/* Badges of Honor */}
                             <div className="col-12 col-lg-4">
-                                <div className="dashboard-card border-0 p-6 md:p-8 bg-card rounded-[2.5rem] shadow-sm h-100 flex flex-col justify-between">
+                                <div className="dashboard-card border-0 p-6 md:p-8 bg-card rounded-[2.5rem] shadow-sm h-full flex flex-col justify-between">
                                     <div>
                                         <h5 className="font-display font-black text-base md:text-lg mb-4 uppercase">
                                             {lang === 'th' ? 'เหรียญตราเกียรติยศกรีด' : 'Grid Badges of Honor'}
@@ -645,7 +645,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                     >
                         {/* Profile & Avatar Details */}
                         <div className="col-12 col-lg-5">
-                            <div className="dashboard-card border-0 p-6 md:p-8 bg-card text-dark rounded-[2.5rem] relative overflow-hidden shadow-sm h-100 flex flex-col justify-between">
+                            <div className="dashboard-card border-0 p-6 md:p-8 bg-card text-dark rounded-[2.5rem] relative overflow-hidden shadow-sm h-full flex flex-col justify-between">
                                 <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-primary/10 blur-[50px] pointer-events-none"></div>
                                 
                                 <div>
@@ -750,7 +750,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
 
                         {/* Unlocked Skins Collection */}
                         <div className="col-12 col-lg-7">
-                            <div className="dashboard-card border-0 p-6 md:p-8 bg-card text-dark rounded-[2.5rem] shadow-sm h-100 flex flex-col justify-between">
+                            <div className="dashboard-card border-0 p-6 md:p-8 bg-card text-dark rounded-[2.5rem] shadow-sm h-full flex flex-col justify-between">
                                 <div>
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                                         <div>
@@ -776,7 +776,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                             
                                             return (
                                                 <div key={skin.id} className="col-12 col-sm-6">
-                                                    <div className={`p-4 rounded-2xl border transition-all h-100 flex flex-col justify-between ${
+                                                    <div className={`p-4 rounded-2xl border transition-all h-full flex flex-col justify-between ${
                                                         isSelected 
                                                             ? 'bg-primary/5 border-primary shadow-sm scale-[1.02]' 
                                                             : isUnlocked 
@@ -831,7 +831,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                         {/* Custom Image entry as skin option if custom URL exists */}
                                         {customLogoUrl && (
                                             <div className="col-12 col-sm-6">
-                                                <div className={`p-4 rounded-2xl border transition-all h-100 flex flex-col justify-between ${
+                                                <div className={`p-4 rounded-2xl border transition-all h-full flex flex-col justify-between ${
                                                     currentAvatar === 'image' 
                                                         ? 'bg-primary/5 border-primary shadow-sm scale-[1.02]' 
                                                         : 'bg-light border-slate-200 dark:border-slate-800 hover:border-slate-300'
@@ -916,7 +916,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                     
                                     return (
                                         <div key={skin.id} className="col-12 col-sm-6 col-md-4">
-                                            <div className={`p-4 rounded-2xl border transition-all h-100 flex flex-col justify-between ${
+                                            <div className={`p-4 rounded-2xl border transition-all h-full flex flex-col justify-between ${
                                                 isSelected 
                                                     ? 'bg-primary/5 border-primary scale-[1.02] shadow-md' 
                                                     : isUnlocked 

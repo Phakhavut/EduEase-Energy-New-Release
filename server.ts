@@ -24,7 +24,7 @@ async function startServer() {
   const corsOrigin = process.env.NODE_ENV === "production" ? (process.env.CORS_ORIGIN || false) : "*";
   app.use(cors({ origin: corsOrigin }));
   
-  app.use(pinoHttp({ logger }));
+  app.use("/api", pinoHttp({ logger }));
 
   const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
