@@ -264,7 +264,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
               className={`px-3 py-1.5 text-[0.7rem] font-bold font-display rounded-xl tracking-tight transition-all flex items-center gap-1.5 ${
                 activeMode === mode
                   ? 'bg-white dark:bg-slate-800 text-primary dark:text-sky-400 shadow-sm'
-                  : 'text-slate-600 dark:text-slate-100 hover:text-slate-900 dark:hover:text-slate-200'
+                  : 'text-slate-700 dark:text-slate-100 hover:text-slate-900 dark:hover:text-slate-200'
               }`}
             >
               <i className={`fas ${
@@ -470,7 +470,7 @@ export const PropertyDistributionMap: React.FC<PropertyDistributionMapProps> = (
               </div>
             </div>
 
-            <p className="text-[0.75rem] text-slate-600 dark:text-slate-100 leading-relaxed bg-white dark:bg-slate-950/20 p-3 rounded-xl border border-slate-150 dark:border-slate-800/40">
+            <p className="text-[0.75rem] text-slate-700 dark:text-slate-100 leading-relaxed bg-white dark:bg-slate-950/20 p-3 rounded-xl border border-slate-150 dark:border-slate-800/40">
               {lang === 'th' ? selectedSector.detailsTh : selectedSector.detailsEn}
             </p>
 

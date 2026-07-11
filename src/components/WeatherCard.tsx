@@ -120,21 +120,27 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ isDarkMode, locationNa
         source: "fallback"
       };
 
-      if (tmdResponse.ok) {
-        tmdData = await tmdResponse.json();
+      if (tmdResponse.ok && tmdResponse.headers.get("content-type")?.includes("application/json")) {
+        try {
+          tmdData = await tmdResponse.json();
+        } catch (jsonErr) {
+          console.error("TMD response is not valid JSON:", jsonErr);
+        }
       }
 
-      // 2. Fetch 5-day daily weather forecast from Open-Meteo
+      // 2. Fetch 5-day daily weather forecast from our secure backend proxy
       const lat = city === "samut_prakan" ? "13.599" : "13.75";
       const lon = city === "samut_prakan" ? "100.596" : "100.5167";
-      const forecastResponse = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FBangkok`
-      );
+      const forecastResponse = await fetch(`/api/weather/forecast?latitude=${lat}&longitude=${lon}`);
       
       let dailyForecast = null;
-      if (forecastResponse.ok) {
-        const fcData = await forecastResponse.json();
-        dailyForecast = fcData.daily;
+      if (forecastResponse.ok && forecastResponse.headers.get("content-type")?.includes("application/json")) {
+        try {
+          const fcData = await forecastResponse.json();
+          dailyForecast = fcData.daily;
+        } catch (jsonErr) {
+          console.error("Forecast response is not valid JSON:", jsonErr);
+        }
       }
 
       // 3. Set combined state
@@ -221,11 +227,11 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ isDarkMode, locationNa
             <div className="p-1.5 bg-sky-500/10 dark:bg-sky-500/20 rounded-xl text-sky-500">
               <MapPin className="w-4 h-4 shrink-0" />
             </div>
-            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <h3 className="text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
               {lang === "th" ? "ศูนย์วิเคราะห์และพยากรณ์อากาศอัจฉริยะ" : "Climate & Dispatch Intelligence Center"}
             </h3>
           </div>
-          <p className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-1 font-medium">
+          <p className="text-[0.7rem] text-slate-600 dark:text-slate-400 mt-1 font-medium">
             {lang === "th" ? "ซิงค์ข้อมูลจริงจาก กรมอุตุนิยมวิทยา (TMD) & Open-Meteo" : "Synchronized Live with Thai Meteorological Department & Open-Meteo"}
           </p>
         </div>
@@ -322,7 +328,7 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ isDarkMode, locationNa
             </div>
           </div>
 
-          <div className="border-t border-slate-200/50 dark:border-slate-800/40 pt-3 mt-2 text-[0.62rem] text-slate-500 dark:text-slate-400 space-y-1">
+          <div className="border-t border-slate-200/50 dark:border-slate-800/40 pt-3 mt-2 text-[0.62rem] text-slate-600 dark:text-slate-400 space-y-1">
             <div className="flex items-center gap-1 font-medium">
               <Clock className="w-3 h-3 text-slate-500 shrink-0" />
               <span>{lang === "th" ? "วัดเมื่อ" : "Measured"}: {loading ? "..." : formatTmdTime(weather.dateTime)}</span>
@@ -468,7 +474,7 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ isDarkMode, locationNa
 
       {/* Footer Details & TMD Link */}
       <div className="mt-5 pt-3 border-t border-dashed border-slate-200 dark:border-slate-800/80 flex items-center justify-between z-10 relative">
-        <span className="text-[0.62rem] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+        <span className="text-[0.62rem] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
           <Info className="w-3 h-3 text-sky-500" />
           <span>{lang === "th" ? "สถานะระบบ: เชื่อมต่อสมบูรณ์" : "SYSTEM: ALL SYSTEMS INTEGRATED"}</span>
         </span>

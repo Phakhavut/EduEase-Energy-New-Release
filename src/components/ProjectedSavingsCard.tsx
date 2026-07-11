@@ -33,6 +33,7 @@ interface ProjectedSavingsData {
   monthlySavings: number;
   savingsPercentage: number;
   insights: Insight[];
+  source?: "gemini" | "fallback-simulation";
 }
 
 interface ProjectedSavingsCardProps {
@@ -236,13 +237,23 @@ export const ProjectedSavingsCard: React.FC<ProjectedSavingsCardProps> = ({
             <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
           </div>
           <div>
-            <h4 className="text-sm font-bold font-display text-slate-800 dark:text-slate-100 flex items-center gap-1.5">
+            <h4 className="text-sm font-bold font-display text-slate-800 dark:text-slate-100 flex items-center gap-1.5 flex-wrap">
               {t("AI Projected Savings", "ประมาณการยอดประหยัดด้วย AI")}
-              <span className="text-[0.6rem] uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.25 rounded-md font-extrabold tracking-wider">
-                Live
-              </span>
+              {data?.source === "gemini" ? (
+                <span className="text-[0.68rem] uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-lg font-mono font-bold tracking-normal border border-emerald-500/20">
+                  ✨ Gemini Core
+                </span>
+              ) : data?.source === "fallback-simulation" ? (
+                <span className="text-[0.68rem] uppercase bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded-lg font-mono font-bold tracking-normal border border-amber-500/20">
+                  ⚙️ Fallback Heuristics
+                </span>
+              ) : (
+                <span className="text-[0.68rem] uppercase bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-lg font-mono font-bold tracking-normal border border-emerald-500/10 animate-pulse">
+                  AI Live
+                </span>
+              )}
             </h4>
-            <p className="text-[0.68rem] text-slate-500 dark:text-slate-400">
+            <p className="text-[0.68rem] text-slate-600 dark:text-slate-400">
               {t(
                 "Automated smart grid scheduling & tuning",
                 "วิเคราะห์จัดระเบียบโครงข่ายอัตโนมัติ"
@@ -301,11 +312,11 @@ export const ProjectedSavingsCard: React.FC<ProjectedSavingsCardProps> = ({
                   <span className="text-2xl font-display font-black text-emerald-700 dark:text-emerald-400 tracking-tight">
                     ฿{data.monthlySavings.toLocaleString()}
                   </span>
-                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                  <span className="text-xs font-bold text-slate-600 dark:text-slate-400">
                     / {t("month", "เดือน")}
                   </span>
                 </div>
-                <p className="text-[0.68rem] text-slate-500 dark:text-slate-400 leading-relaxed max-w-[200px] sm:max-w-xs">
+                <p className="text-[0.68rem] text-slate-600 dark:text-slate-400 leading-relaxed max-w-[200px] sm:max-w-xs">
                   {t(
                     `Drops estimated cost to ฿${data.totalOptimizedCost.toLocaleString()}/mo`,
                     `ลดภาระยอดใช้จ่ายเหลือ ฿${data.totalOptimizedCost.toLocaleString()}/เดือน`
@@ -362,12 +373,12 @@ export const ProjectedSavingsCard: React.FC<ProjectedSavingsCardProps> = ({
                               ฿{item.amount.toLocaleString()} ({item.pct}%)
                             </span>
                           </div>
-                          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                          <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200/50 dark:border-slate-800/50 relative">
                             <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${item.pct}%` }}
                               transition={{ duration: 0.5, delay: index * 0.1 }}
-                              className={`h-full ${item.color} rounded-full`}
+                              className={`h-full ${item.color} rounded-full shadow-md`}
                             />
                           </div>
                         </div>
@@ -386,7 +397,7 @@ export const ProjectedSavingsCard: React.FC<ProjectedSavingsCardProps> = ({
                 disabled={applying || allApplied}
                 className={`w-full relative overflow-hidden py-3 px-4 rounded-2xl font-bold font-display text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 shadow-md ${
                   allApplied 
-                    ? "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 cursor-default shadow-none border border-slate-200 dark:border-slate-700" 
+                    ? "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 cursor-default shadow-none border border-slate-200 dark:border-slate-700" 
                     : applying 
                     ? "bg-primary/90 text-white cursor-wait" 
                     : "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white shadow-emerald-500/10 hover:shadow-emerald-500/20 active:scale-[0.98]"
@@ -429,7 +440,7 @@ export const ProjectedSavingsCard: React.FC<ProjectedSavingsCardProps> = ({
 
             {/* Smart Insights List */}
             <div className="space-y-3 flex-grow pt-2.5">
-              <h5 className="text-[0.68rem] uppercase tracking-wider font-extrabold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mb-1">
+              <h5 className="text-[0.68rem] uppercase tracking-wider font-extrabold text-slate-600 dark:text-slate-400 flex items-center gap-1.5 mb-1">
                 <Lightbulb className="w-3.5 h-3.5 text-amber-400" />
                 {t("Tailored AI Recommendations", "คำแนะนำวิเคราะห์รายโหนดโดย AI")}
               </h5>
@@ -441,13 +452,13 @@ export const ProjectedSavingsCard: React.FC<ProjectedSavingsCardProps> = ({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.08 }}
                     key={idx}
-                    className="flex gap-3 p-3 bg-slate-50 dark:bg-white/5 rounded-2.5xl border border-slate-100 dark:border-0 hover:bg-slate-100/40 dark:hover:bg-white/10 transition-all duration-200 group"
+                    className="flex gap-3 p-3.5 bg-slate-50/50 dark:bg-slate-900/60 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100/50 dark:hover:bg-slate-800/60 hover:shadow-sm transition-all duration-200 group"
                   >
-                    <div className="w-9 h-9 shrink-0 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center border border-slate-200/50 dark:border-slate-800 shadow-xs group-hover:scale-105 transition-all text-slate-500 dark:text-slate-300">
+                    <div className="w-9 h-9 shrink-0 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center border border-slate-200 dark:border-slate-700 shadow-sm group-hover:scale-105 transition-all text-slate-700 dark:text-slate-300">
                       <i className={`fas ${insight.icon} text-xs`} />
                     </div>
 
-                    <div className="flex-grow min-w-0 space-y-0.5">
+                    <div className="flex-grow min-w-0 space-y-1">
                       <div className="flex justify-between items-start gap-2">
                         <span className="text-[0.75rem] font-bold text-slate-800 dark:text-slate-100 truncate group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition-colors">
                           {t(insight.titleEn, insight.titleTh)}
@@ -456,7 +467,7 @@ export const ProjectedSavingsCard: React.FC<ProjectedSavingsCardProps> = ({
                           -{t(insight.savingsEn, insight.savingsTh)}
                         </span>
                       </div>
-                      <p className="text-[0.65rem] text-slate-500 dark:text-slate-400 leading-relaxed">
+                      <p className="text-[0.68rem] text-slate-700 dark:text-slate-300 leading-relaxed">
                         {t(insight.descEn, insight.descTh)}
                       </p>
                       <div className="flex items-center gap-1.5 pt-0.5">

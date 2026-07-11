@@ -28,6 +28,7 @@ export interface SavingsPlan {
   recommendations: SavingRecommendation[];
   planSummaryEn: string;
   planSummaryTh: string;
+  source?: "gemini" | "fallback-simulation";
 }
 
 export interface SmartSavingsCalculatorProps {

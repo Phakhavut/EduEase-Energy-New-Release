@@ -80,7 +80,7 @@ export const EnergyTipWidget = ({
           <h4 className="font-bold text-base mb-3 text-slate-800 dark:text-slate-100 flex items-center gap-2">
             {tip.title}
           </h4>
-          <p className={`text-sm leading-relaxed ${isDarkMode ? "text-slate-300" : "text-slate-600"}`}>
+          <p className={`text-sm leading-relaxed ${isDarkMode ? "text-slate-300" : "text-slate-700"}`}>
             {tip.content}
           </p>
         </div>

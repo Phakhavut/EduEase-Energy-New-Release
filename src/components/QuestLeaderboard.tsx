@@ -426,7 +426,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
     }, [totalClaimedXp, currentAvatar, competitors, lang, claimedQuests]);
 
     return (
-        <div className="space-y-8 text-dark animate-fade-in" id="quest-leaderboard-component">
+        <div className="space-y-8 text-slate-900 dark:text-slate-100 animate-fade-in" id="quest-leaderboard-component">
             
             {/* Ambient Notification Banner */}
             <AnimatePresence>
@@ -450,7 +450,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                     className={`btn btn-sm px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-2 border-0 ${
                         hubTab === 'challenges' 
                             ? 'bg-white dark:bg-slate-800 text-primary shadow-sm font-bold' 
-                            : 'bg-transparent text-muted hover:opacity-85'
+                            : 'bg-transparent text-slate-500 dark:text-slate-400 hover:opacity-85'
                     }`}
                 >
                     <i className="fas fa-tasks"></i>
@@ -461,7 +461,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                     className={`btn btn-sm px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-2 border-0 ${
                         hubTab === 'rewards' 
                             ? 'bg-white dark:bg-slate-800 text-primary shadow-sm font-bold' 
-                            : 'bg-transparent text-muted hover:opacity-85'
+                            : 'bg-transparent text-slate-500 dark:text-slate-400 hover:opacity-85'
                     }`}
                 >
                     <i className="fas fa-gift"></i>
@@ -472,7 +472,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                     className={`btn btn-sm px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 flex items-center gap-2 border-0 ${
                         hubTab === 'shop' 
                             ? 'bg-white dark:bg-slate-800 text-primary shadow-sm font-bold' 
-                            : 'bg-transparent text-muted hover:opacity-85'
+                            : 'bg-transparent text-slate-500 dark:text-slate-400 hover:opacity-85'
                     }`}
                 >
                     <i className="fas fa-store"></i>
@@ -492,13 +492,13 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                         {/* active quests list from props */}
                         <div className="row g-4">
                             <div className="col-12 col-lg-8">
-                                <div className="dashboard-card border-0 p-6 md:p-8 bg-card rounded-[2.5rem] shadow-sm">
+                                <div className="dashboard-card border-0 p-6 md:p-8 bg-white rounded-[2.5rem] shadow-sm">
                                     <div className="flex justify-between items-center mb-6">
                                         <div>
                                             <h5 className="font-display font-black text-base md:text-lg mb-0.5 uppercase">
                                                 {lang === 'th' ? 'ภารกิจประหยัดพลังงานกรีนกริต' : 'Smart Grid Saving Quests'}
                                             </h5>
-                                            <p className="text-[0.75rem] text-muted mb-0">{lang === 'th' ? 'รันโหมดพลังงานประหยัดเพื่อจบเควสสะสมคะแนนกริตและคาร์บอนชีวภาพ' : 'Complete sandbox requirements to earn green points and unlock bonus tokens.'}</p>
+                                            <p className="text-[0.75rem] text-slate-500 dark:text-slate-400 mb-0">{lang === 'th' ? 'รันโหมดพลังงานประหยัดเพื่อจบเควสสะสมคะแนนกริตและคาร์บอนชีวภาพ' : 'Complete sandbox requirements to earn green points and unlock bonus tokens.'}</p>
                                         </div>
                                         <div className="text-end shrink-0">
                                             <span className="text-xs font-black text-emerald-500 font-mono bg-emerald-500/10 px-3 py-1.5 rounded-xl">
@@ -518,7 +518,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                             ? 'bg-slate-500/5 border-slate-200 dark:border-slate-800 opacity-60' 
                                                             : quest.completed 
                                                                 ? 'bg-emerald-500/5 border-emerald-500/30 shadow-emerald-500/5 shadow-md animate-pulse' 
-                                                                : 'bg-light border-transparent'
+                                                                : 'bg-slate-50 dark:bg-slate-800/60 border-transparent'
                                                     }`}
                                                 >
                                                     <div className="flex items-start gap-4 flex-grow">
@@ -527,21 +527,21 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                                 ? 'bg-slate-300 text-slate-500' 
                                                                 : quest.completed 
                                                                     ? 'bg-emerald-500 text-white' 
-                                                                    : 'bg-white text-muted border'
+                                                                    : 'bg-white text-slate-500 dark:text-slate-400 border'
                                                         }`}>
                                                             {isClaimed ? (
                                                                 <i className="fas fa-check-double text-slate-500"></i>
                                                             ) : quest.completed ? (
                                                                 <i className="fas fa-gift text-white"></i>
                                                             ) : (
-                                                                <i className="fas fa-hourglass-half text-muted"></i>
+                                                                <i className="fas fa-hourglass-half text-slate-500 dark:text-slate-400"></i>
                                                             )}
                                                         </div>
                                                         <div>
-                                                            <h6 className={`font-black text-sm md:text-base mb-1 tracking-tight text-dark ${isClaimed ? 'line-through text-muted opacity-55' : ''}`}>
+                                                            <h6 className={`font-black text-sm md:text-base mb-1 tracking-tight text-slate-900 dark:text-slate-100 ${isClaimed ? 'line-through text-slate-500 dark:text-slate-400 opacity-55' : ''}`}>
                                                                 {lang === 'th' ? quest.titleTh : quest.titleEn}
                                                             </h6>
-                                                            <p className="text-xs text-muted leading-relaxed mb-2 max-w-xl">
+                                                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-2 max-w-xl">
                                                                 {lang === 'th' ? quest.descTh : quest.descEn}
                                                             </p>
                                                             <span className="badge bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[0.7rem] font-bold py-1 px-2.5 rounded-lg font-mono">
@@ -552,7 +552,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
 
                                                     <div className="shrink-0 w-full md:w-auto">
                                                         {isClaimed ? (
-                                                            <button disabled className="btn btn-outline-secondary w-full md:w-auto rounded-xl px-4 py-2 text-xs font-black uppercase text-slate-500 border-light">
+                                                            <button disabled className="btn btn-outline-secondary w-full md:w-auto rounded-xl px-4 py-2 text-xs font-black uppercase text-slate-500 border-slate-100 dark:border-slate-800/50">
                                                                 {lang === 'th' ? "รับแล้ว ✓" : "Claimed ✓"}
                                                             </button>
                                                         ) : quest.completed ? (
@@ -585,12 +585,12 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
 
                             {/* Badges of Honor */}
                             <div className="col-12 col-lg-4">
-                                <div className="dashboard-card border-0 p-6 md:p-8 bg-card rounded-[2.5rem] shadow-sm h-full flex flex-col justify-between">
+                                <div className="dashboard-card border-0 p-6 md:p-8 bg-white rounded-[2.5rem] shadow-sm h-full flex flex-col justify-between">
                                     <div>
                                         <h5 className="font-display font-black text-base md:text-lg mb-4 uppercase">
                                             {lang === 'th' ? 'เหรียญตราเกียรติยศกรีด' : 'Grid Badges of Honor'}
                                         </h5>
-                                        <p className="text-xs text-muted mb-6 leading-relaxed">
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
                                             {lang === 'th' ? 'เหรียญเกียรติยศจะถูกปลดล็อกโดยอัตโนมัติเมื่อคุณรักษากระแสไฟฟ้าและคุมค่าบิลให้อยู่ในเกณฑ์ประหยัดเสถียร' : 'These prestigious badges are dynamically earned by sustaining efficient grid standards and keeping standby leakages under control.'}
                                         </p>
 
@@ -609,20 +609,20 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                         key={badge.id} 
                                                         className={`flex items-center gap-3 px-3 py-2.5 rounded-2xl border transition-all ${
                                                             isUnlocked 
-                                                                ? `bg-${badge.color}-500/5 border-${badge.color}-500/25 text-dark` 
+                                                                ? `bg-${badge.color}-500/5 border-${badge.color}-500/25 text-slate-900 dark:text-slate-100` 
                                                                 : 'bg-slate-100/30 border-transparent text-slate-500 opacity-40'
                                                         }`}
                                                     >
                                                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
-                                                            isUnlocked ? 'bg-primary text-white shadow-sm' : 'bg-white text-muted border'
+                                                            isUnlocked ? 'bg-primary text-white shadow-sm' : 'bg-white text-slate-500 dark:text-slate-400 border'
                                                         }`}>
                                                             <i className={`fas ${badge.icon}`}></i>
                                                         </div>
                                                         <div>
-                                                            <div className="font-black text-[0.75rem] tracking-tight text-dark uppercase">
+                                                            <div className="font-black text-[0.75rem] tracking-tight text-slate-900 dark:text-slate-100 uppercase">
                                                                 {lang === 'th' ? badge.nameTh : badge.nameEn}
                                                             </div>
-                                                            <span className="text-[0.65rem] text-muted font-bold font-mono uppercase tracking-wider block">
+                                                            <span className="text-[0.65rem] text-slate-500 dark:text-slate-400 font-bold font-mono uppercase tracking-wider block">
                                                                 {isUnlocked ? (lang === 'th' ? "ปลดล็อคแล้ว ✓" : "Unlocked ✓") : badge.label}
                                                             </span>
                                                         </div>
@@ -645,12 +645,12 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                     >
                         {/* Profile & Avatar Details */}
                         <div className="col-12 col-lg-5">
-                            <div className="dashboard-card border-0 p-6 md:p-8 bg-card text-dark rounded-[2.5rem] relative overflow-hidden shadow-sm h-full flex flex-col justify-between">
+                            <div className="dashboard-card border-0 p-6 md:p-8 bg-white text-slate-900 dark:text-slate-100 rounded-[2.5rem] relative overflow-hidden shadow-sm h-full flex flex-col justify-between">
                                 <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-primary/10 blur-[50px] pointer-events-none"></div>
                                 
                                 <div>
                                     <div className="flex items-center justify-between mb-6">
-                                        <h5 className="font-display font-black text-base md:text-lg mb-0 tracking-tight text-dark uppercase">
+                                        <h5 className="font-display font-black text-base md:text-lg mb-0 tracking-tight text-slate-900 dark:text-slate-100 uppercase">
                                             {lang === 'th' ? 'ข้อมูลโหนด & รูปลักษณ์ประจำตัว' : 'Guardian Profile Identity'}
                                         </h5>
                                         <div className="badge bg-primary/10 text-primary border border-primary/20 text-[0.75rem] font-bold py-1 px-2.5 rounded-lg font-mono">
@@ -659,19 +659,19 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                     </div>
 
                                     {/* Big Character Showcase Card */}
-                                    <div className="p-6 rounded-3xl bg-light border mb-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+                                    <div className="p-6 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border mb-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
                                         <div className="mb-4">
                                             <GridCharacterSkin skinId={currentAvatar} size="avatar" customUrl={customLogoUrl} />
                                         </div>
                                         <div>
-                                            <h6 className="font-black text-lg mb-1 text-dark uppercase tracking-tight">
+                                            <h6 className="font-black text-lg mb-1 text-slate-900 dark:text-slate-100 uppercase tracking-tight">
                                                 {currentAvatar === 'image' 
                                                     ? (lang === 'th' ? 'โลโก้ที่อัปโหลดเอง' : 'Custom Uploaded Node') 
                                                     : (lang === 'th' 
                                                         ? PLATFORM_SKINS.find(s => s.id === currentAvatar)?.nameTh 
                                                         : PLATFORM_SKINS.find(s => s.id === currentAvatar)?.nameEn)}
                                             </h6>
-                                            <p className="text-[0.75rem] text-muted mb-3 font-mono uppercase tracking-wider">
+                                            <p className="text-[0.75rem] text-slate-500 dark:text-slate-400 mb-3 font-mono uppercase tracking-wider">
                                                 {lang === 'th' ? 'สกินที่ติดตั้งในปัจจุบัน' : 'Currently Equipped Skin'}
                                             </p>
                                             <div className="flex flex-wrap items-center justify-center gap-2">
@@ -695,7 +695,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                 <i className="fas fa-coins"></i>
                                             </div>
                                             <div>
-                                                <span className="text-[0.65rem] text-muted font-bold uppercase tracking-widest font-mono block">
+                                                <span className="text-[0.65rem] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest font-mono block">
                                                     {lang === 'th' ? 'โทเค็นสะสมของคุณ' : 'Your Token Wallet'}
                                                 </span>
                                                 <span className="font-mono font-black text-xl text-amber-600 block">
@@ -718,7 +718,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
 
                                     {/* Custom URL Option */}
                                     <form onSubmit={handleApplyCustomLogo} className="space-y-2 mb-2">
-                                        <label className="text-[0.75rem] font-bold text-muted uppercase tracking-wider block">
+                                        <label className="text-[0.75rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                                             {lang === 'th' ? '🔗 ระบุรูปภาพโหนดของคุณเอง (Image URL)' : '🔗 Custom Node Image Logo URL'}
                                         </label>
                                         <div className="flex gap-2">
@@ -727,7 +727,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                 value={imageUrlInput}
                                                 onChange={(e) => setImageUrlInput(e.target.value)}
                                                 placeholder="https://images.unsplash.com/photo-..." 
-                                                className="form-control rounded-xl text-xs bg-light border-slate-200 dark:border-slate-800 text-dark placeholder:text-slate-500 py-2"
+                                                className="form-control rounded-xl text-xs bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 py-2"
                                             />
                                             <button 
                                                 type="submit"
@@ -742,7 +742,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                     </form>
                                 </div>
 
-                                <span className="text-[0.7rem] text-muted italic mt-4 block">
+                                <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 italic mt-4 block">
                                     {lang === 'th' ? '💡 คุณจะได้รับ 200 โทเค็นโดยอัตโนมัติ ทุกครั้งที่เลเวลอัป!' : '💡 Earn 200 Grid Tokens automatically on every single level-up!'}
                                 </span>
                             </div>
@@ -750,14 +750,14 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
 
                         {/* Unlocked Skins Collection */}
                         <div className="col-12 col-lg-7">
-                            <div className="dashboard-card border-0 p-6 md:p-8 bg-card text-dark rounded-[2.5rem] shadow-sm h-full flex flex-col justify-between">
+                            <div className="dashboard-card border-0 p-6 md:p-8 bg-white text-slate-900 dark:text-slate-100 rounded-[2.5rem] shadow-sm h-full flex flex-col justify-between">
                                 <div>
                                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                                         <div>
-                                            <h5 className="font-display font-black text-base md:text-lg mb-0.5 tracking-tight text-dark uppercase">
+                                            <h5 className="font-display font-black text-base md:text-lg mb-0.5 tracking-tight text-slate-900 dark:text-slate-100 uppercase">
                                                 {lang === 'th' ? 'คลังสะสมดิจิทัลสกินผู้พิทักษ์ 🛡️' : 'My Earned Digital Skins Vault 🛡️'}
                                             </h5>
-                                            <p className="text-[0.75rem] text-muted mb-0">{lang === 'th' ? 'เลือกสวมใส่สกินตัวละครที่ปลดล็อกแล้วเป็นภาพโหนดโปรไฟล์ของคุณ' : 'Browse earned character skins and equip unlocked ones as your profile avatar.'}</p>
+                                            <p className="text-[0.75rem] text-slate-500 dark:text-slate-400 mb-0">{lang === 'th' ? 'เลือกสวมใส่สกินตัวละครที่ปลดล็อกแล้วเป็นภาพโหนดโปรไฟล์ของคุณ' : 'Browse earned character skins and equip unlocked ones as your profile avatar.'}</p>
                                         </div>
                                         <button 
                                             onClick={() => setHubTab('shop')}
@@ -780,23 +780,23 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                         isSelected 
                                                             ? 'bg-primary/5 border-primary shadow-sm scale-[1.02]' 
                                                             : isUnlocked 
-                                                                ? 'bg-light border-slate-200 dark:border-slate-800 hover:border-slate-300' 
+                                                                ? 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 hover:border-slate-300' 
                                                                 : 'bg-slate-100/30 dark:bg-slate-900/10 border-dashed border-slate-200 opacity-50'
                                                     }`}>
                                                         <div className="flex items-center gap-3 mb-3">
                                                             <GridCharacterSkin skinId={skin.id} size="lg" />
                                                             <div>
-                                                                <div className="font-black text-xs tracking-tight text-dark uppercase">
+                                                                <div className="font-black text-xs tracking-tight text-slate-900 dark:text-slate-100 uppercase">
                                                                     {lang === 'th' ? skin.nameTh : skin.nameEn}
                                                                 </div>
-                                                                <span className="text-[0.65rem] text-muted font-bold font-mono uppercase tracking-wider block">
+                                                                <span className="text-[0.65rem] text-slate-500 dark:text-slate-400 font-bold font-mono uppercase tracking-wider block">
                                                                     {isUnlocked ? (lang === 'th' ? 'ปลดล็อกแล้ว' : 'UNLOCKED') : (lang === 'th' ? 'ยังไม่ปลดล็อก' : 'LOCKED')}
                                                                 </span>
                                                             </div>
                                                         </div>
 
                                                         <div>
-                                                            <p className="text-[0.75rem] text-muted leading-relaxed mb-3">
+                                                            <p className="text-[0.75rem] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
                                                                 {lang === 'th' ? skin.descTh : skin.descEn}
                                                             </p>
 
@@ -834,22 +834,22 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                 <div className={`p-4 rounded-2xl border transition-all h-full flex flex-col justify-between ${
                                                     currentAvatar === 'image' 
                                                         ? 'bg-primary/5 border-primary shadow-sm scale-[1.02]' 
-                                                        : 'bg-light border-slate-200 dark:border-slate-800 hover:border-slate-300'
+                                                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-800 hover:border-slate-300'
                                                 }`}>
                                                     <div className="flex items-center gap-3 mb-3">
                                                         <GridCharacterSkin skinId="image" size="lg" customUrl={customLogoUrl} />
                                                         <div>
-                                                            <div className="font-black text-xs tracking-tight text-dark uppercase">
+                                                            <div className="font-black text-xs tracking-tight text-slate-900 dark:text-slate-100 uppercase">
                                                                 {lang === 'th' ? 'โลโก้ที่อัปโหลดเอง' : 'Custom Upload'}
                                                             </div>
-                                                            <span className="text-[0.65rem] text-muted font-bold font-mono uppercase tracking-wider block">
+                                                            <span className="text-[0.65rem] text-slate-500 dark:text-slate-400 font-bold font-mono uppercase tracking-wider block">
                                                                 EXTERNAL URL
                                                             </span>
                                                         </div>
                                                     </div>
 
                                                     <div>
-                                                        <p className="text-[0.75rem] text-muted leading-relaxed mb-3">
+                                                        <p className="text-[0.75rem] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
                                                             {lang === 'th' ? 'สลับมาใช้งานรูปโลโก้ภาพที่คุณระบุลิงก์ไว้ด้วยตัวเอง' : 'Switch back to your custom-linked web graphics.'}
                                                         </p>
 
@@ -886,13 +886,13 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                         className="space-y-6"
                     >
                         {/* Lucky Roll Display & Shop */}
-                        <div className="dashboard-card border-0 p-6 md:p-8 bg-card text-dark rounded-[2.5rem] shadow-sm">
+                        <div className="dashboard-card border-0 p-6 md:p-8 bg-white text-slate-900 dark:text-slate-100 rounded-[2.5rem] shadow-sm">
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                                 <div>
-                                    <h5 className="font-display font-black text-base md:text-lg mb-0.5 tracking-tight text-dark uppercase">
+                                    <h5 className="font-display font-black text-base md:text-lg mb-0.5 tracking-tight text-slate-900 dark:text-slate-100 uppercase">
                                         {lang === 'th' ? 'ตู้เสี่ยงทาย & โชว์รูมสกินใหม่ 🎰' : 'Lucky Draw & Character Shop 🎰'}
                                     </h5>
-                                    <p className="text-[0.75rem] text-muted mb-0">{lang === 'th' ? 'สุ่มรับดิจิทัลสกินตัวละครแบบ Limited Edition หรือเลือกซื้อสกินที่คุณถูกใจได้ทันที!' : 'Roll for special character overlays or unlock specific premium skins using GT.'}</p>
+                                    <p className="text-[0.75rem] text-slate-500 dark:text-slate-400 mb-0">{lang === 'th' ? 'สุ่มรับดิจิทัลสกินตัวละครแบบ Limited Edition หรือเลือกซื้อสกินที่คุณถูกใจได้ทันที!' : 'Roll for special character overlays or unlock specific premium skins using GT.'}</p>
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <div className="text-xs font-mono font-black text-amber-600 bg-amber-500/10 px-3 py-2 rounded-xl border border-amber-500/20">
@@ -920,22 +920,22 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                 isSelected 
                                                     ? 'bg-primary/5 border-primary scale-[1.02] shadow-md' 
                                                     : isUnlocked 
-                                                        ? 'bg-light border-slate-200 opacity-80' 
-                                                        : 'bg-light/40 border-slate-200 hover:border-slate-300'
+                                                        ? 'bg-slate-50 dark:bg-slate-800/60 border-slate-200 opacity-80' 
+                                                        : 'bg-slate-50 dark:bg-slate-800/60/40 border-slate-200 hover:border-slate-300'
                                             }`}>
                                                 <div className="flex items-center gap-3 mb-3">
                                                     <GridCharacterSkin skinId={skin.id} size="lg" />
                                                     <div>
-                                                        <div className="font-black text-xs tracking-tight text-dark uppercase">
+                                                        <div className="font-black text-xs tracking-tight text-slate-900 dark:text-slate-100 uppercase">
                                                             {lang === 'th' ? skin.nameTh : skin.nameEn}
                                                         </div>
-                                                        <span className="text-[0.65rem] text-muted font-bold font-mono block">
+                                                        <span className="text-[0.65rem] text-slate-500 dark:text-slate-400 font-bold font-mono block">
                                                             {skin.cost === 0 ? 'DEFAULT (FREE)' : `COST: ${skin.cost} GT`}
                                                         </span>
                                                     </div>
                                                 </div>
 
-                                                <p className="text-[0.75rem] text-muted leading-relaxed mb-4">
+                                                <p className="text-[0.75rem] text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
                                                     {lang === 'th' ? skin.descTh : skin.descEn}
                                                 </p>
 
@@ -976,25 +976,25 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
             </AnimatePresence>
 
             {/* Zero-Carbon Microgrid Leaderboard Rank List */}
-            <div className="dashboard-card border-0 p-6 md:p-8 bg-card rounded-[2.5rem] shadow-sm animate-slide-up">
+            <div className="dashboard-card border-0 p-6 md:p-8 bg-white rounded-[2.5rem] shadow-sm animate-slide-up">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg shadow-sm border border-amber-500/10">
                             <i className="fas fa-medal animate-bounce"></i>
                         </div>
                         <div>
-                            <h4 className="font-display font-black text-lg md:text-xl mb-0.5 tracking-tight text-dark uppercase">
+                            <h4 className="font-display font-black text-lg md:text-xl mb-0.5 tracking-tight text-slate-900 dark:text-slate-100 uppercase">
                                 {lang === 'th' ? 'ทำเนียบขุนพลผู้พิทักษ์คาร์บอนสุทธิเป็นศูนย์' : 'Zero-Carbon Microgrid Leaderboard'}
                             </h4>
                             <p className="text-[0.75rem] text-amber-500 font-bold uppercase tracking-wider font-mono mb-0">Local Microgrid Sandbox Rankings</p>
                         </div>
                     </div>
-                    <span className="text-[0.7rem] text-muted font-bold font-mono bg-light px-3 py-1.5 rounded-full border">
+                    <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 font-bold font-mono bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-full border">
                         <i className="fas fa-satellite mr-1"></i> {lang === 'th' ? 'อัปเดตสถิติจริงผ่านระบบ IoT' : 'REAL-TIME IOT SENSOR NODE NETWORK'}
                     </span>
                 </div>
 
-                <p className="text-xs text-muted mb-6 max-w-3xl leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 max-w-3xl leading-relaxed">
                     {lang === 'th' 
                         ? 'จัดอันดับโหนดความถี่สูงในระบบจำลองละแวกบ้านของคุณ ตามผลคะแนนกรีนกริดที่เคลมสิทธิ์ได้จากภารกิจพลังงานเสถียร ท่านสามารถคลิกที่โหนดเพื่อวิเคราะห์ความต้านทานไฟฟ้าหรือส่งกำลังใจเชิงความถี่ประสานกริตได้' 
                         : 'Local residential microgrid nodes competing to support regional grid stability. Earn green points by completing and claiming eco-quests, customize your node logo banner, and rise through the sandbox community ladder!'}
@@ -1018,7 +1018,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                 className={`p-4 rounded-[2rem] border transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer ${
                                     isSelf 
                                         ? 'bg-primary/5 border-primary/40 shadow-md shadow-primary/5' 
-                                        : 'bg-light/75 border-transparent hover:border-slate-300 dark:hover:border-slate-700'
+                                        : 'bg-slate-50 dark:bg-slate-800/60/75 border-transparent hover:border-slate-300 dark:hover:border-slate-700'
                                 }`}
                                 onClick={() => setSelectedCompetitor(node)}
                             >
@@ -1039,7 +1039,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
 
                                     <div>
                                         <div className="flex items-center gap-2">
-                                            <h6 className={`font-black text-sm md:text-base mb-0 tracking-tight text-dark ${isSelf ? 'text-primary' : ''}`}>
+                                            <h6 className={`font-black text-sm md:text-base mb-0 tracking-tight text-slate-900 dark:text-slate-100 ${isSelf ? 'text-primary' : ''}`}>
                                                 {node.name}
                                             </h6>
                                             {isSelf && (
@@ -1048,17 +1048,17 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                 </span>
                                             )}
                                         </div>
-                                        <p className="text-[0.8rem] text-muted leading-relaxed mb-0 mt-0.5 max-w-xl line-clamp-1">
+                                        <p className="text-[0.8rem] text-slate-500 dark:text-slate-400 leading-relaxed mb-0 mt-0.5 max-w-xl line-clamp-1">
                                             {lang === 'th' ? node.descTh : node.descEn}
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto border-t md:border-t-0 border-light pt-3.5 md:pt-0">
-                                    <div className="flex gap-4 text-left md:text-right font-mono text-[0.75rem] text-muted">
+                                <div className="flex items-center justify-between md:justify-end gap-6 w-full md:w-auto border-t md:border-t-0 border-slate-100 dark:border-slate-800/50 pt-3.5 md:pt-0">
+                                    <div className="flex gap-4 text-left md:text-right font-mono text-[0.75rem] text-slate-500 dark:text-slate-400">
                                         <div>
                                             <span className="block uppercase tracking-wider text-[0.65rem] font-bold">{lang === 'th' ? 'ประสิทธิผลไฟฟ้า' : 'GRID EFFICIENCY'}</span>
-                                            <span className="font-bold text-dark text-xs block">{node.efficiency}</span>
+                                            <span className="font-bold text-slate-900 dark:text-slate-100 text-xs block">{node.efficiency}</span>
                                         </div>
                                         <div>
                                             <span className="block uppercase tracking-wider text-[0.65rem] font-bold">POWER FACTOR</span>
@@ -1071,8 +1071,8 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                     </div>
 
                                     <div className="text-right shrink-0">
-                                        <div className="font-mono font-black text-sm text-dark">{node.xp} XP</div>
-                                        <span className="text-[0.65rem] text-muted font-bold font-mono tracking-wider block">GREEN POINTS</span>
+                                        <div className="font-mono font-black text-sm text-slate-900 dark:text-slate-100">{node.xp} XP</div>
+                                        <span className="text-[0.65rem] text-slate-500 dark:text-slate-400 font-bold font-mono tracking-wider block">GREEN POINTS</span>
                                     </div>
                                 </div>
                             </motion.div>
@@ -1089,11 +1089,11 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 0.95, opacity: 0 }}
-                            className="bg-card text-dark rounded-[2.5rem] border border-light max-w-md w-full p-6 md:p-8 shadow-2xl relative my-auto max-h-[95vh] overflow-y-auto"
+                            className="bg-white text-slate-900 dark:text-slate-100 rounded-[2.5rem] border border-slate-100 dark:border-slate-800/50 max-w-md w-full p-6 md:p-8 shadow-2xl relative my-auto max-h-[95vh] overflow-y-auto"
                         >
                             <button 
                                 onClick={() => setSelectedCompetitor(null)}
-                                className="absolute top-6 right-6 text-muted hover:text-dark border-0 bg-transparent cursor-pointer text-lg"
+                                className="absolute top-6 right-6 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-slate-100 border-0 bg-transparent cursor-pointer text-lg"
                             >
                                 <i className="fas fa-times"></i>
                             </button>
@@ -1103,24 +1103,24 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                     <i className="fas fa-microchip"></i>
                                 </div>
                                 <h5 className="font-display font-black text-lg mb-1">{selectedCompetitor.name}</h5>
-                                <span className="text-[0.7rem] text-muted font-bold font-mono uppercase tracking-widest bg-light px-2.5 py-1 rounded-full border">
+                                <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 font-bold font-mono uppercase tracking-widest bg-slate-50 dark:bg-slate-800/60 px-2.5 py-1 rounded-full border">
                                     NODE TELEMETRY METRIC SIGNATURE
                                 </span>
                             </div>
 
-                            <div className="space-y-4 mb-6 text-xs text-muted leading-relaxed">
+                            <div className="space-y-4 mb-6 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                                 <p className="text-center italic">
                                     "{lang === 'th' ? selectedCompetitor.descTh : selectedCompetitor.descEn}"
                                 </p>
                                 
-                                <div className="border-t border-light pt-4 space-y-2.5 font-mono text-xs">
+                                <div className="border-t border-slate-100 dark:border-slate-800/50 pt-4 space-y-2.5 font-mono text-xs">
                                     <div className="flex justify-between">
                                         <span>{lang === 'th' ? 'ระดับคะแนนสะสม' : 'Green Points Total'}:</span>
-                                        <strong className="text-dark">{selectedCompetitor.xp} XP</strong>
+                                        <strong className="text-slate-900 dark:text-slate-100">{selectedCompetitor.xp} XP</strong>
                                     </div>
                                     <div className="flex justify-between">
                                         <span>{lang === 'th' ? 'ประสิทธิภาพโหนด' : 'Telemetry Efficiency'}:</span>
-                                        <strong className="text-dark">{selectedCompetitor.efficiency}</strong>
+                                        <strong className="text-slate-900 dark:text-slate-100">{selectedCompetitor.efficiency}</strong>
                                     </div>
                                     <div className="flex justify-between">
                                         <span>{lang === 'th' ? 'เพาเวอร์แฟกเตอร์เฉลี่ย' : 'Power Factor average'}:</span>

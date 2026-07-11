@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect, useRef, Suspense } from "react";
 import {
   AreaChart,
   Area,
@@ -41,20 +41,27 @@ import { GuidedTour } from "./GuidedTour";
 import { Confetti } from "./Confetti";
 import { motion, AnimatePresence } from "motion/react";
 import { useOnboardingTour } from "../hooks/useOnboardingTour";
+import { useContrastAdjustment } from "../hooks/useContrastAdjustment";
 import { QuestLeaderboard } from "./QuestLeaderboard";
 import { GridCharacterSkin } from "./GridCharacterSkin";
 import { DailyEnergyQuests } from "./DailyEnergyQuests";
 import { PropertyDistributionMap } from "./PropertyDistributionMap";
 import { WeatherCard } from "./WeatherCard";
 import { SmartSavingsCalculator } from "./SmartSavingsCalculator";
+import { ConsolidatedCalculator } from "./ConsolidatedCalculator";
 import { BillingSimulator } from "./BillingSimulator";
 import { ProjectedSavingsCard } from "./ProjectedSavingsCard";
 import { EnergyTipWidget } from "./EnergyTipWidget";
 import { EnergyMonitoringHub } from "./EnergyMonitoringHub";
 import { HistoricalTrendChart } from "./HistoricalTrendChart";
-import { SavingsCalculator } from "./SavingsCalculator";
+import OverviewTab from "./tabs/OverviewTab";
+import AiHubTab from "./tabs/AiHubTab";
+import DevicesTab from "./tabs/DevicesTab";
+import CalculatorTab from "./tabs/CalculatorTab";
+import StatsTab from "./tabs/StatsTab";
+import NotiTab from "./tabs/NotiTab";
+import ManualTab from "./tabs/ManualTab";
 import { io } from "socket.io-client";
-import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 
 const AnimatedCounter = ({ value, duration = 1.5, fractionDigits = 2 }: { value: number, duration?: number, fractionDigits?: number }) => {
@@ -87,6 +94,29 @@ const AnimatedCounter = ({ value, duration = 1.5, fractionDigits = 2 }: { value:
   return <>{displayValue.toFixed(fractionDigits)}</>;
 };
 
+const parseMaintenanceAdvice = (advice: string): string[] => {
+  if (!advice) return [];
+  
+  let normalized = advice
+    .replace(/([•\-\*]|\b\d+\.)\s+/g, '\n')
+    .replace(/(\r\n|\r|\n)+/g, '\n');
+    
+  const lines = normalized.split('\n');
+  const items: string[] = [];
+  
+  lines.forEach((line) => {
+    let trimmed = line.trim();
+    if (!trimmed) return;
+    
+    trimmed = trimmed.replace(/^[-*•\s\d.]+\s*/, '').trim();
+    if (trimmed) {
+      items.push(trimmed);
+    }
+  });
+  
+  return items.length > 0 ? items : [advice];
+};
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -117,11 +147,9 @@ const langData = {
     m1: "แดชบอร์ดหลัก",
     m2: "จัดการอุปกรณ์ (Nodes)",
     m3: "วิเคราะห์ค่าไฟ & งบประมาณ",
-    m4: "กำหนดงบประมาณ",
     m5: "สถิติย้อนหลัง",
     m6: "ความปลอดภัย & แจ้งเตือน",
     m7: "คำแนะนำจาก AI",
-    m8: "เปรียบเทียบการใช้ไฟกับบ้านอื่น",
     m9: "คู่มือการใช้งาน (Manual)",
     m10: "คู่มือการใช้งานอย่างง่าย",
     logout: "ออกจากระบบ",
@@ -317,11 +345,9 @@ const langData = {
     m1: "Overview",
     m2: "Devices & Nodes",
     m3: "Budget & Tariffs",
-    m4: "Budgeting Limit",
     m5: "Analytics",
     m6: "Alerts & Security",
     m7: "AI Strategy Intel",
-    m8: "Regional Benchmark",
     m9: "User Manual",
     m10: "Quick Guide",
     logout: "Log Out",
@@ -598,6 +624,8 @@ interface DashboardProps {
   onToggleTheme: () => void;
   onLogout: () => void;
   activeHouse?: any;
+  lang: "th" | "en";
+  setLang: (lang: "th" | "en") => void;
 }
 
 const TOU_ON_PEAK_RATE = 5.8;
@@ -608,11 +636,62 @@ const Dashboard: React.FC<DashboardProps> = ({
   onToggleTheme,
   onLogout,
   activeHouse,
+  lang,
+  setLang,
 }) => {
   const [currentPage, setCurrentPage] = useState("dashboard");
-  const [lang, setLang] = useState<"th" | "en">("th");
+
+    const [widgetOrder, setWidgetOrder] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem("eudease_widget_order_v6");
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return [
+      "eco-quests",
+      "leaderboard",
+      "current-weather",
+      "energy-tip"
+    ];
+  });
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [showComparisonView, setShowComparisonView] = useState(false);
+  
+  const [calcMode, setCalcMode] = useState<"hours" | "budget">("hours");
+  const [calcTab, setCalcTab] = useState<"detailed" | "tariff" | "budget">("detailed");
+  
+  const [statsFrame, setStatsFrame] = useState<"daily" | "monthly">("daily");
+  const [statsTab, setStatsTab] = useState<"telemetry" | "benchmark">("telemetry");
+  
+  const [notiTab, setNotiTab] = useState<"alerts" | "quests">("alerts");
+  
+  const [manualTab, setManualTab] = useState<"guide" | "settings">("guide");
+
   const [sidebarAvatar, setSidebarAvatar] = useState("default");
   const [sidebarCustomLogoUrl, setSidebarCustomLogoUrl] = useState("");
+
+  // Dynamically analyze contrast for WCAG AA compliance based on dark/light mode
+  const currentBgColor = isDarkMode ? "#0b1437" : "#f4f7fe";
+  const contrastAnalysis = useContrastAdjustment(
+    currentBgColor,
+    "#ffffff",
+    "#0f172a"
+  );
+
+  useEffect(() => {
+    if (contrastAnalysis.contrastRatio < 4.5) {
+      console.warn(
+        `[WCAG Accessibility Warning] Low contrast ratio detected: ${contrastAnalysis.contrastRatio}:1 (Background: ${currentBgColor}, Text: ${contrastAnalysis.textColor}). Minimum recommended is 4.5:1 (AA).`
+      );
+    } else {
+      console.log(
+        `[Accessibility Status] Valid contrast: ${contrastAnalysis.contrastRatio}:1 (AA compliant).`
+      );
+    }
+  }, [contrastAnalysis, currentBgColor]);
 
   const [severeWeatherAlert, setSevereWeatherAlert] = useState<{
     show: boolean;
@@ -624,7 +703,10 @@ const Dashboard: React.FC<DashboardProps> = ({
   useEffect(() => {
     const fetchWeatherForAlert = async () => {
       try {
-        const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=13.75&longitude=100.5167&daily=weather_code,temperature_2m_max,precipitation_probability_max&timezone=Asia%2FBangkok");
+        const response = await fetch("/api/weather/forecast?latitude=13.75&longitude=100.5167");
+        if (!response.ok || !response.headers.get("content-type")?.includes("application/json")) {
+          throw new Error("Invalid or non-JSON response from weather proxy");
+        }
         const data = await response.json();
         
         // Analyze today's weather
@@ -702,65 +784,40 @@ const Dashboard: React.FC<DashboardProps> = ({
     return () => window.removeEventListener("storage", syncAvatarFromStorage);
   }, []);
 
-  const [widgetOrder, setWidgetOrder] = useState<string[]>(() => {
-    const defaultOrder = [
-      "current-weather",
-      "property-map",
-    ];
-    try {
-      const saved = localStorage.getItem("eudease_widget_order_v2");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          const filtered = parsed.filter(
-            (item) =>
-              typeof item === "string" &&
-              ![
-                "stats",
-                "projected-savings",
-                "daily-savings-goal",
-                "kpi-chart",
-                "ai-optimization-gauge",
-                "smart-savings",
-                "weather-forecast",
-                "energy-monitoring-hub",
-                "energy-tip"
-              ].includes(item),
-          );
-          if (!filtered.includes("current-weather")) {
-            filtered.unshift("current-weather");
-          }
-          if (!filtered.includes("property-map")) {
-            filtered.push("property-map");
-          }
-          return Array.from(new Set(filtered));
-        }
-      }
-      return defaultOrder;
-    } catch {
-      return defaultOrder;
-    }
-  });
-
-  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-
   const generatePDF = async () => {
     setIsGeneratingPDF(true);
     try {
-      const element = document.getElementById("exportable-content");
-      if (element) {
-        const canvas = await html2canvas(element, { scale: 2, useCORS: true, backgroundColor: isDarkMode ? '#0f172a' : '#f8fafc' });
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("p", "mm", "a4");
-        
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-        
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-        pdf.save("energy-usage-report.pdf");
-      }
+      const pdf = new jsPDF("p", "mm", "a4");
+      
+      pdf.setFontSize(20);
+      pdf.text(lang === "th" ? "Energy Usage Report" : "Energy Usage Report", 20, 20);
+      
+      pdf.setFontSize(12);
+      pdf.text(`Generated: ${new Date().toLocaleString()}`, 20, 30);
+      
+      pdf.setFontSize(16);
+      pdf.text("Property Summary", 20, 45);
+      
+      pdf.setFontSize(12);
+      pdf.text(`Monthly Estimate: ฿${analytics.totalCost.toLocaleString()}`, 20, 55);
+      pdf.text(`Total Load: ${analytics.totalUnits.toFixed(2)} kWh`, 20, 65);
+      
+      let yPos = 85;
+      pdf.setFontSize(16);
+      pdf.text("Devices", 20, yPos);
+      yPos += 10;
+      
+      pdf.setFontSize(10);
+      multiDevices.forEach((dev) => {
+        pdf.text(`${dev.name} - ${dev.watt}W - ${dev.status === "on" ? "Online" : "Offline"}`, 20, yPos);
+        yPos += 7;
+        if (yPos > 280) {
+          pdf.addPage();
+          yPos = 20;
+        }
+      });
+      
+      pdf.save("energy-usage-report.pdf");
     } catch (error) {
       console.error("Failed to generate PDF:", error);
     } finally {
@@ -787,7 +844,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const handleDragEnd = () => {
     setDraggedIndex(null);
     try {
-      localStorage.setItem("eudease_widget_order_v2", JSON.stringify(widgetOrder));
+      localStorage.setItem("eudease_widget_order_v3", JSON.stringify(widgetOrder));
     } catch {}
   };
 
@@ -803,17 +860,8 @@ const Dashboard: React.FC<DashboardProps> = ({
       localStorage.setItem("eudease_widget_order_v2", JSON.stringify(updated));
     } catch {}
   };
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
   const [selectedDeviceId, setSelectedDeviceId] = useState<number | null>(null);
   const [compareDeviceIds, setCompareDeviceIds] = useState<number[]>([]);
-  const [showComparisonView, setShowComparisonView] = useState(false);
-  const [calcMode, setCalcMode] = useState<"hours" | "budget">("hours");
-  const [calcTab, setCalcTab] = useState<
-    "detailed" | "batch" | "tariff" | "budget"
-  >("detailed");
-  const [statsFrame, setStatsFrame] = useState<"daily" | "monthly">("daily");
   const [perfRange, setPerfRange] = useState<"daily" | "weekly" | "monthly">(
     "weekly",
   );
@@ -912,12 +960,6 @@ const Dashboard: React.FC<DashboardProps> = ({
     spikedWatt: number;
     time: string;
   } | null>(null);
-
-  const [statsTab, setStatsTab] = useState<"telemetry" | "benchmark">(
-    "telemetry",
-  );
-  const [notiTab, setNotiTab] = useState<"alerts" | "quests">("alerts");
-  const [manualTab, setManualTab] = useState<"guide" | "settings">("guide");
   const [aiAutopilotCapping, setAiAutopilotCapping] = useState(false);
   const [isSecondaryExpanded, setIsSecondaryExpanded] = useState(false);
   const [ecoStreak, setEcoStreak] = useState(() => {
@@ -956,6 +998,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       }
     } catch (err: any) {
       console.error("Error fetching weather forecast:", err);
+      setWeatherData({ source: "fallback-simulation" });
       setWeatherError(
         lang === "th"
           ? "ไม่สามารถเชื่อมต่อ AI ได้ ข้อมูลของคุณไม่ได้สูญหาย ลองใหม่อีกครั้งในอีก 2 นาที"
@@ -1258,7 +1301,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           : "No reply received");
 
       // Insert empty assistant bubble to initiate typing simulation
-      setChatMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+      setChatMessages((prev) => [...prev, { role: "assistant", content: "", source: data.source }].slice(-50));
 
       let charIndex = 0;
       const stepMultiplier = Math.max(1, Math.ceil(replyText.length / 100)); // Dynamic typing speed based on length
@@ -1287,7 +1330,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           ? "ไม่สามารถเชื่อมต่อ AI ได้ ข้อมูลของคุณไม่ได้สูญหาย ลองใหม่อีกครั้งในอีก 2 นาที"
           : "Cannot connect to AI. Your data is not lost. Please try again in 2 minutes.";
 
-      setChatMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+      setChatMessages((prev) => [...prev, { role: "assistant", content: "", source: "fallback-simulation" }].slice(-50));
       let charIndex = 0;
       const typingTimer = setInterval(() => {
         if (charIndex >= errorMsg.length) {
@@ -1698,14 +1741,33 @@ const Dashboard: React.FC<DashboardProps> = ({
     });
   }, [telemetryPerfRange, averagePowerFactor, aiPfTuning]);
 
-  const deviceSpecificChartData = useMemo(() => {
-    if (!selectedDeviceId) return [];
+  const [deviceSpecificChartData, setDeviceSpecificChartData] = useState<any[]>([]);
+  
+  useEffect(() => {
+    if (!selectedDeviceId) {
+      setDeviceSpecificChartData([]);
+      return;
+    }
     const dev = multiDevices.find((d) => d.id === selectedDeviceId);
-    if (!dev) return [];
-    return Array.from({ length: 12 }, (_, i) => ({
+    if (!dev) {
+      setDeviceSpecificChartData([]);
+      return;
+    }
+    
+    // Generate initial data
+    const generateData = () => Array.from({ length: 12 }, (_, i) => ({
       hour: `${i * 2}:00`,
       load: +(dev.watt * (0.5 + Math.random() * 0.5)).toFixed(0),
     }));
+    
+    setDeviceSpecificChartData(generateData());
+    
+    // Update every 10 seconds
+    const interval = setInterval(() => {
+      setDeviceSpecificChartData(generateData());
+    }, 10000);
+    
+    return () => clearInterval(interval);
   }, [selectedDeviceId, multiDevices]);
 
   const compareDevices = useMemo(() => {
@@ -1882,9 +1944,12 @@ const Dashboard: React.FC<DashboardProps> = ({
       }
 
       const results = await response.json();
-      const newAlerts = results.map((r: any) => ({
+      const source = results.source || "gemini";
+      const anomaliesList = Array.isArray(results) ? results : (results.anomalies || []);
+      const newAlerts = anomaliesList.map((r: any) => ({
         ...r,
         isAi: true,
+        aiSource: source,
         time: "Just now",
       }));
       setAiAlerts([...newAlerts, ...aiAlerts]);
@@ -1897,6 +1962,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         severity: "warning",
         icon: "fa-triangle-exclamation",
         isAi: true,
+        aiSource: "fallback-simulation",
         time: "Just now"
       }, ...aiAlerts]);
     } finally {
@@ -2143,6 +2209,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       console.error("Individual AI diagnosis failed", error);
       setDeviceAnalysis({
         error: true,
+        source: "fallback-simulation",
         summary: lang === 'th' ? "ไม่สามารถเชื่อมต่อ AI ได้ ข้อมูลของคุณไม่ได้สูญหาย ลองใหม่อีกครั้งในอีก 2 นาที" : "Cannot connect to AI. Your data is not lost. Please try again in 2 minutes."
       });
     } finally {
@@ -2281,6 +2348,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       i: "fa-bolt",
       time: "5m ago",
       isAi: false,
+      aiSource: undefined as string | undefined,
     },
     {
       t: t("alert_update_title"),
@@ -2289,6 +2357,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       i: "fa-sync",
       time: "2h ago",
       isAi: false,
+      aiSource: undefined as string | undefined,
     },
     {
       t: t("alert_budget_title"),
@@ -2297,6 +2366,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       i: "fa-exclamation-triangle",
       time: "1d ago",
       isAi: false,
+      aiSource: undefined as string | undefined,
     },
   ];
 
@@ -2308,6 +2378,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       i: a.icon,
       time: a.time,
       isAi: true,
+      aiSource: a.aiSource,
     })),
     ...baseAlerts,
   ];
@@ -2321,6 +2392,12 @@ const Dashboard: React.FC<DashboardProps> = ({
         className="shrink-0 shadow-md"
       />
     );
+  };
+
+
+  const shared = {
+    lang, isDarkMode, onToggleTheme, onLogout, multiDevices, setMultiDevices, analytics, t, confettiTrigger, setConfettiTrigger, currentPage, setCurrentPage, sidebarAvatar, setSidebarAvatar, sidebarCustomLogoUrl, setSidebarCustomLogoUrl, currentBgColor, contrastAnalysis, severeWeatherAlert, weatherData, isWeatherLoading, weatherLocation, weatherError, weatherInput, isMobileMenuOpen, setIsMobileMenuOpen, isTourActive, setIsTourActive, startImmediateTour, setStartImmediateTour, aiAutopilotCapping, setAiAutopilotCapping, ecoStreak, setEcoStreak, chatMessages, setChatMessages, chatInput, setChatInput, isSendingChat, setIsSendingChat, isChatOpen, setIsChatOpen, activeFaqCategory, setActiveFaqCategory, removeDevice, generatePDF, handleMoveWidget, widgetOrder, setWidgetOrder, draggedIndex, setDraggedIndex, isGeneratingPDF, setIsGeneratingPDF, dailySavingsData, performanceChartData, aiOptimizationMetrics, settlementLogs, aiSmartAc, setAiSmartAc, aiEcoStandby, setAiEcoStandby, aiPfTuning, setAiPfTuning, aiLoadShift, setAiLoadShift, perfRange, setPerfRange, globalBudget, unitRate, telemetryPerfRange, setTelemetryPerfRange, deviceSpecificChartData, compareDevices, aiOptimizationChartData, deviceAnalysis, isAnalyzingDevice, setIsAnalyzingDevice, selectedDeviceId, setSelectedDeviceId, compareDeviceIds, setCompareDeviceIds, showComparisonView, setShowComparisonView, calcDays, setCalcDays, sharedFtRate, setSharedFtRate, plannedKwh, setPlannedKwh, onPeakShare, setOnPeakShare, activeSpike, setActiveSpike, aiAlerts, setAiAlerts, isAiScanning, setIsAiScanning, aiTick, setAiTick, claimedQuests, setClaimedQuests, handleInjectVirtualLoad, setGlobalBudget, setUnitRate, setDeviceAnalysis, setWeatherInput, setWeatherLocation, addDevice, containerVariants, itemVariants, CATEGORIES, AnimatedCounter, calcMode, setCalcMode, calcTab, setCalcTab, statsFrame, setStatsFrame, statsTab, setStatsTab, notiTab, setNotiTab, manualTab, setManualTab, searchTerm, setSearchTerm, activeCategory, setActiveCategory,
+    aiMonthlySavings, handleBatchStandbyCutoff, filteredDevices, toggleCompareSelection, setLang, runAiAnomalyScan, currentAlerts, totalClaimedXp, activeQuests, handleClaimQuest, handleDragStart, handleDragOver, handleDragEnd, activeHouse, telemetryChartData, CustomTooltip, telemetryPerformanceData, pieData, COLORS
   };
 
   return (
@@ -2351,7 +2428,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 </span>
               </div>
               <button
-                className="btn lg:hidden text-muted h-[44px] w-[44px] flex items-center justify-center"
+                className="btn lg:hidden text-slate-500 dark:text-slate-400 h-[44px] w-[44px] flex items-center justify-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <i className="fas fa-times"></i>
@@ -2372,7 +2449,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <button
             onClick={onLogout}
-            className="nav-link text-danger border-0 bg-transparent w-full text-start flex items-center gap-2 mt-auto p-4 hover:bg-danger/10 shrink-0"
+            className="nav-link text-rose-500 dark:text-rose-400 border-0 bg-transparent w-full text-start flex items-center gap-2 mt-auto p-4 hover:bg-rose-500/10 shrink-0"
           >
             <i className="fas fa-power-off"></i>{" "}
             <span className="text-xs font-bold uppercase tracking-widest">
@@ -2395,7 +2472,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               <h2 className="font-bold mb-0 font-display text-2xl md:text-3xl tracking-tight">
                 {t(navItems.find((n) => n.id === currentPage)?.key || "m1")}
               </h2>
-              <p className="text-muted text-[0.75rem] font-bold uppercase tracking-[0.2em]">
+              <p className="text-slate-500 dark:text-slate-400 text-[0.75rem] font-bold uppercase tracking-[0.2em]">
                 {isDarkMode ? t("terminal") : t("global_access")}
               </p>
             </div>
@@ -2412,9 +2489,9 @@ const Dashboard: React.FC<DashboardProps> = ({
               </span>
             </div>
             
-            <div className="flex items-center gap-2 px-3 py-2 bg-light rounded-2xl border shadow-sm whitespace-nowrap shrink-0">
+            <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border shadow-sm whitespace-nowrap shrink-0">
               <span className="neural-pulse"></span>
-              <span className="text-[0.7rem] font-bold uppercase tracking-widest text-muted">
+              <span className="text-[0.7rem] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                 {t("db_health")}
               </span>
             </div>
@@ -2477,7 +2554,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               onClick={onToggleTheme}
             >
               <i
-                className={`fas ${isDarkMode ? "fa-sun text-warning" : "fa-moon text-primary"}`}
+                className={`fas ${isDarkMode ? "fa-sun text-amber-500 dark:text-amber-400" : "fa-moon text-primary"}`}
               ></i>
             </button>
           </div>
@@ -2485,2171 +2562,50 @@ const Dashboard: React.FC<DashboardProps> = ({
 
         <div className="page-content" id="exportable-content">
           {currentPage === "dashboard" && (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="space-y-8"
-              id="tour-step-dashboard"
-            >
-              {/* PRIMARY HERO METRICS SECTION */}
-              <motion.div 
-                variants={itemVariants}
-                className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 mb-2"
-              >
-                {/* Metric 1: Total Savings */}
-                <div className="bg-gradient-to-br from-emerald-500/10 via-emerald-600/5 to-transparent border border-emerald-500/30 dark:border-emerald-500/20 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-300">
-                    <i className="fas fa-piggy-bank text-8xl text-emerald-500"></i>
-                  </div>
-                  <div className="relative z-10 flex flex-col justify-between h-full">
-                    <div>
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mb-3">
-                        <i className="fas fa-coins text-emerald-500"></i>
-                        {lang === "th" ? "สถิติการประหยัดอัจฉริยะ" : "SMART SAVINGS DIRECTORY"}
-                      </span>
-                      <h4 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">
-                        {lang === "th" ? "ประมาณการประหยัดค่าไฟสะสม" : "Total Combined Savings"}
-                      </h4>
-                    </div>
-                    <div className="mt-4">
-                      <div className="text-4xl md:text-5xl font-black font-mono tracking-tight text-emerald-600 dark:text-emerald-400 flex items-baseline gap-2">
-                        ฿{Math.round(aiMonthlySavings.amount).toLocaleString()}
-                        <span className="text-sm font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-lg border border-emerald-500/10">
-                          -{aiMonthlySavings.percent.toFixed(1)}%
-                        </span>
-                      </div>
-                      <p className="text-[0.75rem] text-slate-500 dark:text-slate-300 mt-2 leading-relaxed mb-0">
-                        {lang === "th" 
-                          ? "ลดภาระค่าใช้จ่ายเครือข่ายจำลองแบบเรียลไทม์ ภายใต้การควบคุมระบบอัจฉริยะ" 
-                          : "Calculated monthly reduction across active smart-nodes under active AI calibration."}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Metric 2: AI Score */}
-                <div className="bg-gradient-to-br from-purple-500/10 via-purple-600/5 to-transparent border border-purple-500/30 dark:border-purple-500/20 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden group">
-                  <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-300">
-                    <i className="fas fa-brain text-8xl text-purple-500"></i>
-                  </div>
-                  <div className="relative z-10 flex flex-col justify-between h-full">
-                    <div>
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 mb-3">
-                        <i className="fas fa-bolt text-purple-500"></i>
-                        {lang === "th" ? "คะแนนเสถียรภาพและคุณภาพ" : "SYSTEM CALIBRATION STATUS"}
-                      </span>
-                      <h4 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">
-                        {lang === "th" ? "คะแนนการเพิ่มประสิทธิภาพด้วย AI" : "AI Efficiency Score"}
-                      </h4>
-                    </div>
-                    <div className="mt-4">
-                      <div className="text-4xl md:text-5xl font-black font-mono tracking-tight text-purple-600 dark:text-purple-400 flex items-baseline gap-2">
-                        {aiOptimizationMetrics.efficiencyIndex.toFixed(0)}
-                        <span className="text-lg font-bold text-slate-400">/ 100</span>
-                        <span className={`text-[0.7rem] font-bold px-2 py-0.5 rounded-lg border uppercase tracking-wider ${aiOptimizationMetrics.confidenceLevelColor}`}>
-                          {aiOptimizationMetrics.statusTag}
-                        </span>
-                      </div>
-                      <p className="text-[0.75rem] text-slate-500 dark:text-slate-300 mt-2 leading-relaxed mb-0">
-                        {lang === "th" 
-                          ? `เสถียรภาพระบบ: ${aiOptimizationMetrics.confidenceLevelLabel} (อัตราร่วม ${aiOptimizationMetrics.confidenceLevel.toFixed(1)}%)` 
-                          : `Calibration index: ${aiOptimizationMetrics.confidenceLevelLabel} (Precision ${aiOptimizationMetrics.confidenceLevel.toFixed(1)}%)`}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              {/* Layout Customization Information Panel */}
-              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-200 dark:border-transparent gap-3 mb-2 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-primary/15 rounded-xl text-primary text-xs">
-                    <i className="fas fa-layer-group text-base"></i>
-                  </div>
-                  <div>
-                    <h6 className="font-bold font-display text-sm mb-0.5 text-slate-900 dark:text-white">
-                      {lang === "th"
-                        ? "เครื่องมือปรับแต่งเลย์เอาต์แผงทำงาน"
-                        : "Grid Layout Customizer"}
-                    </h6>
-                    <p className="text-[0.75rem] text-slate-600 dark:text-slate-100 mb-0">
-                      {lang === "th"
-                        ? "ท่านสามารถลากวางที่หัวข้อการ์ดเพื่อจัดเรียงตำแหน่งวิดเจ็ตสถิติ หรือคลิกลูกศรเลื่อนหน้าต่างได้ตามที่ต้องการ"
-                        : "Drag any widget title bar to rearrange or use standard arrow controllers to personalize your Workspace."}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      const defaultOrder = [
-                        "current-weather",
-                        "property-map",
-                      ];
-                      setWidgetOrder(defaultOrder);
-                      try {
-                        localStorage.setItem(
-                          "eudease_widget_order_v2",
-                          JSON.stringify(defaultOrder),
-                        );
-                      } catch {}
-                    }}
-                    className="btn btn-xs bg-slate-200 text-slate-800 border border-slate-300 hover:bg-slate-300 dark:bg-white/10 dark:text-white dark:border-transparent dark:hover:bg-slate-800 text-[0.75rem] font-bold uppercase tracking-wider rounded-xl px-3 py-2 flex items-center gap-1.5"
-                    type="button"
-                  >
-                    <i className="fas fa-history text-xs text-primary"></i>
-                    <span>
-                      {lang === "th" ? "รีเซ็ตคืนค่าเริ่มต้น" : "Reset Layout"}
-                    </span>
-                  </button>
-                </div>
-              </motion.div>
-
-              {/* Quick Questions & Common Energy Actions Component */}
-              <motion.div variants={itemVariants} className="p-5 rounded-3xl border border-primary/20 bg-gradient-to-r from-primary/5 via-teal-500/5 to-emerald-500/5 shadow-md flex flex-col gap-4 mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/15 flex items-center justify-center text-lg shadow-sm shrink-0">
-                    <i className="fas fa-question-circle"></i>
-                  </div>
-                  <div>
-                    <h6 className="font-bold font-display text-sm mb-0.5 text-slate-900 dark:text-white">
-                      {lang === "th"
-                        ? "เมนูทางเลือกและคำสั่งด่วน"
-                        : "Quick Questions & Actions"}
-                    </h6>
-                    <p className="text-[0.75rem] text-slate-600 dark:text-slate-100 mb-0">
-                      {lang === "th"
-                        ? "รวมปุ่มลัดคำสั่งยอดนิยมเพื่อช่วยสแกนสถิติพลังงานของท่าน แสร้งส่งรายงานปัญหาไฟฟ้าขัดข้อง หรือตรวจสอบระบบประหยัดเร่งด่วนทันทีในคลิกเดียว"
-                        : "Pre-defined action shortcuts to analyze consumption patterns, report anomalies, or fine-tune active grid settings in one click."}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Action 1: View Monthly Consumption */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCurrentPage("stats");
-                      setStatsTab("telemetry");
-                      setStatsFrame("monthly");
-                    }}
-                    className="p-4 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-300 dark:border-white/5 hover:border-primary/50 text-start hover:bg-primary/5 active:scale-95 active:opacity-90 transition-all duration-300 group flex items-center gap-3.5 input-has-focus shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                      <i className="fas fa-chart-bar text-sm"></i>
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold font-display text-slate-900 dark:text-slate-200 mb-0.5">
-                        {lang === "th"
-                          ? "รายงานใช้ไฟรายเดือน"
-                          : "View Monthly Consumption"}
-                      </div>
-                      <p className="text-[0.7rem] text-slate-600 dark:text-slate-200 mb-0 line-clamp-1">
-                        {lang === "th"
-                          ? "สลับข้อมูลสถิติของชาร์ตแสดงผลเป็นรายเดือนทันที"
-                          : "Switch live charts to monthly telemetry context."}
-                      </p>
-                    </div>
-                  </button>
-
-                  {/* Action 2: Report Power Issue */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const newReport = {
-                        id: "user_reported_" + Date.now(),
-                        title:
-                          lang === "th"
-                            ? "📝 บันทึกรายงานปัญหาไฟฟ้าเรียบร้อย"
-                            : "📝 Reported Power Quality Anomaly",
-                        description:
-                          lang === "th"
-                            ? "บันทึกรายงานปัญหาไฟฟ้าขัดข้องของท่านเข้าระบบตรวจสอบพลังงานส่วนกลางเรียบร้อยอย่างปลอดภัยแล้ว"
-                            : "Power irregularity recorded successfully on subgrid sector via Quick Questions selection panel.",
-                        severity: "danger",
-                        icon: "fa-exclamation-triangle",
-                        time: "Just now",
-                      };
-                      setAiAlerts((prev) => [newReport, ...prev]);
-                      setCurrentPage("noti");
-                    }}
-                    className="p-4 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-300 dark:border-white/5 hover:border-danger/50 text-start hover:bg-danger/5 active:scale-95 active:opacity-90 transition-all duration-300 group flex items-center gap-3.5 input-has-focus shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-danger/10 text-danger flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                      <i className="fas fa-exclamation-triangle text-sm"></i>
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold font-display text-slate-900 dark:text-slate-200 mb-0.5">
-                        {lang === "th"
-                          ? "แจ้งรายงานปัญหาไฟฟ้า"
-                          : "Report Power Issue"}
-                      </div>
-                      <p className="text-[0.7rem] text-slate-600 dark:text-slate-200 mb-0 line-clamp-1">
-                        {lang === "th"
-                          ? "จำลองแจ้งเหตุกระแสไฟฟ้าตกหรือแรงดันผิดปกติ"
-                          : "File standard voltage drop warning into alerts center"}
-                      </p>
-                    </div>
-                  </button>
-
-                  {/* Action 3: Optimize Energy Settings */}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAiSmartAc(true);
-                      setAiEcoStandby(true);
-                      setAiLoadShift(true);
-                      setAiPfTuning(true);
-
-                      const optAlert = {
-                        id: "optimize_triggered_" + Date.now(),
-                        title:
-                          lang === "th"
-                            ? "✨ เปิดโหมดประหยัดพลังงานรวมเรียบร้อยแล้ว"
-                            : "✨ Peak Reductions Configured",
-                        description:
-                          lang === "th"
-                            ? "สวิตช์ประหยัดทั้ง 4 หมวด (ปรับอุณหภูมิแอร์, ตัดไฟ Standby, เลื่อนเวลา TOU, และจูนค่าไฟ) เริ่มทำงานประสานกันอย่างมีประสิทธิภาพสูงสุด"
-                            : "All 4 standard smart algorithms toggled on securely (Smart AC, Standby Cutoff, Shift, and Tuning).",
-                        severity: "success",
-                        icon: "fa-magic",
-                        time: "Just now",
-                      };
-                      setAiAlerts((prev) => [optAlert, ...prev]);
-                    }}
-                    className="p-4 rounded-2xl bg-white dark:bg-slate-900/40 border border-slate-300 dark:border-white/5 hover:border-emerald-500/50 text-start hover:bg-emerald-500/5 active:scale-95 active:opacity-90 transition-all duration-300 group flex items-center gap-3.5 input-has-focus shadow-sm"
-                  >
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-                      <i className="fas fa-magic text-sm"></i>
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold font-display text-slate-900 dark:text-slate-200 mb-0.5">
-                        {lang === "th"
-                          ? "เปิดทุกฟังก์ชันประหยัดทันที"
-                          : "Optimize Energy Settings"}
-                      </div>
-                      <p className="text-[0.7rem] text-slate-600 dark:text-slate-200 mb-0 line-clamp-1">
-                        {lang === "th"
-                          ? "เปิดสวิตช์ฟังก์ชันประหยัดพลังงานอัจฉริยะครบ 4 ระบบในคลิกเดียว"
-                          : "Activate all 4 power regulatory smart-toggles"}
-                      </p>
-                    </div>
-                  </button>
-                </div>
-              </motion.div>
-
-              <motion.div variants={containerVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 grid-flow-row-dense gap-4 lg:gap-6 mb-8">
-                {widgetOrder.map((widgetId, index) => {
-                  if (widgetId === "current-weather") {
-                    return (
-                      <motion.div
-                        key="current-weather"
-                        variants={itemVariants}
-                        draggable
-                        onDragStart={(e: any) => handleDragStart(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragOver={(e: any) => handleDragOver(e, typeof index !== 'undefined' ? index : 0)}
-                        onDragEnd={handleDragEnd}
-                        className="md:col-span-2 lg:col-span-12 transition-all duration-300 h-full"
-                      >
-                        <div className="h-full group">
-                          {/* Draggable header (invisible by default, shows on hover/drag) */}
-                          <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity mb-2 px-2">
-                             <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing text-slate-500">
-                               <i className="fas fa-grip-horizontal"></i>
-                               <span className="text-[0.7rem] uppercase tracking-wider font-bold">DRAG TO MOVE</span>
-                             </div>
-                             <div className="flex items-center gap-2">
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "up")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === 0}
-                              >
-                                <i className="fas fa-chevron-up"></i>
-                              </button>
-                              <button
-                                type="button"
-                                className="p-1 px-2 bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-100 rounded hover:bg-primary hover:text-white transition-all text-[0.65rem]"
-                                onClick={() => handleMoveWidget(typeof index !== 'undefined' ? index : 0, "down")}
-                                disabled={(typeof index !== 'undefined' ? index : 0) === widgetOrder.length - 1}
-                              >
-                                <i className="fas fa-chevron-down"></i>
-                              </button>
-                            </div>
-                          </div>
-                          <WeatherCard lang={lang} isDarkMode={isDarkMode} locationName={activeHouse?.name || 'Local Property'} />
-                        </div>
-                      </motion.div>
-                    );
-                  }
-
-
-                  if (widgetId === "energy-monitoring-hub") {
-                    return null;
-                  }
-                  if (widgetId === "energy-tip") {
-                    return null;
-                  }
-
-
-
-
-
-                  
-
-                  
-
-                  
-
-                  if (widgetId === "property-map") {
-                    return null;
-                  }
-
-
-
-                  return null;
-                })}
-              
-
-
-              {/* ECO-QUESTS SECTION */}
-              <div className="md:col-span-2 lg:col-span-12 w-full mt-6">
-                <div className="dashboard-card border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/40 p-6 rounded-[2rem] shadow-sm transition-all duration-300">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/15 flex items-center justify-center text-lg shadow-sm shrink-0">
-                      <i className="fas fa-trophy text-amber-500 animate-bounce"></i>
-                    </div>
-                    <div>
-                      <h5 className="font-bold font-display text-sm md:text-base mb-0.5 text-slate-900 dark:text-white">
-                        {lang === "th" ? "ภารกิจกรีนเอเนอร์ยี่สะสมคะแนนแลกรางวัล" : "Active Eco-Quests & Smart Savings"}
-                      </h5>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-0">
-                        {lang === "th" 
-                          ? "ทำภารกิจจำลองเพื่อเพิ่มประสิทธิภาพ และปรับค่าเสถียรภาพการประหยัดไฟ" 
-                          : "Calibrate systems and complete live tasks to gain XP tokens and rewards."}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <QuestLeaderboard
-                      lang={lang}
-                      totalClaimedXp={totalClaimedXp}
-                      claimedQuests={claimedQuests}
-                      ecoStreak={ecoStreak}
-                      activeQuests={activeQuests}
-                      handleClaimQuest={handleClaimQuest}
-                      triggerConfetti={() => setConfettiTrigger((t) => t + 1)}
-                    />
-
-                    <div className="w-full">
-                      <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-500/5 backdrop-blur-sm shadow-sm mb-0">
-                        <div className="p-1">
-                          <DailyEnergyQuests
-                            lang={lang}
-                            onTokenClaimed={(amount) => {
-                              setConfettiTrigger((t) => t + 1);
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
+            <Suspense fallback={<div className="flex justify-center p-10"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+              <OverviewTab shared={shared} />
+            </Suspense>
+          )}
 
           {currentPage === "ai_hub" && (
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              className="space-y-8 animate-fade-in"
-              id="tour-step-ai-hub"
-            >
-              <EnergyMonitoringHub
-                lang={lang}
-                isDarkMode={isDarkMode}
-                devices={multiDevices}
-                analytics={analytics}
-                dailySavingsData={dailySavingsData}
-                performanceChartData={performanceChartData}
-                aiOptimizationMetrics={aiOptimizationMetrics}
-                aiSmartAc={aiSmartAc}
-                setAiSmartAc={setAiSmartAc}
-                aiEcoStandby={aiEcoStandby}
-                setAiEcoStandby={setAiEcoStandby}
-                aiPfTuning={aiPfTuning}
-                setAiPfTuning={setAiPfTuning}
-                aiLoadShift={aiLoadShift}
-                setAiLoadShift={setAiLoadShift}
-                perfRange={perfRange}
-                setPerfRange={setPerfRange}
-                globalBudget={globalBudget}
-                unitRate={unitRate}
-              />
-            </motion.div>
+            <Suspense fallback={<div className="flex justify-center p-10"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+              <AiHubTab shared={shared} />
+            </Suspense>
           )}
 
           {currentPage === "devices" && (
-            <div className="animate-fade-in relative">
-              {/* Premium Node Control toolbar */}
-<div className="w-full mb-6">
-                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm rounded-[2rem] hover:shadow-lg transition-all duration-300">
-                          {/* Header */}
-                          
-                          <div className="p-5">
-                            <PropertyDistributionMap lang={lang} isDarkMode={isDarkMode} />
-                          </div>
-                        </div>
-</div>
-<div className="w-full mb-6">
-                        <div
-                          id="tour-step-ai-switches"
-                          className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden shadow-sm h-full flex flex-col bg-white dark:bg-white/5"
-                        >
-                          
-                          <div className="p-6 flex flex-col justify-between h-full bg-slate-900/40">
-                            <div className="w-full">
-                              <div className="flex justify-between items-center mb-4">
-                                <h6 className="font-display font-bold text-sm uppercase tracking-wider text-white m-0 flex items-center gap-2">
-                                  <i className="fas fa-sliders-h text-emerald-400"></i>
-                                  <span>
-                                    {lang === "th"
-                                      ? "ควบคุมโมดูล AI โครงข่าย"
-                                      : "AI Grid Control Center"}
-                                  </span>
-                                </h6>
-                                <span className="badge bg-emerald-555/20 text-emerald-300 font-mono text-[0.7rem] font-bold p-1 px-2.5 rounded-full uppercase">
-                                  Interactive Live
-                                </span>
-                              </div>
-                              <p className="text-[0.8rem] text-muted mb-6 leading-relaxed">
-                                {lang === "th"
-                                  ? "คลิปรับฟังข้อมูลและควบคุมสวิตช์ระบบประหยัด เพื่อคาดคำนวณและโกนยอดโหลดสูงสุดในการบริหารงบล่วงหน้าแบบเรียลไทม์"
-                                  : "Toggle active subgrid features inside the simulator core to adjust real-time peak-shaving forecasts."}
-                              </p>
-
-                              {/* Optimization Settings Switch List */}
-                              <div className="space-y-3.5 mb-6">
-                                {/* Switch 1 */}
-                                <div
-                                  onClick={() => setAiSmartAc(!aiSmartAc)}
-                                  className={`p-3 rounded-2xl border transition-all active:scale-[0.98] active:opacity-90 cursor-pointer flex items-center justify-between ${
-                                    aiSmartAc
-                                      ? "bg-emerald-500/10 border-emerald-500/30"
-                                      : isDarkMode
-                                        ? "bg-slate-900/60 border-slate-800 text-slate-500"
-                                        : "bg-slate-100 border-slate-200 text-slate-500"
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div
-                                      className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs transition-colors ${
-                                        aiSmartAc
-                                          ? "bg-emerald-555 text-white shadow-sm"
-                                          : "bg-slate-800 text-slate-500"
-                                      }`}
-                                    >
-                                      <i className="fas fa-temperature-low animate-pulse"></i>
-                                    </div>
-                                    <div>
-                                      <div
-                                        className={`text-[0.8rem] font-black ${aiSmartAc ? "text-white/95" : "text-slate-500"}`}
-                                      >
-                                        {lang === "th"
-                                          ? "1. ปรับอุณหภูมิ AC แบบประหยัด"
-                                          : "Smart AC Peak Regulation"}
-                                      </div>
-                                      <div className="text-[8.5px] opacity-60 font-bold">
-                                        {lang === "th"
-                                          ? "ประหยัดเฉลี่ย 6.5% - คุมโหมดบ่ายหลัก"
-                                          : "Est. Saving 6.5% - thermal bounds"}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div
-                                    className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 ${aiSmartAc ? "bg-emerald-500" : "bg-slate-600"} flex items-center`}
-                                  >
-                                    <div
-                                      className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${aiSmartAc ? "translate-x-[16px]" : "translate-x-0"}`}
-                                    />
-                                  </div>
-                                </div>
-
-                                {/* Switch 2 */}
-                                <div
-                                  onClick={() => setAiEcoStandby(!aiEcoStandby)}
-                                  className={`p-3 rounded-2xl border transition-all active:scale-[0.98] active:opacity-90 cursor-pointer flex items-center justify-between ${
-                                    aiEcoStandby
-                                      ? "bg-emerald-500/10 border-emerald-500/30"
-                                      : isDarkMode
-                                        ? "bg-slate-900/60 border-slate-800 text-slate-500"
-                                        : "bg-slate-100 border-slate-200 text-slate-500"
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div
-                                      className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs transition-colors ${
-                                        aiEcoStandby
-                                          ? "bg-emerald-555 text-white shadow-sm"
-                                          : "bg-slate-800 text-slate-500"
-                                      }`}
-                                    >
-                                      <i className="fas fa-power-off"></i>
-                                    </div>
-                                    <div>
-                                      <div
-                                        className={`text-[0.8rem] font-black ${aiEcoStandby ? "text-white/95" : "text-slate-500"}`}
-                                      >
-                                        {lang === "th"
-                                          ? "2. ระงับไฟรั่วสแตนด์บาย"
-                                          : "Eco Standby Autocut"}
-                                      </div>
-                                      <div className="text-[8.5px] opacity-60 font-bold">
-                                        {lang === "th"
-                                          ? "ประหยัดเฉลี่ย 4.2% - ตัดกระแสแฝงเที่ยงคืน"
-                                          : "Est. Saving 4.2% - Residual leak cutoff"}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div
-                                    className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 ${aiEcoStandby ? "bg-emerald-500" : "bg-slate-600"} flex items-center`}
-                                  >
-                                    <div
-                                      className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${aiEcoStandby ? "translate-x-[16px]" : "translate-x-0"}`}
-                                    />
-                                  </div>
-                                </div>
-
-                                {/* Switch 3 */}
-                                <div
-                                  onClick={() => setAiLoadShift(!aiLoadShift)}
-                                  className={`p-3 rounded-2xl border transition-all active:scale-[0.98] active:opacity-90 cursor-pointer flex items-center justify-between ${
-                                    aiLoadShift
-                                      ? "bg-emerald-500/10 border-emerald-500/30"
-                                      : isDarkMode
-                                        ? "bg-slate-900/60 border-slate-800 text-slate-500"
-                                        : "bg-slate-100 border-slate-200 text-slate-500"
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div
-                                      className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs transition-colors ${
-                                        aiLoadShift
-                                          ? "bg-emerald-555 text-white shadow-sm"
-                                          : "bg-slate-800 text-slate-500"
-                                      }`}
-                                    >
-                                      <i className="fas fa-history"></i>
-                                    </div>
-                                    <div>
-                                      <div
-                                        className={`text-[0.8rem] font-black ${aiLoadShift ? "text-white/95" : "text-slate-500"}`}
-                                      >
-                                        {lang === "th"
-                                          ? "3. อัลกอริทึมสลับเวลา TOU"
-                                          : "Smart TOU Load Shifter"}
-                                      </div>
-                                      <div className="text-[8.5px] opacity-60 font-bold">
-                                        {lang === "th"
-                                          ? "ประหยัดเฉลี่ย 8.3% - เลื่อนยอดจ่ายพ้น On-Peak"
-                                          : "Est. Saving 8.3% - Peak hour shaving"}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div
-                                    className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 ${aiLoadShift ? "bg-emerald-500" : "bg-slate-600"} flex items-center`}
-                                  >
-                                    <div
-                                      className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${aiLoadShift ? "translate-x-[16px]" : "translate-x-0"}`}
-                                    />
-                                  </div>
-                                </div>
-
-                                {/* Switch 4 */}
-                                <div
-                                  onClick={() => setAiPfTuning(!aiPfTuning)}
-                                  className={`p-3 rounded-2xl border transition-all active:scale-[0.98] active:opacity-90 cursor-pointer flex items-center justify-between ${
-                                    aiPfTuning
-                                      ? "bg-emerald-500/10 border-emerald-500/30"
-                                      : isDarkMode
-                                        ? "bg-slate-900/60 border-slate-800 text-slate-500"
-                                        : "bg-slate-100 border-slate-200 text-slate-500"
-                                  }`}
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div
-                                      className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs transition-colors ${
-                                        aiPfTuning
-                                          ? "bg-emerald-555 text-white shadow-sm"
-                                          : "bg-slate-800 text-slate-500"
-                                      }`}
-                                    >
-                                      <i className="fas fa-microchip"></i>
-                                    </div>
-                                    <div>
-                                      <div
-                                        className={`text-[0.8rem] font-black ${aiPfTuning ? "text-white/95" : "text-slate-500"}`}
-                                      >
-                                        {lang === "th"
-                                          ? "4. ตัวจูน Power Factor โครงข่าย"
-                                          : "Smart Power Factor Tuning"}
-                                      </div>
-                                      <div className="text-[8.5px] opacity-60 font-bold">
-                                        {lang === "th"
-                                          ? "ประหยัดเพิ่ม 3.0% - ประยุกต์แคปฟิลเตอร์"
-                                          : "Est. Saving 3.0% - Active PF filter"}
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div
-                                    className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 ${aiPfTuning ? "bg-emerald-500" : "bg-slate-600"} flex items-center`}
-                                  >
-                                    <div
-                                      className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${aiPfTuning ? "translate-x-[16px]" : "translate-x-0"}`}
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Bottom Impact Telemetry Card */}
-                            <div className="border-t border-slate-500/10 pt-4 mt-auto w-full">
-                              <div className="grid grid-cols-2 gap-3">
-                                <div className="p-3 bg-light rounded-2xl text-center md:text-start">
-                                  <span className="text-[0.7rem] text-muted font-bold block mb-1 uppercase">
-                                    {lang === "th"
-                                      ? "จำลองมูลค่าประหยัด"
-                                      : "Est. Savings Amount"}
-                                  </span>
-                                  <span className="text-sm font-black text-emerald-400 font-mono">
-                                    ฿{aiMonthlySavings.amount.toFixed(0)}
-                                  </span>
-                                </div>
-                                <div className="p-3 bg-light rounded-2xl text-center md:text-start">
-                                  <span className="text-[0.7rem] text-muted font-bold block mb-1 uppercase">
-                                    {lang === "th"
-                                      ? "ยอดจ่ายจำลองสุทธิ"
-                                      : "Optimized Estimate"}
-                                  </span>
-                                  <span className="text-sm font-black text-white/90 font-mono">
-                                    ฿{aiMonthlySavings.finalCost.toFixed(0)}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-</div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="dashboard-card border-0 p-5 bg-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div>
-                    <h6 className="font-extrabold text-sm mb-1">
-                      {lang === "th"
-                        ? "⚡ เครื่องยิงประจุจำลองโหลดด่วน"
-                        : "⚡ Virtual Load Stress Injector"}
-                    </h6>
-                    <p className="text-[0.75rem] text-muted mb-0">
-                      {lang === "th"
-                        ? "จำลองเครื่องใช้กำลังวัตต์สูงเข้าระบบเพื่อทดสอบพีคเทเลเมทรี"
-                        : "Inject transient multi-kilowatt load into the sandbox to test pricing peaks."}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleInjectVirtualLoad(1500)}
-                      className="btn btn-xs btn-outline-warning text-[0.75rem] uppercase font-bold py-2 px-3 rounded-xl border-amber-500/20 text-amber-500 hover:bg-amber-500 hover:text-white transition-all"
-                    >
-                      + 1.5kW
-                    </button>
-                    <button
-                      onClick={() => handleInjectVirtualLoad(3000)}
-                      className="btn btn-xs btn-outline-danger text-[0.75rem] uppercase font-bold py-2 px-3 rounded-xl border-rose-500/20 text-rose-500 hover:bg-rose-500 hover:text-white transition-all"
-                    >
-                      + 3.0kW
-                    </button>
-                  </div>
-                </div>
-                <div className="dashboard-card border-0 p-5 bg-card flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div>
-                    <h6 className="font-extrabold text-sm mb-1">
-                      {lang === "th"
-                        ? "🔌 บล็อกสแตนด์บายตกค้างอัจฉริยะ"
-                        : "🔌 Eco Standby Bulk Disconnect"}
-                    </h6>
-                    <p className="text-[0.75rem] text-muted mb-0">
-                      {lang === "th"
-                        ? "ปิดการใช้ขั้วแสตนด์บายทั้งหมดเพื่อตัดปัญหากระแสรั่ว"
-                        : "Disconnect standby items in one go to instantly reduce idle leakage."}
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleBatchStandbyCutoff}
-                    className="btn lg:whitespace-nowrap rounded-xl px-4 py-2 text-xs font-black uppercase text-white hover:scale-105 active:scale-95 transition-all shadow-md shadow-emerald-500/20 flex items-center justify-center gap-1.5"
-                    style={{
-                      backgroundColor: "#10b981",
-                      border: 0,
-                      cursor: "pointer",
-                    }}
-                  >
-                    <i className="fas fa-unplug"></i>
-                    <span>{lang === "th" ? "ตัดไฟด่วน" : "Disconnect"}</span>
-                  </button>
-                </div>
-              </div>
-
-              <div
-                id="tour-step-devices-controls"
-                className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 mb-6 animate-slide-up transition-all duration-500"
-                style={{ animationDelay: "50ms" }}
-              >
-                <div className="flex gap-2 items-center flex-grow max-w-xl">
-                  <div className="relative flex-grow">
-                    <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-muted text-xs"></i>
-                    <input
-                      type="text"
-                      className="form-control border-0 bg-light rounded-2xl ps-10 py-3 text-sm font-bold"
-                      placeholder={t("search")}
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-                  <select
-                    className="form-select border-0 bg-light rounded-2xl py-3 text-xs font-bold w-32"
-                    value={activeCategory}
-                    onChange={(e) => setActiveCategory(e.target.value)}
-                  >
-                    <option value="All">{t("filter")}</option>
-                    {CATEGORIES.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex gap-2">
-                  {compareDeviceIds.length > 0 && (
-                    <button
-                      className="btn btn-primary rounded-2xl px-4 py-3 font-bold text-xs uppercase shadow-lg shadow-primary/20 flex items-center gap-2"
-                      onClick={() => setShowComparisonView(true)}
-                    >
-                      <i className="fas fa-balance-scale"></i>
-                      {t("node_compare_btn")} ({compareDeviceIds.length})
-                    </button>
-                  )}
-                  <button
-                    className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 border-2 border-light rounded-2xl px-6 py-3 font-bold text-xs uppercase text-primary"
-                    onClick={addDevice}
-                  >
-                    <i className="fas fa-plus me-2"></i> Node
-                  </button>
-                </div>
-              </div>
-
-              <div
-                id="tour-step-devices-grid"
-                className="row g-3 g-md-4 transition-all duration-500"
-              >
-                {filteredDevices.length === 0 ? (
-                  <div className="col-12">
-                    <div className="dashboard-card border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-10 text-center rounded-[2rem] flex flex-col items-center justify-center space-y-4">
-                      <div className="w-16 h-16 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center text-slate-500">
-                        <i className="fas fa-plug-circle-xmark text-2xl"></i>
-                      </div>
-                      <div>
-                        <h5 className="font-display font-bold text-slate-800 dark:text-slate-200 mb-2">
-                          {lang === "th" ? "ไม่พบอุปกรณ์" : "No Devices Found"}
-                        </h5>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm max-w-sm mx-auto mb-6">
-                          {lang === "th" 
-                            ? "คุณยังไม่ได้เพิ่มอุปกรณ์ในหมวดหมู่นี้ หรือการค้นหาไม่ตรงกับข้อมูลที่มี กดปุ่ม 'Add Node' ด้านบนเพื่อสร้างอุปกรณ์ใหม่"
-                            : "You haven't added any devices here, or your filter matches nothing. Click 'Add Node' to create a new appliance."}
-                        </p>
-                        <button
-                          className="btn btn-primary px-6 py-2.5 rounded-2xl font-bold text-xs uppercase shadow-lg hover:scale-[1.02] transition-all"
-                          onClick={addDevice}
-                        >
-                          <i className="fas fa-plus me-2"></i> {lang === "th" ? "เพิ่มอุปกรณ์เลย" : "Add Device Now"}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  filteredDevices.map((dev, i) => {
-                  const isSelected = compareDeviceIds.includes(dev.id);
-                  const dailyKwh =
-                    dev.status === "off"
-                      ? 0
-                      : dev.status === "standby"
-                        ? (Math.max(2, dev.watt * 0.02) / 1000) * 24
-                        : (dev.watt / 1000) * dev.hours;
-                  const devCost = dailyKwh * calcDays * unitRate;
-                  return (
-                    <div
-                      key={dev.id}
-                      className="col-12 col-md-6 col-lg-4 animate-slide-up"
-                      style={{ animationDelay: `${i * 50}ms` }}
-                    >
-                      <div
-                        onClick={() => setSelectedDeviceId(dev.id)}
-                        className={`dashboard-card border-0 p-5 cursor-pointer hover:shadow-xl active:scale-[0.98] hover:scale-[1.01] active:opacity-95 transition-all duration-300 group relative overflow-hidden ${isSelected ? "ring-2 ring-primary ring-inset" : ""}`}
-                      >
-                        <div className="absolute top-0 left-0 p-3 z-10">
-                          <button
-                            onClick={(e) => toggleCompareSelection(e, dev.id)}
-                            className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${isSelected ? "bg-primary text-white shadow-md" : "bg-white/80 backdrop-blur-sm border-2 border-primary/20 text-primary hover:bg-primary hover:text-white"}`}
-                          >
-                            <i
-                              className={`fas ${isSelected ? "fa-check" : "fa-plus"} text-[0.75rem]`}
-                            ></i>
-                          </button>
-                        </div>
-                        <div
-                          className={`absolute top-0 right-0 p-3 text-[0.65rem] font-bold uppercase tracking-widest ${dev.status === "active" ? "bg-emerald-500" : "bg-amber-500"} text-white`}
-                        >
-                          {dev.status}
-                        </div>
-                        <div className="p-3 bg-primary-subtle text-primary rounded-2xl w-fit mb-4 group-hover:bg-primary group-hover:text-white transition-all">
-                          <i
-                            className={`fas ${dev.category === "Cooling" ? "fa-snowflake" : "fa-plug"} text-lg`}
-                          ></i>
-                        </div>
-                        <h6 className="font-bold text-lg mb-1">{dev.name}</h6>
-                        <p className="label text-[0.7rem] mb-4 dark:opacity-100 opacity-60">
-                          {dev.category}
-                        </p>
-                        <div className="flex justify-between items-end border-t border-light pt-4">
-                          <div className="mono-font font-bold text-primary">
-                            ฿{devCost.toFixed(0)}
-                          </div>
-                          <div className="text-[0.75rem] text-muted font-bold">
-                            {dev.watt}W
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }))}
-              </div>
-            </div>
+            <Suspense fallback={<div className="flex justify-center p-10"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+              <DevicesTab shared={shared} />
+            </Suspense>
           )}
 
           {currentPage === "calculator" && (
-            <div className="animate-fade-in tech-grid p-4 md:p-6 rounded-[30px] md:rounded-[40px]">
-              
-              {/* Sub Navigation Tabs */}
-              <div className="flex gap-4 mb-6 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                <button
-                  type="button"
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer flex items-center gap-1.5 ${calcTab === "detailed" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400 font-bold" : "text-muted dark:opacity-100 opacity-50"}`}
-                  onClick={() => setCalcTab("detailed")}
-                >
-                  <Sliders className="w-4 h-4 text-emerald-500" />
-                  <span>{lang === "th" ? "จำลองเครื่องใช้ไฟฟ้า & บิล" : "Appliance Sim & Billing"}</span>
-                </button>
-                <button
-                  type="button"
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer flex items-center gap-1.5 ${calcTab === "tariff" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400 font-bold" : "text-muted dark:opacity-100 opacity-50"}`}
-                  onClick={() => setCalcTab("tariff")}
-                >
-                  <Clock className="w-4 h-4 text-sky-500" />
-                  <span>{lang === "th" ? "คู่มือระบบ TOU" : "TOU Tariff Guide"}</span>
-                </button>
-                <button
-                  type="button"
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer flex items-center gap-1.5 ${calcTab === "budget" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400 font-bold" : "text-muted dark:opacity-100 opacity-50"}`}
-                  onClick={() => setCalcTab("budget")}
-                >
-                  <Shield className="w-4 h-4 text-amber-500" />
-                  <span>{lang === "th" ? "คุมงบประมาณพลังงาน" : "Budget Optimization"}</span>
-                </button>
-              </div>
-
-              {calcTab === "detailed" && (
-                <div className="row g-4 md:g-5">
-                  <div className="col-12">
-                    <div className="w-full mb-6">
-                      <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-900/40 backdrop-blur-md shadow-sm rounded-[2rem] hover:shadow-lg transition-all duration-300">
-                        {/* Header */}
-                        <div className="p-5">
-                          <SmartSavingsCalculator 
-                            lang={lang} 
-                            isDarkMode={isDarkMode} 
-                            onTokensEarned={(amount) => {
-                              try {
-                                const cur = parseInt(localStorage.getItem('eudease_grid_tokens') || '300', 10);
-                                localStorage.setItem('eudease_grid_tokens', String(cur + amount));
-                                // Dispatch a storage event to let DailyEnergyQuests update if it is listening
-                                window.dispatchEvent(new Event('storage'));
-                              } catch {}
-                              setConfettiTrigger((t) => t + 1);
-                            }}
-                            rate={sharedFtRate}
-                            setRate={setSharedFtRate}
-                            days={calcDays}
-                            setDays={setCalcDays}
-                            targetBudget={globalBudget}
-                            setTargetBudget={setGlobalBudget}
-                            onTotalKwhChange={setPlannedKwh}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="col-12 mb-6">
-                    <BillingSimulator 
-                      lang={lang} 
-                      isDarkMode={isDarkMode} 
-                      plannedKwh={plannedKwh}
-                      ftRate={sharedFtRate}
-                      setFtRate={setSharedFtRate}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {calcTab === "tariff" && (
-                <div className="animate-fade-in flex flex-col gap-6">
-                  {/* Header Intro */}
-                  <div className="dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div className="flex items-start gap-4">
-                      <div className="p-3.5 rounded-2xl bg-sky-500/10 text-sky-500 shrink-0">
-                        <Clock className="w-6 h-6 animate-pulse" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-black font-display text-slate-800 dark:text-white flex items-center gap-2">
-                          <span>{t("tou_title")}</span>
-                          <span className="text-[10px] uppercase font-mono bg-sky-500/15 text-sky-600 dark:text-sky-400 px-2.5 py-0.5 rounded-full font-black">
-                            {lang === "th" ? "อัตราประเภท 1.2" : "Tariff Type 1.2"}
-                          </span>
-                        </h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                          {t("tou_desc")}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    {/* Fast info box */}
-                    <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-center font-bold min-w-[160px] self-stretch md:self-auto flex flex-col justify-center">
-                      <span className="text-[10px] uppercase tracking-wider">{lang === "th" ? "ส่วนประหยัดเฉลี่ย" : "Average TOU Savings"}</span>
-                      <span className="text-2xl font-mono font-black mt-1">~30% - 45%</span>
-                    </div>
-                  </div>
-
-                  {/* TOU Tariff Timeline Schedule Visualizer */}
-                  <div className="dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col gap-6">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-sky-500" />
-                      <h4 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
-                        {lang === "th" ? "ตารางเวลาและอัตราระบบค่าไฟ TOU ประเทศไทย" : "Thailand TOU Pricing & Time Slots"}
-                      </h4>
-                    </div>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      
-                      {/* Weekdays Slot Bar */}
-                      <div className="flex flex-col gap-3">
-                        <div className="flex justify-between items-center text-xs font-bold">
-                          <span className="text-slate-700 dark:text-slate-200">📅 {lang === "th" ? "วันธรรมดา (จันทร์ - ศุกร์)" : "Weekdays (Mon - Fri)"}</span>
-                          <span className="text-muted dark:opacity-100 opacity-60">24 {lang === "th" ? "ชั่วโมง" : "Hours"}</span>
-                        </div>
-                        
-                        <div className="relative h-12 w-full rounded-2xl overflow-hidden flex font-bold text-[9px] text-white">
-                          {/* 00:00 - 09:00 Off-Peak */}
-                          <div className="bg-emerald-500 h-full flex-grow hover:opacity-90 transition-opacity flex flex-col justify-center items-center text-center px-1" title="Off-Peak: 22.00 - 09.00">
-                            <span>00:00 - 09:00</span>
-                            <span className="text-[8px] opacity-90">{lang === "th" ? "Off-Peak" : "Off-Peak"}</span>
-                            <span className="text-[8px] font-mono">฿2.63</span>
-                          </div>
-                          {/* 09:00 - 22:00 On-Peak */}
-                          <div className="bg-rose-500 h-full w-[54%] hover:opacity-90 transition-opacity flex flex-col justify-center items-center text-center px-1" title="On-Peak: 09.00 - 22.00">
-                            <span>09:00 - 22:00</span>
-                            <span className="text-[8px] opacity-90">{lang === "th" ? "On-Peak" : "On-Peak"}</span>
-                            <span className="text-[8px] font-mono">฿5.79</span>
-                          </div>
-                          {/* 22:00 - 24:00 Off-Peak */}
-                          <div className="bg-emerald-500 h-full flex-grow hover:opacity-90 transition-opacity flex flex-col justify-center items-center text-center px-1" title="Off-Peak: 22.00 - 09.00">
-                            <span>22:00 - 24:00</span>
-                            <span className="text-[8px] opacity-90">{lang === "th" ? "Off-Peak" : "Off-Peak"}</span>
-                            <span className="text-[8px] font-mono">฿2.63</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Weekends & Holidays Slot Bar */}
-                      <div className="flex flex-col gap-3">
-                        <div className="flex justify-between items-center text-xs font-bold">
-                          <span className="text-slate-700 dark:text-slate-200">🎉 {lang === "th" ? "วันเสาร์ - อาทิตย์ และวันหยุดราชการ" : "Weekends & Public Holidays"}</span>
-                          <span className="text-emerald-500 font-mono">Off-Peak {lang === "th" ? "ทั้งวัน!" : "All Day!"}</span>
-                        </div>
-                        
-                        <div className="relative h-12 w-full rounded-2xl overflow-hidden flex font-bold text-[9px] text-white">
-                          <div className="bg-emerald-500 w-full h-full hover:opacity-90 transition-opacity flex flex-col justify-center items-center text-center" title="Off-Peak: ตลอด 24 ชั่วโมง">
-                            <span className="text-xs">00:00 - 24:00 (ตลอดทั้งวัน)</span>
-                            <span className="text-[8px] opacity-90">{lang === "th" ? "นอกช่วงเร่งด่วนราคาพิเศษ" : "All-Day Low Rate Off-Peak"}</span>
-                            <span className="text-xs font-mono font-black">฿2.6369 / {lang === "th" ? "หน่วย" : "kWh"}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-
-                    {/* Peak/Off-peak details cards */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                      <div className="p-5 rounded-[2rem] bg-rose-500/5 border border-rose-500/10 flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                          <h5 className="text-xs font-black uppercase text-rose-500">{t("tou_peak")}</h5>
-                        </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-300 leading-relaxed">
-                          {t("tou_peak_desc")}
-                        </p>
-                        <div className="mt-2 text-xs font-mono font-bold text-rose-600 dark:text-rose-400">
-                          {lang === "th" ? "อัตรา On-Peak: ~5.7982 บาท/หน่วย" : "On-Peak Rate: ~5.7982 Baht/kWh"}
-                        </div>
-                      </div>
-
-                      <div className="p-5 rounded-[2rem] bg-emerald-500/5 border border-emerald-500/10 flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                          <h5 className="text-xs font-black uppercase text-emerald-500">{t("tou_off")}</h5>
-                        </div>
-                        <p className="text-xs text-slate-500 dark:text-slate-300 leading-relaxed">
-                          {t("tou_off_desc")}
-                        </p>
-                        <div className="mt-2 text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                          {lang === "th" ? "อัตรา Off-Peak: ~2.6369 บาท/หน่วย" : "Off-Peak Rate: ~2.6369 Baht/kWh"}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* TOU vs Progressive Tariff Structure comparison table */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Progressive explanation */}
-                    <div className="dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col gap-4">
-                      <div className="flex items-center gap-2 text-amber-500">
-                        <TrendingUp className="w-5 h-5" />
-                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
-                          {t("progressive_title")}
-                        </h4>
-                      </div>
-                      <p className="text-xs text-slate-500 dark:text-slate-300 leading-relaxed">
-                        {t("progressive_desc")}
-                      </p>
-
-                      <div className="mt-2 flex flex-col gap-2 border-t border-slate-100 dark:border-slate-800/80 pt-4 text-xs font-mono">
-                        <div className="flex justify-between items-center text-muted">
-                          <span>{lang === "th" ? "15 หน่วยแรก (ประเภท 1.1.2)" : "First 15 Units (Type 1.1.2)"}</span>
-                          <span className="font-bold">฿3.2484 / {lang === "th" ? "หน่วย" : "kWh"}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-muted">
-                          <span>{lang === "th" ? "หน่วยที่ 16 - 150" : "Units 16 - 150"}</span>
-                          <span className="font-bold">฿3.2484 / {lang === "th" ? "หน่วย" : "kWh"}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-muted">
-                          <span>{lang === "th" ? "หน่วยที่ 151 - 400" : "Units 151 - 400"}</span>
-                          <span className="font-bold">฿4.2218 / {lang === "th" ? "หน่วย" : "kWh"}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-slate-800 dark:text-white font-bold">
-                          <span>{lang === "th" ? "หน่วยที่ 401 ขึ้นไป (แพงสุด)" : "Over 400 Units (Maximum Tier)"}</span>
-                          <span className="font-bold text-rose-500">฿4.4217 / {lang === "th" ? "หน่วย" : "kWh"}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Smart TOU Actions and Optimization Tips */}
-                    <div className="dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col gap-4">
-                      <div className="flex items-center gap-2 text-emerald-500">
-                        <Lightbulb className="w-5 h-5 animate-bounce" />
-                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
-                          {lang === "th" ? "เทคนิคประหยัดเงินด้วย TOU" : "TOU Shift Load Strategies"}
-                        </h4>
-                      </div>
-
-                      <div className="flex flex-col gap-3.5 mt-1 text-xs">
-                        <div className="flex gap-3">
-                          <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 font-bold font-mono">1</div>
-                          <div>
-                            <span className="font-bold block text-slate-700 dark:text-slate-100">{lang === "th" ? "ชาร์จรถไฟฟ้า (EV) หลัง 4 ทุ่ม" : "Charge EV Cars After 10:00 PM"}</span>
-                            <span className="text-[11px] text-slate-400 mt-0.5 block leading-relaxed">{lang === "th" ? "ประหยัดขึ้นทันทีเกิน 50% ต่อหน่วย แนะนำให้ตั้ง Timer ชาร์จช่วง Off-Peak อัตโนมัติ" : "Save over 50% per kWh. Set an automatic timer to kick in during cheap night slots."}</span>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-3">
-                          <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 font-bold font-mono">2</div>
-                          <div>
-                            <span className="font-bold block text-slate-700 dark:text-slate-100">{lang === "th" ? "ย้ายกลุ่มเครื่องซักผ้า-อบผ้าไปซักวันหยุด" : "Shift Washers & Dryers to Weekends"}</span>
-                            <span className="text-[11px] text-slate-400 mt-0.5 block leading-relaxed">{lang === "th" ? "อุปกรณ์พลังงานสูงอย่างเครื่องอบผ้า ควรหลีกเลี่ยงการเปิดใช้งานในวันธรรมดากลางวัน ให้ทำในวันหยุดซึ่งเป็น Off-Peak ทั้งวัน" : "Heavy thermal devices like clothes dryers are perfect to run on Saturday or Sunday for all-day cheap rates."}</span>
-                          </div>
-                        </div>
-
-                        <div className="flex gap-3">
-                          <div className="w-6 h-6 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0 font-bold font-mono">3</div>
-                          <div>
-                            <span className="font-bold block text-slate-700 dark:text-slate-100">{lang === "th" ? "ตั้งแอร์เปิดโหมด Eco ร่วมกับพัดลม" : "Optimize AC Scheduling"}</span>
-                            <span className="text-[11px] text-slate-400 mt-0.5 block leading-relaxed">{lang === "th" ? "ช่วง On-Peak บ่ายร้อน แนะนำเปิดแอร์อุณหภูมิ 26°C คู่กับพัดลมสวิง จะช่วยประหยัดโหลดแอร์ได้มหาศาล" : "Set AC to 26°C with an oscillating fan during peak afternoons to reduce the compressor workload."}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {calcTab === "budget" && (
-                <div className="animate-fade-in flex flex-col gap-6">
-                  {/* Budget Configuration Card */}
-                  <div className="dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-6">
-                    <div className="flex items-start gap-4 flex-grow">
-                      <div className="p-3.5 rounded-2xl bg-amber-500/10 text-amber-500 shrink-0">
-                        <Shield className="w-6 h-6" />
-                      </div>
-                      <div className="flex-grow">
-                        <h3 className="text-base font-black font-display text-slate-800 dark:text-white flex items-center gap-2">
-                          <span>{t("budget_limit_title")}</span>
-                        </h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-300 mt-1 max-w-xl leading-relaxed">
-                          {t("budget_modify")}
-                        </p>
-                        
-                        {/* Interactive Budget slider */}
-                        <div className="mt-4 flex items-center gap-4">
-                          <input 
-                            type="range"
-                            min="500"
-                            max="10000"
-                            step="250"
-                            value={globalBudget}
-                            onChange={(e) => setGlobalBudget(parseInt(e.target.value, 10))}
-                            className="w-full max-w-md accent-amber-500 bg-slate-100 dark:bg-slate-800 h-1.5 rounded cursor-pointer"
-                          />
-                          <input 
-                            type="number"
-                            min="500"
-                            max="50000"
-                            value={globalBudget}
-                            onChange={(e) => setGlobalBudget(Math.max(500, parseInt(e.target.value, 10) || 0))}
-                            className="w-24 text-xs font-mono font-bold text-center p-2 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-800 focus:outline-none"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Quick Budget Health Indicator card */}
-                    <div className={`p-5 rounded-[2rem] border font-black flex flex-col justify-center min-w-[200px] text-center transition-all ${
-                      plannedKwh * 4 > globalBudget 
-                        ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' 
-                        : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
-                    }`}>
-                      <span className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mb-1">
-                        {lang === "th" ? "สถานะการคุมบัดเจตค่าไฟ" : "Budget Tracking Status"}
-                      </span>
-                      <span className="text-xl font-mono">
-                        {plannedKwh * 4 > globalBudget 
-                          ? (lang === "th" ? "⚠️ เสี่ยงเกินงบประมาณ" : "⚠️ High Budget Risk")
-                          : (lang === "th" ? "🌿 ปลอดภัยและประหยัด" : "🌿 Within Target Range")}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Budget Allocation Analysis and Breakdown */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                    {/* Budget Progress Meter */}
-                    <div className="lg:col-span-7 dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col gap-6">
-                      <div className="flex items-center gap-2">
-                        <Award className="w-5 h-5 text-amber-500" />
-                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
-                          {lang === "th" ? "วิเคราะห์เป้าหมายและสัดส่วนงบประมาณ" : "Budget Utilization Analysis"}
-                        </h4>
-                      </div>
-
-                      <div className="flex flex-col gap-4 mt-2">
-                        {/* Progressive estimation comparison */}
-                        <div className="flex justify-between items-center text-xs">
-                          <span className="text-muted">{lang === "th" ? "งบประมาณจัดสรรสูงสุดของคุณ:" : "Your Target Allocation Limit:"}</span>
-                          <span className="font-mono font-black text-slate-800 dark:text-white">฿{globalBudget.toLocaleString()}</span>
-                        </div>
-
-                        {/* Actual progress bar */}
-                        <div>
-                          <div className="flex justify-between text-[10px] text-slate-400 mb-1">
-                            <span>{lang === "th" ? "ใช้งานจริงจากเครื่องจำลองอุปกรณ์:" : "Simulated Active Load Cost:"}</span>
-                            <span className="font-mono font-bold">
-                              {plannedKwh > 0 ? `~฿${Math.round(plannedKwh * 3.8).toLocaleString()}` : "฿0"}
-                            </span>
-                          </div>
-                          <div className="relative w-full h-3 bg-slate-100 dark:bg-slate-950 rounded-full overflow-hidden border border-slate-150 dark:border-slate-800/80">
-                            <div 
-                              className={`h-full rounded-full transition-all duration-500 ${
-                                (plannedKwh * 3.8) > globalBudget ? "bg-rose-500" : "bg-emerald-500"
-                              }`}
-                              style={{ width: `${Math.min(100, ((plannedKwh * 3.8) / globalBudget) * 100)}%` }}
-                            />
-                          </div>
-                          <div className="flex justify-between text-[9px] font-mono text-slate-400 mt-1">
-                            <span>0%</span>
-                            <span>{Math.round(((plannedKwh * 3.8) / globalBudget) * 100)}%</span>
-                            <span>100%</span>
-                          </div>
-                        </div>
-
-                        {/* Remainder metrics */}
-                        <div className="grid grid-cols-2 gap-4 mt-2 pt-4 border-t border-slate-100 dark:border-slate-800/60 text-xs">
-                          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-800">
-                            <span className="text-slate-400 text-[10px] block">{t("budget_remainder")}</span>
-                            <span className={`text-base font-mono font-black mt-1 block ${globalBudget - (plannedKwh * 3.8) < 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
-                              ฿{(globalBudget - Math.round(plannedKwh * 3.8)).toLocaleString()}
-                            </span>
-                          </div>
-
-                          <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-150 dark:border-slate-800">
-                            <span className="text-slate-400 text-[10px] block">{lang === "th" ? "ค่าไฟประหยัดแบบ TOU ร่วมด้วย" : "Estimated with TOU Strategy"}</span>
-                            <span className="text-base font-mono font-black mt-1 text-sky-500 block">
-                              +฿{Math.round(plannedKwh * 1.2).toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* AI Advisor Card */}
-                    <div className="lg:col-span-5 dashboard-card p-6 bg-white dark:bg-slate-900/40 border border-slate-150 dark:border-slate-800 rounded-[2rem] shadow-sm flex flex-col gap-4">
-                      <div className="flex items-center gap-2 text-emerald-500">
-                        <Coins className="w-5 h-5 text-emerald-500" />
-                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200">
-                          {lang === "th" ? "สัดส่วนและเป้าหมายผู้คุมงบ AI" : "AI Guardian Assessment"}
-                        </h4>
-                      </div>
-
-                      <div className="text-xs leading-relaxed text-slate-500 dark:text-slate-300 flex-grow">
-                        {plannedKwh * 3.8 > globalBudget ? (
-                          <div className="space-y-3">
-                            <p className="p-3 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20 font-bold text-[11px]">
-                              {lang === "th" 
-                                ? "⚠️ ขณะนี้การจำลองการกินไฟรวม เกินกว่างบสูงสุดที่คุณวางเป้าหมาย!" 
-                                : "⚠️ Your current simulated load is exceeding your target monthly budget!"}
-                            </p>
-                            <p>
-                              {lang === "th"
-                                ? "คำแนะนำ: ลองสลับไปใช้อุปกรณ์แอร์แบบ Inverter หรือปรับเวลาการซักผ้าและอบผ้าจำนวนมากไปทำในช่วงดึก (หลัง 22.00 น.) อัตราค่าไฟประเภท TOU จะถูกลงมากจนช่วยดึงคุณให้กลับเข้ามาอยู่ในกรอบงบประมาณสีเขียว"
-                                : "Pro-Tip: Try shifting massive laundry loads or EV charging sessions to late night slots (after 10:00 PM). This will drastically pull your net bill back into the safe green zone."}
-                            </p>
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            <p className="p-3 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-bold text-[11px]">
-                              {lang === "th" 
-                                ? "🌿 ยอดเยี่ยมมาก! การคำนวณการใช้พลังงานของคุณสอดคล้องและอยู่ในงบเป้าหมายอย่างปลอดภัย" 
-                                : "🌿 Excellent job! Your consumption profile fits perfectly within your budget goals."}
-                            </p>
-                            <p>
-                              {lang === "th"
-                                ? "คุณยังคงรักษาวินัยกริดได้อย่างยอดเยี่ยม เพื่อสะสมเหรียญรางวัลเพิ่มขึ้น แนะนำให้ตั้งเวลาประหยัดพลังงานเสริมสำหรับเครื่องปรับอากาศ และปิดสแตนด์บายเครื่องใช้ไฟฟ้าที่ไม่ได้ใช้งานเป็นประจำ"
-                                : "You are maintaining high green-grid status. To earn more sustainability tokens, schedule deep Eco modes for home cooling and completely unplug entertainment devices when dormant."}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <Suspense fallback={<div className="flex justify-center p-10"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+              <CalculatorTab shared={shared} />
+            </Suspense>
           )}
 
           {currentPage === "stats" && (
-            <div className="animate-fade-in text-dark" id="tour-step-stats">
-              {/* Stats Page Sub-Tabs */}
-              <div className="flex gap-4 mb-6 border-b border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                <button
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${statsTab === "telemetry" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
-                  style={{
-                    borderBottom:
-                      statsTab === "telemetry" ? "2px solid" : "none",
-                  }}
-                  onClick={() => setStatsTab("telemetry")}
-                >
-                  <i className="fas fa-chart-line mr-2"></i>
-                  {lang === "th" ? "ข้อมูลคลื่นไฟฟ้าด่วน" : "Telemetry Logs"}
-                </button>
-                <button
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${statsTab === "benchmark" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
-                  style={{
-                    borderBottom:
-                      statsTab === "benchmark" ? "2px solid" : "none",
-                  }}
-                  onClick={() => setStatsTab("benchmark")}
-                >
-                  <i className="fas fa-balance-scale mr-2"></i>
-                  {lang === "th"
-                    ? "การเปรียบเทียบมาตรฐานเชิงกลุ่ม"
-                    : "Benchmark Sectors"}
-                </button>
-              </div>
-
-              {statsTab === "telemetry" ? (
-                <div className="space-y-4 animate-fade-in text-dark">
-
-<div className="w-full mb-6">
-                        <div className="dashboard-card border-0 overflow-hidden h-full flex flex-col bg-primary text-white relative shadow-sm">
-                          
-                          <div className="p-6 flex-grow flex flex-col justify-between relative">
-                            <div className="absolute top-0 right-0 p-10 opacity-10">
-                              <i className="fas fa-brain text-[150px]"></i>
-                            </div>
-                            <h5 className="font-bold mb-4 font-display text-lg relative z-10">
-                              {t("ai_scan_title")}
-                            </h5>
-                            <p className="text-xs opacity-80 leading-relaxed mb-6 relative z-10">
-                              {t("ai_scan_desc")}
-                            </p>
-                            <button className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 w-full rounded-2xl py-3 font-bold text-[0.75rem] uppercase tracking-widest text-primary relative z-10">
-                              {t("ai_apply")}
-                            </button>
-
-                            <div className="mt-auto relative z-10 pt-10 border-t border-white/10">
-                              <div className="flex items-center gap-3 mb-4">
-                                <div className="p-2 bg-white/10 rounded-xl">
-                                  <i className="fas fa-bolt text-xs"></i>
-                                </div>
-                                <div>
-                                  <div className="text-[0.75rem] font-bold opacity-60 uppercase">
-                                    Real-time Efficiency
-                                  </div>
-                                  <div className="text-xl font-bold mono-font">
-                                    {aiOptimizationMetrics.efficiencyIndex.toFixed(1)}%
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <div className="p-2 bg-white/10 rounded-xl">
-                                  <i className="fas fa-microchip text-xs"></i>
-                                </div>
-                                <div>
-                                  <div className="text-[0.75rem] font-bold opacity-60 uppercase">
-                                    System Health
-                                  </div>
-                                  <div className="text-xl font-bold mono-font">
-                                    Optimal
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-</div>
-<div className="w-full mb-6">
-                        <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden shadow-sm bg-white dark:bg-white/5">
-                          
-                          <div className="p-6 md:p-8">
-                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-                              <div>
-                                <span className="text-[0.7rem] text-primary font-bold uppercase tracking-widest font-mono block mb-1">
-                                  <i className="fas fa-brain me-1.5 align-middle text-emerald-400"></i>{" "}
-                                  AI-OPTIMIZED PATTERN VISUALIZER
-                                </span>
-                                <h5 className="font-bold mb-1 font-display text-lg tracking-tight text-white/90 font-sans">
-                                  {lang === "th"
-                                    ? "การวิเคราะห์โครงข่ายและคาดการณ์ประหยัดด้วย AI (Smart Peak Shaving)"
-                                    : "Dynamic AI Load Curve & Peak Shaving Forecast"}
-                                </h5>
-                                <p className="text-xs text-muted mb-0">
-                                  {lang === "th"
-                                    ? "เปรียบเทียบคลื่นกำลังไฟฟ้าโหนดปกติ กับคลื่นพลังงานที่ลดหย่อนด้วย AI สรุปผลความถี่วิเคราะห์ราย 24 ชม."
-                                    : "Simultaneous real-time analysis of standard grid metrics vs. AI energy-saver demand curves"}
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-2xl">
-                                <div className="text-end">
-                                  <span className="text-[0.7rem] text-emerald-400 font-bold uppercase block">
-                                    {lang === "th"
-                                      ? "ประหยัดพลังงานรวม"
-                                      : "Total Combined Savings"}
-                                  </span>
-                                  <span className="text-base font-black text-emerald-400 font-mono">
-                                    -{aiMonthlySavings.percent.toFixed(1)}%
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="h-[280px] md:h-[320px]">
-                              <ResponsiveContainer>
-                                <AreaChart data={aiOptimizationChartData}>
-                                  <defs>
-                                    <linearGradient
-                                      id="normalLoad"
-                                      x1="0"
-                                      y1="0"
-                                      x2="0"
-                                      y2="1"
-                                    >
-                                      <stop
-                                        offset="5%"
-                                        stopColor="#f59e0b"
-                                        stopOpacity={0.15}
-                                      />
-                                      <stop
-                                        offset="95%"
-                                        stopColor="#f59e0b"
-                                        stopOpacity={0}
-                                      />
-                                    </linearGradient>
-                                    <linearGradient
-                                      id="optimizedLoad"
-                                      x1="0"
-                                      y1="0"
-                                      x2="0"
-                                      y2="1"
-                                    >
-                                      <stop
-                                        offset="5%"
-                                        stopColor="#10b981"
-                                        stopOpacity={0.25}
-                                      />
-                                      <stop
-                                        offset="95%"
-                                        stopColor="#10b981"
-                                        stopOpacity={0}
-                                      />
-                                    </linearGradient>
-                                  </defs>
-                                  <XAxis
-                                    dataKey="hour"
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fontSize: 9, fontWeight: "bold" }}
-                                  />
-                                  <YAxis
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fontSize: 9 }}
-                                    unit=" kW"
-                                  />
-                                  <CartesianGrid
-                                    strokeDasharray="3 3"
-                                    vertical={false}
-                                    stroke={
-                                      isDarkMode
-                                        ? "rgba(255,255,255,0.06)"
-                                        : "rgba(0,0,0,0.05)"
-                                    }
-                                  />
-                                  <Tooltip
-                                    contentStyle={{
-                                      borderRadius: "20px",
-                                      border: "none",
-                                      backgroundColor: isDarkMode
-                                        ? "#0f172a"
-                                        : "#fff",
-                                      boxShadow: "0 10px 45px rgba(0,0,0,0.2)",
-                                    }}
-                                  />
-                                  <Legend
-                                    align="right"
-                                    verticalAlign="top"
-                                    iconType="circle"
-                                    wrapperStyle={{
-                                      paddingBottom: "15px",
-                                      fontSize: "9px",
-                                      fontWeight: "bold",
-                                    }}
-                                  />
-                                  <Area
-                                    name={
-                                      lang === "th"
-                                        ? "โหลดกำลังไฟฟ้ามาตรฐาน (kWh)"
-                                        : "Standard Demand Profile (kWh)"
-                                    }
-                                    type="monotone"
-                                    dataKey="normal"
-                                    stroke="#f59e0b"
-                                    strokeWidth={2.5}
-                                    fill="url(#normalLoad)"
-                                  />
-                                  <Area
-                                    name={
-                                      lang === "th"
-                                        ? "โหลดกำลังไฟฟ้าหลังผ่าน AI (kWh)"
-                                        : "AI-Optimized Stream (kWh)"
-                                    }
-                                    type="monotone"
-                                    dataKey="optimized"
-                                    stroke="#10b981"
-                                    strokeWidth={3}
-                                    fill="url(#optimizedLoad)"
-                                  />
-                                </AreaChart>
-                              </ResponsiveContainer>
-                            </div>
-                          </div>
-                        </div>
-</div>
-
-                  <div className="w-full mb-8">
-                    <HistoricalTrendChart isDarkMode={isDarkMode} activeHouseName={activeHouse?.name || 'Local Property'} />
-                  </div>
-                  <div
-                    className="dashboard-card border-0 p-4 md:p-8 mb-8 shadow-xl animate-slide-up"
-                    style={{ animationDelay: "50ms" }}
-                  >
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10">
-                      <h4 className="font-display font-bold text-lg md:text-2xl tracking-tight">
-                        {t("telemetry_active_load")}
-                      </h4>
-                      <div className="p-1 bg-light rounded-2xl flex gap-1 w-full sm:w-auto">
-                        <button
-                          className={`btn btn-xs flex-grow sm:flex-none px-4 rounded-xl font-bold ${statsFrame === "daily" ? "btn-primary shadow-lg" : "text-muted"}`}
-                          onClick={() => setStatsFrame("daily")}
-                        >
-                          {t("telemetry_daily").toUpperCase()}
-                        </button>
-                        <button
-                          className={`btn btn-xs flex-grow sm:flex-none px-4 rounded-xl font-bold ${statsFrame === "monthly" ? "btn-primary shadow-lg" : "text-muted"}`}
-                          onClick={() => setStatsFrame("monthly")}
-                        >
-                          {t("telemetry_monthly").toUpperCase()}
-                        </button>
-                      </div>
-                    </div>
-                    <div className="h-[250px] md:h-[400px]">
-                      <ResponsiveContainer>
-                        <ComposedChart data={telemetryChartData}>
-                          <defs>
-                            <linearGradient
-                              id="pColor"
-                              x1="0"
-                              y1="0"
-                              x2="0"
-                              y2="1"
-                            >
-                              <stop
-                                offset="5%"
-                                stopColor="var(--primary)"
-                                stopOpacity={0.4}
-                              />
-                              <stop
-                                offset="95%"
-                                stopColor="var(--primary)"
-                                stopOpacity={0}
-                              />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            vertical={false}
-                            stroke={isDarkMode ? "#1b254b" : "#eee"}
-                          />
-                          <XAxis
-                            dataKey="name"
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fontSize: 10, fontWeight: "bold" }}
-                          />
-                          <YAxis
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fontSize: 10 }}
-                          />
-                          <Tooltip content={<CustomTooltip />} />
-                          <Area
-                            type="monotone"
-                            dataKey="usage"
-                            stroke="var(--primary)"
-                            strokeWidth={4}
-                            fill="url(#pColor)"
-                            name={t("telemetry_active_load")}
-                          />
-                          <Line
-                            type="monotone"
-                            dataKey="forecast"
-                            stroke="#f59e0b"
-                            strokeWidth={2}
-                            strokeDasharray="4 4"
-                            dot={false}
-                            name={lang === "th" ? "แนวโน้มพยากรณ์" : "Forecasted Trend"}
-                          />
-                        </ComposedChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-
-                  {/* Performance Metrics Charts in Telemetry */}
-                  <div
-                    className="dashboard-card border-0 p-6 md:p-10 mb-8 shadow-xl animate-slide-up"
-                    style={{ animationDelay: "100ms" }}
-                  >
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
-                      <div>
-                        <h4 className="font-display font-bold text-lg md:text-2xl tracking-tight">
-                          {t("telemetry_perf_metrics")}
-                        </h4>
-                        <p className="text-[0.75rem] text-muted font-bold uppercase tracking-widest mt-1">
-                          Uptime & Efficiency Telemetry
-                        </p>
-                      </div>
-                      <div className="p-1 bg-light rounded-2xl flex gap-1 w-full md:w-auto">
-                        {(["daily", "weekly", "monthly"] as const).map(
-                          (range) => (
-                            <button
-                              key={range}
-                              onClick={() => setTelemetryPerfRange(range)}
-                              className={`btn btn-xs flex-grow md:flex-none px-4 rounded-xl font-bold uppercase text-[0.7rem] tracking-widest ${telemetryPerfRange === range ? "btn-primary shadow-md" : "text-muted dark:opacity-100 opacity-60"}`}
-                            >
-                              {t(
-                                range === "daily"
-                                  ? "telemetry_daily"
-                                  : range === "weekly"
-                                    ? "weekly"
-                                    : "telemetry_monthly",
-                              )}
-                            </button>
-                          ),
-                        )}
-                      </div>
-                    </div>
-                    <div className="h-[300px] md:h-[400px]">
-                      <ResponsiveContainer>
-                        <ComposedChart data={telemetryPerformanceData}>
-                          <defs>
-                            <linearGradient
-                              id="teleUptimeColor"
-                              x1="0"
-                              y1="0"
-                              x2="0"
-                              y2="1"
-                            >
-                              <stop
-                                offset="5%"
-                                stopColor="#10b981"
-                                stopOpacity={0.2}
-                              />
-                              <stop
-                                offset="95%"
-                                stopColor="#10b981"
-                                stopOpacity={0}
-                              />
-                            </linearGradient>
-                            <linearGradient
-                              id="teleEffColor"
-                              x1="0"
-                              y1="0"
-                              x2="0"
-                              y2="1"
-                            >
-                              <stop
-                                offset="5%"
-                                stopColor="var(--primary)"
-                                stopOpacity={0.2}
-                              />
-                              <stop
-                                offset="95%"
-                                stopColor="var(--primary)"
-                                stopOpacity={0}
-                              />
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid
-                            strokeDasharray="3 3"
-                            vertical={false}
-                            stroke={isDarkMode ? "#1b254b" : "#eee"}
-                          />
-                          <XAxis
-                            dataKey="name"
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fontSize: 9, fontWeight: "bold" }}
-                          />
-                          <YAxis
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fontSize: 9 }}
-                            domain={[85, 100]}
-                          />
-                          <Tooltip content={<CustomTooltip />} />
-                          <Legend
-                            align="center"
-                            verticalAlign="bottom"
-                            iconType="circle"
-                            wrapperStyle={{
-                              paddingTop: "30px",
-                              fontSize: "11px",
-                              fontWeight: "bold",
-                            }}
-                          />
-                          <Area
-                            name={t("perf_uptime")}
-                            type="monotone"
-                            dataKey="uptime"
-                            stroke="#10b981"
-                            strokeWidth={3}
-                            fill="url(#teleUptimeColor)"
-                          />
-                          <Line
-                            name={t("perf_efficiency")}
-                            type="monotone"
-                            dataKey="efficiency"
-                            stroke="var(--primary)"
-                            strokeWidth={3}
-                            dot={{ r: 4, strokeWidth: 2, fill: "#fff" }}
-                            activeDot={{ r: 6 }}
-                          />
-                        </ComposedChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-
-                  <div className="row g-4">
-                    <div
-                      className="col-12 col-xl-6 animate-slide-up"
-                      style={{ animationDelay: "200ms" }}
-                    >
-                      <div className="dashboard-card border-0 p-6 md:p-8 h-full">
-                        <h6 className="font-bold font-display text-lg mb-8">
-                          {t("telemetry_dist")}
-                        </h6>
-                        <div className="h-[250px] md:h-[300px]">
-                          <ResponsiveContainer>
-                            <PieChart>
-                              <Pie
-                                data={pieData}
-                                innerRadius={window.innerWidth < 768 ? 60 : 80}
-                                outerRadius={window.innerWidth < 768 ? 90 : 120}
-                                paddingAngle={5}
-                                dataKey="value"
-                                stroke="none"
-                              >
-                                {pieData.map((_, i) => (
-                                  <Cell
-                                    key={i}
-                                    fill={COLORS[i % COLORS.length]}
-                                  />
-                                ))}
-                              </Pie>
-                              <Tooltip content={<CustomTooltip />} />
-                              <Legend
-                                align="center"
-                                verticalAlign="bottom"
-                                iconType="circle"
-                                wrapperStyle={{
-                                  paddingTop: "20px",
-                                  fontSize: "10px",
-                                  fontWeight: "bold",
-                                }}
-                              />
-                            </PieChart>
-                          </ResponsiveContainer>
-                        </div>
-                      </div>
-                    </div>
-                    <div
-                      className="col-12 col-xl-6 animate-slide-up"
-                      style={{ animationDelay: "300ms" }}
-                    >
-                      <div className="dashboard-card border-0 p-6 md:p-8 h-full overflow-hidden">
-                        <h6 className="font-bold font-display text-lg mb-8">
-                          {t("telemetry_logs")}
-                        </h6>
-                        <div className="overflow-auto max-h-[300px] w-full bg-transparent custom-scrollbar">
-                          <table className="table table-hover align-middle text-sm text-slate-800 dark:text-slate-100">
-                            <thead className="bg-light text-slate-600 dark:text-slate-100">
-                              <tr className="label text-[0.7rem]">
-                                <th>{t("log_cycle")}</th>
-                                <th>{t("log_units")}</th>
-                                <th className="text-end">
-                                  {t("log_settlement")}
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {settlementLogs.map((row, i) => (
-                                <tr key={i} className="border-b border-slate-200 dark:border-slate-800/50">
-                                  <td className="font-bold whitespace-nowrap text-slate-800 dark:text-slate-100">
-                                    {row.p}
-                                  </td>
-                                  <td className="mono-font text-slate-700 dark:text-slate-100">{row.u} kWh</td>
-                                  <td className="text-end font-bold text-primary dark:text-sky-400 mono-font">
-                                    ฿{row.c.toLocaleString()}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="row g-4 md:g-5 animate-fade-in text-dark">
-                  <div className="col-12 col-xl-7">
-                    <div
-                      className="dashboard-card border-0 p-6 md:p-8 h-full animate-slide-up bg-card"
-                      style={{ animationDelay: "100ms" }}
-                    >
-                      <h5 className="font-display font-bold text-xl md:text-2xl mb-10 tracking-tight">
-                        {t("bench_title")}
-                      </h5>
-                      <div className="h-[250px] md:h-[350px]">
-                        <ResponsiveContainer>
-                          <BarChart
-                            data={[
-                              { n: t("bench_you"), v: analytics.totalUnits },
-                              {
-                                n: t("bench_sector_avg"),
-                                v: analytics.totalUnits * 1.2,
-                              },
-                              {
-                                n: t("bench_eco_hub"),
-                                v: analytics.totalUnits * 0.8,
-                              },
-                            ]}
-                          >
-                            <CartesianGrid
-                              strokeDasharray="3 3"
-                              vertical={false}
-                              stroke="#eee"
-                            />
-                            <XAxis
-                              dataKey="n"
-                              axisLine={false}
-                              tickLine={false}
-                              tick={{ fontSize: 10, fontWeight: "bold" }}
-                            />
-                            <YAxis hide />
-                            <Tooltip
-                              content={<CustomTooltip />}
-                              cursor={{ fill: "transparent" }}
-                            />
-                            <Bar
-                              dataKey="v"
-                              radius={[15, 15, 0, 0]}
-                              barSize={window.innerWidth < 768 ? 40 : 60}
-                            >
-                              {[0, 1, 2].map((_, i) => (
-                                <Cell
-                                  key={i}
-                                  fill={i === 0 ? "var(--primary)" : "#cbd5e1"}
-                                />
-                              ))}
-                            </Bar>
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="col-12 col-xl-5 flex flex-col justify-center gap-4 md:gap-6">
-                    <div
-                      className="p-6 md:p-8 bg-emerald-500/5 border-2 border-emerald-500/20 rounded-[30px] md:rounded-[40px] text-center animate-slide-up shadow-sm bg-card"
-                      style={{ animationDelay: "200ms" }}
-                    >
-                      <h5 className="font-display font-bold text-emerald-600 text-xl md:text-2xl mb-2">
-                        {t("bench_status")}
-                      </h5>
-                      <p className="text-xs md:text-sm font-semibold opacity-70 mb-0">
-                        {t("bench_status_desc")}
-                      </p>
-                    </div>
-                    <div
-                      className="p-6 md:p-8 bg-primary/5 border-2 border-primary/10 rounded-[30px] md:rounded-[40px] italic text-[0.8rem] md:text-xs text-muted leading-relaxed animate-slide-up bg-card shadow-sm"
-                      style={{ animationDelay: "300ms" }}
-                    >
-                      <h6 className="font-bold text-primary mb-2 uppercase tracking-[0.2em] text-[0.75rem]">
-                        {t("bench_insight_title")}
-                      </h6>
-                      {t("bench_insight_desc")}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <Suspense fallback={<div className="flex justify-center p-10"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+              <StatsTab shared={shared} />
+            </Suspense>
           )}
 
           {currentPage === "noti" && (
-            <div className="animate-fade-in max-w-4xl mx-auto text-dark">
-              {/* Grid Intelligence Sub-Tabs */}
-              <div className="flex gap-4 mb-6 border-b border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                <button
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${notiTab === "alerts" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
-                  style={{
-                    borderBottom:
-                      notiTab === "alerts" ? "2px solid" : "none",
-                  }}
-                  onClick={() => setNotiTab("alerts")}
-                >
-                  <i className="fas fa-shield-alt mr-2"></i>
-                  {lang === "th"
-                    ? "รายงานการขับเคลื่อนและการตรวจจับความผิดปกติ"
-                    : "Anomaly & Surge Reports"}
-                </button>
-                <button
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${notiTab === "quests" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
-                  style={{
-                    borderBottom:
-                      notiTab === "quests" ? "2px solid" : "none",
-                  }}
-                  onClick={() => setNotiTab("quests")}
-                >
-                  <i className="fas fa-trophy mr-2"></i>
-                  {lang === "th"
-                    ? "ภารกิจกรีนเอเนอร์ยี่และการออมเงิน"
-                    : "Eco-Quests & Smart Savings"}
-                </button>
-              </div>
-
-              {notiTab === "alerts" ? (
-                <div className="space-y-4 animate-fade-in">
-                  <div
-                    id="tour-step-noti-header"
-                    className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 transition-all duration-500"
-                  >
-                    <h4 className="font-display font-bold text-2xl">
-                      {t("alert_log_title")}
-                    </h4>
-                    <div className="flex gap-2 w-full sm:w-auto">
-                      <button
-                        disabled={isAiScanning}
-                        onClick={runAiAnomalyScan}
-                        className={`btn flex-grow sm:flex-none rounded-xl font-bold text-[0.75rem] uppercase tracking-widest flex items-center justify-center gap-2 ${isAiScanning ? "btn-light" : "btn-primary shadow-lg shadow-primary/20"}`}
-                      >
-                        {isAiScanning ? (
-                          <>
-                            <i className="fas fa-circle-notch animate-spin"></i>{" "}
-                            {t("alert_scanning")}
-                          </>
-                        ) : (
-                          <>
-                            <i className="fas fa-brain"></i>{" "}
-                            {t("alert_ai_scan")}
-                          </>
-                        )}
-                      </button>
-                      <button
-                        className="btn btn-outline-primary border-0 font-bold text-[0.75rem] uppercase tracking-widest"
-                        onClick={() => setAiAlerts([])}
-                      >
-                        {t("alert_clear")}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="space-y-4">
-                    {currentAlerts.length === 0 ? (
-                      <div className="text-center p-10 bg-light rounded-[30px] border border-transparent">
-                        <i className="fas fa-check-circle text-emerald-500 text-4xl mb-4"></i>
-                        <h6 className="font-bold text-lg">
-                          {lang === "th"
-                            ? "ระบบทำงานปกติ"
-                            : "System Operating Normally"}
-                        </h6>
-                        <p className="text-xs text-muted mb-0">
-                          {lang === "th"
-                            ? "ยังไม่มีการแจ้งเตือนปัญหาการใช้ไฟในขณะนี้"
-                            : "No spikes or thermal anomalies detected in the sandbox nodes."}
-                        </p>
-                      </div>
-                    ) : (
-                      currentAlerts.map((n, i) => (
-                        <div
-                          key={i}
-                          className={`dashboard-card border-start border-[6px] border-${n.c} p-5 md:p-6 flex flex-col sm:flex-row gap-4 md:gap-6 animate-slide-up shadow-sm hover:translate-x-2 transition-transform cursor-pointer relative overflow-hidden bg-card text-dark`}
-                          style={{ animationDelay: `${i * 100}ms` }}
-                        >
-                          {n.isAi && (
-                            <div className="absolute top-0 right-0 p-2">
-                              <span className="badge bg-primary/10 text-primary text-[0.65rem] font-bold uppercase tracking-widest border border-primary/20">
-                                <i className="fas fa-robot me-1"></i> AI
-                                Analysis
-                              </span>
-                            </div>
-                          )}
-                          <div
-                            className={`p-4 rounded-3xl bg-${n.c}-subtle text-${n.c} w-fit h-fit shadow-md`}
-                          >
-                            <i className={`fas ${n.i} text-xl`}></i>
-                          </div>
-                          <div className="flex-grow">
-                            <div className="flex justify-between items-start mb-2">
-                              <h6 className="font-bold mb-0 text-base md:text-lg tracking-tight text-dark">
-                                {n.t}
-                              </h6>
-                              <span className="text-[0.75rem] font-bold text-muted uppercase tracking-widest">
-                                {n.time}
-                              </span>
-                            </div>
-                            <p className="text-muted text-[0.8rem] md:text-xs leading-relaxed mb-0">
-                              {n.d}
-                            </p>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <QuestLeaderboard
-                    lang={lang}
-                    totalClaimedXp={totalClaimedXp}
-                    claimedQuests={claimedQuests}
-                    ecoStreak={ecoStreak}
-                    activeQuests={activeQuests}
-                    handleClaimQuest={handleClaimQuest}
-                    triggerConfetti={() => setConfettiTrigger((t) => t + 1)}
-                  />
-                  <div className="w-full mb-6">
-                    <div className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden bg-white dark:bg-slate-500/5 backdrop-blur-sm shadow-sm animate-fade-in mb-4">
-                      <div className="p-1">
-                        <DailyEnergyQuests
-                          lang={lang}
-                          onTokenClaimed={(amount) => {
-                            setConfettiTrigger((t) => t + 1);
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
+            <Suspense fallback={<div className="flex justify-center p-10"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+              <NotiTab shared={shared} />
+            </Suspense>
           )}
 
           {currentPage === "manual" && (
-            <div className="animate-fade-in max-w-4xl mx-auto text-dark">
-              {/* Manual Page Sub-Tabs */}
-              <div className="flex gap-4 mb-6 border-b border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
-                <button
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${manualTab === "guide" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
-                  style={{
-                    borderBottom:
-                      manualTab === "guide" ? "2px solid" : "none",
-                  }}
-                  onClick={() => setManualTab("guide")}
-                >
-                  <i className="fas fa-book-open mr-2"></i>
-                  {lang === "th" ? "คู่มือผู้ใช้ระบบกริต" : "User Guide"}
-                </button>
-                <button
-                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${manualTab === "settings" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
-                  style={{
-                    borderBottom:
-                      manualTab === "settings" ? "2px solid" : "none",
-                  }}
-                  onClick={() => setManualTab("settings")}
-                >
-                  <i className="fas fa-sliders-h mr-2"></i>
-                  {lang === "th"
-                    ? "ตั้งค่าเครือข่ายวิจัยและการแสดงผล"
-                    : "Account Settings"}
-                </button>
-              </div>
-
-              {manualTab === "guide" ? (
-                <UserManual
-                  isOpen={true}
-                  isDarkMode={isDarkMode}
-                  lang={lang}
-                  isInline={true}
-                />
-              ) : (
-                <div
-                  className="dashboard-card border-0 p-6 md:p-10 text-center shadow-2xl rounded-[40px] md:rounded-[50px] animate-slide-up bg-card relative overflow-hidden"
-                  style={{ animationDelay: "100ms" }}
-                >
-                  <div className="absolute top-0 right-0 p-10 opacity-5 d-none d-sm-block">
-                    <i className="fas fa-cog text-[150px] animate-spin-slow"></i>
-                  </div>
-                  <div className="p-1 rounded-full bg-gradient-to-tr from-primary to-emerald-500 mx-auto w-24 h-24 md:w-32 md:h-32 mb-6 shadow-xl relative z-10">
-                    <div className="bg-white rounded-full w-full h-full flex items-center justify-center text-primary text-3xl md:text-4xl font-display font-bold border-4 border-white">
-                      NY
-                    </div>
-                  </div>
-                  <h4 className="font-display font-bold text-2xl md:text-3xl mb-1 relative z-10">
-                    Namyen Admin
-                  </h4>
-                  <div className="badge bg-primary-subtle text-primary px-4 py-2 rounded-full text-[0.7rem] md:text-[0.75rem] uppercase tracking-widest font-bold mb-8 md:mb-10 relative z-10">
-                    {t("set_authority")}
-                  </div>
-
-                  <div className="space-y-3 text-start relative z-10">
-                    {[
-                      {
-                        label: t("set_lang"),
-                        val: lang.toUpperCase(),
-                        type: "select",
-                        opts: ["EN", "TH"],
-                        onChange: (v: string) =>
-                          setLang(v.toLowerCase() as any),
-                      },
-                      {
-                        label: t("set_dark_mode"),
-                        val: isDarkMode,
-                        type: "switch",
-                        onChange: onToggleTheme,
-                      },
-                      { label: t("set_telemetry"), val: "High", type: "info" },
-                      { label: t("set_security"), val: "Active", type: "info" },
-                    ].map((row, i) => (
-                      <div
-                        key={i}
-                        className="p-4 md:p-5 bg-light rounded-3xl flex justify-between items-center transition-all hover:bg-white hover:shadow-md border border-transparent hover:border-light"
-                      >
-                        <span className="font-bold text-xs md:text-sm tracking-tight">
-                          {row.label}
-                        </span>
-                        {row.type === "select" ? (
-                          <select
-                            className="form-select border-0 bg-transparent w-auto font-bold text-primary text-xs md:text-sm p-0 focus:ring-0 focus:outline-none"
-                            value={row.val as string}
-                            onChange={(e) =>
-                              (row.onChange as (v: string) => void)(
-                                e.target.value,
-                              )
-                            }
-                          >
-                            {row.opts?.map((o) => (
-                              <option key={o} value={o}>
-                                {o}
-                              </option>
-                            ))}
-                          </select>
-                        ) : row.type === "switch" ? (
-                          <div className="form-check form-switch mb-0">
-                            <input
-                              className="form-check-input scale-110 md:scale-125 cursor-pointer"
-                              type="checkbox"
-                              checked={row.val as boolean}
-                              onChange={row.onChange as any}
-                            />
-                          </div>
-                        ) : (
-                          <span className="text-emerald-500 font-bold text-[0.75rem] md:text-xs uppercase tracking-widest">
-                            {row.val}
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                  <button
-                    className="btn btn-outline-danger w-full py-3.5 md:py-4 rounded-3xl font-bold text-[0.75rem] md:text-[0.8rem] uppercase tracking-[0.2em] md:tracking-[0.3em] mt-8 md:mt-10 transition-all hover:bg-danger hover:text-white shadow-lg border-rose-500/20 text-rose-500 cursor-pointer"
-                    onClick={onLogout}
-                  >
-                    {t("set_terminate")}
-                  </button>
-                </div>
-              )}
-            </div>
+            <Suspense fallback={<div className="flex justify-center p-10"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
+              <ManualTab shared={shared} />
+            </Suspense>
           )}
         </div>
 
         {/* Global Footer */}
-        <footer className="mt-16 pt-8 pb-12 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6 text-[0.7rem] text-slate-500 dark:text-slate-400 font-medium">
+        <footer className="mt-16 pt-8 pb-12 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6 text-[0.7rem] text-slate-600 dark:text-slate-400 font-medium">
           <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
             <span className="font-bold tracking-widest uppercase text-slate-700 dark:text-slate-300">
               EduEase Energy v2.4.0
@@ -4675,12 +2631,12 @@ const Dashboard: React.FC<DashboardProps> = ({
       {showComparisonView && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[5000] flex items-center justify-center p-4">
           <div className="w-full max-w-6xl bg-body rounded-[3rem] shadow-2xl overflow-hidden animate-slide-up h-[90vh] flex flex-col">
-            <div className="p-6 md:p-10 flex justify-between items-center border-b border-light bg-card shadow-sm z-10">
+            <div className="p-6 md:p-10 flex justify-between items-center border-b border-slate-100 dark:border-slate-800/50 bg-white shadow-sm z-10">
               <div>
                 <h3 className="font-display font-bold text-2xl md:text-3xl mb-1">
                   {t("comp_title")}
                 </h3>
-                <p className="text-[0.75rem] text-muted font-bold uppercase tracking-widest">
+                <p className="text-[0.75rem] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">
                   {t("node_comparing").replace(
                     "{n}",
                     compareDevices.length.toString(),
@@ -4715,7 +2671,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         style={{ animationDelay: `${di * 75}ms` }}
                       >
                         <div
-                          className={`dashboard-card p-6 h-full flex flex-col relative transition-all border-2 ${isBestPF ? "border-emerald-500/20 shadow-emerald-500/10" : di === 0 ? "border-primary/20" : "border-light"}`}
+                          className={`dashboard-card p-6 h-full flex flex-col relative transition-all border-2 ${isBestPF ? "border-emerald-500/20 shadow-emerald-500/10" : di === 0 ? "border-primary/20" : "border-slate-100 dark:border-slate-800/50"}`}
                         >
                           {isBestPF && (
                             <div className="absolute top-4 right-4">
@@ -4727,41 +2683,41 @@ const Dashboard: React.FC<DashboardProps> = ({
                           )}
                           {isWorstConsumer && (
                             <div className="absolute top-4 right-4">
-                              <span className="badge bg-danger text-white rounded-full text-[0.65rem] font-bold uppercase py-1.5 px-3">
+                              <span className="badge bg-rose-500 text-white rounded-full text-[0.65rem] font-bold uppercase py-1.5 px-3">
                                 {t("comp_worst")}
                               </span>
                             </div>
                           )}
 
-                          <div className="p-4 bg-light rounded-[2rem] w-fit mb-6">
+                          <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-[2rem] w-fit mb-6">
                             <i
                               className={`fas ${dev.category === "Cooling" ? "fa-snowflake" : "fa-plug"} text-primary text-xl`}
                             ></i>
                           </div>
-                          <h4 className="font-bold text-xl mb-1">{dev.name}</h4>
-                          <p className="text-[0.75rem] text-muted uppercase font-bold tracking-widest mb-8">
+                          <h4 className="font-bold text-xl mb-1 truncate">{dev.name}</h4>
+                          <p className="text-[0.75rem] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-widest mb-8">
                             {dev.category} Sector
                           </p>
 
                           <div className="space-y-6 mt-auto">
-                            <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
-                              <span className="text-[0.7rem] font-bold text-muted uppercase block mb-1">
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-3xl border border-transparent hover:border-primary/10 transition-all">
+                              <span className="text-[0.7rem] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-1">
                                 {t("comp_metric_load")}
                               </span>
                               <div className="text-xl font-bold mono-font">
                                 {dev.watt} W
                               </div>
                             </div>
-                            <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
-                              <span className="text-[0.7rem] font-bold text-muted uppercase block mb-1">
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-3xl border border-transparent hover:border-primary/10 transition-all">
+                              <span className="text-[0.7rem] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-1">
                                 {t("comp_metric_energy")}
                               </span>
                               <div className="text-xl font-bold mono-font text-primary">
                                 {energyMonth.toFixed(1)} kWh
                               </div>
                             </div>
-                            <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
-                              <span className="text-[0.7rem] font-bold text-muted uppercase block mb-1">
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-3xl border border-transparent hover:border-primary/10 transition-all">
+                              <span className="text-[0.7rem] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-1">
                                 {t("comp_metric_cost")}
                               </span>
                               <div className="text-xl font-bold mono-font text-emerald-500">
@@ -4771,8 +2727,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                                 })}
                               </div>
                             </div>
-                            <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
-                              <span className="text-[0.7rem] font-bold text-muted uppercase block mb-1">
+                            <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-3xl border border-transparent hover:border-primary/10 transition-all">
+                              <span className="text-[0.7rem] font-bold text-slate-500 dark:text-slate-400 uppercase block mb-1">
                                 {t("comp_metric_pf")}
                               </span>
                               <div className="flex items-center gap-2">
@@ -4793,8 +2749,8 @@ const Dashboard: React.FC<DashboardProps> = ({
               </div>
             </div>
 
-            <div className="p-8 bg-card border-t border-light flex justify-center">
-              <div className="flex gap-4 p-2 bg-light rounded-full border shadow-inner">
+            <div className="p-8 bg-white border-t border-slate-100 dark:border-slate-800/50 flex justify-center">
+              <div className="flex gap-4 p-2 bg-slate-50 dark:bg-slate-800/60 rounded-full border shadow-inner">
                 <button
                   className="btn btn-primary rounded-full px-10 py-3 font-bold text-[0.75rem] uppercase tracking-widest shadow-lg shadow-primary/20"
                   onClick={() => setShowComparisonView(false)}
@@ -4837,15 +2793,15 @@ const Dashboard: React.FC<DashboardProps> = ({
                 return (
                   <div className="space-y-8">
                     <div className="row g-4">
-                      <div className="col-md-7">
-                        <div className="p-5 bg-primary/5 rounded-[2rem] border border-primary/10 h-full flex flex-col justify-between">
+                      <div className="col-12">
+                        <div className="p-5 bg-primary/5 rounded-[2rem] border border-primary/10 flex flex-col justify-between">
                           <div>
                             <label className="label text-[0.75rem] block mb-3">
                               {t("node_id")}: {d.id}
                             </label>
                             <input
                               type="text"
-                              className="form-control text-xl font-bold border-0 bg-transparent p-0 mb-4 focus:ring-0 focus:outline-none focus:border-b focus:border-primary/20 text-dark dark:text-white"
+                              className="form-control text-xl font-bold border-0 bg-transparent p-0 mb-4 focus:ring-0 focus:outline-none focus:border-b focus:border-primary/20 text-slate-900 dark:text-slate-100 dark:text-white"
                               value={d.name}
                               onChange={(e) =>
                                 updateDevice(d.id, "name", e.target.value)
@@ -4923,8 +2879,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                         </div>
                       </div>
 
-                      <div className="col-md-5">
-                        <div className="p-5 bg-slate-900/90 dark:bg-slate-950/60 rounded-[2rem] border border-slate-800 flex flex-col justify-between h-full relative overflow-hidden group">
+                      <div className="col-12">
+                        <div className="p-5 bg-slate-900/90 dark:bg-slate-950/60 rounded-[2rem] border border-slate-800 flex flex-col justify-between relative overflow-hidden group">
                           {/* Decorative background visual */}
                           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent opacity-50"></div>
                           <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-2xl"></div>
@@ -4958,7 +2914,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           {isAnalyzingDevice && (
                             <div className="relative z-10 text-center py-6">
                               <i className="fas fa-circle-notch animate-spin text-2xl text-primary mb-3 block"></i>
-                              <p className="text-[0.8rem] font-bold text-slate-300 animate-pulse">
+                              <p className="text-[0.8rem] font-bold text-slate-700 dark:text-slate-300 animate-pulse">
                                 {t("ai_analyzing")}
                               </p>
                               <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden mt-2">
@@ -4968,7 +2924,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           )}
 
                           {deviceAnalysis && (
-                            <div className="relative z-10 space-y-5 animate-fade-in text-xs">
+                            <div className="relative z-10 space-y-6 animate-fade-in text-xs">
                               {deviceAnalysis.error ? (
                                 <div className="text-rose-400 p-4 rounded-2xl bg-rose-500/5 border border-rose-500/15">
                                   <i className="fas fa-exclamation-circle text-sm me-2"></i>{" "}
@@ -4977,24 +2933,35 @@ const Dashboard: React.FC<DashboardProps> = ({
                               ) : (
                                 <>
                                   {/* Summary block */}
-                                  <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700/50">
+                                  <div className="p-4 bg-slate-800/80 rounded-2xl border border-slate-700/60 relative overflow-hidden">
+                                    <div className="absolute top-3 right-3 z-10">
+                                      {deviceAnalysis.source === "gemini" ? (
+                                        <span className="text-[0.62rem] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                          ✨ Gemini
+                                        </span>
+                                      ) : (
+                                        <span className="text-[0.62rem] font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                                          ⚙️ Simulated
+                                        </span>
+                                      )}
+                                    </div>
                                     <div className="flex gap-4 items-center mb-3">
                                       <div className="flex flex-col">
-                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-1">
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-400 font-bold block mb-1">
                                           {t("ai_health_score")}
                                         </span>
                                         <div className="flex items-baseline gap-1">
                                           <span className="text-2xl font-display font-bold text-emerald-400">
                                             {deviceAnalysis.healthScore}
                                           </span>
-                                          <span className="text-[0.75rem] text-slate-500">
+                                          <span className="text-[0.75rem] text-slate-400">
                                             /100
                                           </span>
                                         </div>
                                       </div>
-                                      <div className="h-8 w-px bg-slate-705"></div>
+                                      <div className="h-8 w-px bg-slate-700"></div>
                                       <div>
-                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-1">
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-400 font-bold block mb-1">
                                           {t("ai_health_status")}
                                         </span>
                                         <span
@@ -5012,7 +2979,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                                         </span>
                                       </div>
                                     </div>
-                                    <p className="text-[0.8rem] text-slate-300 leading-relaxed mb-0 italic">
+                                    <p className="text-[0.8rem] text-slate-200 leading-relaxed mb-0 italic">
                                       "{deviceAnalysis.summary}"
                                     </p>
                                   </div>
@@ -5021,20 +2988,24 @@ const Dashboard: React.FC<DashboardProps> = ({
                                   {deviceAnalysis.technicalDetails &&
                                     deviceAnalysis.technicalDetails.length > 0 && (
                                       <div>
-                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-2">
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-400 font-bold block mb-2.5">
                                           {t("ai_tech_details")}
                                         </span>
-                                        <div className="grid grid-cols-1 gap-1.5">
+                                        <div className="space-y-2">
                                           {deviceAnalysis.technicalDetails.map(
                                             (detail: string, idx: number) => (
                                               <div
                                                 key={idx}
-                                                className="flex gap-2 items-start bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"
+                                                className="flex gap-3 items-start bg-slate-800/40 hover:bg-slate-800/60 p-3 rounded-xl border border-slate-700/50 transition-colors"
                                               >
-                                                <i className="fas fa-check text-emerald-500 text-[0.75rem] mt-0.5"></i>
-                                                <span className="text-[0.75rem] text-slate-300 leading-tight">
-                                                  {detail}
-                                                </span>
+                                                <div className="w-5.5 h-5.5 rounded bg-emerald-500/10 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5 text-[0.65rem]">
+                                                  <i className="fas fa-check"></i>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                  <p className="text-[0.75rem] text-slate-200 leading-relaxed mb-0">
+                                                    {detail}
+                                                  </p>
+                                                </div>
                                               </div>
                                             ),
                                           )}
@@ -5047,20 +3018,24 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     deviceAnalysis.structuralOptimizations.length >
                                       0 && (
                                       <div>
-                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-2">
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-400 font-bold block mb-2.5">
                                           {t("ai_onpeak_opt")}
                                         </span>
-                                        <div className="grid grid-cols-1 gap-1.5">
+                                        <div className="space-y-2">
                                           {deviceAnalysis.structuralOptimizations.map(
                                             (opt: string, idx: number) => (
                                               <div
                                                 key={idx}
-                                                className="flex gap-2 items-start bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"
+                                                className="flex gap-3 items-start bg-slate-800/40 hover:bg-slate-800/60 p-3 rounded-xl border border-slate-700/50 transition-colors"
                                               >
-                                                <i className="fas fa-lightbulb text-amber-400 text-[0.75rem] mt-0.5 animate-pulse"></i>
-                                                <span className="text-[0.75rem] text-slate-300 leading-tight">
-                                                  {opt}
-                                                </span>
+                                                <div className="w-5.5 h-5.5 rounded bg-amber-500/10 text-amber-400 flex items-center justify-center shrink-0 mt-0.5 text-[0.65rem]">
+                                                  <i className="fas fa-lightbulb animate-pulse"></i>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                  <p className="text-[0.75rem] text-slate-200 leading-relaxed mb-0">
+                                                    {opt}
+                                                  </p>
+                                                </div>
                                               </div>
                                             ),
                                           )}
@@ -5069,17 +3044,36 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     )}
 
                                   {/* Prescriptive advice */}
-                                  {deviceAnalysis.maintenanceAdvice && (
-                                    <div className="p-4 bg-indigo-950/20 rounded-2xl border border-indigo-500/20 text-indigo-200">
-                                      <span className="text-[0.7rem] uppercase tracking-wider text-indigo-400 font-bold block mb-1.5">
-                                        <i className="fas fa-tools me-1"></i>{" "}
-                                        {t("ai_maintenance_advice")}
-                                      </span>
-                                      <p className="text-[0.8rem] leading-relaxed mb-0">
-                                        {deviceAnalysis.maintenanceAdvice}
-                                      </p>
-                                    </div>
-                                  )}
+                                  {deviceAnalysis.maintenanceAdvice && (() => {
+                                    const adviceList = parseMaintenanceAdvice(deviceAnalysis.maintenanceAdvice);
+                                    return (
+                                      <div className="space-y-2.5">
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-indigo-400 font-bold block mb-1">
+                                          <i className="fas fa-tools me-1"></i>{" "}
+                                          {t("ai_maintenance_advice")}
+                                        </span>
+                                        <div className="space-y-3">
+                                          {adviceList.map((adviceItem: string, idx: number) => (
+                                            <div
+                                              key={idx}
+                                              className="p-3.5 bg-indigo-950/30 hover:bg-indigo-950/50 rounded-2xl border border-indigo-500/20 hover:border-indigo-500/40 transition-all text-indigo-200"
+                                            >
+                                              <div className="flex gap-3 items-start">
+                                                <div className="w-5.5 h-5.5 rounded bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0 mt-0.5 text-[0.65rem]">
+                                                  <i className="fas fa-wrench"></i>
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                  <p className="text-[0.75rem] leading-relaxed mb-0 text-indigo-100 font-medium">
+                                                    {adviceItem}
+                                                  </p>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    );
+                                  })()}
 
                                   {/* Refresh action */}
                                   <div className="text-end pt-1">
@@ -5100,7 +3094,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                     </div>
 
-                  <div className="p-6 bg-light rounded-[2.5rem]">
+                  <div className="p-6 bg-slate-50 dark:bg-slate-800/60 rounded-[2.5rem]">
                       <h6 className="label text-[0.75rem] mb-6">
                         {t("node_history_title")}
                       </h6>
@@ -5156,7 +3150,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                       </div>
                     </div>
 
-                    <div className="p-6 bg-white border rounded-[2.5rem] shadow-sm">
+                    <div className="p-6 bg-white dark:bg-slate-800 border dark:border-slate-700 rounded-[2.5rem] shadow-sm">
                       <h6 className="label text-[0.75rem] mb-6">
                         {t("node_maintenance")}
                       </h6>
@@ -5165,13 +3159,13 @@ const Dashboard: React.FC<DashboardProps> = ({
                           d.logs.map((log, li) => (
                             <div
                               key={li}
-                              className="flex justify-between items-center p-3 bg-light rounded-2xl border border-transparent hover:border-primary/20 transition-all"
+                              className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-transparent hover:border-primary/20 transition-all"
                             >
                               <div>
                                 <div className="text-[0.8rem] font-bold text-main mb-1">
                                   {log.action}
                                 </div>
-                                <div className="text-[0.7rem] font-bold text-muted uppercase tracking-widest">
+                                <div className="text-[0.7rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                                   {log.date}
                                 </div>
                               </div>
@@ -5185,7 +3179,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             </div>
                           ))
                         ) : (
-                          <div className="text-center py-6 italic text-muted text-xs opacity-50">
+                          <div className="text-center py-6 italic text-slate-500 dark:text-slate-400 text-xs opacity-50">
                             No logs on record.
                           </div>
                         )}
@@ -5365,7 +3359,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                               return (
                                 <div
                                   key={lIdx}
-                                  className="flex items-start text-xs text-slate-200 leading-relaxed mb-1 pl-2"
+                                  className="flex items-start text-xs text-slate-700 dark:text-slate-200 leading-relaxed mb-1 pl-2"
                                 >
                                   {bulletIcon}
                                   <div className="flex-1">{finalNode}</div>
@@ -5376,7 +3370,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                             return (
                               <p
                                 key={lIdx}
-                                className="text-xs text-slate-100 leading-relaxed mb-1.5"
+                                className="text-xs text-slate-700 dark:text-slate-100 leading-relaxed mb-1.5"
                               >
                                 {finalNode}
                               </p>
@@ -5397,6 +3391,19 @@ const Dashboard: React.FC<DashboardProps> = ({
                                     : "Isolate Wave Surge & Reset Grid Draw"}
                                 </span>
                               </button>
+                            </div>
+                          )}
+                          {msg.source && (
+                            <div className={`mt-2.5 pt-2 border-t border-dashed ${isDarkMode ? 'border-slate-700/50' : 'border-slate-200/50'} flex justify-end`}>
+                              {msg.source === "gemini" ? (
+                                <span className={`text-[0.58rem] font-mono font-bold px-1.5 py-0.5 rounded ${isDarkMode ? 'text-emerald-400 bg-emerald-500/10 border border-emerald-500/20' : 'text-emerald-700 bg-emerald-100 border border-emerald-200'}`}>
+                                  ✨ Powered by Gemini
+                                </span>
+                              ) : (
+                                <span className={`text-[0.58rem] font-mono font-bold px-1.5 py-0.5 rounded ${isDarkMode ? 'text-amber-400 bg-amber-500/10 border border-amber-500/20' : 'text-amber-700 bg-amber-100 border border-amber-200'}`}>
+                                  ⚙️ Fallback Heuristics
+                                </span>
+                              )}
                             </div>
                           )}
                         </>
@@ -5759,7 +3766,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       <button
         id="energy-ai-chatbot-trigger"
         onClick={() => setIsChatOpen(!isChatOpen)}
-        className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${
+        className={`fixed bottom-24 md:bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 ${
           isChatOpen
             ? "bg-rose-500 hover:bg-rose-600 rotate-90 scale-105 text-white"
             : "bg-emerald-500 hover:bg-emerald-600 hover:scale-110 text-white"

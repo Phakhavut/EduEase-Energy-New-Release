@@ -3,6 +3,9 @@ import compression from "compression";
 import cors from "cors";
 import express from "express";
 import path from "path";
+import jwt from "jsonwebtoken";
+import cookieParser from "cookie-parser";
+import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type, ThinkingLevel } from "@google/genai";
 import rateLimit from "express-rate-limit";
@@ -16,6 +19,7 @@ const logger = pino({ level: process.env.LOG_LEVEL || "info" });
 
 async function startServer() {
   const app = express();
+  app.use(cookieParser());
   app.set('trust proxy', 1);
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(compression());
@@ -84,6 +88,116 @@ async function startServer() {
     }
   }
 
+  const JWT_SECRET = process.env.JWT_SECRET || "fallback_sec_46423939_aistudio_energy_monitoring";
+
+  // REST API Endpoint: real /api/auth/login POST endpoint that validates against a hashed credential store
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ error: "Username and password are required" });
+      }
+
+      // Valid credentials in hashed form (username "Namyen" and password "12345")
+      // sha256 hash of "12345" is "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5"
+      const targetUsername = "Namyen";
+      const targetPasswordHash = "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5";
+
+      const inputPasswordHash = crypto.createHash("sha256").update(password).digest("hex");
+
+      if (username === targetUsername && inputPasswordHash === targetPasswordHash) {
+        // Correct credentials! Generate signed session JWT
+        const token = jwt.sign(
+          { username: "Namyen", role: "admin" },
+          JWT_SECRET,
+          { expiresIn: "24h" }
+        );
+
+        // Return signed session in httpOnly cookie
+        res.cookie("session_token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+          maxAge: 24 * 60 * 60 * 1000, // 24 hours
+          path: "/"
+        });
+
+        return res.json({
+          success: true,
+          user: { username: "Namyen", role: "admin" }
+        });
+      }
+
+      return res.status(401).json({ error: "Invalid username or password" });
+    } catch (err: any) {
+      console.error("Login endpoint error:", err);
+      return res.status(500).json({ error: "An error occurred during authentication" });
+    }
+  });
+
+  // REST API Endpoint: /api/auth/guest-login POST endpoint
+  app.post("/api/auth/guest-login", async (req, res) => {
+    try {
+      // Create guest session
+      const token = jwt.sign(
+        { username: "Guest User", role: "guest" },
+        JWT_SECRET,
+        { expiresIn: "6h" }
+      );
+
+      res.cookie("session_token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 6 * 60 * 60 * 1000, // 6 hours
+        path: "/"
+      });
+
+      return res.json({
+        success: true,
+        user: { username: "Guest User", role: "guest" }
+      });
+    } catch (err: any) {
+      console.error("Guest login error:", err);
+      return res.status(500).json({ error: "An error occurred during guest registration" });
+    }
+  });
+
+  // REST API Endpoint: /api/auth/me GET endpoint
+  app.get("/api/auth/me", async (req, res) => {
+    try {
+      const token = req.cookies.session_token;
+      if (!token) {
+        return res.json({ authenticated: false });
+      }
+
+      try {
+        const decoded = jwt.verify(token, JWT_SECRET) as any;
+        return res.json({
+          authenticated: true,
+          user: {
+            username: decoded.username,
+            role: decoded.role
+          }
+        });
+      } catch (jwtErr) {
+        // Clear invalid token
+        res.clearCookie("session_token", { path: "/" });
+        return res.json({ authenticated: false });
+      }
+    } catch (err: any) {
+      console.error("Verification endpoint error:", err);
+      return res.json({ authenticated: false });
+    }
+  });
+
+  // REST API Endpoint: /api/auth/logout POST endpoint
+  app.post("/api/auth/logout", async (req, res) => {
+    res.clearCookie("session_token", { path: "/" });
+    return res.json({ success: true });
+  });
+
   // REST API Endpoint: Global Anomaly Scan Proxy
   app.post("/api/ai/anomaly-scan", async (req, res) => {
     try {
@@ -141,7 +255,7 @@ async function startServer() {
       }
 
       if (aiResponseData) {
-        return res.json(aiResponseData);
+        return res.json({ source: "gemini", anomalies: aiResponseData });
       } else {
         // High-Intelligence Expert Heuristic Real-time Scanner Fallback
         const anomalies = [];
@@ -193,7 +307,7 @@ async function startServer() {
           });
         }
 
-        return res.json(anomalies.slice(0, 2));
+        return res.json({ source: "fallback-simulation", anomalies: anomalies.slice(0, 2) });
       }
     } catch (error: any) {
       console.error("Server-side anomaly scan error:", error);
@@ -284,7 +398,7 @@ async function startServer() {
       }
 
       if (hasSuccess && aiResult) {
-        return res.json(aiResult);
+        return res.json({ ...aiResult, source: "gemini" });
       } else {
         // High-Intelligence Individual Diagnosis Heuristic Fallback
         const name = device.name || "Unknown Appliance";
@@ -343,7 +457,8 @@ async function startServer() {
           summary,
           technicalDetails,
           structuralOptimizations,
-          maintenanceAdvice
+          maintenanceAdvice,
+          source: "fallback-simulation"
         });
       }
     } catch (error: any) {
@@ -409,7 +524,7 @@ async function startServer() {
 
       // High-Intelligence Expert Heuristic Real-time Scanner Fallback
       if (aiResponseText) {
-        return res.json({ reply: aiResponseText });
+        return res.json({ reply: aiResponseText, source: "gemini" });
       } else {
         const lastMsg = messages[messages.length - 1].content.toLowerCase();
         let reply = "";
@@ -472,13 +587,14 @@ async function startServer() {
 คุณสามารถสอบถามเจาะจงในหัวข้อแอร์, ไฟสแตนด์บายรั่วซึม หรือวิธีการคำนวณอัตรา TOU ยอดเปรียบเทียบได้เลยครับ ผู้ช่วย AI ยินดีอธิบายประเมินผลให้ฟังทันทีครับ!`;
         }
         
-        return res.json({ reply });
+        return res.json({ reply, source: "fallback-simulation" });
       }
     } catch (error: any) {
       console.error("AI chatbot endpoint error:", error);
       res.status(500).json({ error: error.message || "Failed to process chat securely." });
     }
   });
+
 
   // REST API Endpoint: AI Weather Grounding & Energy Optimization Tips
   app.post("/api/ai/weather-forecast", async (req, res) => {
@@ -701,7 +817,8 @@ async function startServer() {
 
           return res.json({
             ...parsed,
-            groundingUrls: groundingUrls.slice(0, 3) // limit to top 3
+            groundingUrls: groundingUrls.slice(0, 3), // limit to top 3
+            source: "gemini"
           });
         } catch (apiError: any) {
           // Gracefully and cleanly capture quota limit exceptions without printing noisy backtraces to prevent CI/CD alerts
@@ -715,19 +832,19 @@ async function startServer() {
           }
           // Fall back gracefully to the dynamic simulation generator
           const fallbackData = getSimulatedWeatherData(location);
-          return res.json(fallbackData);
+          return res.json({ ...fallbackData, source: "fallback-simulation" });
         }
       } else {
         // Fallback for when KEY itself is completely absent
         const fallbackData = getSimulatedWeatherData(location);
-        return res.json(fallbackData);
+        return res.json({ ...fallbackData, source: "fallback-simulation" });
       }
     } catch (error: any) {
       console.log("AI Weather grounding endpoint fallback handled cleanly.");
       // Fallback for security even if outer framework fails
       try {
         const fallbackData = getSimulatedWeatherData(location);
-        return res.json(fallbackData);
+        return res.json({ ...fallbackData, source: "fallback-simulation" });
       } catch (innerError) {
         res.status(500).json({ error: "Failed to generate simulated climate metrics" });
       }
@@ -817,6 +934,88 @@ async function startServer() {
         fallback: true
       };
       
+      return res.json({ source: "fallback", ...fallbackData });
+    }
+  });
+
+  // Proxy endpoint to fetch Open-Meteo weather forecast and cache it for 10 minutes
+  interface ForecastCachedData {
+    timestamp: number;
+    data: any;
+  }
+  const forecastCache: Record<string, ForecastCachedData> = {};
+
+  app.get("/api/weather/forecast", async (req, res) => {
+    try {
+      const lat = String(req.query.latitude || "13.75");
+      const lon = String(req.query.longitude || "100.5167");
+      const cacheKey = `${lat}_${lon}`;
+
+      const now = Date.now();
+      if (forecastCache[cacheKey] && (now - forecastCache[cacheKey].timestamp < CACHE_DURATION)) {
+        return res.json({ source: "cache", ...forecastCache[cacheKey].data });
+      }
+
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FBangkok`;
+
+      const meteoRes = await fetch(url, {
+        headers: {
+          "Accept": "application/json",
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      });
+
+      if (!meteoRes.ok) {
+        throw new Error(`Open-Meteo returned status ${meteoRes.status}`);
+      }
+
+      const rawJson = await meteoRes.json();
+      if (rawJson && rawJson.daily) {
+        forecastCache[cacheKey] = {
+          timestamp: now,
+          data: rawJson,
+        };
+        return res.json({ source: "api", ...rawJson });
+      } else {
+        throw new Error("Invalid Open-Meteo response structure");
+      }
+    } catch (err: any) {
+      console.error("Open-Meteo forecast proxy fetch error, using safe fallback:", err.message);
+      
+      // Generate a simulated, high-fidelity 5-day forecast
+      const today = new Date();
+      const time: string[] = [];
+      const weather_code: number[] = [];
+      const temperature_2m_max: number[] = [];
+      const temperature_2m_min: number[] = [];
+      const precipitation_probability_max: number[] = [];
+
+      // Base pattern (hot/sunny Bangkok style)
+      const mockCodes = [3, 0, 1, 61, 2];
+      const mockMaxTemps = [34, 35, 34.5, 32, 33.5];
+      const mockMinTemps = [26, 25.5, 26, 24.5, 25];
+      const mockRainProbs = [20, 10, 15, 65, 30];
+
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        time.push(d.toISOString().split("T")[0]);
+        weather_code.push(mockCodes[i % mockCodes.length]);
+        temperature_2m_max.push(mockMaxTemps[i % mockMaxTemps.length]);
+        temperature_2m_min.push(mockMinTemps[i % mockMinTemps.length]);
+        precipitation_probability_max.push(mockRainProbs[i % mockRainProbs.length]);
+      }
+
+      const fallbackData = {
+        daily: {
+          time,
+          weather_code,
+          temperature_2m_max,
+          temperature_2m_min,
+          precipitation_probability_max
+        }
+      };
+
       return res.json({ source: "fallback", ...fallbackData });
     }
   });
@@ -1057,7 +1256,7 @@ async function startServer() {
 
           if (response && response.text) {
             const result = JSON.parse(response.text.trim());
-            return res.json(result);
+            return res.json({ ...result, source: "gemini" });
           }
           throw new Error("Empty response received from Gemini API");
         } catch (apiError: any) {
@@ -1067,17 +1266,17 @@ async function startServer() {
           }
           cleanGeminiErrorLog("smart-savings", apiError);
           const fallbackData = getSimulatedSavingsData(appliances, customHabits);
-          return res.json(fallbackData);
+          return res.json({ ...fallbackData, source: "fallback-simulation" });
         }
       } else {
         const fallbackData = getSimulatedSavingsData(appliances, customHabits);
-        return res.json(fallbackData);
+        return res.json({ ...fallbackData, source: "fallback-simulation" });
       }
     } catch (err: any) {
       console.error("Smart Savings server-level error, executing absolute safe guard:", err);
       try {
         const fallbackData = getSimulatedSavingsData(appliances, customHabits);
-        return res.json(fallbackData);
+        return res.json({ ...fallbackData, source: "fallback-simulation" });
       } catch (innerErr) {
         res.status(500).json({ error: "Could not compute savings profile" });
       }
@@ -1292,7 +1491,7 @@ async function startServer() {
 
           if (response && response.text) {
             const result = JSON.parse(response.text.trim());
-            return res.json(result);
+            return res.json({ ...result, source: "gemini" });
           }
           throw new Error("Empty response received from Gemini API");
         } catch (apiError: any) {
@@ -1302,17 +1501,17 @@ async function startServer() {
           }
           cleanGeminiErrorLog("projected-savings", apiError);
           const fallbackData = getSimulatedProjectedSavings(devices, analytics);
-          return res.json(fallbackData);
+          return res.json({ ...fallbackData, source: "fallback-simulation" });
         }
       } else {
         const fallbackData = getSimulatedProjectedSavings(devices, analytics);
-        return res.json(fallbackData);
+        return res.json({ ...fallbackData, source: "fallback-simulation" });
       }
     } catch (err: any) {
       console.error("Projected Savings server error:", err);
       try {
         const fallbackData = getSimulatedProjectedSavings(devices, analytics);
-        return res.json(fallbackData);
+        return res.json({ ...fallbackData, source: "fallback-simulation" });
       } catch (innerErr) {
         res.status(500).json({ error: "Could not compute savings profile" });
       }

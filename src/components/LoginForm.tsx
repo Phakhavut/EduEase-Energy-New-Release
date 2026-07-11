@@ -6,9 +6,11 @@ interface LoginFormProps {
   onLogin: (username: string) => void;
   selectedHouseName: string;
   isDarkMode: boolean;
+  lang: 'th' | 'en';
+  setLang: (lang: 'th' | 'en') => void;
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDarkMode }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDarkMode, lang, setLang }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -28,25 +30,36 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
     });
   }, [selectedHouseName]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
     
-    setTimeout(() => {
-      if (username === 'Namyen' && password === '12345') {
-        onLogin(username);
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        onLogin(data.user.username);
       } else {
-        setError('ไม่สามารถตรวจสอบสิทธิ์ได้ กรุณาตรวจสอบข้อมูลและลองใหม่');
-        setIsLoading(false);
+        setError(data.error || (lang === 'th' ? 'ไม่สามารถตรวจสอบสิทธิ์ได้ กรุณาตรวจสอบข้อมูลและลองใหม่' : 'Authentication failed. Please check credentials and try again.'));
       }
-    }, 1000);
+    } catch (err) {
+      setError(lang === 'th' ? 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์' : 'Server connection error occurred.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const glassClass = isDarkMode ? 'glass-dark' : 'glass-light';
-  const labelColor = isDarkMode ? 'text-white/40' : 'text-slate-500';
+  const labelColor = isDarkMode ? 'text-white/60' : 'text-slate-500'; // Fixed WCAG contrast text-white/40 -> text-white/60
   const inputBg = isDarkMode ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200';
-  const inputTextColor = isDarkMode ? 'text-white placeholder-white/10' : 'text-slate-900 placeholder-slate-400';
+  const inputTextColor = isDarkMode ? 'text-white placeholder-white/20' : 'text-slate-900 placeholder-slate-400';
   const headingColor = isDarkMode ? 'text-white' : 'text-slate-900';
   const subHeadingColor = isDarkMode ? 'text-white/60' : 'text-slate-600';
 
@@ -58,7 +71,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
         
         <div className="relative z-10">
           <div className="mb-4 text-center">
-            <h2 className={`text-2xl font-semibold ${headingColor} mb-1 tracking-tight font-display transition-colors`}>Welcome Back</h2>
+            <h2 className={`text-2xl font-semibold ${headingColor} mb-1 tracking-tight font-display transition-colors`}>{lang === 'th' ? 'ยินดีต้อนรับกลับมา' : 'Welcome Back'}</h2>
             <p className={`${subHeadingColor} text-[0.75rem] font-medium uppercase tracking-[0.15em] transition-colors`}>
               Node: <span className="text-emerald-500">{selectedHouseName}</span>
             </p>
@@ -94,25 +107,25 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
               </LineChart>
             </ResponsiveContainer>
             <div className={`text-center text-[0.65rem] uppercase tracking-widest mt-2 ${labelColor}`}>
-              24-Hour Consumption Trend
+              {lang === 'th' ? 'แนวโน้มการใช้ไฟ 24 ชั่วโมง (ข้อมูลจำลอง)' : '24-Hour Consumption Trend (Sample Data)'}
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label className={`text-[0.7rem] font-bold ${labelColor} uppercase tracking-[0.2em] ml-1`}>Identity</label>
+              <label className={`text-[0.7rem] font-bold ${labelColor} uppercase tracking-[0.2em] ml-1`}>{lang === 'th' ? 'ผู้ใช้งาน' : 'Identity'}</label>
               <input
                 required
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Username"
+                placeholder={lang === 'th' ? 'ชื่อผู้ใช้' : 'Username'}
                 className={`w-full ${inputBg} border rounded-2xl px-4 py-3 ${inputTextColor} focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all text-sm`}
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className={`text-[0.7rem] font-bold ${labelColor} uppercase tracking-[0.2em] ml-1`}>Passkey</label>
+              <label className={`text-[0.7rem] font-bold ${labelColor} uppercase tracking-[0.2em] ml-1`}>{lang === 'th' ? 'รหัสผ่าน' : 'Passkey'}</label>
               <input
                 required
                 type="password"
@@ -135,16 +148,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
               className={`w-full bg-emerald-500 text-white font-bold py-3.5 rounded-2xl shadow-lg hover:bg-emerald-400 active:scale-[0.97] transition-all flex items-center justify-center gap-2 mt-2 ${isLoading ? 'animate-pulse cursor-wait' : ''}`}
             >
               {isLoading ? (
-                <span className="tracking-widest text-[0.75rem]">กำลังตรวจสอบข้อมูล...</span>
+                <span className="tracking-widest text-[0.75rem]">{lang === 'th' ? 'กำลังตรวจสอบข้อมูล...' : 'AUTHENTICATING...'}</span>
               ) : (
-                <span className="tracking-widest text-[0.75rem]">AUTHORIZE ACCESS</span>
+                <span className="tracking-widest text-[0.75rem]">{lang === 'th' ? 'เข้าสู่ระบบควบคุม' : 'AUTHORIZE ACCESS'}</span>
               )}
             </button>
             
-            <div className="text-center">
-               <button type="button" className={`text-[0.7rem] ${labelColor} hover:text-emerald-500 transition-colors tracking-tighter uppercase font-bold`}>
-                 Secure Authentication Required
-               </button>
+            <div className="text-center pt-1">
+               <span className={`text-[0.65rem] ${labelColor} font-mono tracking-wider uppercase flex items-center justify-center gap-1.5`}>
+                 <i className="fas fa-shield-alt text-emerald-500 animate-pulse" aria-hidden="true"></i> SECURE MFA GATEWAY ENFORCED
+               </span>
             </div>
           </form>
         </div>

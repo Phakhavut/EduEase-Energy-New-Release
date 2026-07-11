@@ -186,7 +186,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
         
         {/* LEVEL 1: Primary Usage */}
         <div className="text-center md:text-left space-y-2 animate-fade-in">
-          <h2 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest flex items-center justify-center md:justify-start gap-2">
+          <h2 className="text-sm font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest flex items-center justify-center md:justify-start gap-2">
             <Zap className="w-4 h-4 text-blue-500" />
             {t("Today's Energy", "วันนี้ใช้ไฟ")}
           </h2>
@@ -196,9 +196,9 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
         </div>
 
         {/* LEVEL 2: Cost */}
-        <div className="bg-slate-50 dark:bg-slate-900/50 rounded-3xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-center sm:items-end gap-4 animate-fade-in" style={{ animationDelay: '100ms' }}>
+        <div className="bg-slate-50 dark:bg-slate-900/50 rounded-3xl p-5 md:p-6 border border-slate-100 dark:border-slate-800 flex flex-wrap justify-between items-center sm:items-end gap-4 animate-fade-in" style={{ animationDelay: '100ms' }}>
           <div>
-            <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 flex items-center justify-center sm:justify-start gap-2">
+            <h3 className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-2 flex items-center justify-center sm:justify-start gap-2">
               <Coins className="w-4 h-4 text-emerald-500" />
               {t("Est. Monthly Cost", "ค่าไฟประเมินเดือนนี้")}
             </h3>
@@ -219,8 +219,8 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
 
         {/* LEVEL 3: AI Recommendations */}
         <div className="border border-purple-500/20 bg-purple-500/5 dark:bg-purple-900/10 p-6 rounded-3xl animate-fade-in" style={{ animationDelay: '200ms' }}>
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex-1 space-y-4">
+          <div className="flex flex-wrap gap-6">
+            <div className="flex-auto w-full lg:w-[calc(100%-21.5rem)] min-w-[280px] space-y-4">
               <h4 className="text-sm font-bold text-purple-700 dark:text-purple-300 uppercase tracking-widest flex items-center gap-2">
                 <Sparkles className="w-4 h-4" />
                 {t("AI Assistant", "คำแนะนำจาก AI ผู้ช่วย")}
@@ -248,7 +248,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                     setAiLoadShift(!allOn);
                     setAiPfTuning(!allOn);
                   }}
-                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-sm active:scale-95 ${(aiSmartAc && aiEcoStandby && aiLoadShift && aiPfTuning) ? 'bg-purple-600 text-white shadow-purple-500/30 hover:bg-purple-700' : 'bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/30 hover:bg-purple-50 dark:hover:bg-purple-900/20'}`}
+                  className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold transition-all shadow-sm active:scale-95 whitespace-nowrap ${(aiSmartAc && aiEcoStandby && aiLoadShift && aiPfTuning) ? 'bg-purple-600 text-white shadow-purple-500/30 hover:bg-purple-700' : 'bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/30 hover:bg-purple-50 dark:hover:bg-purple-900/20'}`}
                 >
                   <i className="fas fa-magic"></i>
                   {lang === "th" ? "เปิดทุกฟังก์ชันประหยัดอัตโนมัติ" : "Optimize All Settings Automatically"}
@@ -257,7 +257,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
             </div>
             
             {/* Quick AI Switches */}
-            <div className="w-full md:w-80 space-y-2 shrink-0">
+            <div className="w-full lg:w-80 space-y-2 shrink-0">
                <div className="text-[0.65rem] font-bold text-slate-500 uppercase tracking-widest mb-3">
                  {t("Smart Controls", "ควบคุมสวิตช์")}
                </div>
@@ -281,7 +281,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                      <span className="block font-bold text-slate-800 dark:text-slate-200">
                        {t("1. Smart AC Thermostat", "1. จูนอุณหภูมิ AC อัจฉริยะ")}
                      </span>
-                     <span className="block text-[0.58rem] text-slate-500 dark:text-slate-400 font-medium">
+                     <span className="block text-[0.58rem] text-slate-600 dark:text-slate-400 font-medium">
                        {t("Adapts air cooling loads", "ปรับลดกระแสแอร์ตามสภาพอากาศ")}
                      </span>
                    </div>
@@ -314,7 +314,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                      <span className="block font-bold text-slate-800 dark:text-slate-200">
                        {t("2. Eco Standby Cutoff", "2. คุมไฟกระแส Standby อัตโนมัติ")}
                      </span>
-                     <span className="block text-[0.58rem] text-slate-500 dark:text-slate-400 font-medium">
+                     <span className="block text-[0.58rem] text-slate-600 dark:text-slate-400 font-medium">
                        {t("Cuts residual power leaks", "ปิดการใช้พลังงานสำรองที่สูญเปล่า")}
                      </span>
                    </div>
@@ -347,7 +347,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                      <span className="block font-bold text-slate-800 dark:text-slate-200">
                        {t("3. AI TOU Load Shifting", "3. การย้ายช่วงเวลาโหลด (TOU)")}
                      </span>
-                     <span className="block text-[0.58rem] text-slate-500 dark:text-slate-400 font-medium">
+                     <span className="block text-[0.58rem] text-slate-600 dark:text-slate-400 font-medium">
                        {t("Shifts peak power to night", "โยกย้ายช่วงใช้ไฟหลักเพื่อรับเรต Off-Peak")}
                      </span>
                    </div>
@@ -380,7 +380,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                      <span className="block font-bold text-slate-800 dark:text-slate-200">
                        {t("4. PF Auto-Smoothing", "4. ปรับจูนเพาเวอร์แฟกเตอร์ (PF)")}
                      </span>
-                     <span className="block text-[0.58rem] text-slate-500 dark:text-slate-400 font-medium">
+                     <span className="block text-[0.58rem] text-slate-600 dark:text-slate-400 font-medium">
                        {t("Minimizes electrical network losses", "จูนกระแสและลดค่าสูญเสียความต้านทานสายส่ง")}
                      </span>
                    </div>
@@ -403,9 +403,9 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
               {lang === 'th' ? 'ข้อมูลเชิงลึกจากการวิเคราะห์ของ AI (AI Insights)' : 'AI Analytical Insights'}
             </h4>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-wrap gap-4">
               {/* Card 1 */}
-              <div className="bg-slate-50 dark:bg-slate-900/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-all">
+              <div className="w-full lg:w-[calc(50%-0.5rem)] flex-auto bg-slate-50 dark:bg-slate-900/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-all">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg">
@@ -418,7 +418,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                   </div>
                   <span className="px-2 py-1 bg-rose-500/10 text-rose-600 rounded text-xs font-bold uppercase">{lang === 'th' ? 'ความเสี่ยงสูง' : 'High Priority'}</span>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
+                <p className="text-sm text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">
                   {lang === 'th' ? 'ตรวจพบการใช้พลังงานของคอมเพรสเซอร์แอร์ห้องนั่งเล่นพุ่งสูงผิดปกติในช่วงเวลา 13:00 - 15:00 น. คาดว่าเกิดจากอุณหภูมิภายนอกที่สูงขึ้น หรือมีการรั่วซึมของความเย็น' : 'Detected unusual power spikes in the Living Room AC compressor between 13:00 - 15:00. Likely due to high external temperature or cooling leak.'}
                 </p>
                 <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
@@ -428,7 +428,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
               </div>
 
               {/* Card 2 */}
-              <div className="bg-slate-50 dark:bg-slate-900/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-all">
+              <div className="w-full lg:w-[calc(50%-0.5rem)] flex-auto bg-slate-50 dark:bg-slate-900/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-all">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">
@@ -441,7 +441,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                   </div>
                   <span className="px-2 py-1 bg-amber-500/10 text-amber-600 rounded text-xs font-bold uppercase">{lang === 'th' ? 'ปานกลาง' : 'Medium Priority'}</span>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
+                <p className="text-sm text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">
                   {lang === 'th' ? 'มีอุปกรณ์บันเทิง (TV, เครื่องเสียง, เกมคอนโซล) เสียบปลั๊กทิ้งไว้ตลอด 24 ชั่วโมงแม้ไม่ได้ใช้งาน ทำให้เกิดการสูญเสียพลังงานสะสม' : 'Entertainment systems (TV, Sound system, Consoles) are left plugged in 24/7, causing cumulative standby power waste.'}
                 </p>
                 <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
@@ -451,7 +451,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
               </div>
 
               {/* Card 3 */}
-              <div className="bg-slate-50 dark:bg-slate-900/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-all">
+              <div className="w-full lg:w-[calc(50%-0.5rem)] flex-auto bg-slate-50 dark:bg-slate-900/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-all">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg">
@@ -464,7 +464,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                   </div>
                   <span className="px-2 py-1 bg-rose-500/10 text-rose-600 rounded text-xs font-bold uppercase">{lang === 'th' ? 'ความเสี่ยงสูง' : 'High Priority'}</span>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
+                <p className="text-sm text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">
                   {lang === 'th' ? 'คุณมักใช้งานเครื่องซักผ้าและเครื่องทำน้ำอุ่นพร้อมกันในช่วงเวลา 18:00 - 20:00 น. ซึ่งเป็นช่วงเวลาที่ค่าไฟแพงที่สุดของมิเตอร์แบบ TOU' : 'Heavy usage of washing machine and water heater detected between 18:00 - 20:00, which falls into the most expensive TOU peak rate.'}
                 </p>
                 <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
@@ -474,7 +474,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
               </div>
 
               {/* Card 4 */}
-              <div className="bg-slate-50 dark:bg-slate-900/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-all">
+              <div className="w-full lg:w-[calc(50%-0.5rem)] flex-auto bg-slate-50 dark:bg-slate-900/60 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition-all">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg">
@@ -487,7 +487,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                   </div>
                   <span className="px-2 py-1 bg-emerald-500/10 text-emerald-600 rounded text-xs font-bold uppercase">{lang === 'th' ? 'ดีเยี่ยม' : 'Optimal'}</span>
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed">
+                <p className="text-sm text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">
                   {lang === 'th' ? 'การใช้ตู้เย็นและอุปกรณ์ส่องสว่างของคุณอยู่ในเกณฑ์มาตรฐาน ไม่พบความผิดปกติหรือกระแสไฟกระชากที่อาจก่อให้เกิดความเสียหายกับเครื่องใช้ไฟฟ้า' : 'Refrigerator and lighting consumption patterns are well within standard baselines. No power surges or anomalies detected.'}
                 </p>
                 <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-800">
@@ -504,7 +504,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                </div>
                <div>
                   <h5 className="font-bold text-slate-800 dark:text-slate-200 mb-1">{lang === 'th' ? 'บทสรุปผู้บริหาร' : 'Executive Summary'}</h5>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                  <p className="text-sm text-slate-700 dark:text-slate-300">
                     {lang === 'th' 
                       ? 'หากทำตามคำแนะนำทั้งหมด คาดว่าจะลดค่าไฟรวมได้ประมาณ ฿750 - ฿900 ต่อเดือน (ลดลง 15-20%) โดยไม่กระทบความสะดวกสบาย' 
                       : 'Implementing these AI-driven recommendations could reduce total monthly energy costs by ฿750 - ฿900 (15-20% reduction) without compromising comfort.'}
@@ -519,7 +519,7 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
         <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
           <button 
             onClick={() => setIsGraphExpanded(!isGraphExpanded)}
-            className="w-full flex items-center justify-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors uppercase tracking-widest py-2"
+            className="w-full flex items-center justify-center gap-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors uppercase tracking-widest py-2"
           >
             {isGraphExpanded ? (
               <><i className="fas fa-chevron-up"></i> {t("Hide Advanced Analytics", "ซ่อนข้อมูลเชิงลึก")}</>

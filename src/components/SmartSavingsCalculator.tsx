@@ -482,7 +482,7 @@ export const SmartSavingsCalculator: React.FC<{
               {/* TOU On-Peak Slider */}
               <div className="md:col-span-3 bg-white dark:bg-slate-950/20 p-3.5 rounded-2xl border border-slate-150 dark:border-slate-800/80 mt-1">
                 <div className="flex justify-between items-center mb-1.5">
-                  <span className="text-[10.5px] font-bold text-slate-500 dark:text-slate-300">
+                  <span className="text-[10.5px] font-bold text-slate-700 dark:text-slate-300">
                     {lang === 'th' ? 'ร้อยละการใช้งานไฟช่วงเร่งด่วน (กลางวัน/On-Peak)' : 'On-Peak Usage Share (Daytime)'}
                   </span>
                   <span className="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-lg">

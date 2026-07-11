@@ -1,0 +1,28 @@
+{
+  "keys": {
+    "lang": 1, "isDarkMode": 1, "onToggleTheme": 1, "onLogout": 1, "multiDevices": 1, "setMultiDevices": 1,
+    "analytics": 1, "t": 1, "confettiTrigger": 1, "setConfettiTrigger": 1, "currentPage": 1, "setCurrentPage": 1,
+    "sidebarAvatar": 1, "setSidebarAvatar": 1, "sidebarCustomLogoUrl": 1, "setSidebarCustomLogoUrl": 1,
+    "currentBgColor": 1, "contrastAnalysis": 1, "severeWeatherAlert": 1, "weatherData": 1, "isWeatherLoading": 1,
+    "weatherLocation": 1, "weatherError": 1, "weatherInput": 1, "isMobileMenuOpen": 1, "setIsMobileMenuOpen": 1,
+    "isTourActive": 1, "setIsTourActive": 1, "startImmediateTour": 1, "setStartImmediateTour": 1,
+    "aiAutopilotCapping": 1, "setAiAutopilotCapping": 1, "ecoStreak": 1, "setEcoStreak": 1,
+    "chatMessages": 1, "setChatMessages": 1, "chatInput": 1, "setChatInput": 1, "isSendingChat": 1, "setIsSendingChat": 1,
+    "isChatOpen": 1, "setIsChatOpen": 1, "activeFaqCategory": 1, "setActiveFaqCategory": 1,
+    "removeDevice": 1, "generatePDF": 1, "handleMoveWidget": 1, "widgetOrder": 1, "setWidgetOrder": 1,
+    "draggedIndex": 1, "setDraggedIndex": 1, "isGeneratingPDF": 1, "setIsGeneratingPDF": 1,
+    "dailySavingsData": 1, "performanceChartData": 1, "aiOptimizationMetrics": 1, "settlementLogs": 1,
+    "aiSmartAc": 1, "setAiSmartAc": 1, "aiEcoStandby": 1, "setAiEcoStandby": 1, "aiPfTuning": 1, "setAiPfTuning": 1,
+    "aiLoadShift": 1, "setAiLoadShift": 1, "perfRange": 1, "setPerfRange": 1, "globalBudget": 1, "unitRate": 1,
+    "telemetryPerfRange": 1, "setTelemetryPerfRange": 1, "deviceSpecificChartData": 1, "compareDevices": 1,
+    "aiOptimizationChartData": 1, "deviceAnalysis": 1, "isAnalyzingDevice": 1, "setIsAnalyzingDevice": 1,
+    "selectedDeviceId": 1, "setSelectedDeviceId": 1, "compareDeviceIds": 1, "setCompareDeviceIds": 1,
+    "showComparisonView": 1, "setShowComparisonView": 1, "calcDays": 1, "setCalcDays": 1, "sharedFtRate": 1,
+    "setSharedFtRate": 1, "plannedKwh": 1, "setPlannedKwh": 1, "onPeakShare": 1, "setOnPeakShare": 1,
+    "activeSpike": 1, "setActiveSpike": 1, "aiAlerts": 1, "setAiAlerts": 1, "isAiScanning": 1, "setIsAiScanning": 1,
+    "aiTick": 1, "setAiTick": 1, "claimedQuests": 1, "setClaimedQuests": 1, "handleInjectVirtualLoad": 1,
+    "handleAiOptimization": 1, "setGlobalBudget": 1, "setUnitRate": 1, "setDeviceAnalysis": 1,
+    "setWeatherInput": 1, "setWeatherLocation": 1, "fetchWeatherForAlert": 1, "addDevice": 1, "updateDeviceConfig": 1,
+    "containerVariants": 1, "itemVariants": 1, "CATEGORIES": 1, "renderWidgetWrapper": 1, "AnimatedCounter": 1
+  }
+}

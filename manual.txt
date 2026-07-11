@@ -1,0 +1,690 @@
+          {currentPage === "manual" && (
+            <div className="animate-fade-in max-w-4xl mx-auto text-dark">
+              {/* Manual Page Sub-Tabs */}
+              <div className="flex gap-4 mb-6 border-b border-light pb-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
+                <button
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${manualTab === "guide" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  style={{
+                    borderBottom:
+                      manualTab === "guide" ? "2px solid" : "none",
+                  }}
+                  onClick={() => setManualTab("guide")}
+                >
+                  <i className="fas fa-book-open mr-2"></i>
+                  {lang === "th" ? "คู่มือผู้ใช้ระบบกริต" : "User Guide"}
+                </button>
+                <button
+                  className={`text-[0.75rem] md:text-sm font-black uppercase tracking-wider pb-2 transition-all border-0 bg-transparent cursor-pointer ${manualTab === "settings" ? "text-primary dark:text-sky-400 border-b-2 border-primary dark:border-sky-400" : "text-muted dark:opacity-100 opacity-50"}`}
+                  style={{
+                    borderBottom:
+                      manualTab === "settings" ? "2px solid" : "none",
+                  }}
+                  onClick={() => setManualTab("settings")}
+                >
+                  <i className="fas fa-sliders-h mr-2"></i>
+                  {lang === "th"
+                    ? "ตั้งค่าเครือข่ายวิจัยและการแสดงผล"
+                    : "Account Settings"}
+                </button>
+              </div>
+
+              {manualTab === "guide" ? (
+                <UserManual
+                  isOpen={true}
+                  isDarkMode={isDarkMode}
+                  lang={lang}
+                  isInline={true}
+                />
+              ) : (
+                <div
+                  className="dashboard-card border-0 p-6 md:p-10 text-center shadow-2xl rounded-[40px] md:rounded-[50px] animate-slide-up bg-card relative overflow-hidden"
+                  style={{ animationDelay: "100ms" }}
+                >
+                  <div className="absolute top-0 right-0 p-10 opacity-5 d-none d-sm-block">
+                    <i className="fas fa-cog text-[150px] animate-spin-slow"></i>
+                  </div>
+                  <div className="p-1 rounded-full bg-gradient-to-tr from-primary to-emerald-500 mx-auto w-24 h-24 md:w-32 md:h-32 mb-6 shadow-xl relative z-10">
+                    <div className="bg-white rounded-full w-full h-full flex items-center justify-center text-primary text-3xl md:text-4xl font-display font-bold border-4 border-white">
+                      NY
+                    </div>
+                  </div>
+                  <h4 className="font-display font-bold text-2xl md:text-3xl mb-1 relative z-10">
+                    Namyen Admin
+                  </h4>
+                  <div className="badge bg-primary-subtle text-primary px-4 py-2 rounded-full text-[0.7rem] md:text-[0.75rem] uppercase tracking-widest font-bold mb-8 md:mb-10 relative z-10">
+                    {t("set_authority")}
+                  </div>
+
+                  <div className="space-y-3 text-start relative z-10">
+                    {[
+                      {
+                        label: t("set_lang"),
+                        val: lang.toUpperCase(),
+                        type: "select",
+                        opts: ["EN", "TH"],
+                        onChange: (v: string) =>
+                          setLang(v.toLowerCase() as any),
+                      },
+                      {
+                        label: t("set_dark_mode"),
+                        val: isDarkMode,
+                        type: "switch",
+                        onChange: onToggleTheme,
+                      },
+                      { label: t("set_telemetry"), val: "High", type: "info" },
+                      { label: t("set_security"), val: "Active", type: "info" },
+                    ].map((row, i) => (
+                      <div
+                        key={i}
+                        className="p-4 md:p-5 bg-light rounded-3xl flex justify-between items-center transition-all hover:bg-white hover:shadow-md border border-transparent hover:border-light"
+                      >
+                        <span className="font-bold text-xs md:text-sm tracking-tight">
+                          {row.label}
+                        </span>
+                        {row.type === "select" ? (
+                          <select
+                            className="form-select border-0 bg-transparent w-auto font-bold text-primary text-xs md:text-sm p-0 focus:ring-0 focus:outline-none"
+                            value={row.val as string}
+                            onChange={(e) =>
+                              (row.onChange as (v: string) => void)(
+                                e.target.value,
+                              )
+                            }
+                          >
+                            {row.opts?.map((o) => (
+                              <option key={o} value={o}>
+                                {o}
+                              </option>
+                            ))}
+                          </select>
+                        ) : row.type === "switch" ? (
+                          <div className="form-check form-switch mb-0">
+                            <input
+                              className="form-check-input scale-110 md:scale-125 cursor-pointer"
+                              type="checkbox"
+                              checked={row.val as boolean}
+                              onChange={row.onChange as any}
+                            />
+                          </div>
+                        ) : (
+                          <span className="text-emerald-500 font-bold text-[0.75rem] md:text-xs uppercase tracking-widest">
+                            {row.val}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    className="btn btn-outline-danger w-full py-3.5 md:py-4 rounded-3xl font-bold text-[0.75rem] md:text-[0.8rem] uppercase tracking-[0.2em] md:tracking-[0.3em] mt-8 md:mt-10 transition-all hover:bg-danger hover:text-white shadow-lg border-rose-500/20 text-rose-500 cursor-pointer"
+                    onClick={onLogout}
+                  >
+                    {t("set_terminate")}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Global Footer */}
+        <footer className="mt-16 pt-8 pb-12 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6 text-[0.7rem] text-slate-500 dark:text-slate-400 font-medium">
+          <div className="flex flex-col md:flex-row items-center gap-2 md:gap-6">
+            <span className="font-bold tracking-widest uppercase text-slate-700 dark:text-slate-300">
+              EduEase Energy v2.4.0
+            </span>
+            <span className="hidden md:inline text-slate-300 dark:text-slate-600">|</span>
+            <div className="flex items-center gap-4">
+              <a href="#" className="hover:text-emerald-500 transition-colors">Documentation</a>
+              <a href="#" className="hover:text-emerald-500 transition-colors">API Status: 🟢 Online</a>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
+            <a href="#" className="hover:text-emerald-500 transition-colors flex items-center gap-1"><i className="fab fa-github text-xs"></i> GitHub</a>
+            <a href="#" className="hover:text-emerald-500 transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-emerald-500 transition-colors">Contact</a>
+            <a href="#" className="hover:text-emerald-500 transition-colors flex items-center gap-1"><i className="fas fa-comment-dots text-xs"></i> Feedback</a>
+            <a href="#" className="hover:text-rose-500 transition-colors flex items-center gap-1"><i className="fas fa-bug text-xs"></i> Report Bug</a>
+          </div>
+        </footer>
+      </main>
+
+      {/* Comparison View Overlay */}
+      {showComparisonView && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[5000] flex items-center justify-center p-4">
+          <div className="w-full max-w-6xl bg-body rounded-[3rem] shadow-2xl overflow-hidden animate-slide-up h-[90vh] flex flex-col">
+            <div className="p-6 md:p-10 flex justify-between items-center border-b border-light bg-card shadow-sm z-10">
+              <div>
+                <h3 className="font-display font-bold text-2xl md:text-3xl mb-1">
+                  {t("comp_title")}
+                </h3>
+                <p className="text-[0.75rem] text-muted font-bold uppercase tracking-widest">
+                  {t("node_comparing").replace(
+                    "{n}",
+                    compareDevices.length.toString(),
+                  )}
+                </p>
+              </div>
+              <button
+                className="btn btn-light rounded-2xl p-4 shadow-sm"
+                onClick={() => setShowComparisonView(false)}
+              >
+                <i className="fas fa-times text-lg"></i>
+              </button>
+            </div>
+
+            <div className="flex-grow overflow-x-auto p-6 md:p-10 custom-scrollbar">
+              <div className="w-full">
+                <div className="row g-4 h-full flex-nowrap md:flex-wrap">
+                  {compareDevices.map((dev, di) => {
+                    const energyMonth =
+                      (dev.watt / 1000) * dev.hours * calcDays;
+                    const costMonth = energyMonth * unitRate;
+                    const isBestPF =
+                      dev.pf === Math.max(...compareDevices.map((d) => d.pf));
+                    const isWorstConsumer =
+                      dev.watt ===
+                      Math.max(...compareDevices.map((d) => d.watt));
+
+                    return (
+                      <div
+                        key={dev.id}
+                        className="col animate-slide-up"
+                        style={{ animationDelay: `${di * 75}ms` }}
+                      >
+                        <div
+                          className={`dashboard-card p-6 h-full flex flex-col relative transition-all border-2 ${isBestPF ? "border-emerald-500/20 shadow-emerald-500/10" : di === 0 ? "border-primary/20" : "border-light"}`}
+                        >
+                          {isBestPF && (
+                            <div className="absolute top-4 right-4">
+                              <span className="badge bg-emerald-500 text-white rounded-full text-[0.65rem] font-bold uppercase py-1.5 px-3">
+                                <i className="fas fa-star me-1"></i>{" "}
+                                {t("comp_best")}
+                              </span>
+                            </div>
+                          )}
+                          {isWorstConsumer && (
+                            <div className="absolute top-4 right-4">
+                              <span className="badge bg-danger text-white rounded-full text-[0.65rem] font-bold uppercase py-1.5 px-3">
+                                {t("comp_worst")}
+                              </span>
+                            </div>
+                          )}
+
+                          <div className="p-4 bg-light rounded-[2rem] w-fit mb-6">
+                            <i
+                              className={`fas ${dev.category === "Cooling" ? "fa-snowflake" : "fa-plug"} text-primary text-xl`}
+                            ></i>
+                          </div>
+                          <h4 className="font-bold text-xl mb-1">{dev.name}</h4>
+                          <p className="text-[0.75rem] text-muted uppercase font-bold tracking-widest mb-8">
+                            {dev.category} Sector
+                          </p>
+
+                          <div className="space-y-6 mt-auto">
+                            <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
+                              <span className="text-[0.7rem] font-bold text-muted uppercase block mb-1">
+                                {t("comp_metric_load")}
+                              </span>
+                              <div className="text-xl font-bold mono-font">
+                                {dev.watt} W
+                              </div>
+                            </div>
+                            <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
+                              <span className="text-[0.7rem] font-bold text-muted uppercase block mb-1">
+                                {t("comp_metric_energy")}
+                              </span>
+                              <div className="text-xl font-bold mono-font text-primary">
+                                {energyMonth.toFixed(1)} kWh
+                              </div>
+                            </div>
+                            <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
+                              <span className="text-[0.7rem] font-bold text-muted uppercase block mb-1">
+                                {t("comp_metric_cost")}
+                              </span>
+                              <div className="text-xl font-bold mono-font text-emerald-500">
+                                ฿
+                                {costMonth.toLocaleString(undefined, {
+                                  maximumFractionDigits: 0,
+                                })}
+                              </div>
+                            </div>
+                            <div className="p-4 bg-light rounded-3xl border border-transparent hover:border-primary/10 transition-all">
+                              <span className="text-[0.7rem] font-bold text-muted uppercase block mb-1">
+                                {t("comp_metric_pf")}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <div className="text-xl font-bold mono-font">
+                                  {dev.pf}
+                                </div>
+                                <div
+                                  className={`w-2 h-2 rounded-full ${dev.pf > 0.9 ? "bg-emerald-500" : "bg-amber-500"} animate-pulse`}
+                                ></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-8 bg-card border-t border-light flex justify-center">
+              <div className="flex gap-4 p-2 bg-light rounded-full border shadow-inner">
+                <button
+                  className="btn btn-primary rounded-full px-10 py-3 font-bold text-[0.75rem] uppercase tracking-widest shadow-lg shadow-primary/20"
+                  onClick={() => setShowComparisonView(false)}
+                >
+                  Done
+                </button>
+                <button
+                  className="btn btn-outline-danger border-0 rounded-full px-6 py-3 font-bold text-[0.75rem] uppercase"
+                  onClick={() => {
+                    setCompareDeviceIds([]);
+                    setShowComparisonView(false);
+                  }}
+                >
+                  Clear Selection
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Node Config Overlay */}
+      {selectedDeviceId && !showComparisonView && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[4000] flex justify-end">
+          <div className="w-full max-w-xl bg-body h-full shadow-2xl p-6 md:p-10 animate-slide-left overflow-y-auto">
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="font-display font-bold text-xl md:text-2xl">
+                {t("node_config_title")}
+              </h3>
+              <button
+                className="btn btn-light rounded-2xl p-3"
+                onClick={() => setSelectedDeviceId(null)}
+              >
+                <i className="fas fa-times"></i>
+              </button>
+            </div>
+            {multiDevices.find((d) => d.id === selectedDeviceId) &&
+              (() => {
+                const d = multiDevices.find((d) => d.id === selectedDeviceId)!;
+                return (
+                  <div className="space-y-8">
+                    <div className="row g-4">
+                      <div className="col-md-7">
+                        <div className="p-5 bg-primary/5 rounded-[2rem] border border-primary/10 h-full flex flex-col justify-between">
+                          <div>
+                            <label className="label text-[0.75rem] block mb-3">
+                              {t("node_id")}: {d.id}
+                            </label>
+                            <input
+                              type="text"
+                              className="form-control text-xl font-bold border-0 bg-transparent p-0 mb-4 focus:ring-0 focus:outline-none focus:border-b focus:border-primary/20 text-dark dark:text-white"
+                              value={d.name}
+                              onChange={(e) =>
+                                updateDevice(d.id, "name", e.target.value)
+                              }
+                            />
+
+                            <div className="row g-3">
+                              <div className="col-6">
+                                <label className="label text-[0.75rem] block mb-2">
+                                  {t("node_watt")}
+                                </label>
+                                <input
+                                  type="number"
+                                  className="form-control border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 text-slate-900 dark:text-white rounded-2xl p-3 font-bold mono-font focus:border-primary focus:ring-0"
+                                  value={d.watt}
+                                  onChange={(e) =>
+                                    updateDevice(d.id, "watt", +e.target.value)
+                                  }
+                                />
+                              </div>
+                              <div className="col-6">
+                                <label className="label text-[0.75rem] block mb-2">
+                                  {t("node_hours")}
+                                </label>
+                                <input
+                                  type="number"
+                                  className="form-control border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 text-slate-900 dark:text-white rounded-2xl p-3 font-bold mono-font focus:border-primary focus:ring-0"
+                                  value={d.hours}
+                                  onChange={(e) =>
+                                    updateDevice(d.id, "hours", +e.target.value)
+                                  }
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="mt-4 pt-1">
+                            <label className="label text-[0.75rem] block mb-2">
+                              {lang === "th"
+                                ? "สถานะกริตไอโอที (Smart State)"
+                                : "Smart State Link"}
+                            </label>
+                            <div className="flex gap-2">
+                              {["active", "standby", "off"].map((s) => (
+                                <button
+                                  key={s}
+                                  onClick={() =>
+                                    updateDevice(d.id, "status", s)
+                                  }
+                                  className={`btn btn-xs flex-grow py-2.5 rounded-xl border font-bold text-[0.7rem] uppercase tracking-wider transition-all duration-200 ${
+                                    d.status === s
+                                      ? s === "active"
+                                        ? "bg-emerald-500 text-white border-emerald-500 shadow-md"
+                                        : s === "standby"
+                                          ? "bg-amber-500 text-white border-amber-500 shadow-md"
+                                          : "bg-rose-500 text-white border-rose-500 shadow-md"
+                                      : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-transparent hover:bg-slate-200 dark:hover:bg-slate-700"
+                                  }`}
+                                >
+                                  {s === "active"
+                                    ? lang === "th"
+                                      ? "ปกติ"
+                                      : "Active"
+                                    : s === "standby"
+                                      ? lang === "th"
+                                        ? "สแตนด์บาย"
+                                        : "Standby"
+                                      : lang === "th"
+                                        ? "ปิด"
+                                        : "Off"}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="col-md-5">
+                        <div className="p-5 bg-slate-900/90 dark:bg-slate-950/60 rounded-[2rem] border border-slate-800 flex flex-col justify-between h-full relative overflow-hidden group">
+                          {/* Decorative background visual */}
+                          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent opacity-50"></div>
+                          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/5 rounded-full blur-2xl"></div>
+
+                          <div className="relative z-10 flex items-center justify-between mb-4">
+                            {d.status === "active" && (
+                              <span className="text-[0.65rem] text-emerald-500 font-bold uppercase tracking-widest border border-emerald-500/20 py-1 px-2.5 rounded-full">
+                                <i className="fas fa-activity me-1"></i> Live Audit
+                              </span>
+                            )}
+                          </div>
+
+                          {!deviceAnalysis && !isAnalyzingDevice && (
+                            <div className="relative z-10 py-2">
+                              <p className="text-[0.8rem] text-slate-300 dark:text-slate-400 leading-relaxed mb-4">
+                                Analyze telemetric power signatures, power factors,
+                                and historical service logs of this node to diagnose
+                                issues, estimate grid compliance anomalies, and
+                                output prescriptive fixes.
+                              </p>
+                              <button
+                                onClick={() => runIndividualDeviceAnalysis(d)}
+                                className="btn btn-primary w-full rounded-2xl py-3 text-[0.75rem] uppercase tracking-widest font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] transition-transform"
+                              >
+                                <i className="fas fa-brain text-xs"></i>{" "}
+                                {t("ai_btn_diagnose")}
+                              </button>
+                            </div>
+                          )}
+
+                          {isAnalyzingDevice && (
+                            <div className="relative z-10 text-center py-6">
+                              <i className="fas fa-circle-notch animate-spin text-2xl text-primary mb-3 block"></i>
+                              <p className="text-[0.8rem] font-bold text-slate-300 animate-pulse">
+                                {t("ai_analyzing")}
+                              </p>
+                              <div className="w-full bg-slate-800 h-3 rounded-full overflow-hidden mt-2">
+                                <div className="bg-primary h-full animate-pulse w-full rounded-full"></div>
+                              </div>
+                            </div>
+                          )}
+
+                          {deviceAnalysis && (
+                            <div className="relative z-10 space-y-5 animate-fade-in text-xs">
+                              {deviceAnalysis.error ? (
+                                <div className="text-rose-400 p-4 rounded-2xl bg-rose-500/5 border border-rose-500/15">
+                                  <i className="fas fa-exclamation-circle text-sm me-2"></i>{" "}
+                                  {deviceAnalysis.summary}
+                                </div>
+                              ) : (
+                                <>
+                                  {/* Summary block */}
+                                  <div className="p-4 bg-slate-800 rounded-2xl border border-slate-700/50 relative overflow-hidden">
+                                    <div className="absolute top-3 right-3 z-10">
+                                      {deviceAnalysis.source === "gemini" ? (
+                                        <span className="text-[0.62rem] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                          ✨ Gemini
+                                        </span>
+                                      ) : (
+                                        <span className="text-[0.62rem] font-mono font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                                          ⚙️ Simulated
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="flex gap-4 items-center mb-3">
+                                      <div className="flex flex-col">
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-1">
+                                          {t("ai_health_score")}
+                                        </span>
+                                        <div className="flex items-baseline gap-1">
+                                          <span className="text-2xl font-display font-bold text-emerald-400">
+                                            {deviceAnalysis.healthScore}
+                                          </span>
+                                          <span className="text-[0.75rem] text-slate-500">
+                                            /100
+                                          </span>
+                                        </div>
+                                      </div>
+                                      <div className="h-8 w-px bg-slate-705"></div>
+                                      <div>
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-1">
+                                          {t("ai_health_status")}
+                                        </span>
+                                        <span
+                                          className={`inline-block font-bold py-0.5 px-2 bg-slate-900 rounded-md text-[0.75rem] ${
+                                            deviceAnalysis.healthStatus ===
+                                            "Critical"
+                                              ? "text-rose-400 border border-rose-500/20"
+                                              : deviceAnalysis.healthStatus ===
+                                                  "Needs Maintenance"
+                                                ? "text-amber-400 border border-amber-500/20"
+                                                : "text-emerald-400 border border-emerald-500/20"
+                                          }`}
+                                        >
+                                          {deviceAnalysis.healthStatus}
+                                        </span>
+                                      </div>
+                                    </div>
+                                    <p className="text-[0.8rem] text-slate-300 leading-relaxed mb-0 italic">
+                                      "{deviceAnalysis.summary}"
+                                    </p>
+                                  </div>
+
+                                  {/* Tech Details checks */}
+                                  {deviceAnalysis.technicalDetails &&
+                                    deviceAnalysis.technicalDetails.length > 0 && (
+                                      <div>
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-2">
+                                          {t("ai_tech_details")}
+                                        </span>
+                                        <div className="grid grid-cols-1 gap-1.5">
+                                          {deviceAnalysis.technicalDetails.map(
+                                            (detail: string, idx: number) => (
+                                              <div
+                                                key={idx}
+                                                className="flex gap-2 items-start bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"
+                                              >
+                                                <i className="fas fa-check text-emerald-500 text-[0.75rem] mt-0.5"></i>
+                                                <span className="text-[0.75rem] text-slate-300 leading-tight">
+                                                  {detail}
+                                                </span>
+                                              </div>
+                                            ),
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                  {/* Onpeak grid optimization suggestions */}
+                                  {deviceAnalysis.structuralOptimizations &&
+                                    deviceAnalysis.structuralOptimizations.length >
+                                      0 && (
+                                      <div>
+                                        <span className="text-[0.7rem] uppercase tracking-wider text-slate-500 font-bold block mb-2">
+                                          {t("ai_onpeak_opt")}
+                                        </span>
+                                        <div className="grid grid-cols-1 gap-1.5">
+                                          {deviceAnalysis.structuralOptimizations.map(
+                                            (opt: string, idx: number) => (
+                                              <div
+                                                key={idx}
+                                                className="flex gap-2 items-start bg-slate-800/60 p-2.5 rounded-xl border border-slate-750"
+                                              >
+                                                <i className="fas fa-lightbulb text-amber-400 text-[0.75rem] mt-0.5 animate-pulse"></i>
+                                                <span className="text-[0.75rem] text-slate-300 leading-tight">
+                                                  {opt}
+                                                </span>
+                                              </div>
+                                            ),
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                  {/* Prescriptive advice */}
+                                  {deviceAnalysis.maintenanceAdvice && (
+                                    <div className="p-4 bg-indigo-950/20 rounded-2xl border border-indigo-500/20 text-indigo-200">
+                                      <span className="text-[0.7rem] uppercase tracking-wider text-indigo-400 font-bold block mb-1.5">
+                                        <i className="fas fa-tools me-1"></i>{" "}
+                                        {t("ai_maintenance_advice")}
+                                      </span>
+                                      <p className="text-[0.8rem] leading-relaxed mb-0">
+                                        {deviceAnalysis.maintenanceAdvice}
+                                      </p>
+                                    </div>
+                                  )}
+
+                                  {/* Refresh action */}
+                                  <div className="text-end pt-1">
+                                    <button
+                                      onClick={() => runIndividualDeviceAnalysis(d)}
+                                      disabled={isAnalyzingDevice}
+                                      className="text-primary hover:underline font-bold text-[0.7rem] uppercase tracking-wider bg-transparent border-0"
+                                    >
+                                      <i className="fas fa-sync me-1"></i> Run Live
+                                      Diagnosis
+                                    </button>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                  <div className="p-6 bg-light rounded-[2.5rem]">
+                      <h6 className="label text-[0.75rem] mb-6">
+                        {t("node_history_title")}
+                      </h6>
+                      <div className="h-[200px]">
+                        <ResponsiveContainer>
+                          <AreaChart data={deviceSpecificChartData}>
+                            <defs>
+                              <linearGradient
+                                id="dColor"
+                                x1="0"
+                                y1="0"
+                                x2="0"
+                                y2="1"
+                              >
+                                <stop
+                                  offset="5%"
+                                  stopColor="var(--primary)"
+                                  stopOpacity={0.3}
+                                />
+                                <stop
+                                  offset="95%"
+                                  stopColor="var(--primary)"
+                                  stopOpacity={0}
+                                />
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid
+                              strokeDasharray="3 3"
+                              vertical={false}
+                              strokeOpacity={0.1}
+                            />
+                            <XAxis
+                              dataKey="hour"
+                              axisLine={false}
+                              tickLine={false}
+                              tick={{ fontSize: 9 }}
+                            />
+                            <YAxis
+                              axisLine={false}
+                              tickLine={false}
+                              tick={{ fontSize: 9 }}
+                            />
+                            <Tooltip />
+                            <Area
+                              type="monotone"
+                              dataKey="load"
+                              stroke="var(--primary)"
+                              strokeWidth={3}
+                              fill="url(#dColor)"
+                            />
+                          </AreaChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+
+                    <div className="p-6 bg-white border rounded-[2.5rem] shadow-sm">
+                      <h6 className="label text-[0.75rem] mb-6">
+                        {t("node_maintenance")}
+                      </h6>
+                      <div className="space-y-4">
+                        {d.logs.length > 0 ? (
+                          d.logs.map((log, li) => (
+                            <div
+                              key={li}
+                              className="flex justify-between items-center p-3 bg-light rounded-2xl border border-transparent hover:border-primary/20 transition-all"
+                            >
+                              <div>
+                                <div className="text-[0.8rem] font-bold text-main mb-1">
+                                  {log.action}
+                                </div>
+                                <div className="text-[0.7rem] font-bold text-muted uppercase tracking-widest">
+                                  {log.date}
+                                </div>
+                              </div>
+                              <div
+                                className={`badge rounded-full px-3 py-1.5 text-[0.65rem] font-bold uppercase ${log.status === "resolved" ? "bg-emerald-500/10 text-emerald-500" : "bg-amber-500/10 text-amber-500"}`}
+                              >
+                                {log.status === "resolved"
+                                  ? t("node_log_resolved")
+                                  : t("node_log_pending")}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-center py-6 italic text-muted text-xs opacity-50">
+                            No logs on record.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="pt-6 flex flex-col sm:flex-row gap-3">
+                      <button
+                        className="btn btn-primary flex-grow rounded-[1.5rem] py-4 font-bold text-[0.75rem] uppercase tracking-widest shadow-lg shadow-primary/20"
+                        onClick={() => setSelectedDeviceId(null)}
+                      >
+                        {t("node_auth")}
+                      </button>

@@ -215,20 +215,20 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
     };
 
     return (
-        <div className="dashboard-card border border-slate-200 dark:border-0 p-6 md:p-8 bg-white dark:bg-card text-dark rounded-[2.5rem] shadow-sm relative overflow-hidden h-full flex flex-col justify-between">
+        <div className="dashboard-card border border-slate-200 dark:border-0 p-6 md:p-8 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-[2.5rem] shadow-sm relative overflow-hidden h-full flex flex-col justify-between">
             {/* Ambient subtle decorative lights */}
             <div className="absolute -top-10 -left-10 w-40 h-40 rounded-full bg-emerald-500/5 blur-[60px] pointer-events-none"></div>
             <div className="absolute -bottom-10 -right-10 w-40 h-40 rounded-full bg-primary/5 blur-[60px] pointer-events-none"></div>
 
             <div>
                 {/* Header section with Timer & Wallet */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+                <div className="flex flex-wrap justify-between items-center gap-3 mb-6">
                     <div>
                         <h5 className="font-display font-black text-base md:text-lg mb-1 tracking-tight text-slate-900 dark:text-slate-100 uppercase flex items-center gap-2">
                             <i className="fas fa-tasks text-emerald-500 animate-pulse"></i>
                             {lang === 'th' ? 'ภารกิจประหยัดพลังงานรายวัน' : 'Daily Energy Quests'}
                         </h5>
-                        <p className="text-[0.75rem] text-slate-600 dark:text-slate-100 mb-0 font-mono tracking-wider">
+                        <p className="text-[0.75rem] text-slate-700 dark:text-slate-100 mb-0 font-mono tracking-wider">
                             {lang === 'th' ? 'เคลมโทเค็น GT จากพฤติกรรมประหยัดรักษ์โลกประจำวัน' : 'Complete expiring targets to earn premium GT rewards.'}
                         </p>
                     </div>
@@ -283,7 +283,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                         return (
                             <div 
                                 key={quest.id} 
-                                className={`p-4 rounded-3xl border bg-slate-50/50 dark:bg-light/50 transition-all ${
+                                className={`p-4 rounded-3xl border bg-slate-50/50 dark:bg-slate-50 dark:bg-slate-800/60/50 transition-all ${
                                     isClaimed 
                                         ? 'opacity-60 border-slate-200' 
                                         : isCompleted 
@@ -301,7 +301,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                                             <h6 className="font-black text-xs md:text-sm mb-0.5 text-slate-900 dark:text-slate-100 uppercase tracking-tight">
                                                 {lang === 'th' ? quest.titleTh : quest.titleEn}
                                             </h6>
-                                            <p className="text-[0.75rem] text-slate-600 dark:text-slate-100 leading-relaxed line-clamp-2 md:line-clamp-1">
+                                            <p className="text-[0.75rem] text-slate-700 dark:text-slate-100 leading-relaxed line-clamp-2 md:line-clamp-1">
                                                 {lang === 'th' ? quest.descTh : quest.descEn}
                                             </p>
                                         </div>
@@ -319,7 +319,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                                 </div>
 
                                 {/* Progress Section */}
-                                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-1.5">
+                                <div className="flex flex-wrap items-center gap-3.5 pt-1.5">
                                     <div className="flex-grow flex items-center gap-3">
                                         {/* Progress Bar */}
                                         <div className="flex-grow h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -375,7 +375,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                 <span>DAILY RESET CYCLE SYSTEM: ON</span>
                 <button 
                     onClick={handleResetAll} 
-                    className="p-1 px-2.5 rounded bg-slate-100 hover:bg-slate-200 border-0 text-[0.65rem] text-slate-600 dark:text-slate-100 hover:text-slate-900 dark:hover:text-white uppercase font-bold cursor-pointer transition-colors shadow-sm"
+                    className="p-1 px-2.5 rounded bg-slate-100 hover:bg-slate-200 border-0 text-[0.65rem] text-slate-700 dark:text-slate-100 hover:text-slate-900 dark:hover:text-white uppercase font-bold cursor-pointer transition-colors shadow-sm"
                 >
                     <i className="fas fa-sync mr-1"></i> {lang === 'th' ? 'รีเซ็ตเควสใหม่' : 'Reset Quests'}
                 </button>

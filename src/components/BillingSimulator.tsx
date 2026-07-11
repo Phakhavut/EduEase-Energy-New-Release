@@ -151,7 +151,7 @@ ${lang === 'th' ? 'รวมเงินค่าไฟฟ้าทั้งส�
           </div>
           <div>
             <h3 className="text-xl font-bold font-display">{lang === 'th' ? 'จำลองค่าไฟฟ้า (อัตรา 1.1.2)' : 'Billing Simulator (Type 1.1.2)'}</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400">{lang === 'th' ? 'คำนวณโครงสร้างค่าไฟฟ้าแบบก้าวหน้า' : 'Calculate progressive block tariff structure'}</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">{lang === 'th' ? 'คำนวณโครงสร้างค่าไฟฟ้าแบบก้าวหน้า' : 'Calculate progressive block tariff structure'}</p>
           </div>
         </div>
         
@@ -233,18 +233,18 @@ ${lang === 'th' ? 'รวมเงินค่าไฟฟ้าทั้งส�
               <div className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-widest">{lang === 'th' ? 'ค่าพลังงานไฟฟ้า (Base Tariff)' : 'Base Energy Charge'}</div>
               
               <div className="flex justify-between items-center">
-                <span className="text-slate-600 dark:text-slate-400">{lang === 'th' ? '150 หน่วยแรก' : 'First 150 kWh'} (฿3.2484)</span>
+                <span className="text-slate-700 dark:text-slate-300">{lang === 'th' ? '150 หน่วยแรก' : 'First 150 kWh'} (฿3.2484)</span>
                 <span className="font-semibold">฿{billDetails.block1Cost.toFixed(2)}</span>
               </div>
               {billDetails.block2 > 0 && (
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-600 dark:text-slate-400">{lang === 'th' ? '250 หน่วยถัดไป' : 'Next 250 kWh'} (฿4.2218)</span>
+                  <span className="text-slate-700 dark:text-slate-300">{lang === 'th' ? '250 หน่วยถัดไป' : 'Next 250 kWh'} (฿4.2218)</span>
                   <span className="font-semibold">฿{billDetails.block2Cost.toFixed(2)}</span>
                 </div>
               )}
               {billDetails.block3 > 0 && (
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-600 dark:text-slate-400">{lang === 'th' ? 'เกิน 400 หน่วย' : 'Over 400 kWh'} (฿4.4217)</span>
+                  <span className="text-slate-700 dark:text-slate-300">{lang === 'th' ? 'เกิน 400 หน่วย' : 'Over 400 kWh'} (฿4.4217)</span>
                   <span className="font-semibold">฿{billDetails.block3Cost.toFixed(2)}</span>
                 </div>
               )}
@@ -260,11 +260,11 @@ ${lang === 'th' ? 'รวมเงินค่าไฟฟ้าทั้งส�
               <div className="text-xs font-bold text-slate-500 mb-2 uppercase tracking-widest">{lang === 'th' ? 'ค่าใช้จ่ายอื่นๆ' : 'Additional Charges'}</div>
               
               <div className="flex justify-between items-center">
-                <span className="text-slate-600 dark:text-slate-400">{lang === 'th' ? 'ค่าบริการรายเดือน' : 'Service Charge'}</span>
+                <span className="text-slate-700 dark:text-slate-300">{lang === 'th' ? 'ค่าบริการรายเดือน' : 'Service Charge'}</span>
                 <span className="font-semibold">฿{billDetails.serviceCharge.toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-slate-600 dark:text-slate-400">{lang === 'th' ? 'ค่า Ft' : 'Ft Charge'} (฿{billDetails.ftRate.toFixed(4)})</span>
+                <span className="text-slate-700 dark:text-slate-300">{lang === 'th' ? 'ค่า Ft' : 'Ft Charge'} (฿{billDetails.ftRate.toFixed(4)})</span>
                 <span className="font-semibold">฿{billDetails.ftCost.toFixed(2)}</span>
               </div>
               
@@ -277,7 +277,7 @@ ${lang === 'th' ? 'รวมเงินค่าไฟฟ้าทั้งส�
             {/* VAT & Total */}
             <div className="space-y-2 pt-4 border-t border-slate-200 dark:border-slate-800">
               <div className="flex justify-between items-center">
-                <span className="text-slate-600 dark:text-slate-400">{lang === 'th' ? 'ภาษีมูลค่าเพิ่ม' : 'VAT'} (7%)</span>
+                <span className="text-slate-700 dark:text-slate-300">{lang === 'th' ? 'ภาษีมูลค่าเพิ่ม' : 'VAT'} (7%)</span>
                 <span className="font-semibold">฿{billDetails.vat.toFixed(2)}</span>
               </div>
               <div className="pt-4 flex justify-between items-center text-xl font-black border-t border-slate-200 dark:border-slate-800">
@@ -317,7 +317,7 @@ ${lang === 'th' ? 'รวมเงินค่าไฟฟ้าทั้งส�
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="text-xs text-slate-400">{lang === 'th' ? 'ไม่มีการใช้พลังงาน' : 'No energy consumption'}</div>
+                <div className="text-xs text-slate-600 dark:text-slate-400">{lang === 'th' ? 'ไม่มีการใช้พลังงาน' : 'No energy consumption'}</div>
               )}
 
               {/* Centered Total Display */}
@@ -339,7 +339,7 @@ ${lang === 'th' ? 'รวมเงินค่าไฟฟ้าทั้งส�
                   <div key={idx} className="flex items-center gap-2 p-1.5 rounded-lg bg-slate-50 dark:bg-slate-950/40 border border-slate-100 dark:border-slate-850/60">
                     <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }}></span>
                     <div className="flex flex-col min-w-0">
-                      <span className="truncate text-slate-600 dark:text-slate-400 font-bold">{item.name}</span>
+                      <span className="truncate text-slate-700 dark:text-slate-300 font-bold">{item.name}</span>
                       <span className="font-semibold text-slate-900 dark:text-white">
                         ฿{item.value.toFixed(0)} ({percent}%)
                       </span>
