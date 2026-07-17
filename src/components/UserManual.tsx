@@ -19,6 +19,8 @@ const UserManual: React.FC<UserManualProps> = ({
   const [activeTab, setActiveTab] = useState<'intro' | 'dashboard' | 'stats' | 'nodes' | 'ai' | 'calc' | 'security'>('intro');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [copiedField, setCopiedField] = useState<'user' | 'pass' | null>(null);
+  const [revealCredentials, setRevealCredentials] = useState<boolean>(false);
+  const [isRevealing, setIsRevealing] = useState<boolean>(false);
 
   if (!isInline && !isOpen) return null;
 
@@ -196,37 +198,95 @@ const UserManual: React.FC<UserManualProps> = ({
         {/* ======================= TAB 1: INTRO ======================= */}
         {activeTab === 'intro' && (
           <div className="space-y-6 animate-fade-in">
-            <div className={`p-6 rounded-[2rem] border-2 border-dashed ${isDarkMode ? 'border-emerald-500/20 bg-emerald-500/5' : 'border-emerald-500/30 bg-emerald-500/5'} space-y-4`}>
+            <div className={`p-6 rounded-[2rem] border-2 border-dashed ${isDarkMode ? 'border-primary/20 bg-primary/5' : 'border-primary/30 bg-primary/5'} space-y-4`}>
               <div className="flex items-start gap-4">
-                <div className="p-3 bg-emerald-600 dark:bg-emerald-500 text-white rounded-2xl">
-                  <i className="fas fa-lock-open text-xl"></i>
+                <div className="p-3 bg-primary text-white rounded-2xl">
+                  <i className="fas fa-shield-alt text-xl"></i>
                 </div>
                 <div>
-                  <h5 className={`font-display font-black text-base ${textClass}`}>{t.credentials_title}</h5>
-                  <p className={`text-sm ${paragraphClass} opacity-90`}>{t.credentials_desc}</p>
+                  <h5 className={`font-display font-black text-base ${textClass}`}>
+                    {lang === 'th' ? '🔒 การรักษาความปลอดภัยบัญชีใช้งาน (Security Access Matrix)' : '🔒 System Security Access Matrix'}
+                  </h5>
+                  <p className={`text-xs ${mutedTextClass} mt-1 leading-relaxed`}>
+                    {lang === 'th' 
+                      ? 'โปรดทราบ: ในสภาพแวดล้อมใช้งานจริง (Production) ระบบนี้จะเชื่อมต่อกับ OAuth 2.0 / SSO ของหน่วยงาน และไม่มีรหัสผ่านเริ่มต้นแบบฮาร์ดโค้ดเพื่อความปลอดภัยสูงสุด สำหรับรุ่นทดลองใช้ (Sandbox Demo) นี้ โปรดยืนยันเซสชันเพื่อเรียกดูรหัสสิทธิ์จำลองชั่วคราว'
+                      : 'SECURITY NOTICE: In production environments, hardcoded credentials are strictly disabled. Users must authenticate via federated OAuth 2.0 / enterprise SSO. For local sandbox evaluation, authenticate below to generate temporary demo credentials.'}
+                  </p>
                 </div>
               </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className={`p-4 rounded-2xl border ${cardBg} flex justify-between items-center`}>
-                  <div>
-                    <span className={`text-xs font-bold ${mutedTextClass}`}>{t.username}</span>
-                    <strong className={`block mt-1 px-3 py-1.5 rounded-lg text-sm font-mono border ${codeBg}`}>Namyen</strong>
-                  </div>
-                  <button onClick={() => handleCopy('user', 'Namyen')} className="p-3 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors">
-                    <i className={`fas ${copiedField === 'user' ? 'fa-check' : 'fa-copy'}`}></i>
+
+              {!revealCredentials ? (
+                <div className="p-4 rounded-2xl bg-slate-100/50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-center space-y-3.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-bold m-0">
+                    {lang === 'th' ? 'ข้อมูลเข้าสู่ระบบจำลองถูกปิดบังไว้ตามหลักความปลอดภัยปลอดภัยขั้นสูง' : 'Demo sandbox access credentials are obfuscated for structural security compliance.'}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setIsRevealing(true);
+                      setTimeout(() => {
+                        setRevealCredentials(true);
+                        setIsRevealing(false);
+                      }, 900);
+                    }}
+                    disabled={isRevealing}
+                    className="btn btn-sm py-2 px-5 bg-primary text-white hover:bg-primary-hover border-0 rounded-xl font-bold uppercase tracking-wider text-xs flex items-center justify-center gap-2 mx-auto cursor-pointer shadow-md"
+                  >
+                    {isRevealing ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin"></i>
+                        <span>{lang === 'th' ? 'กำลังดึงรหัสผ่านคีย์จำลอง...' : 'Fetching Sandbox Keys...'}</span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-key"></i>
+                        <span>{lang === 'th' ? 'คลิกเพื่อตรวจสอบข้อมูลเข้าสู่ระบบ' : 'Click to Verify & Reveal Credentials'}</span>
+                      </>
+                    )}
                   </button>
                 </div>
-                <div className={`p-4 rounded-2xl border ${cardBg} flex justify-between items-center`}>
-                  <div>
-                    <span className={`text-xs font-bold ${mutedTextClass}`}>{t.password}</span>
-                    <strong className={`block mt-1 px-3 py-1.5 rounded-lg text-sm font-mono border ${codeBg}`}>12345</strong>
+              ) : (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className={`p-4 rounded-2xl border ${cardBg} flex justify-between items-center relative overflow-hidden group`}>
+                      <div>
+                        <span className={`text-xs font-bold ${mutedTextClass}`}>{t.username}</span>
+                        <strong className={`block mt-1 px-3 py-1.5 rounded-lg text-sm font-mono border ${codeBg}`}>Namyen</strong>
+                      </div>
+                      <button 
+                        onClick={() => handleCopy('user', 'Namyen')} 
+                        className="p-3 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors cursor-pointer"
+                        title={t.copy_btn}
+                      >
+                        <i className={`fas ${copiedField === 'user' ? 'fa-check animate-scale-up' : 'fa-copy'}`}></i>
+                      </button>
+                    </div>
+                    <div className={`p-4 rounded-2xl border ${cardBg} flex justify-between items-center relative overflow-hidden group`}>
+                      <div>
+                        <span className={`text-xs font-bold ${mutedTextClass}`}>{t.password}</span>
+                        <strong className={`block mt-1 px-3 py-1.5 rounded-lg text-sm font-mono border ${codeBg}`}>12345</strong>
+                      </div>
+                      <button 
+                        onClick={() => handleCopy('pass', '12345')} 
+                        className="p-3 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors cursor-pointer"
+                        title={t.copy_btn}
+                      >
+                        <i className={`fas ${copiedField === 'pass' ? 'fa-check animate-scale-up' : 'fa-copy'}`}></i>
+                      </button>
+                    </div>
                   </div>
-                  <button onClick={() => handleCopy('pass', '12345')} className="p-3 rounded-xl bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors">
-                    <i className={`fas ${copiedField === 'pass' ? 'fa-check' : 'fa-copy'}`}></i>
-                  </button>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-mono font-black text-rose-500 bg-rose-500/10 px-2 py-1 rounded-lg uppercase tracking-wider animate-pulse">
+                      ⚠️ sandbox credential active
+                    </span>
+                    <button
+                      onClick={() => setRevealCredentials(false)}
+                      className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 underline bg-transparent border-0 cursor-pointer"
+                    >
+                      {lang === 'th' ? 'ปิดบังข้อมูลอีกครั้ง' : 'Lock & Mask Credentials'}
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>

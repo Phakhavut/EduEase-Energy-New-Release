@@ -265,31 +265,31 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                {/* Switch 1: Smart AC */}
                <button
                  onClick={() => setAiSmartAc(!aiSmartAc)}
-                 className={`w-full p-3.5 rounded-2xl flex items-center justify-between border text-xs font-semibold transition-all duration-200 group/sw ${
+                 className={`w-full p-3.5 rounded-2xl flex items-center justify-between border text-xs font-semibold transition-all duration-200 cursor-pointer hover:scale-[1.01] group/sw ${
                    aiSmartAc
-                     ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
-                     : "bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50 text-slate-500"
+                     ? "bg-emerald-500/10 dark:bg-emerald-500/10 border-emerald-500/30 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15"
+                     : "bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-850"
                  }`}
                >
                  <div className="flex items-center gap-3">
                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover/sw:scale-105 ${
-                     aiSmartAc ? "bg-emerald-500/10" : "bg-slate-200/50 dark:bg-slate-800"
+                     aiSmartAc ? "bg-emerald-500/20" : "bg-slate-100 dark:bg-slate-800"
                    }`}>
                      <i className={`fas fa-snowflake text-[0.8rem] ${aiSmartAc ? "text-emerald-500 animate-spin-slow" : "text-slate-500"}`} />
                    </div>
                    <div className="text-left">
-                     <span className="block font-bold text-slate-800 dark:text-slate-200">
+                     <span className={`block font-bold transition-colors ${aiSmartAc ? "text-emerald-600 dark:text-emerald-400" : "text-slate-800 dark:text-slate-200"}`}>
                        {t("1. Smart AC Thermostat", "1. จูนอุณหภูมิ AC อัจฉริยะ")}
                      </span>
-                     <span className="block text-[0.58rem] text-slate-600 dark:text-slate-400 font-medium">
+                     <span className="block text-[0.58rem] text-slate-500 dark:text-slate-400 font-medium">
                        {t("Adapts air cooling loads", "ปรับลดกระแสแอร์ตามสภาพอากาศ")}
                      </span>
                    </div>
                  </div>
                  <div className={`w-10 h-5.5 rounded-full p-0.5 transition-colors duration-250 shrink-0 ${
-                   aiSmartAc ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"
-                 }`}>
-                   <div className={`w-4.5 h-4.5 rounded-full bg-white transition-transform duration-250 shadow-sm ${
+                   aiSmartAc ? "bg-emerald-500" : "bg-slate-200 dark:bg-slate-700"
+                 } flex items-center`}>
+                   <div className={`w-4.5 h-4.5 rounded-full bg-white transition-transform duration-250 shadow-md ${
                      aiSmartAc ? "translate-x-4.5" : "translate-x-0"
                    }`} />
                  </div>
@@ -298,31 +298,31 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                {/* Switch 2: Eco Standby */}
                <button
                  onClick={() => setAiEcoStandby(!aiEcoStandby)}
-                 className={`w-full p-3.5 rounded-2xl flex items-center justify-between border text-xs font-semibold transition-all duration-200 group/sw ${
+                 className={`w-full p-3.5 rounded-2xl flex items-center justify-between border text-xs font-semibold transition-all duration-200 cursor-pointer hover:scale-[1.01] group/sw ${
                    aiEcoStandby
-                     ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
-                     : "bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50 text-slate-500"
+                     ? "bg-emerald-500/10 dark:bg-emerald-500/10 border-emerald-500/30 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15"
+                     : "bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-850"
                  }`}
                >
                  <div className="flex items-center gap-3">
                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover/sw:scale-105 ${
-                     aiEcoStandby ? "bg-emerald-500/10" : "bg-slate-200/50 dark:bg-slate-800"
+                     aiEcoStandby ? "bg-emerald-500/20" : "bg-slate-100 dark:bg-slate-800"
                    }`}>
                      <i className={`fas fa-plug text-[0.8rem] ${aiEcoStandby ? "text-emerald-500" : "text-slate-500"}`} />
                    </div>
                    <div className="text-left">
-                     <span className="block font-bold text-slate-800 dark:text-slate-200">
+                     <span className={`block font-bold transition-colors ${aiEcoStandby ? "text-emerald-600 dark:text-emerald-400" : "text-slate-800 dark:text-slate-200"}`}>
                        {t("2. Eco Standby Cutoff", "2. คุมไฟกระแส Standby อัตโนมัติ")}
                      </span>
-                     <span className="block text-[0.58rem] text-slate-600 dark:text-slate-400 font-medium">
+                     <span className="block text-[0.58rem] text-slate-500 dark:text-slate-400 font-medium">
                        {t("Cuts residual power leaks", "ปิดการใช้พลังงานสำรองที่สูญเปล่า")}
                      </span>
                    </div>
                  </div>
                  <div className={`w-10 h-5.5 rounded-full p-0.5 transition-colors duration-250 shrink-0 ${
-                   aiEcoStandby ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"
-                 }`}>
-                   <div className={`w-4.5 h-4.5 rounded-full bg-white transition-transform duration-250 shadow-sm ${
+                   aiEcoStandby ? "bg-emerald-500" : "bg-slate-200 dark:bg-slate-700"
+                 } flex items-center`}>
+                   <div className={`w-4.5 h-4.5 rounded-full bg-white transition-transform duration-250 shadow-md ${
                      aiEcoStandby ? "translate-x-4.5" : "translate-x-0"
                    }`} />
                  </div>
@@ -331,31 +331,31 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                {/* Switch 3: Load Shift */}
                <button
                  onClick={() => setAiLoadShift(!aiLoadShift)}
-                 className={`w-full p-3.5 rounded-2xl flex items-center justify-between border text-xs font-semibold transition-all duration-200 group/sw ${
+                 className={`w-full p-3.5 rounded-2xl flex items-center justify-between border text-xs font-semibold transition-all duration-200 cursor-pointer hover:scale-[1.01] group/sw ${
                    aiLoadShift
-                     ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
-                     : "bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50 text-slate-500"
+                     ? "bg-emerald-500/10 dark:bg-emerald-500/10 border-emerald-500/30 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15"
+                     : "bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-850"
                  }`}
                >
                  <div className="flex items-center gap-3">
                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover/sw:scale-105 ${
-                     aiLoadShift ? "bg-emerald-500/10" : "bg-slate-200/50 dark:bg-slate-800"
+                     aiLoadShift ? "bg-emerald-500/20" : "bg-slate-100 dark:bg-slate-800"
                    }`}>
                      <i className={`fas fa-history text-[0.8rem] ${aiLoadShift ? "text-emerald-500" : "text-slate-500"}`} />
                    </div>
                    <div className="text-left">
-                     <span className="block font-bold text-slate-800 dark:text-slate-200">
+                     <span className={`block font-bold transition-colors ${aiLoadShift ? "text-emerald-600 dark:text-emerald-400" : "text-slate-800 dark:text-slate-200"}`}>
                        {t("3. AI TOU Load Shifting", "3. การย้ายช่วงเวลาโหลด (TOU)")}
                      </span>
-                     <span className="block text-[0.58rem] text-slate-600 dark:text-slate-400 font-medium">
+                     <span className="block text-[0.58rem] text-slate-500 dark:text-slate-400 font-medium">
                        {t("Shifts peak power to night", "โยกย้ายช่วงใช้ไฟหลักเพื่อรับเรต Off-Peak")}
                      </span>
                    </div>
                  </div>
                  <div className={`w-10 h-5.5 rounded-full p-0.5 transition-colors duration-250 shrink-0 ${
-                   aiLoadShift ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"
-                 }`}>
-                   <div className={`w-4.5 h-4.5 rounded-full bg-white transition-transform duration-250 shadow-sm ${
+                   aiLoadShift ? "bg-emerald-500" : "bg-slate-200 dark:bg-slate-700"
+                 } flex items-center`}>
+                   <div className={`w-4.5 h-4.5 rounded-full bg-white transition-transform duration-250 shadow-md ${
                      aiLoadShift ? "translate-x-4.5" : "translate-x-0"
                    }`} />
                  </div>
@@ -364,31 +364,31 @@ export const EnergyMonitoringHub: React.FC<EnergyMonitoringHubProps> = ({
                {/* Switch 4: Power Factor Tuning */}
                <button
                  onClick={() => setAiPfTuning(!aiPfTuning)}
-                 className={`w-full p-3.5 rounded-2xl flex items-center justify-between border text-xs font-semibold transition-all duration-200 group/sw ${
+                 className={`w-full p-3.5 rounded-2xl flex items-center justify-between border text-xs font-semibold transition-all duration-200 cursor-pointer hover:scale-[1.01] group/sw ${
                    aiPfTuning
-                     ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10"
-                     : "bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50 text-slate-500"
+                     ? "bg-emerald-500/10 dark:bg-emerald-500/10 border-emerald-500/30 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15"
+                     : "bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700/50 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-850"
                  }`}
                >
                  <div className="flex items-center gap-3">
                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover/sw:scale-105 ${
-                     aiPfTuning ? "bg-emerald-500/10" : "bg-slate-200/50 dark:bg-slate-800"
+                     aiPfTuning ? "bg-emerald-500/20" : "bg-slate-100 dark:bg-slate-800"
                    }`}>
                      <i className={`fas fa-charging-station text-[0.8rem] ${aiPfTuning ? "text-emerald-500" : "text-slate-500"}`} />
                    </div>
                    <div className="text-left">
-                     <span className="block font-bold text-slate-800 dark:text-slate-200">
+                     <span className={`block font-bold transition-colors ${aiPfTuning ? "text-emerald-600 dark:text-emerald-400" : "text-slate-800 dark:text-slate-200"}`}>
                        {t("4. PF Auto-Smoothing", "4. ปรับจูนเพาเวอร์แฟกเตอร์ (PF)")}
                      </span>
-                     <span className="block text-[0.58rem] text-slate-600 dark:text-slate-400 font-medium">
+                     <span className="block text-[0.58rem] text-slate-500 dark:text-slate-400 font-medium">
                        {t("Minimizes electrical network losses", "จูนกระแสและลดค่าสูญเสียความต้านทานสายส่ง")}
                      </span>
                    </div>
                  </div>
                  <div className={`w-10 h-5.5 rounded-full p-0.5 transition-colors duration-250 shrink-0 ${
-                   aiPfTuning ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"
-                 }`}>
-                   <div className={`w-4.5 h-4.5 rounded-full bg-white transition-transform duration-250 shadow-sm ${
+                   aiPfTuning ? "bg-emerald-500" : "bg-slate-200 dark:bg-slate-700"
+                 } flex items-center`}>
+                   <div className={`w-4.5 h-4.5 rounded-full bg-white transition-transform duration-250 shadow-md ${
                      aiPfTuning ? "translate-x-4.5" : "translate-x-0"
                    }`} />
                  </div>

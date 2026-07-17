@@ -274,203 +274,253 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ isDarkMode, locationNa
       </div>
 
       {/* Main Unified Grid: Desktop 3-columns, Tablet/Mobile stack */}
-      <motion.div 
-        key={updateKey}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: "easeOut" }}
-        className="grid grid-cols-1 lg:grid-cols-12 gap-6 z-10 relative"
-      >
-        
-        {/* Column 1: Live TMD Current Weather */}
-        <div className="lg:col-span-4 flex flex-col justify-between bg-slate-50/50 dark:bg-slate-800/10 p-5 rounded-[1.75rem] border border-slate-100 dark:border-slate-800/60 h-full">
-          <div>
-            <div className="text-[0.68rem] font-extrabold uppercase tracking-widest text-slate-500 mb-3.5">
-              {lang === "th" ? "สภาพอากาศปัจจุบัน (TMD Live)" : "Current Weather (TMD Live)"}
-            </div>
-
-            <div className="flex items-center gap-4 mb-5">
-              <div className={`p-3.5 rounded-2xl ${isDarkMode ? "bg-slate-800/80" : "bg-white border border-slate-200/60"} flex items-center justify-center shadow-xs`}>
-                {!cond.isClear ? <Cloud className="w-10 h-10 text-sky-400/80" /> : <Sun className="w-10 h-10 text-amber-500" />}
+      {loading ? (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 z-10 relative animate-pulse">
+          {/* Skeleton Column 1 */}
+          <div className="lg:col-span-4 flex flex-col justify-between bg-slate-100/50 dark:bg-slate-800/10 p-5 rounded-[1.75rem] border border-slate-200/50 dark:border-slate-800/60 h-full space-y-4">
+            <div>
+              <div className="h-3 w-28 bg-slate-200 dark:bg-slate-800 rounded-md mb-4" />
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-slate-200 dark:bg-slate-800/80 rounded-2xl" />
+                <div className="space-y-2 flex-grow">
+                  <div className="h-8 w-16 bg-slate-200 dark:bg-slate-800/80 rounded-md" />
+                  <div className="h-3 w-24 bg-slate-200 dark:bg-slate-800/80 rounded-md" />
+                </div>
               </div>
-              <div>
-                <div className="text-4xl font-light font-display tracking-tighter flex items-baseline leading-none mb-1.5">
-                  {loading ? "--" : weather.temp}
-                  <span className="text-xl font-normal text-slate-500 ml-0.5">°C</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[0.78rem] font-bold text-sky-500 dark:text-sky-400">{loading ? "Syncing..." : cond.th}</span>
-                  <span className="text-slate-500 text-[0.68rem] font-medium">{loading ? "" : cond.en}</span>
-                </div>
+              <div className="grid grid-cols-2 gap-3 pt-6 mt-4 border-t border-dashed border-slate-200 dark:border-slate-800/80">
+                <div className="h-10 bg-slate-200 dark:bg-slate-800 rounded-xl" />
+                <div className="h-10 bg-slate-200 dark:bg-slate-800 rounded-xl" />
               </div>
             </div>
-
-            <div className="grid grid-cols-2 gap-3 border-t border-dashed border-slate-200 dark:border-slate-800/80 pt-4 mb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="p-1.5 bg-sky-500/10 rounded-lg text-sky-400">
-                  <Droplets className="w-3.5 h-3.5" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[0.6rem] font-extrabold uppercase tracking-wider text-slate-500">{lang === "th" ? "ความชื้น" : "Humidity"}</span>
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{loading ? "--" : weather.humidity}% RH</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <div className="p-1.5 bg-slate-500/10 rounded-lg text-slate-500">
-                  <Wind className="w-3.5 h-3.5" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[0.6rem] font-extrabold uppercase tracking-wider text-slate-500">{lang === "th" ? "ความเร็วลม" : "Wind Speed"}</span>
-                  <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{loading ? "--" : weather.wind} km/h</span>
-                </div>
-              </div>
-            </div>
+            <div className="h-3 w-40 bg-slate-200 dark:bg-slate-800 rounded-md pt-2" />
           </div>
 
-          <div className="border-t border-slate-200/50 dark:border-slate-800/40 pt-3 mt-2 text-[0.62rem] text-slate-600 dark:text-slate-400 space-y-1">
-            <div className="flex items-center gap-1 font-medium">
-              <Clock className="w-3 h-3 text-slate-500 shrink-0" />
-              <span>{lang === "th" ? "วัดเมื่อ" : "Measured"}: {loading ? "..." : formatTmdTime(weather.dateTime)}</span>
-              <span className="text-slate-300 dark:text-slate-700">|</span>
-              <span className={`font-bold ${weather.source === "api" ? "text-emerald-500" : "text-sky-500"}`}>
-                {weather.source === "api" || weather.source === "cache" 
-                  ? (lang === "th" ? "เชื่อมต่อสด" : "Live Feed") 
-                  : (lang === "th" ? "โหมดเสมือน" : "Virtual Mode")}
-              </span>
+          {/* Skeleton Column 2 */}
+          <div className="lg:col-span-4 flex flex-col justify-between space-y-3">
+            <div className="h-3 w-36 bg-slate-200 dark:bg-slate-800 rounded-md mb-1" />
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/60">
+                <div className="h-4 w-10 bg-slate-200 dark:bg-slate-800 rounded-md" />
+                <div className="h-4 w-14 bg-slate-200 dark:bg-slate-800 rounded-md" />
+                <div className="h-4 w-12 bg-slate-200 dark:bg-slate-800 rounded-md" />
+              </div>
+            ))}
+          </div>
+
+          {/* Skeleton Column 3 */}
+          <div className="lg:col-span-4 flex flex-col justify-between space-y-4">
+            <div>
+              <div className="h-3 w-32 bg-slate-200 dark:bg-slate-800 rounded-md mb-3" />
+              <div className="h-[105px] bg-slate-200 dark:bg-slate-800 rounded-2xl" />
             </div>
-            <div className="truncate font-medium" title={weather.stationName}>
-              {lang === "th" ? "สถานีอุตุนิยมวิทยา" : "Station"}: {loading ? "..." : weather.stationName}
+            <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800/60 flex gap-3">
+              <div className="w-8 h-8 bg-slate-200 dark:bg-slate-800 rounded-xl shrink-0" />
+              <div className="space-y-2 flex-grow">
+                <div className="h-3 w-28 bg-slate-200 dark:bg-slate-800 rounded-md" />
+                <div className="h-6 w-full bg-slate-200 dark:bg-slate-800 rounded-md" />
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Column 2: 5-Day Forecast Grid */}
-        <div className="lg:col-span-4 flex flex-col justify-between">
-          <div>
-            <div className="text-[0.68rem] font-extrabold uppercase tracking-widest text-slate-500 mb-3.5">
-              {lang === "th" ? "พยากรณ์ล่วงหน้า 5 วัน (Open-Meteo)" : "5-Day Forecast (Open-Meteo)"}
-            </div>
-
-            {weather.forecast ? (
-              <div className="flex flex-col gap-2.5">
-                {weather.forecast.time.slice(0, 5).map((dateStr: string, idx: number) => {
-                  const date = new Date(dateStr);
-                  const dayName = new Intl.DateTimeFormat(lang === "th" ? "th-TH" : "en-US", { weekday: "short" }).format(date);
-                  const tempMax = Math.round(weather.forecast.temperature_2m_max[idx]);
-                  const tempMin = Math.round(weather.forecast.temperature_2m_min[idx]);
-                  const rainProb = weather.forecast.precipitation_probability_max[idx];
-                  const wCode = weather.forecast.weather_code[idx];
-
-                  return (
-                    <div 
-                      key={dateStr} 
-                      className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
-                        idx === 0 
-                          ? isDarkMode ? "bg-sky-500/10 border-sky-500/20" : "bg-sky-50 border-sky-100"
-                          : isDarkMode ? "bg-slate-800/30 border-slate-800 hover:bg-slate-800" : "bg-white border-slate-100 hover:bg-slate-50 shadow-2xs"
-                      }`}
-                    >
-                      <div className="w-14 text-xs font-extrabold text-slate-500 uppercase tracking-wider">
-                        {idx === 0 ? (lang === "th" ? "วันนี้" : "Today") : dayName}
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        {getWmoWeatherIcon(wCode, "w-5 h-5")}
-                        <span className="text-[0.7rem] font-bold text-slate-500 max-w-[80px] truncate">
-                          {getWmoWeatherLabel(wCode, lang)}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-1.5 text-xs font-bold">
-                          <span className={isDarkMode ? "text-slate-100" : "text-slate-700"}>{tempMax}°</span>
-                          <span className="text-slate-500 font-normal">{tempMin}°</span>
-                        </div>
-
-                        {rainProb > 20 ? (
-                          <span className="text-[0.62rem] font-bold text-sky-500 bg-sky-500/10 px-1.5 py-0.5 rounded-full shrink-0">
-                            {rainProb}%
-                          </span>
-                        ) : (
-                          <span className="text-[0.62rem] text-slate-300 dark:text-slate-600 px-1.5 py-0.5 rounded-full shrink-0">
-                            0%
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="h-[200px] flex items-center justify-center border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
-                <div className="flex gap-2 w-full px-4">{Array.from({ length: 5 }).map((_, i) => (<div key={i} className="flex-1 h-32 bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse" />))}</div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Column 3: AI Intelligence Dispatch & Recharts Trend */}
-        <div className="lg:col-span-4 flex flex-col justify-between">
+      ) : (
+        <motion.div 
+          key={updateKey}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-6 z-10 relative"
+        >
           
-          {/* Recharts Area Chart */}
-          <div className="mb-4">
-            <div className="text-[0.68rem] font-extrabold uppercase tracking-widest text-slate-500 mb-3 flex items-center justify-between">
-              <span>{lang === "th" ? "แนวโน้มอุณหภูมิ (°C)" : "Temperature Trend (°C)"}</span>
-              <div className="flex items-center gap-2 text-[0.6rem] font-bold uppercase tracking-wider">
-                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div> Max</span>
-                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div> Min</span>
+          {/* Column 1: Live TMD Current Weather */}
+          <div className="lg:col-span-4 flex flex-col justify-between bg-slate-50/50 dark:bg-slate-800/10 p-5 rounded-[1.75rem] border border-slate-100 dark:border-slate-800/60 h-full">
+            <div>
+              <div className="text-[0.68rem] font-extrabold uppercase tracking-widest text-slate-500 mb-3.5">
+                {lang === "th" ? "สภาพอากาศปัจจุบัน (TMD Live)" : "Current Weather (TMD Live)"}
+              </div>
+  
+              <div className="flex items-center gap-4 mb-5">
+                <div className={`p-3.5 rounded-2xl ${isDarkMode ? "bg-slate-800/80" : "bg-white border border-slate-200/60"} flex items-center justify-center shadow-xs`}>
+                  {!cond.isClear ? <Cloud className="w-10 h-10 text-sky-400/80" /> : <Sun className="w-10 h-10 text-amber-500" />}
+                </div>
+                <div>
+                  <div className="text-4xl font-light font-display tracking-tighter flex items-baseline leading-none mb-1.5">
+                    {loading ? "--" : weather.temp}
+                    <span className="text-xl font-normal text-slate-500 ml-0.5">°C</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[0.78rem] font-bold text-sky-500 dark:text-sky-400">{loading ? "Syncing..." : cond.th}</span>
+                    <span className="text-slate-500 text-[0.68rem] font-medium">{loading ? "" : cond.en}</span>
+                  </div>
+                </div>
+              </div>
+  
+              <div className="grid grid-cols-2 gap-3 border-t border-dashed border-slate-200 dark:border-slate-800/80 pt-4 mb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 bg-sky-500/10 rounded-lg text-sky-400">
+                    <Droplets className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[0.6rem] font-extrabold uppercase tracking-wider text-slate-500">{lang === "th" ? "ความชื้น" : "Humidity"}</span>
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{loading ? "--" : weather.humidity}% RH</span>
+                  </div>
+                </div>
+  
+                <div className="flex items-center gap-2.5">
+                  <div className="p-1.5 bg-slate-500/10 rounded-lg text-slate-500">
+                    <Wind className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-[0.6rem] font-extrabold uppercase tracking-wider text-slate-500">{lang === "th" ? "ความเร็วลม" : "Wind Speed"}</span>
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{loading ? "--" : weather.wind} km/h</span>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <div className={`h-[105px] p-2.5 rounded-2xl border ${isDarkMode ? 'bg-slate-800/20 border-slate-800/80' : 'bg-slate-50/80 border-slate-100'}`}>
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData} margin={{ top: 2, right: 0, left: -32, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorMax" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.25}/>
-                      <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="colorMin" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.25}/>
-                      <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: isDarkMode ? '#64748b' : '#94a3b8' }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: isDarkMode ? '#64748b' : '#94a3b8' }} domain={['dataMin - 2', 'dataMax + 2']} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
-                      borderColor: isDarkMode ? '#1e293b' : '#e2e8f0',
-                      borderRadius: '8px',
-                      fontSize: '10px'
-                    }}
-                  />
-                  <Area type="monotone" dataKey="max" stroke="#f97316" strokeWidth={1.5} fillOpacity={1} fill="url(#colorMax)" />
-                  <Area type="monotone" dataKey="min" stroke="#0ea5e9" strokeWidth={1.5} fillOpacity={1} fill="url(#colorMin)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          {/* AI Dispatch Analysis */}
-          <div className={`p-4 rounded-2xl border flex items-start gap-3 ${isDarkMode ? "bg-indigo-950/20 border-indigo-500/20 text-indigo-200" : "bg-indigo-50/50 border-indigo-100 text-indigo-800"}`}>
-            <div className="p-2 bg-indigo-500 rounded-xl text-white shrink-0 mt-0.5">
-              <Zap className="w-3.5 h-3.5 fill-current animate-pulse" />
-            </div>
-            <div className="min-w-0">
-              <div className="text-[0.68rem] font-extrabold uppercase tracking-widest text-indigo-500 mb-1">
-                {lang === "th" ? "แผนจัดสรรพลังงาน AI Dispatch" : "AI Dispatch Optimization Planning"}
+  
+            <div className="border-t border-slate-200/50 dark:border-slate-800/40 pt-3 mt-2 text-[0.62rem] text-slate-600 dark:text-slate-400 space-y-1">
+              <div className="flex items-center gap-1 font-medium">
+                <Clock className="w-3 h-3 text-slate-500 shrink-0" />
+                <span>{lang === "th" ? "วัดเมื่อ" : "Measured"}: {loading ? "..." : formatTmdTime(weather.dateTime)}</span>
+                <span className="text-slate-300 dark:text-slate-700">|</span>
+                <span className={`font-bold ${weather.source === "api" ? "text-emerald-500" : "text-sky-500"}`}>
+                  {weather.source === "api" || weather.source === "cache" 
+                    ? (lang === "th" ? "เชื่อมต่อสด" : "Live Feed") 
+                    : (lang === "th" ? "โหมดเสมือน" : "Virtual Mode")}
+                </span>
               </div>
-              <p className="text-[0.72rem] leading-relaxed font-medium">
-                {lang === "th" ? aiInsight.th : aiInsight.en}
-              </p>
+              <div className="truncate font-medium" title={weather.stationName}>
+                {lang === "th" ? "สถานีอุตุนิยมวิทยา" : "Station"}: {loading ? "..." : weather.stationName}
+              </div>
             </div>
           </div>
-
-        </div>
-
-      </motion.div>
+  
+          {/* Column 2: 5-Day Forecast Grid */}
+          <div className="lg:col-span-4 flex flex-col justify-between">
+            <div>
+              <div className="text-[0.68rem] font-extrabold uppercase tracking-widest text-slate-500 mb-3.5">
+                {lang === "th" ? "พยากรณ์ล่วงหน้า 5 วัน (Open-Meteo)" : "5-Day Forecast (Open-Meteo)"}
+              </div>
+  
+              {weather.forecast ? (
+                <div className="flex flex-col gap-2.5">
+                  {weather.forecast.time.slice(0, 5).map((dateStr: string, idx: number) => {
+                    const date = new Date(dateStr);
+                    const dayName = new Intl.DateTimeFormat(lang === "th" ? "th-TH" : "en-US", { weekday: "short" }).format(date);
+                    const tempMax = Math.round(weather.forecast.temperature_2m_max[idx]);
+                    const tempMin = Math.round(weather.forecast.temperature_2m_min[idx]);
+                    const rainProb = weather.forecast.precipitation_probability_max[idx];
+                    const wCode = weather.forecast.weather_code[idx];
+  
+                    return (
+                      <div 
+                        key={dateStr} 
+                        className={`flex items-center justify-between p-2.5 rounded-xl border transition-all ${
+                          idx === 0 
+                            ? isDarkMode ? "bg-sky-500/10 border-sky-500/20" : "bg-sky-50 border-sky-100"
+                            : isDarkMode ? "bg-slate-800/30 border-slate-800 hover:bg-slate-800" : "bg-white border-slate-100 hover:bg-slate-50 shadow-2xs"
+                        }`}
+                      >
+                        <div className="w-14 text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+                          {idx === 0 ? (lang === "th" ? "วันนี้" : "Today") : dayName}
+                        </div>
+  
+                        <div className="flex items-center gap-2">
+                          {getWmoWeatherIcon(wCode, "w-5 h-5")}
+                          <span className="text-[0.7rem] font-bold text-slate-500 max-w-[80px] truncate">
+                            {getWmoWeatherLabel(wCode, lang)}
+                          </span>
+                        </div>
+  
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-1.5 text-xs font-bold">
+                            <span className={isDarkMode ? "text-slate-100" : "text-slate-700"}>{tempMax}°</span>
+                            <span className="text-slate-500 font-normal">{tempMin}°</span>
+                          </div>
+  
+                          {rainProb > 20 ? (
+                            <span className="text-[0.62rem] font-bold text-sky-500 bg-sky-500/10 px-1.5 py-0.5 rounded-full shrink-0">
+                              {rainProb}%
+                            </span>
+                          ) : (
+                            <span className="text-[0.62rem] text-slate-300 dark:text-slate-600 px-1.5 py-0.5 rounded-full shrink-0">
+                              0%
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="h-[200px] flex items-center justify-center border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+                  <div className="flex gap-2 w-full px-4">{Array.from({ length: 5 }).map((_, i) => (<div key={i} className="flex-1 h-32 bg-slate-200 dark:bg-slate-800 rounded-xl animate-pulse" />))}</div>
+                </div>
+              )}
+            </div>
+          </div>
+  
+          {/* Column 3: AI Intelligence Dispatch & Recharts Trend */}
+          <div className="lg:col-span-4 flex flex-col justify-between">
+            
+            {/* Recharts Area Chart */}
+            <div className="mb-4">
+              <div className="text-[0.68rem] font-extrabold uppercase tracking-widest text-slate-500 mb-3 flex items-center justify-between">
+                <span>{lang === "th" ? "แนวโน้มอุณหภูมิ (°C)" : "Temperature Trend (°C)"}</span>
+                <div className="flex items-center gap-2 text-[0.6rem] font-bold uppercase tracking-wider">
+                  <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div> Max</span>
+                  <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-sky-500"></div> Min</span>
+                </div>
+              </div>
+  
+              <div className={`h-[105px] p-2.5 rounded-2xl border ${isDarkMode ? 'bg-slate-800/20 border-slate-800/80' : 'bg-slate-50/80 border-slate-100'}`}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={chartData} margin={{ top: 2, right: 0, left: -32, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorMax" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#f97316" stopOpacity={0.25}/>
+                        <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorMin" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.25}/>
+                        <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: isDarkMode ? '#64748b' : '#94a3b8' }} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fill: isDarkMode ? '#64748b' : '#94a3b8' }} domain={['dataMin - 2', 'dataMax + 2']} />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: isDarkMode ? '#0f172a' : '#ffffff',
+                        borderColor: isDarkMode ? '#1e293b' : '#e2e8f0',
+                        borderRadius: '8px',
+                        fontSize: '10px'
+                      }}
+                    />
+                    <Area type="monotone" dataKey="max" stroke="#f97316" strokeWidth={1.5} fillOpacity={1} fill="url(#colorMax)" />
+                    <Area type="monotone" dataKey="min" stroke="#0ea5e9" strokeWidth={1.5} fillOpacity={1} fill="url(#colorMin)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+  
+            {/* AI Dispatch Analysis */}
+            <div className={`p-4 rounded-2xl border flex items-start gap-3 ${isDarkMode ? "bg-indigo-950/20 border-indigo-500/20 text-indigo-200" : "bg-indigo-50/50 border-indigo-100 text-indigo-800"}`}>
+              <div className="p-2 bg-indigo-500 rounded-xl text-white shrink-0 mt-0.5">
+                <Zap className="w-3.5 h-3.5 fill-current animate-pulse" />
+              </div>
+              <div className="min-w-0">
+                <div className="text-[0.68rem] font-extrabold uppercase tracking-widest text-indigo-500 mb-1">
+                  {lang === "th" ? "แผนจัดสรรพลังงาน AI Dispatch" : "AI Dispatch Optimization Planning"}
+                </div>
+                <p className="text-[0.72rem] leading-relaxed font-medium">
+                  {lang === "th" ? aiInsight.th : aiInsight.en}
+                </p>
+              </div>
+            </div>
+  
+          </div>
+  
+        </motion.div>
+      )}
 
       {/* Footer Details & TMD Link */}
       <div className="mt-5 pt-3 border-t border-dashed border-slate-200 dark:border-slate-800/80 flex items-center justify-between z-10 relative">

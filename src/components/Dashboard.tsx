@@ -655,6 +655,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   });
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [isGeneratingCSV, setIsGeneratingCSV] = useState(false);
   
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
@@ -822,6 +823,95 @@ const Dashboard: React.FC<DashboardProps> = ({
       console.error("Failed to generate PDF:", error);
     } finally {
       setIsGeneratingPDF(false);
+    }
+  };
+
+  const exportToCSV = () => {
+    setIsGeneratingCSV(true);
+    try {
+      let csvContent = "";
+
+      // 1. Report Metadata
+      csvContent += `${lang === "th" ? "รายงานสรุปข้อมูลพลังงานไฟฟ้า" : "Energy Usage Summary Report"}\n`;
+      csvContent += `${lang === "th" ? "สร้างเมื่อ" : "Generated at"},"${new Date().toLocaleString()}"\n\n`;
+
+      // 2. Global Metrics
+      csvContent += `${lang === "th" ? "สรุปงบประมาณและข้อมูลโครงข่ายหลัก" : "Grid and Budget Summary"}\n`;
+      csvContent += `${lang === "th" ? "ค่าไฟคาดการณ์เดือนนี้ (บาท)" : "Estimated Monthly Cost (฿)"},"${analytics.totalCost.toFixed(2)}"\n`;
+      csvContent += `${lang === "th" ? "พลังงานไฟฟ้าทั้งหมด (kWh)" : "Total Energy Usage (kWh)"},"${analytics.totalUnits.toFixed(2)}"\n`;
+      csvContent += `${lang === "th" ? "เฉลี่ยค่าไฟต่อวัน (บาท)" : "Burn Rate (฿/day)"},"${analytics.burnRate.toFixed(2)}"\n`;
+      csvContent += `${lang === "th" ? "งบประมาณคงเหลือ (บาท)" : "Remaining Budget (฿)"},"${analytics.budgetRemaining.toFixed(2)}"\n\n`;
+
+      // 3. TOU Tariff Breakdown
+      csvContent += `${lang === "th" ? "ข้อมูลค่าไฟฟ้าแบบตามช่วงเวลา (TOU)" : "Time of Use (TOU) Tariff breakdown"}\n`;
+      csvContent += `${lang === "th" ? "ค่าไฟคาดการณ์แบบ TOU (บาท)" : "Estimated TOU Cost (฿)"},"${analytics.touCost.toFixed(2)}"\n`;
+      csvContent += `${lang === "th" ? "ส่วนต่างงบประหยัดที่เพิ่มขึ้น (บาท)" : "Savings vs Standard (฿)"},"${analytics.touSavings.toFixed(2)}"\n`;
+      csvContent += `${lang === "th" ? "หน่วยการใช้งาน On-Peak (kWh)" : "On-Peak Usage (kWh)"},"${analytics.onPeakUnits.toFixed(2)}"\n`;
+      csvContent += `${lang === "th" ? "หน่วยการใช้งาน Off-Peak (kWh)" : "Off-Peak Usage (kWh)"},"${analytics.offPeakUnits.toFixed(2)}"\n\n`;
+
+      // 4. Device Details Table
+      csvContent += `${lang === "th" ? "รายละเอียดอัตรากินไฟรายอุปกรณ์" : "Individual Appliance Consumption Data"}\n`;
+      const deviceHeaders = lang === "th"
+        ? ["ไอดี", "ชื่อเครื่องใช้ไฟฟ้า", "ขนาดกำลังไฟ (W)", "ชั่วโมงใช้งาน/วัน", "หมวดหมู่โซน", "สถานะ", "ค่าประสิทธิภาพ (Power Factor)", "ค่าไฟฟ้าประมาณการ/วัน (฿)", "หน่วยไฟที่ใช้/วัน (kWh)"]
+        : ["ID", "Device Name", "Power Rate (Watts)", "Daily Duty (Hours)", "Grid Sector", "Status", "Power Factor (PF)", "Est. Daily Cost (฿)", "Est. Daily Usage (kWh)"];
+      csvContent += deviceHeaders.map(h => `"${h}"`).join(",") + "\n";
+
+      multiDevices.forEach((dev) => {
+        const dailyKwh = dev.status === "off"
+          ? 0
+          : dev.status === "standby"
+            ? (Math.max(2, dev.watt * 0.02) / 1000) * 24
+            : (dev.watt / 1000) * dev.hours;
+        const dailyCost = dailyKwh * unitRate;
+
+        const row = [
+          dev.id,
+          dev.name,
+          dev.watt,
+          dev.hours,
+          dev.category,
+          dev.status,
+          dev.pf.toFixed(2),
+          dailyCost.toFixed(2),
+          dailyKwh.toFixed(3)
+        ];
+        csvContent += row.map(val => `"${val}"`).join(",") + "\n";
+      });
+      csvContent += "\n";
+
+      // 5. Active Telemetry Chart Data
+      const currentModeLabel = statsFrame === "daily" 
+        ? (lang === "th" ? "ข้อมูลรายชั่วโมง (24 ชม.)" : "Hourly Load (24h)")
+        : (lang === "th" ? "ข้อมูลรายวัน (30 วัน)" : "Daily Load (30d)");
+      csvContent += `${lang === "th" ? "ข้อมูลสถิติปริมาณไฟฟ้าตามช่วงเวลาปัจจุบัน" : "Current Load Telemetry Data"} (${currentModeLabel})\n`;
+      
+      const telemetryHeaders = lang === "th"
+        ? ["ช่วงเวลา/วัน", "ปริมาณการใช้ไฟฟ้าจริง (kWh)", "ปริมาณการใช้ไฟฟ้าคาดการณ์ AI (kWh)"]
+        : ["Time Interval / Day", "Real Energy Consumption (kWh)", "AI Forecasted Consumption (kWh)"];
+      csvContent += telemetryHeaders.map(h => `"${h}"`).join(",") + "\n";
+
+      telemetryChartData.forEach((item) => {
+        const row = [
+          item.name,
+          item.usage,
+          item.forecast
+        ];
+        csvContent += row.map(val => `"${val}"`).join(",") + "\n";
+      });
+
+      // Trigger download
+      const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", `energy-consumption-data-${new Date().toISOString().slice(0,10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Failed to export CSV:", error);
+    } finally {
+      setIsGeneratingCSV(false);
     }
   };
 
@@ -2521,6 +2611,25 @@ const Dashboard: React.FC<DashboardProps> = ({
               </span>
             </button>
 
+            {/* Export CSV Data Link */}
+            <button
+              className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 border-0 rounded-2xl px-4 shadow-sm font-bold text-xs text-blue-500 dark:text-blue-400 bg-white h-[44px] flex items-center gap-2 shrink-0"
+              onClick={exportToCSV}
+              disabled={isGeneratingCSV}
+              title={lang === "th" ? "ส่งออกข้อมูลเป็น CSV" : "Export Data to CSV"}
+            >
+              {isGeneratingCSV ? (
+                <i className="fas fa-spinner fa-spin text-primary"></i>
+              ) : (
+                <i className="fas fa-file-csv text-base"></i>
+              )}
+              <span className="hidden sm:inline">
+                {isGeneratingCSV
+                  ? lang === "th" ? "กำลังส่งออก..." : "Exporting..."
+                  : lang === "th" ? "ส่งออก CSV" : "CSV Export"}
+              </span>
+            </button>
+
             {/* Quick User Manual Link */}
             <button
               className="btn btn-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors dark:bg-slate-800  dark:border-slate-700 border-0 rounded-2xl px-4 shadow-sm font-bold text-xs text-emerald-600 dark:text-emerald-400 bg-white h-[44px] flex items-center gap-2 shrink-0"
@@ -2775,7 +2884,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       {/* Node Config Overlay */}
       {selectedDeviceId && !showComparisonView && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[4000] flex justify-end">
-          <div className="w-full max-w-xl bg-body h-full shadow-2xl p-6 md:p-10 animate-slide-left overflow-y-auto">
+          <div className="w-full max-w-xl bg-white dark:bg-[#111827] border-l border-slate-150 dark:border-slate-800 h-full shadow-2xl p-6 md:p-10 animate-slide-left overflow-y-auto text-slate-900 dark:text-slate-100">
             <div className="flex justify-between items-center mb-8">
               <h3 className="font-display font-bold text-xl md:text-2xl">
                 {t("node_config_title")}

@@ -42,25 +42,25 @@ export default function DevicesTab({ shared }: { shared: any }) {
 <div className="w-full mb-6">
                         <div
                           id="tour-step-ai-switches"
-                          className="dashboard-card border border-slate-200 dark:border-0 overflow-hidden shadow-sm h-full flex flex-col bg-white dark:bg-white/5"
+                          className="dashboard-card border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm h-full flex flex-col bg-white dark:bg-slate-900/40"
                         >
                           
-                          <div className="p-6 flex flex-col justify-between h-full bg-slate-900/40">
+                          <div className="p-6 flex flex-col justify-between h-full">
                             <div className="w-full">
                               <div className="flex justify-between items-center mb-4">
-                                <h6 className="font-display font-bold text-sm uppercase tracking-wider text-white m-0 flex items-center gap-2">
-                                  <i className="fas fa-sliders-h text-emerald-400"></i>
+                                <h6 className="font-display font-bold text-sm uppercase tracking-wider text-slate-900 dark:text-white m-0 flex items-center gap-2">
+                                  <i className="fas fa-sliders-h text-emerald-500"></i>
                                   <span>
                                     {lang === "th"
                                       ? "ควบคุมโมดูล AI โครงข่าย"
                                       : "AI Grid Control Center"}
                                   </span>
                                 </h6>
-                                <span className="badge bg-emerald-555/20 text-emerald-300 font-mono text-[0.7rem] font-bold p-1 px-2.5 rounded-full uppercase">
+                                <span className="badge bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-mono text-[0.7rem] font-bold p-1 px-2.5 rounded-full uppercase">
                                   Interactive Live
                                 </span>
                               </div>
-                              <p className="text-[0.8rem] text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
+                              <p className="text-[0.8rem] text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
                                 {lang === "th"
                                   ? "คลิปรับฟังข้อมูลและควบคุมสวิตช์ระบบประหยัด เพื่อคาดคำนวณและโกนยอดโหลดสูงสุดในการบริหารงบล่วงหน้าแบบเรียลไทม์"
                                   : "Toggle active subgrid features inside the simulator core to adjust real-time peak-shaving forecasts."}
@@ -73,31 +73,29 @@ export default function DevicesTab({ shared }: { shared: any }) {
                                   onClick={() => setAiSmartAc(!aiSmartAc)}
                                   className={`p-3 rounded-2xl border transition-all active:scale-[0.98] active:opacity-90 cursor-pointer flex items-center justify-between ${
                                     aiSmartAc
-                                      ? "bg-emerald-500/10 border-emerald-500/30"
-                                      : isDarkMode
-                                        ? "bg-slate-900/60 border-slate-800 text-slate-500"
-                                        : "bg-slate-100 border-slate-200 text-slate-500"
+                                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-300"
+                                      : "bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400"
                                   }`}
                                 >
                                   <div className="flex items-center gap-3">
                                     <div
                                       className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs transition-colors ${
                                         aiSmartAc
-                                          ? "bg-emerald-555 text-white shadow-sm"
-                                          : "bg-slate-800 text-slate-500"
+                                          ? "bg-emerald-500 text-white shadow-sm"
+                                          : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500"
                                       }`}
                                     >
                                       <i className="fas fa-temperature-low animate-pulse"></i>
                                     </div>
                                     <div>
                                       <div
-                                        className={`text-[0.8rem] font-black ${aiSmartAc ? "text-white/95" : "text-slate-500"}`}
+                                        className={`text-[0.8rem] font-black ${aiSmartAc ? "text-emerald-800 dark:text-emerald-200" : "text-slate-700 dark:text-slate-300"}`}
                                       >
                                         {lang === "th"
                                           ? "1. ปรับอุณหภูมิ AC แบบประหยัด"
                                           : "Smart AC Peak Regulation"}
                                       </div>
-                                      <div className="text-[8.5px] opacity-60 font-bold">
+                                      <div className="text-[8.5px] text-slate-500 dark:text-slate-400 opacity-80 font-bold">
                                         {lang === "th"
                                           ? "ประหยัดเฉลี่ย 6.5% - คุมโหมดบ่ายหลัก"
                                           : "Est. Saving 6.5% - thermal bounds"}
@@ -105,7 +103,7 @@ export default function DevicesTab({ shared }: { shared: any }) {
                                     </div>
                                   </div>
                                   <div
-                                    className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 ${aiSmartAc ? "bg-emerald-500" : "bg-slate-600"} flex items-center`}
+                                    className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 ${aiSmartAc ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"} flex items-center`}
                                   >
                                     <div
                                       className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${aiSmartAc ? "translate-x-[16px]" : "translate-x-0"}`}
@@ -118,31 +116,29 @@ export default function DevicesTab({ shared }: { shared: any }) {
                                   onClick={() => setAiEcoStandby(!aiEcoStandby)}
                                   className={`p-3 rounded-2xl border transition-all active:scale-[0.98] active:opacity-90 cursor-pointer flex items-center justify-between ${
                                     aiEcoStandby
-                                      ? "bg-emerald-500/10 border-emerald-500/30"
-                                      : isDarkMode
-                                        ? "bg-slate-900/60 border-slate-800 text-slate-500"
-                                        : "bg-slate-100 border-slate-200 text-slate-500"
+                                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-300"
+                                      : "bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400"
                                   }`}
                                 >
                                   <div className="flex items-center gap-3">
                                     <div
                                       className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs transition-colors ${
                                         aiEcoStandby
-                                          ? "bg-emerald-555 text-white shadow-sm"
-                                          : "bg-slate-800 text-slate-500"
+                                          ? "bg-emerald-500 text-white shadow-sm"
+                                          : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500"
                                       }`}
                                     >
                                       <i className="fas fa-power-off"></i>
                                     </div>
                                     <div>
                                       <div
-                                        className={`text-[0.8rem] font-black ${aiEcoStandby ? "text-white/95" : "text-slate-500"}`}
+                                        className={`text-[0.8rem] font-black ${aiEcoStandby ? "text-emerald-800 dark:text-emerald-200" : "text-slate-700 dark:text-slate-300"}`}
                                       >
                                         {lang === "th"
                                           ? "2. ระงับไฟรั่วสแตนด์บาย"
                                           : "Eco Standby Autocut"}
                                       </div>
-                                      <div className="text-[8.5px] opacity-60 font-bold">
+                                      <div className="text-[8.5px] text-slate-500 dark:text-slate-400 opacity-80 font-bold">
                                         {lang === "th"
                                           ? "ประหยัดเฉลี่ย 4.2% - ตัดกระแสแฝงเที่ยงคืน"
                                           : "Est. Saving 4.2% - Residual leak cutoff"}
@@ -150,7 +146,7 @@ export default function DevicesTab({ shared }: { shared: any }) {
                                     </div>
                                   </div>
                                   <div
-                                    className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 ${aiEcoStandby ? "bg-emerald-500" : "bg-slate-600"} flex items-center`}
+                                    className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 ${aiEcoStandby ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"} flex items-center`}
                                   >
                                     <div
                                       className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${aiEcoStandby ? "translate-x-[16px]" : "translate-x-0"}`}
@@ -163,31 +159,29 @@ export default function DevicesTab({ shared }: { shared: any }) {
                                   onClick={() => setAiLoadShift(!aiLoadShift)}
                                   className={`p-3 rounded-2xl border transition-all active:scale-[0.98] active:opacity-90 cursor-pointer flex items-center justify-between ${
                                     aiLoadShift
-                                      ? "bg-emerald-500/10 border-emerald-500/30"
-                                      : isDarkMode
-                                        ? "bg-slate-900/60 border-slate-800 text-slate-500"
-                                        : "bg-slate-100 border-slate-200 text-slate-500"
+                                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-300"
+                                      : "bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400"
                                   }`}
                                 >
                                   <div className="flex items-center gap-3">
                                     <div
                                       className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs transition-colors ${
                                         aiLoadShift
-                                          ? "bg-emerald-555 text-white shadow-sm"
-                                          : "bg-slate-800 text-slate-500"
+                                          ? "bg-emerald-500 text-white shadow-sm"
+                                          : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500"
                                       }`}
                                     >
                                       <i className="fas fa-history"></i>
                                     </div>
                                     <div>
                                       <div
-                                        className={`text-[0.8rem] font-black ${aiLoadShift ? "text-white/95" : "text-slate-500"}`}
+                                        className={`text-[0.8rem] font-black ${aiLoadShift ? "text-emerald-800 dark:text-emerald-200" : "text-slate-700 dark:text-slate-300"}`}
                                       >
                                         {lang === "th"
                                           ? "3. อัลกอริทึมสลับเวลา TOU"
                                           : "Smart TOU Load Shifter"}
                                       </div>
-                                      <div className="text-[8.5px] opacity-60 font-bold">
+                                      <div className="text-[8.5px] text-slate-500 dark:text-slate-400 opacity-80 font-bold">
                                         {lang === "th"
                                           ? "ประหยัดเฉลี่ย 8.3% - เลื่อนยอดจ่ายพ้น On-Peak"
                                           : "Est. Saving 8.3% - Peak hour shaving"}
@@ -195,7 +189,7 @@ export default function DevicesTab({ shared }: { shared: any }) {
                                     </div>
                                   </div>
                                   <div
-                                    className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 ${aiLoadShift ? "bg-emerald-500" : "bg-slate-600"} flex items-center`}
+                                    className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 ${aiLoadShift ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"} flex items-center`}
                                   >
                                     <div
                                       className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${aiLoadShift ? "translate-x-[16px]" : "translate-x-0"}`}
@@ -208,31 +202,29 @@ export default function DevicesTab({ shared }: { shared: any }) {
                                   onClick={() => setAiPfTuning(!aiPfTuning)}
                                   className={`p-3 rounded-2xl border transition-all active:scale-[0.98] active:opacity-90 cursor-pointer flex items-center justify-between ${
                                     aiPfTuning
-                                      ? "bg-emerald-500/10 border-emerald-500/30"
-                                      : isDarkMode
-                                        ? "bg-slate-900/60 border-slate-800 text-slate-500"
-                                        : "bg-slate-100 border-slate-200 text-slate-500"
+                                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-300"
+                                      : "bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400"
                                   }`}
                                 >
                                   <div className="flex items-center gap-3">
                                     <div
                                       className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs transition-colors ${
                                         aiPfTuning
-                                          ? "bg-emerald-555 text-white shadow-sm"
-                                          : "bg-slate-800 text-slate-500"
+                                          ? "bg-emerald-500 text-white shadow-sm"
+                                          : "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500"
                                       }`}
                                     >
                                       <i className="fas fa-microchip"></i>
                                     </div>
                                     <div>
                                       <div
-                                        className={`text-[0.8rem] font-black ${aiPfTuning ? "text-white/95" : "text-slate-500"}`}
+                                        className={`text-[0.8rem] font-black ${aiPfTuning ? "text-emerald-800 dark:text-emerald-200" : "text-slate-700 dark:text-slate-300"}`}
                                       >
                                         {lang === "th"
                                           ? "4. ตัวจูน Power Factor โครงข่าย"
                                           : "Smart Power Factor Tuning"}
                                       </div>
-                                      <div className="text-[8.5px] opacity-60 font-bold">
+                                      <div className="text-[8.5px] text-slate-500 dark:text-slate-400 opacity-80 font-bold">
                                         {lang === "th"
                                           ? "ประหยัดเพิ่ม 3.0% - ประยุกต์แคปฟิลเตอร์"
                                           : "Est. Saving 3.0% - Active PF filter"}
@@ -240,7 +232,7 @@ export default function DevicesTab({ shared }: { shared: any }) {
                                     </div>
                                   </div>
                                   <div
-                                    className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 ${aiPfTuning ? "bg-emerald-500" : "bg-slate-600"} flex items-center`}
+                                    className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-300 ${aiPfTuning ? "bg-emerald-500" : "bg-slate-300 dark:bg-slate-700"} flex items-center`}
                                   >
                                     <div
                                       className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${aiPfTuning ? "translate-x-[16px]" : "translate-x-0"}`}
@@ -251,25 +243,25 @@ export default function DevicesTab({ shared }: { shared: any }) {
                             </div>
 
                             {/* Bottom Impact Telemetry Card */}
-                            <div className="border-t border-slate-500/10 pt-4 mt-auto w-full">
+                            <div className="border-t border-slate-200 dark:border-slate-800 pt-4 mt-auto w-full">
                               <div className="grid grid-cols-2 gap-3">
-                                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl text-center md:text-start">
-                                  <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">
+                                <div className="p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 rounded-2xl text-center md:text-start flex flex-col justify-between shadow-sm">
+                                  <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase tracking-wider">
                                     {lang === "th"
                                       ? "จำลองมูลค่าประหยัด"
                                       : "Est. Savings Amount"}
                                   </span>
-                                  <span className="text-sm font-black text-emerald-400 font-mono">
+                                  <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 font-mono">
                                     ฿{aiMonthlySavings.amount.toFixed(0)}
                                   </span>
                                 </div>
-                                <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-2xl text-center md:text-start">
-                                  <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase">
+                                <div className="p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 rounded-2xl text-center md:text-start flex flex-col justify-between shadow-sm">
+                                  <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 font-bold block mb-1 uppercase tracking-wider">
                                     {lang === "th"
                                       ? "ยอดจ่ายจำลองสุทธิ"
                                       : "Optimized Estimate"}
                                   </span>
-                                  <span className="text-sm font-black text-white/90 font-mono">
+                                  <span className="text-sm font-black text-slate-900 dark:text-white font-mono">
                                     ฿{aiMonthlySavings.finalCost.toFixed(0)}
                                   </span>
                                 </div>
@@ -279,9 +271,9 @@ export default function DevicesTab({ shared }: { shared: any }) {
                         </div>
 </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="dashboard-card border-0 p-5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="dashboard-card border border-slate-200 dark:border-slate-800 p-5 bg-white dark:bg-slate-900/40 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
-                    <h6 className="font-extrabold text-sm mb-1">
+                    <h6 className="font-extrabold text-sm mb-1 text-slate-850 dark:text-slate-100">
                       {lang === "th"
                         ? "⚡ เครื่องยิงประจุจำลองโหลดด่วน"
                         : "⚡ Virtual Load Stress Injector"}
@@ -307,9 +299,9 @@ export default function DevicesTab({ shared }: { shared: any }) {
                     </button>
                   </div>
                 </div>
-                <div className="dashboard-card border-0 p-5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div className="dashboard-card border border-slate-200 dark:border-slate-800 p-5 bg-white dark:bg-slate-900/40 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
-                    <h6 className="font-extrabold text-sm mb-1">
+                    <h6 className="font-extrabold text-sm mb-1 text-slate-850 dark:text-slate-100">
                       {lang === "th"
                         ? "🔌 บล็อกสแตนด์บายตกค้างอัจฉริยะ"
                         : "🔌 Eco Standby Bulk Disconnect"}
@@ -389,27 +381,32 @@ export default function DevicesTab({ shared }: { shared: any }) {
               >
                 {filteredDevices.length === 0 ? (
                   <div className="col-12">
-                    <div className="dashboard-card border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-10 text-center rounded-[2rem] flex flex-col items-center justify-center space-y-4">
-                      <div className="w-16 h-16 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center text-slate-500">
-                        <i className="fas fa-plug-circle-xmark text-2xl"></i>
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="dashboard-card border-2 border-dashed border-slate-200 dark:border-slate-850 bg-slate-50/50 dark:bg-slate-900/25 p-12 text-center rounded-[2.5rem] flex flex-col items-center justify-center space-y-5"
+                    >
+                      <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400 dark:text-slate-500 border border-slate-200/40 dark:border-slate-700/40">
+                        <ZapOff className="w-7 h-7" />
                       </div>
-                      <div>
-                        <h5 className="font-display font-bold text-slate-800 dark:text-slate-200 mb-2">
-                          {lang === "th" ? "ไม่พบอุปกรณ์" : "No Devices Found"}
+                      <div className="space-y-1.5 max-w-sm">
+                        <h5 className="font-display font-black text-slate-800 dark:text-slate-100 text-base md:text-lg mb-1">
+                          {lang === "th" ? "ไม่พบอุปกรณ์เชื่อมต่อ" : "No Active Grid Nodes"}
                         </h5>
-                        <p className="text-slate-600 dark:text-slate-400 text-sm max-w-sm mx-auto mb-6">
+                        <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
                           {lang === "th" 
-                            ? "คุณยังไม่ได้เพิ่มอุปกรณ์ในหมวดหมู่นี้ หรือการค้นหาไม่ตรงกับข้อมูลที่มี กดปุ่ม 'Add Node' ด้านบนเพื่อสร้างอุปกรณ์ใหม่"
-                            : "You haven't added any devices here, or your filter matches nothing. Click 'Add Node' to create a new appliance."}
+                            ? "คุณยังไม่ได้เพิ่มโหนดหรืออุปกรณ์ในหมวดหมู่นี้ หรือระบบค้นหาไม่พบข้อมูลที่ตรงกัน แตะปุ่มด้านล่างเพื่อเชื่อมต่ออุปกรณ์ใหม่"
+                            : "No virtual microgrid nodes exist in this segment or search criteria. Connect your high-load appliances to initiate real-time logging."}
                         </p>
-                        <button
-                          className="btn btn-primary px-6 py-2.5 rounded-2xl font-bold text-xs uppercase shadow-lg hover:scale-[1.02] transition-all"
-                          onClick={addDevice}
-                        >
-                          <i className="fas fa-plus me-2"></i> {lang === "th" ? "เพิ่มอุปกรณ์เลย" : "Add Device Now"}
-                        </button>
                       </div>
-                    </div>
+                      <button
+                        className="btn btn-primary px-6 py-3 rounded-2xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer flex items-center gap-2"
+                        onClick={addDevice}
+                      >
+                        <Zap className="w-3.5 h-3.5" />
+                        {lang === "th" ? "เชื่อมต่ออุปกรณ์ใหม่" : "Connect New Device"}
+                      </button>
+                    </motion.div>
                   </div>
                 ) : (
                   filteredDevices.map((dev, i) => {
@@ -429,38 +426,76 @@ export default function DevicesTab({ shared }: { shared: any }) {
                     >
                       <div
                         onClick={() => setSelectedDeviceId(dev.id)}
-                        className={`dashboard-card border-0 p-5 cursor-pointer hover:shadow-xl active:scale-[0.98] hover:scale-[1.01] active:opacity-95 transition-all duration-300 group relative overflow-hidden ${isSelected ? "ring-2 ring-primary ring-inset" : ""}`}
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setSelectedDeviceId(dev.id);
+                          }
+                        }}
+                        className={`dashboard-card border border-slate-100 dark:border-slate-800/80 p-5 cursor-pointer hover:shadow-xl hover:shadow-primary/5 active:scale-[0.98] hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition-all duration-300 group relative overflow-hidden ${isSelected ? "ring-2 ring-primary border-primary dark:border-primary" : ""}`}
                       >
-                        <div className="absolute top-0 left-0 p-3 z-10">
+                        <div className="absolute top-4 left-4 z-10">
                           <button
                             onClick={(e) => toggleCompareSelection(e, dev.id)}
-                            className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${isSelected ? "bg-primary text-white shadow-md" : "bg-white/80 backdrop-blur-sm border-2 border-primary/20 text-primary hover:bg-primary hover:text-white"}`}
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all ${isSelected ? "bg-primary text-white shadow-md" : "bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 text-primary hover:bg-primary hover:text-white"}`}
                           >
                             <i
                               className={`fas ${isSelected ? "fa-check" : "fa-plus"} text-[0.75rem]`}
                             ></i>
                           </button>
                         </div>
-                        <div
-                          className={`absolute top-0 right-0 p-3 text-[0.65rem] font-bold uppercase tracking-widest ${dev.status === "active" ? "bg-emerald-500" : "bg-amber-500"} text-white`}
-                        >
-                          {dev.status}
+                        <div className="absolute top-4 right-4">
+                          <span className={`badge-premium ${
+                            dev.status === "active" 
+                              ? "badge-premium-success" 
+                              : dev.status === "standby" 
+                                ? "badge-premium-warning" 
+                                : "badge-premium-gray"
+                          }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${
+                              dev.status === "active" 
+                                ? "bg-emerald-500 animate-pulse" 
+                                : dev.status === "standby" 
+                                  ? "bg-amber-500" 
+                                  : "bg-gray-400"
+                            }`}></span>
+                            {dev.status}
+                          </span>
                         </div>
-                        <div className="p-3 bg-primary-subtle text-primary rounded-2xl w-fit mb-4 group-hover:bg-primary group-hover:text-white transition-all">
+                        <div className="p-3.5 bg-slate-50 dark:bg-slate-800/50 text-primary border border-slate-100 dark:border-slate-700/50 rounded-2xl w-fit mb-4 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all duration-300">
                           <i
-                            className={`fas ${dev.category === "Cooling" ? "fa-snowflake" : "fa-plug"} text-lg`}
+                            className={`fas ${
+                              dev.category === "Cooling" 
+                                ? "fa-snowflake" 
+                                : dev.category === "Entertainment" 
+                                  ? "fa-tv" 
+                                  : dev.category === "Kitchen" 
+                                    ? "fa-blender" 
+                                    : "fa-plug"
+                            } text-base`}
                           ></i>
                         </div>
-                        <h6 className="font-bold text-lg mb-1">{dev.name}</h6>
-                        <p className="label text-[0.7rem] mb-4 dark:opacity-100 opacity-60">
+                        <h6 className="font-bold font-display text-base mb-1 text-slate-900 dark:text-white">{dev.name}</h6>
+                        <p className="text-[0.7rem] uppercase tracking-widest font-extrabold text-slate-400 dark:text-slate-500 mb-4">
                           {dev.category}
                         </p>
-                        <div className="flex justify-between items-end border-t border-slate-100 dark:border-slate-800/50 pt-4">
-                          <div className="mono-font font-bold text-primary">
-                            ฿{devCost.toFixed(0)}
+                        <div className="flex justify-between items-end border-t border-slate-100 dark:border-slate-800/50 pt-4 mt-2">
+                          <div>
+                            <div className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-0.5">
+                              {lang === "th" ? "ค่าไฟประหยัดสะสม" : "EST. COST"}
+                            </div>
+                            <div className="font-mono font-black text-lg text-emerald-500 dark:text-emerald-400">
+                              ฿{devCost.toFixed(0)}
+                            </div>
                           </div>
-                          <div className="text-[0.75rem] text-slate-500 dark:text-slate-400 font-bold">
-                            {dev.watt}W
+                          <div className="text-right">
+                            <div className="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-0.5">
+                              {lang === "th" ? "กำลังไฟฟ้า" : "WATTAGE"}
+                            </div>
+                            <div className="font-mono font-bold text-sm text-slate-700 dark:text-slate-300">
+                              {dev.watt}W
+                            </div>
                           </div>
                         </div>
                       </div>

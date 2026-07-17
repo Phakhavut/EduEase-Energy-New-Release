@@ -41,8 +41,8 @@ export default function OverviewTab({ shared }: { shared: any }) {
                 className="flex flex-wrap gap-4 lg:gap-6 mb-2"
               >
                 {/* Metric 1: Total Savings */}
-                <div className="w-full lg:w-[calc(50%-0.75rem)] flex-auto dashboard-card bg-white dark:bg-slate-800 p-6 relative overflow-hidden group border-2 border-emerald-500/30 dark:border-emerald-500/50 hover:border-emerald-500">
-                  <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-full lg:w-[calc(50%-0.75rem)] flex-auto dashboard-card p-6 relative overflow-hidden group border border-slate-100 dark:border-emerald-500/10 hover:border-emerald-500/20">
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.03] dark:opacity-10 group-hover:scale-110 transition-transform duration-300">
                     <i className="fas fa-piggy-bank text-8xl text-emerald-500"></i>
                   </div>
                   <div className="relative z-10 flex flex-col justify-between h-full">
@@ -64,16 +64,16 @@ export default function OverviewTab({ shared }: { shared: any }) {
                       </div>
                       <p className="text-[0.75rem] text-slate-700 dark:text-slate-300 mt-2 leading-relaxed mb-0">
                         {lang === "th" 
-                          ? "ลดภาระค่าใช้จ่ายเครือข่ายจำลองแบบเรียลไทม์ ภายใต้การควบคุมระบบอัจฉริยะ" 
-                          : "Calculated monthly reduction across active smart-nodes under active AI calibration."}
+                           ? "ลดภาระค่าใช้จ่ายเครือข่ายจำลองแบบเรียลไทม์ ภายใต้การควบคุมระบบอัจฉริยะ" 
+                           : "Calculated monthly reduction across active smart-nodes under active AI calibration."}
                       </p>
                     </div>
                   </div>
                 </div>
 
                 {/* Metric 2: AI Score */}
-                <div className="w-full lg:w-[calc(50%-0.75rem)] flex-auto dashboard-card bg-white dark:bg-slate-800 p-6 relative overflow-hidden group border-2 border-purple-500/30 dark:border-purple-500/50 hover:border-purple-500">
-                  <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-300">
+                <div className="w-full lg:w-[calc(50%-0.75rem)] flex-auto dashboard-card p-6 relative overflow-hidden group border border-slate-100 dark:border-purple-500/10 hover:border-purple-500/20">
+                  <div className="absolute top-0 right-0 p-8 opacity-[0.03] dark:opacity-10 group-hover:scale-110 transition-transform duration-300">
                     <i className="fas fa-brain text-8xl text-purple-500"></i>
                   </div>
                   <div className="relative z-10 flex flex-col justify-between h-full">

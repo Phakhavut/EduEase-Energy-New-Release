@@ -513,12 +513,12 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                             return (
                                                 <div 
                                                     key={quest.id} 
-                                                    className={`p-4 md:p-5 rounded-[2rem] border transition-all duration-300 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${
+                                                    className={`p-4 md:p-5 rounded-[2rem] border transition-all duration-350 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 ${
                                                         isClaimed 
-                                                            ? 'bg-slate-500/5 border-slate-200 dark:border-slate-800 opacity-60' 
+                                                            ? 'opacity-35 grayscale pointer-events-none select-none border-slate-200/50 dark:border-slate-800/40 bg-slate-100/80 dark:bg-slate-900/40' 
                                                             : quest.completed 
-                                                                ? 'bg-emerald-500/5 border-emerald-500/30 shadow-emerald-500/5 shadow-md animate-pulse' 
-                                                                : 'bg-slate-50 dark:bg-slate-800/60 border-transparent'
+                                                                ? 'border-amber-400 dark:border-amber-500 bg-gradient-to-br from-amber-500/5 to-yellow-500/5 shadow-md shadow-amber-500/5 animate-[pulse_2s_infinite]' 
+                                                                : 'bg-slate-50 dark:bg-slate-800/60 border-transparent hover:border-slate-200 dark:hover:border-slate-700'
                                                     }`}
                                                 >
                                                     <div className="flex items-start gap-4 flex-grow">
@@ -686,7 +686,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                     </div>
 
                                     {/* Tokens Vault Balance */}
-                                    <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/30 flex items-center justify-between gap-4 mb-6 relative overflow-hidden">
+                                    <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/30 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6 relative overflow-hidden">
                                         <div className="absolute top-0 right-0 p-1 opacity-10">
                                             <i className="fas fa-coins text-4xl"></i>
                                         </div>
@@ -710,7 +710,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                                 showNotification(lang === 'th' ? `💰 เคลมเหรียญโบนัสประหยัดสำเร็จ +${bonus} GT!` : `💰 Claimed level energy bonus +${bonus} GT!`);
                                                 if (triggerConfetti) triggerConfetti();
                                             }}
-                                            className="btn btn-xs py-2 px-3 bg-amber-500 hover:bg-amber-600 border-0 text-white font-black text-[0.7rem] uppercase tracking-wider rounded-xl shadow-md cursor-pointer transition-transform active:scale-95 whitespace-nowrap"
+                                            className="btn btn-xs py-2 px-3 bg-amber-500 hover:bg-amber-600 border-0 text-white font-black text-[0.7rem] uppercase tracking-wider rounded-xl shadow-md cursor-pointer transition-transform active:scale-95 whitespace-nowrap w-full sm:w-auto"
                                         >
                                             <i className="fas fa-plus mr-1"></i> {lang === 'th' ? 'เคลมโบนัสรายวัน' : 'Claim Daily Bonus'}
                                         </button>
@@ -976,7 +976,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
             </AnimatePresence>
 
             {/* Zero-Carbon Microgrid Leaderboard Rank List */}
-            <div className="dashboard-card border-0 p-6 md:p-8 bg-white rounded-[2.5rem] shadow-sm animate-slide-up">
+            <div className="dashboard-card border border-slate-150 dark:border-slate-800/50 p-6 md:p-8 bg-white dark:bg-slate-900/40 rounded-[2.5rem] shadow-sm animate-slide-up">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center text-lg shadow-sm border border-amber-500/10">
@@ -1018,7 +1018,7 @@ export const QuestLeaderboard: React.FC<QuestLeaderboardProps> = ({
                                 className={`p-4 rounded-[2rem] border transition-all flex flex-col md:flex-row items-start md:items-center justify-between gap-4 cursor-pointer ${
                                     isSelf 
                                         ? 'bg-primary/5 border-primary/40 shadow-md shadow-primary/5' 
-                                        : 'bg-slate-50 dark:bg-slate-800/60/75 border-transparent hover:border-slate-300 dark:hover:border-slate-700'
+                                        : 'bg-slate-50 dark:bg-slate-800/40 border-transparent hover:border-slate-200 dark:hover:border-slate-700'
                                 }`}
                                 onClick={() => setSelectedCompetitor(node)}
                             >

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Thermometer, Zap, Cpu, Plug } from 'lucide-react';
 
 interface DailyEnergyQuestsProps {
     lang: 'th' | 'en';
@@ -18,7 +19,7 @@ interface Quest {
     actionLabelEn: string;
     actionSuccessTh: string;
     actionSuccessEn: string;
-    icon: string;
+    icon: React.ComponentType<any>;
     colorClass: string; // e.g. 'emerald', 'sky', 'amber', 'purple'
 }
 
@@ -100,7 +101,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
             actionLabelTh: 'ตั้งแอร์ 25°C',
             actionSuccessEn: 'Thermostat shifted to eco-friendly 25°C! AC load optimized.',
             actionSuccessTh: 'ปรับอุณหภูมิแอร์เป็น 25°C สำเร็จ! ลดการกระชากของคอมเพรสเซอร์',
-            icon: 'fa-temperature-high',
+            icon: Thermometer,
             colorClass: 'emerald'
         },
         {
@@ -115,7 +116,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
             actionLabelTh: 'ตัดโหลดสำรองไฟฟ้า',
             actionSuccessEn: 'Heavy loads isolated! Peak consumption lowered safely.',
             actionSuccessTh: 'สับสวิตช์แยกโหลดใหญ่สำเร็จ! ลดปริมาณการใช้ไฟช่วงพีก',
-            icon: 'fa-bolt',
+            icon: Zap,
             colorClass: 'sky'
         },
         {
@@ -130,7 +131,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
             actionLabelTh: 'จูนเก็บประจุอัจฉริยะ',
             actionSuccessEn: 'Capacitive bank auto-aligned! Power factor tuned to 0.98.',
             actionSuccessTh: 'เปิดตัวประจุไฟฟ้าประคองเฟสเสร็จสิ้น! ค่า PF เฉลี่ยพุ่งแตะ 0.98',
-            icon: 'fa-atom',
+            icon: Cpu,
             colorClass: 'amber'
         },
         {
@@ -145,7 +146,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
             actionLabelTh: 'เชื่อมต่อโมดูลที่ 5',
             actionSuccessEn: '5th IoT sensor registered successfully! Distributed mesh active.',
             actionSuccessTh: 'ซิงก์ปลั๊กอัจฉริยะตัวที่ 5 แล้ว! เชื่อมต่อโครงข่ายกระจายโหลดสมบูรณ์',
-            icon: 'fa-plug',
+            icon: Plug,
             colorClass: 'purple'
         }
     ];
@@ -228,7 +229,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                             <i className="fas fa-tasks text-emerald-500 animate-pulse"></i>
                             {lang === 'th' ? 'ภารกิจประหยัดพลังงานรายวัน' : 'Daily Energy Quests'}
                         </h5>
-                        <p className="text-[0.75rem] text-slate-700 dark:text-slate-100 mb-0 font-mono tracking-wider">
+                        <p className="text-[0.75rem] text-slate-500 dark:text-slate-400 mb-0 font-mono tracking-wider">
                             {lang === 'th' ? 'เคลมโทเค็น GT จากพฤติกรรมประหยัดรักษ์โลกประจำวัน' : 'Complete expiring targets to earn premium GT rewards.'}
                         </p>
                     </div>
@@ -283,25 +284,25 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                         return (
                             <div 
                                 key={quest.id} 
-                                className={`p-4 rounded-3xl border bg-slate-50/50 dark:bg-slate-50 dark:bg-slate-800/60/50 transition-all ${
+                                className={`p-4 rounded-3xl border transition-all duration-350 ${
                                     isClaimed 
-                                        ? 'opacity-60 border-slate-200' 
+                                        ? 'opacity-35 grayscale border-slate-200/50 dark:border-slate-800/40 bg-slate-100/80 dark:bg-slate-900/40 pointer-events-none select-none' 
                                         : isCompleted 
-                                            ? 'border-emerald-500/30 bg-emerald-500/5 shadow-sm' 
-                                            : 'border-slate-200/80 hover:border-slate-300'
+                                            ? 'border-amber-400 dark:border-amber-500 bg-gradient-to-br from-amber-500/5 to-yellow-500/5 shadow-md shadow-amber-500/5 animate-[pulse_2s_infinite]' 
+                                            : 'bg-slate-50/50 dark:bg-slate-800/40 border-slate-200/60 dark:border-slate-850 hover:border-slate-300 dark:hover:border-slate-700'
                                     }`}
                                 >
                                 <div className="flex justify-between items-start gap-3 mb-2.5">
                                     <div className="flex gap-3">
                                         {/* Icon Container */}
-                                        <div className={`w-9 h-9 rounded-2xl ${activeTheme.bg} ${activeTheme.text} border ${activeTheme.border} flex items-center justify-center text-sm shrink-0 overflow-hidden`}>
-                                            <i className={`fas ${quest.icon} ${isCompleted && !isClaimed ? 'animate-bounce' : ''}`}></i>
+                                        <div className={`w-9 h-9 rounded-2xl ${activeTheme.bg} ${activeTheme.text} border ${activeTheme.border} flex items-center justify-center shrink-0 overflow-hidden`}>
+                                            <quest.icon className={`w-4 h-4 ${isCompleted && !isClaimed ? 'animate-bounce' : ''}`} />
                                         </div>
                                         <div>
-                                            <h6 className="font-black text-xs md:text-sm mb-0.5 text-slate-900 dark:text-slate-100 uppercase tracking-tight">
+                                            <h6 className="font-black text-xs md:text-sm mb-0.5 text-slate-800 dark:text-slate-100 uppercase tracking-tight">
                                                 {lang === 'th' ? quest.titleTh : quest.titleEn}
                                             </h6>
-                                            <p className="text-[0.75rem] text-slate-700 dark:text-slate-100 leading-relaxed line-clamp-2 md:line-clamp-1">
+                                            <p className="text-[0.75rem] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2 md:line-clamp-1">
                                                 {lang === 'th' ? quest.descTh : quest.descEn}
                                             </p>
                                         </div>
@@ -309,10 +310,10 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
 
                                     {/* Reward Tag */}
                                     <div className="text-end shrink-0">
-                                        <span className="font-mono font-black text-xs text-amber-700 dark:text-amber-600 block">
+                                        <span className="font-mono font-black text-xs text-amber-600 dark:text-amber-500 block">
                                             +{quest.reward} GT
                                         </span>
-                                        <span className="text-[0.65rem] text-slate-500 dark:text-slate-100 uppercase font-bold tracking-widest font-mono">
+                                        <span className="text-[0.65rem] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-widest font-mono">
                                             {isClaimed ? (lang === 'th' ? 'เคลมแล้ว' : 'CLAIMED') : (lang === 'th' ? 'แต้ม' : 'REWARD')}
                                         </span>
                                     </div>
@@ -337,13 +338,12 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                                     {/* Interactive Action or Claim Button */}
                                     <div className="shrink-0 flex gap-2">
                                         {isClaimed ? (
-                                            <button 
-                                                disabled 
-                                                className="btn btn-xs py-1.5 px-3 bg-slate-100 dark:bg-slate-900 border-0 text-slate-500 dark:text-slate-100 font-bold text-[0.7rem] uppercase tracking-wider rounded-xl w-full sm:w-auto"
+                                            <div 
+                                                className="py-1.5 px-3 bg-emerald-500 dark:bg-emerald-600 border border-emerald-500 text-white font-bold text-[0.7rem] uppercase tracking-wider rounded-xl w-full sm:w-auto flex items-center justify-center gap-1.5 opacity-95 select-none pointer-events-none shadow-sm"
                                             >
-                                                <i className="fas fa-check-circle mr-1"></i>
-                                                {lang === 'th' ? 'รับแล้ว' : 'Claimed'}
-                                            </button>
+                                                <i className="fas fa-check-circle text-white"></i>
+                                                <span>{lang === 'th' ? 'รับแล้ว' : 'Claimed'}</span>
+                                            </div>
                                         ) : isCompleted ? (
                                             <motion.button 
                                                 whileHover={{ scale: 1.05 }}

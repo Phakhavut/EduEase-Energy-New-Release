@@ -63,20 +63,48 @@ export default function NotiTab({ shared }: { shared: any }) {
           </div>
         </div>
         <div className="space-y-4">
-          {currentAlerts.length === 0 ? (
-            <div className="text-center p-10 bg-slate-50 dark:bg-slate-800/60 rounded-[30px] border border-transparent">
-              <i className="fas fa-check-circle text-emerald-500 text-4xl mb-4"></i>
-              <h6 className="font-bold text-lg">
-                {lang === "th"
-                  ? "ระบบทำงานปกติ"
-                  : "System Operating Normally"}
-              </h6>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mb-0">
-                {lang === "th"
-                  ? "ยังไม่มีการแจ้งเตือนปัญหาการใช้ไฟในขณะนี้"
-                  : "No spikes or thermal anomalies detected in the sandbox nodes."}
-              </p>
+          {isAiScanning ? (
+            <div className="space-y-4 animate-pulse">
+              {[1, 2, 3].map((idx) => (
+                <div
+                  key={idx}
+                  className="dashboard-card border-l-[6px] border-slate-200 dark:border-slate-800 p-5 md:p-6 flex flex-col sm:flex-row gap-4 md:gap-6 bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-250 dark:border-slate-800/80"
+                >
+                  <div className="p-4 rounded-3xl bg-slate-200 dark:bg-slate-800 w-12 h-12 shrink-0" />
+                  <div className="flex-grow space-y-3 pt-1">
+                    <div className="flex justify-between items-center">
+                      <div className="h-4 w-1/3 bg-slate-200 dark:bg-slate-800 rounded-md" />
+                      <div className="h-3 w-16 bg-slate-200 dark:bg-slate-800 rounded-md" />
+                    </div>
+                    <div className="h-3 w-3/4 bg-slate-200 dark:bg-slate-800 rounded-md" />
+                    <div className="h-3 w-1/2 bg-slate-200 dark:bg-slate-800 rounded-md" />
+                  </div>
+                </div>
+              ))}
             </div>
+          ) : currentAlerts.length === 0 ? (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.35 }}
+              className="text-center p-12 bg-slate-50/50 dark:bg-slate-900/25 rounded-[2.5rem] border border-slate-200/50 dark:border-slate-800/60 flex flex-col items-center justify-center space-y-4 shadow-2xs"
+            >
+              <div className="w-16 h-16 bg-emerald-500/10 dark:bg-emerald-500/25 rounded-full flex items-center justify-center text-emerald-500 border border-emerald-500/20 shadow-md shadow-emerald-500/5">
+                <ShieldAlert className="w-8 h-8 animate-pulse" />
+              </div>
+              <div className="space-y-1.5 max-w-sm">
+                <h6 className="font-display font-black text-slate-800 dark:text-slate-100 text-lg">
+                  {lang === "th"
+                    ? "ระบบวิเคราะห์พลังงานปกติ"
+                    : "Grid Security Matrix Normal"}
+                </h6>
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                  {lang === "th"
+                    ? "ยังไม่มีการตรวจพบสัญญาณไฟกระชาก หรือความร้อนผิดปกติในระบบกริดจำลองขณะนี้"
+                    : "No power spikes, thermal leaks, or voltage harmonic anomalies detected in the sandbox nodes."}
+                </p>
+              </div>
+            </motion.div>
           ) : (
             <>
               {currentAlerts.map((n: any, i: number) => (

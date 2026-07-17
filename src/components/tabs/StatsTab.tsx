@@ -119,7 +119,7 @@ export default function StatsTab({ shared }: { shared: any }) {
                                   <i className="fas fa-brain me-1.5 align-middle text-emerald-400"></i>{" "}
                                   AI-OPTIMIZED PATTERN VISUALIZER
                                 </span>
-                                <h5 className="font-bold mb-1 font-display text-lg tracking-tight text-white/90 font-sans">
+                                <h5 className="font-bold mb-1 font-display text-lg tracking-tight text-slate-900 dark:text-white/90 font-sans">
                                   {lang === "th"
                                     ? "การวิเคราะห์โครงข่ายและคาดการณ์ประหยัดด้วย AI (Smart Peak Shaving)"
                                     : "Dynamic AI Load Curve & Peak Shaving Forecast"}
@@ -554,7 +554,7 @@ export default function StatsTab({ shared }: { shared: any }) {
                 <div className="row g-4 md:g-5 animate-fade-in text-slate-900 dark:text-slate-100">
                   <div className="col-12 col-xl-7">
                     <div
-                      className="dashboard-card border-0 p-6 md:p-8 h-full animate-slide-up bg-white"
+                      className="dashboard-card border border-slate-200 dark:border-slate-800 p-6 md:p-8 h-full animate-slide-up bg-white dark:bg-slate-900/40"
                       style={{ animationDelay: "100ms" }}
                     >
                       <h5 className="font-display font-bold text-xl md:text-2xl mb-10 tracking-tight">
@@ -610,21 +610,21 @@ export default function StatsTab({ shared }: { shared: any }) {
                   </div>
                   <div className="col-12 col-xl-5 flex flex-col justify-center gap-4 md:gap-6">
                     <div
-                      className="p-6 md:p-8 bg-emerald-500/5 border-2 border-emerald-500/20 rounded-[30px] md:rounded-[40px] text-center animate-slide-up shadow-sm bg-white"
+                      className="p-6 md:p-8 bg-emerald-500/5 dark:bg-emerald-950/20 border-2 border-emerald-500/20 dark:border-emerald-500/30 rounded-[30px] md:rounded-[40px] text-center animate-slide-up shadow-sm bg-white dark:bg-slate-900/40"
                       style={{ animationDelay: "200ms" }}
                     >
-                      <h5 className="font-display font-bold text-emerald-600 text-xl md:text-2xl mb-2">
+                      <h5 className="font-display font-bold text-emerald-600 dark:text-emerald-400 text-xl md:text-2xl mb-2">
                         {t("bench_status")}
                       </h5>
-                      <p className="text-xs md:text-sm font-semibold opacity-70 mb-0">
+                      <p className="text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-300 opacity-90 mb-0">
                         {t("bench_status_desc")}
                       </p>
                     </div>
                     <div
-                      className="p-6 md:p-8 bg-primary/5 border-2 border-primary/10 rounded-[30px] md:rounded-[40px] italic text-[0.8rem] md:text-xs text-slate-500 dark:text-slate-400 leading-relaxed animate-slide-up bg-white shadow-sm"
+                      className="p-6 md:p-8 bg-primary/5 dark:bg-purple-950/20 border-2 border-primary/10 dark:border-purple-500/20 rounded-[30px] md:rounded-[40px] italic text-[0.8rem] md:text-xs text-slate-700 dark:text-slate-300 leading-relaxed animate-slide-up bg-white dark:bg-slate-900/40 shadow-sm"
                       style={{ animationDelay: "300ms" }}
                     >
-                      <h6 className="font-bold text-primary mb-2 uppercase tracking-[0.2em] text-[0.75rem]">
+                      <h6 className="font-bold text-primary dark:text-purple-400 mb-2 uppercase tracking-[0.2em] text-[0.75rem]">
                         {t("bench_insight_title")}
                       </h6>
                       {t("bench_insight_desc")}
