@@ -302,7 +302,7 @@ export const DailyEnergyQuests: React.FC<DailyEnergyQuestsProps> = ({ lang, onTo
                                             <h6 className="font-black text-xs md:text-sm mb-0.5 text-slate-800 dark:text-slate-100 uppercase tracking-tight">
                                                 {lang === 'th' ? quest.titleTh : quest.titleEn}
                                             </h6>
-                                            <p className="text-[0.75rem] text-slate-600 dark:text-slate-300 leading-relaxed line-clamp-2 md:line-clamp-1">
+                                            <p className="text-[0.75rem] text-slate-600 dark:text-slate-300 leading-relaxed">
                                                 {lang === 'th' ? quest.descTh : quest.descEn}
                                             </p>
                                         </div>

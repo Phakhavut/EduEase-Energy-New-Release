@@ -1,5 +1,4 @@
-
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 
 interface UserManualProps {
   isOpen: boolean;
@@ -16,7 +15,7 @@ const UserManual: React.FC<UserManualProps> = ({
   lang, 
   isInline = false 
 }) => {
-  const [activeTab, setActiveTab] = useState<'intro' | 'dashboard' | 'stats' | 'nodes' | 'ai' | 'calc' | 'security'>('intro');
+  const [activeTab, setActiveTab] = useState<'intro' | 'dashboard' | 'stats' | 'nodes' | 'quests' | 'ai' | 'calc' | 'security'>('intro');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [copiedField, setCopiedField] = useState<'user' | 'pass' | null>(null);
   const [revealCredentials, setRevealCredentials] = useState<boolean>(false);
@@ -24,66 +23,55 @@ const UserManual: React.FC<UserManualProps> = ({
 
   if (!isInline && !isOpen) return null;
 
-  // Modern UI color mapping with supreme accessibility contrast
+  // Accessibility & Dark mode styles
   const bgClass = isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-300 shadow-2xl';
   const textClass = isDarkMode ? 'text-white' : 'text-slate-900 font-black';
-  const mutedTextClass = isDarkMode ? 'text-slate-500' : 'text-slate-600 font-extrabold';
-  const paragraphClass = isDarkMode ? 'text-slate-300' : 'text-slate-900 font-semibold';
-  const overlayClass = isDarkMode ? 'bg-black/80' : 'bg-slate-950/60';
+  const mutedTextClass = isDarkMode ? 'text-slate-400' : 'text-slate-600 font-extrabold';
+  const paragraphClass = isDarkMode ? 'text-slate-300' : 'text-slate-800 font-medium';
   const codeBg = isDarkMode ? 'bg-slate-800 text-emerald-400 border-slate-700' : 'bg-slate-100 text-emerald-900 border-emerald-300 font-extrabold shadow-sm';
-  const cardBg = isDarkMode ? 'bg-slate-800/70 border-slate-800' : 'bg-white border-slate-300 shadow-md';
+  const cardBg = isDarkMode ? 'bg-slate-800/80 border-slate-700/80' : 'bg-white border-slate-200 shadow-md';
   const borderThinClass = isDarkMode ? 'border-slate-800' : 'border-slate-200';
 
   const translations = {
     th: {
-      title: '📚 คู่มือการใช้งานแบบละเอียด (Comprehensive User Manual)',
-      subtitle: 'เรียนรู้วิธีการใช้งานระบบ ตรวจสอบค่าไฟ และควบคุมอุปกรณ์ต่างๆ ในบ้านอย่างเจาะลึกครบทุกฟีเจอร์',
-      tab_intro: '🔑 เริ่มต้น & ล็อกอิน',
-      tab_dashboard: '📊 แดชบอร์ดหลัก',
-      tab_stats: '📈 สถิติย้อนหลัง',
+      title: '📚 คู่มือการใช้งานระบบEduEase Energy แบบละเอียด',
+      subtitle: 'คู่มืออธิบายฟีเจอร์การใช้งานอย่างเจาะลึก ครอบคลุมการจัดการพลังงาน, AI อัจฉริยะ, ภารกิจเควส, การคำนวณงบประมาณ และระบบความปลอดภัย',
+      tab_intro: '🔑 เริ่มต้นใช้งาน',
+      tab_dashboard: '📊 แดชบอร์ด & AI',
+      tab_stats: '📈 สถิติ & กราฟ',
       tab_nodes: '⚙️ จัดการอุปกรณ์',
-      tab_ai: '🧠 คำแนะนำจาก AI',
-      tab_calc: '⚡ วิเคราะห์ & งบ',
-      tab_security: '🛡️ ความปลอดภัย',
-      close: 'ปิดหน้าต่างคู่มือ',
-      credentials_title: '🔑 รหัสผ่านสำหรับเข้าสู่ระบบ (Demo Credentials)',
-      credentials_desc: 'ใช้ข้อมูลด้านล่างนี้เพื่อเข้าสู่ระบบ:',
+      tab_quests: '🏆 ภารกิจ & ร้านค้า',
+      tab_ai: '🧠 AI Hub',
+      tab_calc: '⚡ คำนวณค่าไฟ & งบ',
+      tab_security: '🛡️ ความปลอดภัย Log',
+      close: 'ปิดคู่มือ',
       username: 'บัญชีใช้งาน (Username):',
-      password: 'รหัสผ่านแรกเข้า (Password):',
-      copied_username_tip: 'คัดลอกชื่อบัญชีเรียบร้อย!',
-      copied_password_tip: 'คัดลอกรหัสผ่านเรียบร้อย!',
+      password: 'รหัสผ่าน (Password):',
       copy_btn: 'คัดลอกข้อมูล',
-      search_placeholder: 'ค้นหาในคู่มือ... (เช่น "แอร์", "AI", "TOU", "งบ")',
-      badge_pro_tip: 'ข้อแนะนำเชิงกลยุทธ์ (Pro Tip)',
+      search_placeholder: 'ค้นหาฟีเจอร์ที่ต้องการ... (เช่น "แอร์", "AI", "TOU", "งบประมาณ", "เควส")',
       warning_title: '⚠️ ข้อควรระวังและแนวทางแก้ไข',
       feedback_success: 'คัดลอกแล้ว',
-      no_results: '❌ ขออภัย! ไม่พบคู่มือแนะนำที่ตรงกับคำค้นหาของคุณ',
-      total_chapters: 'เนื้อหาทั้งหมด 7 หมวด',
+      no_results: '❌ ขออภัย! ไม่พบคู่มือที่ตรงกับคำค้นหาของคุณ',
     },
     en: {
-      title: '📚 Comprehensive User Manual',
-      subtitle: 'Learn how to use the dashboard, monitor energy, and control your devices in deep detail.',
-      tab_intro: '🔑 Onboarding',
-      tab_dashboard: '📊 Dashboard',
-      tab_stats: '📈 Stats',
-      tab_nodes: '⚙️ Devices',
-      tab_ai: '🧠 AI Hub',
-      tab_calc: '⚡ Calc & Budget',
-      tab_security: '🛡️ Security',
+      title: '📚 Comprehensive EduEase Energy User Handbook',
+      subtitle: 'Complete manual covering energy management, AI smart optimization, quests, budget calculation, and log security diagnostics.',
+      tab_intro: '🔑 Getting Started',
+      tab_dashboard: '📊 Dashboard & AI',
+      tab_stats: '📈 Stats & Analytics',
+      tab_nodes: '⚙️ Device Management',
+      tab_quests: '🏆 Quests & Shop',
+      tab_ai: '🧠 AI Optimization Hub',
+      tab_calc: '⚡ Calc & Grid Budget',
+      tab_security: '🛡️ Security Logs',
       close: 'Close Handbook',
-      credentials_title: '🔑 Demo Login Credentials',
-      credentials_desc: 'Use the following credentials to log in:',
-      username: 'Credentials Account:',
+      username: 'Account Credentials:',
       password: 'Security Passcode:',
-      copied_username_tip: 'Username copied to clipboard!',
-      copied_password_tip: 'Passcode copied to clipboard!',
-      copy_btn: 'Copy Access',
-      search_placeholder: 'Search handbook... (e.g., "AC", "AI", "TOU", "Budget")',
-      badge_pro_tip: 'Strategic Pro Tip',
-      warning_title: '⚠️ Advanced Calibration Warnings',
+      copy_btn: 'Copy Data',
+      search_placeholder: 'Search features... (e.g., "AC", "AI", "TOU", "Budget", "Quests")',
+      warning_title: '⚠️ Caution & Troubleshooting',
       feedback_success: 'Copied!',
-      no_results: '❌ No chapters found matching your search keys. Please retry.',
-      total_chapters: 'Structure covers 7 operational modules.',
+      no_results: '❌ No chapters found matching your search. Try another keyword.',
     }
   };
   const t = translations[lang];
@@ -102,7 +90,7 @@ const UserManual: React.FC<UserManualProps> = ({
       <>
         {parts.map((part, index) => 
           regex.test(part) ? (
-            <mark key={index} className="bg-yellow-100 dark:bg-yellow-950/80 text-yellow-905 dark:text-yellow-200 px-1 py-0.5 rounded font-black border border-yellow-300 dark:border-yellow-900">
+            <mark key={index} className="bg-amber-100 dark:bg-amber-950/80 text-amber-950 dark:text-amber-200 px-1 py-0.5 rounded font-black border border-amber-300 dark:border-amber-800">
               {part}
             </mark>
           ) : (
@@ -113,11 +101,6 @@ const UserManual: React.FC<UserManualProps> = ({
     );
   };
 
-  const textIncludesSearch = (text: string) => {
-    if (!searchTerm.trim()) return true;
-    return text.toLowerCase().includes(searchTerm.toLowerCase());
-  };
-
   const modalContent = (
     <div className={`w-full max-w-5xl md:h-[90vh] ${bgClass} md:rounded-3xl flex flex-col relative overflow-hidden ring-1 ring-black/5 dark:ring-white/10`}>
       
@@ -125,17 +108,17 @@ const UserManual: React.FC<UserManualProps> = ({
       <div className={`p-6 md:p-8 border-b ${borderThinClass} flex flex-col gap-4 flex-shrink-0 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md relative z-10`}>
         <div className="flex justify-between items-start">
           <div className="space-y-1.5">
-            <h2 className={`text-2xl md:text-3xl font-display font-black ${textClass} tracking-tight`}>
+            <h2 className={`text-xl md:text-2xl font-display font-black ${textClass} tracking-tight`}>
               {highlightText(t.title, searchTerm)}
             </h2>
-            <p className={`text-sm md:text-base ${paragraphClass} max-w-2xl opacity-90 leading-relaxed`}>
+            <p className={`text-xs md:text-sm ${paragraphClass} max-w-3xl opacity-90 leading-relaxed`}>
               {highlightText(t.subtitle, searchTerm)}
             </p>
           </div>
           {!isInline && (
             <button 
               onClick={onClose}
-              className="p-2 -mr-2 rounded-xl hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+              className="p-2 -mr-2 rounded-xl hover:bg-slate-200/50 dark:hover:bg-slate-800/50 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
             >
               <i className="fas fa-times-circle text-xl"></i>
             </button>
@@ -143,18 +126,18 @@ const UserManual: React.FC<UserManualProps> = ({
         </div>
 
         {/* SEARCH BAR */}
-        <div className="relative w-full max-w-lg mt-2">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <i className="fas fa-search text-slate-400"></i>
+        <div className="relative w-full max-w-md mt-1">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+            <i className="fas fa-search text-slate-400 text-xs"></i>
           </div>
           <input
             type="text"
             placeholder={t.search_placeholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className={`w-full pl-11 pr-4 py-3 rounded-2xl border transition-all text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 ${
+            className={`w-full pl-10 pr-4 py-2.5 rounded-2xl border transition-all text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 ${
               isDarkMode 
-                ? 'bg-slate-950/50 border-slate-700 text-white placeholder-slate-500' 
+                ? 'bg-slate-950/60 border-slate-700 text-white placeholder-slate-500' 
                 : 'bg-white border-slate-300 text-slate-900 placeholder-slate-400 shadow-sm'
             }`}
           />
@@ -162,26 +145,27 @@ const UserManual: React.FC<UserManualProps> = ({
       </div>
 
       {/* NAVIGATION TABS */}
-      <div className={`px-4 md:px-8 py-3 border-b ${borderThinClass} bg-slate-50 dark:bg-slate-900/80 flex-shrink-0 overflow-x-auto scrollbar-hide`}>
+      <div className={`px-4 md:px-8 py-3 border-b ${borderThinClass} bg-slate-100/60 dark:bg-slate-900/80 flex-shrink-0 overflow-x-auto scrollbar-hide`}>
         <div className="flex gap-2 min-w-max">
           {[
             { id: 'intro', label: t.tab_intro, icon: 'fa-user-cog text-emerald-500' },
             { id: 'dashboard', label: t.tab_dashboard, icon: 'fa-chart-area text-blue-500' },
             { id: 'stats', label: t.tab_stats, icon: 'fa-chart-pie text-indigo-500' },
-            { id: 'nodes', label: t.tab_nodes, icon: 'fa-laptop-house text-cyan-500' },
+            { id: 'nodes', label: t.tab_nodes, icon: 'fa-plug text-cyan-500' },
+            { id: 'quests', label: t.tab_quests, icon: 'fa-trophy text-amber-500' },
             { id: 'ai', label: t.tab_ai, icon: 'fa-brain text-purple-400' },
-            { id: 'calc', label: t.tab_calc, icon: 'fa-bolt text-amber-500' },
-            { id: 'security', label: t.tab_security, icon: 'fa-shield-halved text-purple-500' },
+            { id: 'calc', label: t.tab_calc, icon: 'fa-calculator text-teal-500' },
+            { id: 'security', label: t.tab_security, icon: 'fa-shield-halved text-rose-500' },
           ].map((tab) => {
             const isSelected = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-[0.8rem] md:text-sm font-black rounded-xl border transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-2 text-xs font-black rounded-xl border transition-all cursor-pointer ${
                   isSelected 
                     ? (isDarkMode ? 'bg-primary border-primary text-white shadow-lg' : 'bg-primary border-primary text-white shadow-md')
-                    : (isDarkMode ? 'border-slate-800 text-slate-300 hover:bg-slate-800' : 'border-slate-200 text-slate-600 bg-white hover:bg-slate-100')
+                    : (isDarkMode ? 'border-slate-800 text-slate-300 bg-slate-800/40 hover:bg-slate-800' : 'border-slate-200 text-slate-700 bg-white hover:bg-slate-100')
                 }`}
               >
                 <i className={`fas ${tab.icon} ${isSelected ? '!text-white' : ''}`} />
@@ -193,32 +177,32 @@ const UserManual: React.FC<UserManualProps> = ({
       </div>
 
       {/* CONTENT AREA */}
-      <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8 space-y-8 bg-white dark:bg-slate-900/20 scrollbar-thin">
+      <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8 space-y-8 bg-white dark:bg-slate-900/30 scrollbar-thin">
         
         {/* ======================= TAB 1: INTRO ======================= */}
         {activeTab === 'intro' && (
-          <div className="space-y-6 animate-fade-in">
-            <div className={`p-6 rounded-[2rem] border-2 border-dashed ${isDarkMode ? 'border-primary/20 bg-primary/5' : 'border-primary/30 bg-primary/5'} space-y-4`}>
+          <div className="space-y-6 animate-fade-in text-sm leading-relaxed">
+            <div className={`p-6 rounded-[2rem] border-2 border-dashed ${isDarkMode ? 'border-primary/30 bg-primary/5' : 'border-primary/30 bg-primary/5'} space-y-4`}>
               <div className="flex items-start gap-4">
-                <div className="p-3 bg-primary text-white rounded-2xl">
+                <div className="p-3 bg-primary text-white rounded-2xl shrink-0">
                   <i className="fas fa-shield-alt text-xl"></i>
                 </div>
                 <div>
                   <h5 className={`font-display font-black text-base ${textClass}`}>
-                    {lang === 'th' ? '🔒 การรักษาความปลอดภัยบัญชีใช้งาน (Security Access Matrix)' : '🔒 System Security Access Matrix'}
+                    {lang === 'th' ? '🔒 การรักษาความปลอดภัยและสิทธิ์เข้าสู่ระบบ' : '🔒 Authentication & Access Matrix'}
                   </h5>
                   <p className={`text-xs ${mutedTextClass} mt-1 leading-relaxed`}>
                     {lang === 'th' 
-                      ? 'โปรดทราบ: ในสภาพแวดล้อมใช้งานจริง (Production) ระบบนี้จะเชื่อมต่อกับ OAuth 2.0 / SSO ของหน่วยงาน และไม่มีรหัสผ่านเริ่มต้นแบบฮาร์ดโค้ดเพื่อความปลอดภัยสูงสุด สำหรับรุ่นทดลองใช้ (Sandbox Demo) นี้ โปรดยืนยันเซสชันเพื่อเรียกดูรหัสสิทธิ์จำลองชั่วคราว'
-                      : 'SECURITY NOTICE: In production environments, hardcoded credentials are strictly disabled. Users must authenticate via federated OAuth 2.0 / enterprise SSO. For local sandbox evaluation, authenticate below to generate temporary demo credentials.'}
+                      ? 'ระบบถูกออกแบบให้รองรับการล็อกอินทดสอบผ่านบัญชี Sandbox และพร้อมเชื่อมต่อกับ OAuth 2.0 ในระบบจริง'
+                      : 'Designed for instant sandbox trial authentication and enterprise OAuth 2.0 / SSO deployment.'}
                   </p>
                 </div>
               </div>
 
               {!revealCredentials ? (
-                <div className="p-4 rounded-2xl bg-slate-100/50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-center space-y-3.5">
+                <div className="p-4 rounded-2xl bg-slate-100/50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-center space-y-3">
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-bold m-0">
-                    {lang === 'th' ? 'ข้อมูลเข้าสู่ระบบจำลองถูกปิดบังไว้ตามหลักความปลอดภัยปลอดภัยขั้นสูง' : 'Demo sandbox access credentials are obfuscated for structural security compliance.'}
+                    {lang === 'th' ? 'คลิกปุ่มด้านล่างเพื่อแสดงข้อมูลเข้าสู่ระบบจำลอง (Sandbox Credentials)' : 'Click below to reveal demo sandbox login credentials.'}
                   </p>
                   <button
                     onClick={() => {
@@ -226,7 +210,7 @@ const UserManual: React.FC<UserManualProps> = ({
                       setTimeout(() => {
                         setRevealCredentials(true);
                         setIsRevealing(false);
-                      }, 900);
+                      }, 600);
                     }}
                     disabled={isRevealing}
                     className="btn btn-sm py-2 px-5 bg-primary text-white hover:bg-primary-hover border-0 rounded-xl font-bold uppercase tracking-wider text-xs flex items-center justify-center gap-2 mx-auto cursor-pointer shadow-md"
@@ -234,12 +218,12 @@ const UserManual: React.FC<UserManualProps> = ({
                     {isRevealing ? (
                       <>
                         <i className="fas fa-spinner fa-spin"></i>
-                        <span>{lang === 'th' ? 'กำลังดึงรหัสผ่านคีย์จำลอง...' : 'Fetching Sandbox Keys...'}</span>
+                        <span>{lang === 'th' ? 'กำลังดึงรหัสผ่าน...' : 'Fetching Credentials...'}</span>
                       </>
                     ) : (
                       <>
                         <i className="fas fa-key"></i>
-                        <span>{lang === 'th' ? 'คลิกเพื่อตรวจสอบข้อมูลเข้าสู่ระบบ' : 'Click to Verify & Reveal Credentials'}</span>
+                        <span>{lang === 'th' ? 'แสดงข้อมูลล็อกอินจำลอง' : 'Reveal Sandbox Credentials'}</span>
                       </>
                     )}
                   </button>
@@ -247,7 +231,7 @@ const UserManual: React.FC<UserManualProps> = ({
               ) : (
                 <div className="space-y-4 animate-fade-in">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className={`p-4 rounded-2xl border ${cardBg} flex justify-between items-center relative overflow-hidden group`}>
+                    <div className={`p-4 rounded-2xl border ${cardBg} flex justify-between items-center`}>
                       <div>
                         <span className={`text-xs font-bold ${mutedTextClass}`}>{t.username}</span>
                         <strong className={`block mt-1 px-3 py-1.5 rounded-lg text-sm font-mono border ${codeBg}`}>Namyen</strong>
@@ -260,7 +244,7 @@ const UserManual: React.FC<UserManualProps> = ({
                         <i className={`fas ${copiedField === 'user' ? 'fa-check animate-scale-up' : 'fa-copy'}`}></i>
                       </button>
                     </div>
-                    <div className={`p-4 rounded-2xl border ${cardBg} flex justify-between items-center relative overflow-hidden group`}>
+                    <div className={`p-4 rounded-2xl border ${cardBg} flex justify-between items-center`}>
                       <div>
                         <span className={`text-xs font-bold ${mutedTextClass}`}>{t.password}</span>
                         <strong className={`block mt-1 px-3 py-1.5 rounded-lg text-sm font-mono border ${codeBg}`}>12345</strong>
@@ -276,13 +260,13 @@ const UserManual: React.FC<UserManualProps> = ({
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-[10px] font-mono font-black text-rose-500 bg-rose-500/10 px-2 py-1 rounded-lg uppercase tracking-wider animate-pulse">
-                      ⚠️ sandbox credential active
+                      ⚠️ Sandbox active
                     </span>
                     <button
                       onClick={() => setRevealCredentials(false)}
                       className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 underline bg-transparent border-0 cursor-pointer"
                     >
-                      {lang === 'th' ? 'ปิดบังข้อมูลอีกครั้ง' : 'Lock & Mask Credentials'}
+                      {lang === 'th' ? 'ซ่อนข้อมูลอีกครั้ง' : 'Hide Credentials'}
                     </button>
                   </div>
                 </div>
@@ -291,13 +275,25 @@ const UserManual: React.FC<UserManualProps> = ({
 
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
-                <i className="fas fa-cubes text-primary"></i>
-                {lang === 'th' ? 'ข้อมูลเบื้องต้นเกี่ยวกับระบบ (System Overview)' : 'System Overview'}
+                <i className="fas fa-compass text-emerald-500"></i>
+                {lang === 'th' ? 'การเริ่มทัวร์แนะนำระบบ (Interactive Guided Tour)' : 'Interactive Guided Tour'}
               </h5>
-              <p className={`${paragraphClass} text-sm leading-relaxed`}>
+              <p className={`${paragraphClass}`}>
                 {lang === 'th' 
-                  ? 'ระบบนี้เป็นศูนย์ควบคุมส่วนกลาง (Control Hub) ที่ถูกออกแบบมาให้ติดตามค่าพลังงาน สถิติรายวัน การจำลองปรับตั้งค่าฮาร์ดแวร์เพื่อลดค่าใช้จ่าย และการแจ้งเตือนจากระบบรักษาความปลอดภัย โดยทำงานคู่กับ AI (Gemini) เพื่อวิเคราะห์ให้เชิงลึก'
-                  : 'This Control Hub is designed to track energy metrics, simulate hardware adjustments to cut costs, and alert on security logs. It works closely with Gemini AI for deep analysis.'}
+                  ? 'คุณสามารถกดปุ่ม "ทัวร์แนะนำระบบ" ที่เมนูด้านบนหรือแถบข้าง เพื่อให้ระบบไฮไลต์และแนะนำจุดสำคัญต่างๆ ของแดชบอร์ดทีละขั้นตอนอย่างง่ายดาย'
+                  : 'Click the "Guided Tour" button on the top or sidebar menu to receive an interactive walkthrough of key features.'}
+              </p>
+            </div>
+
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-globe text-sky-500"></i>
+                {lang === 'th' ? 'การสลับภาษา และ โหมดมืด/สว่าง' : 'Language & Dark/Light Theme'}
+              </h5>
+              <p className={`${paragraphClass}`}>
+                {lang === 'th' 
+                  ? 'ระบบรองรับ 2 ภาษา (ไทย และ English) สามารถกดสลับ TH/EN หรือปุ่มรูปดวงอาทิตย์/ดวงจันทร์ ที่มุมขวาบนของหน้าจอได้ตลอดเวลาเพื่อความสบายตา'
+                  : 'Toggle between Thai/English and Dark/Light themes seamlessly using the controls at the top-right header.'}
               </p>
             </div>
           </div>
@@ -309,40 +305,74 @@ const UserManual: React.FC<UserManualProps> = ({
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
                 <i className="fas fa-piggy-bank text-emerald-500"></i>
-                {lang === 'th' ? '1. ส่วนสรุปข้อมูลหลัก (Hero Metrics)' : '1. Hero Metrics'}
+                {lang === 'th' ? '1. ภาพรวมดัชนีพลังงาน (Hero Metrics)' : '1. Hero Energy Metrics'}
               </h5>
-              <p className={`${paragraphClass}`}>
-                {lang === 'th'
-                  ? 'แสดงภาพรวมที่สำคัญที่สุด ได้แก่:'
-                  : 'Displays the most critical high-level overviews:'}
-              </p>
-              <ul className="list-disc ps-5 space-y-2 font-bold opacity-90">
-                <li>{lang === 'th' ? 'เงินประหยัดสะสม (Total Savings): จำนวนเงินที่ถูกประหยัดได้จากการตั้งค่า AI' : 'Total Savings: Money saved via AI optimization.'}</li>
-                <li>{lang === 'th' ? 'การใช้พลังงานปัจจุบัน (Active Load): วัตต์รวมที่กำลังใช้งานอยู่ในวินาทีนี้' : 'Active Load: Current total wattage running.'}</li>
+              <ul className="list-disc ps-5 space-y-2 font-medium opacity-95">
+                <li><strong>{lang === 'th' ? 'เงินประหยัดสะสม (Total Savings):' : 'Total Savings:'}</strong> {lang === 'th' ? 'คำนวณยอดเงินประหยัดสะสมจากการเปิดโหมด AI และการบริหารพลังงาน' : 'Accumulated money saved via AI optimization modes.'}</li>
+                <li><strong>{lang === 'th' ? 'โหลดวัตต์ปัจจุบัน (Active Load):' : 'Active Load:'}</strong> {lang === 'th' ? 'กำลังไฟฟ้าวัตต์ (W) ที่กำลังใช้งานแบบเรียลไทม์' : 'Real-time wattage currently consumed by active devices.'}</li>
+                <li><strong>{lang === 'th' ? 'ค่า FT & ราคาต่อหน่วย:' : 'FT & Tariff Rate:'}</strong> {lang === 'th' ? 'อัตราค่าไฟฟ้าฐานและค่า FT ล่าสุดที่ใช้คำนวณบิล' : 'Current electrical tariff rate and FT multiplier applied.'}</li>
+                <li><strong>{lang === 'th' ? 'ค่า Power Factor (PF):' : 'Power Factor (PF):'}</strong> {lang === 'th' ? 'ดัชนีประสิทธิภาพไฟฟ้าของระบบ (ค่าใกล้เคียง 1.0 คือดีที่สุด)' : 'Efficiency ratio of power conversion (closer to 1.0 is ideal).'}</li>
               </ul>
             </div>
 
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
-                <i className="fas fa-toggle-on text-indigo-500"></i>
-                {lang === 'th' ? '2. สวิตช์จำลองการตั้งค่า AI (AI Override Switches)' : '2. AI Override Switches'}
+                <i className="fas fa-sliders-h text-primary"></i>
+                {lang === 'th' ? '2. โหมดประหยัดไฟอัจฉริยะ (AI Smart Switches)' : '2. AI Smart Switches'}
+              </h5>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <strong className="text-primary block mb-1">❄️ AI Smart AC (+1°C Offset)</strong>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 m-0">{lang === 'th' ? 'ปรับอุณหภูมิแอร์ขึ้น 1°C ช่วยประหยัดค่าไฟแอร์ได้ทันที 8-10%' : 'Offsets AC temp by +1°C, reducing cooling load by 8-10%.'}</p>
+                </div>
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <strong className="text-emerald-500 block mb-1">🔌 AI Standby Cutoff</strong>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 m-0">{lang === 'th' ? 'ตัดกระแสไฟสแตนด์บายของเครื่องใช้ไฟฟ้าที่ไม่ได้เปิดใช้งาน' : 'Cuts phantom load on idle electronics to eliminate zero-standby waste.'}</p>
+                </div>
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <strong className="text-indigo-500 block mb-1">⚡ AI Power Factor Tuning</strong>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 m-0">{lang === 'th' ? 'ปรับปรุงคุณภาพกำลังไฟฟ้า ลดกำลังไฟฟ้าสูญเสียในสาย' : 'Optimizes capacitive load tuning to improve system PF.'}</p>
+                </div>
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <strong className="text-amber-500 block mb-1">⏰ AI Peak Load Shifting</strong>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 m-0">{lang === 'th' ? 'ย้ายการทำงานของอุปกรณ์กินไฟสูงไปช่วงค่าไฟถูก (Off-Peak)' : 'Shifts high-wattage device runtime to TOU Off-Peak hours.'}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-cloud-sun-rain text-sky-500"></i>
+                {lang === 'th' ? '3. สภาพอากาศ และระบบแจ้งเตือนความร้อน (Weather & Thermal Alert)' : '3. Weather & Thermal Alert'}
               </h5>
               <p className={`${paragraphClass}`}>
                 {lang === 'th'
-                  ? 'ระบบให้คุณเปิด-ปิด สวิตช์จำลองต่างๆ เช่น "ปรับอุณหภูมิ AC 1°C", "ปิดอุปกรณ์ Standby" เพื่อประเมินยอดเงินที่จะประหยัดได้แบบสดๆ ทันที (Real-time Shaving)'
-                  : 'Toggle simulation switches like "AC Offset" or "Standby Cutoff" to instantly see how much energy and money can be saved.'}
+                  ? 'วิดเจ็ตพยากรณ์อากาศช่วยตรวจวัดอุณหภูมิภายนอก หากวันไหนมีอากาศร้อนจัด ระบบจะเตือนว่าแอร์อาจทำงานหนักขึ้น พร้อมคำแนะนำในการรับมือ'
+                  : 'Monitors ambient outdoor temperature and alerts when heat waves increase air conditioner workload.'}
               </p>
             </div>
 
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
-                <i className="fas fa-network-wired text-cyan-500"></i>
-                {lang === 'th' ? '3. ระบบวินิจฉัยเครือข่าย (Network Diagnostics)' : '3. Network Diagnostics'}
+                <i className="fas fa-map-marked-alt text-teal-500"></i>
+                {lang === 'th' ? '4. แผนที่จำลองโครงข่ายไฟฟ้า และการจัดเรียงวิดเจ็ต' : '4. Property Map & Drag-and-Drop'}
               </h5>
               <p className={`${paragraphClass}`}>
                 {lang === 'th'
-                  ? 'แผงแสดงความหน่วง (Latency), แพ็กเก็ตสูญหาย (Packet Loss), และสถานะ Uptime เพื่อให้วิศวกรตรวจสอบว่าระบบ IoT ที่เชื่อมต่อมีสัญญาณที่เสถียรหรือไม่'
-                  : 'Panels detailing Latency, Packet Loss, and Uptime, allowing engineers to verify if the IoT network is stable.'}
+                  ? 'คุณสามารถคลิกลากสลับตำแหน่งวิดเจ็ตในหน้าแดชบอร์ดได้อย่างอิสระ (Drag & Drop) และดูโซนการใช้ไฟฟ้าบนแผนที่จำลอง Property Map'
+                  : 'Rearrange dashboard widgets via Drag & Drop and view property load distribution on the map.'}
+              </p>
+            </div>
+
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-comments text-purple-500"></i>
+                {lang === 'th' ? '5. ผู้ช่วยอัจฉริยะ Gemini AI Chatbot' : '5. Gemini AI Energy Assistant'}
+              </h5>
+              <p className={`${paragraphClass}`}>
+                {lang === 'th'
+                  ? 'กดปุ่มแชตหุ่นยนต์มุมขวาล่างเพื่อสนทนากับ Gemini AI สอบถามคำแนะนำในการประหยัดไฟหรือวิเคราะห์ปัญหาในบ้านได้ตลอด 24 ชั่วโมง'
+                  : 'Click the floating AI chatbot icon at the bottom-right to ask Gemini AI for custom energy advice anytime.'}
               </p>
             </div>
           </div>
@@ -354,166 +384,247 @@ const UserManual: React.FC<UserManualProps> = ({
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
                 <i className="fas fa-chart-line text-blue-500"></i>
-                {lang === 'th' ? '1. กราฟ 7 วัน (7-Day Telemetry Chart)' : '1. 7-Day Telemetry Chart'}
+                {lang === 'th' ? '1. กราฟเทเลเมทรี 7 วันย้อนหลัง (7-Day Telemetry Chart)' : '1. 7-Day Telemetry Chart'}
               </h5>
               <p className={`${paragraphClass}`}>
                 {lang === 'th'
-                  ? 'แท็บ Telemetry มีกราฟเชิงปฏิสัมพันธ์ (Interactive Chart) ที่แสดงการใช้พลังงาน 7 วันย้อนหลัง สามารถ "เอาเมาส์ชี้ (Hover)" เพื่อดูค่าใช้จ่ายในจุดนั้นๆ ได้ทันที'
-                  : 'The Telemetry tab features an interactive 7-day usage chart. Hover over any data point to reveal the exact wattage and estimated cost at that moment.'}
+                  ? 'แสดงแนวโน้มการใช้พลังงานตลอด 7 วัน สามารถนำเมาส์ชี้บนกราฟเพื่อดูปริมาณการใช้ไฟ (kWh) ค่าไฟรายชั่วโมง และจุดที่มีการใช้ไฟสูงสุด (Peak Usage)'
+                  : 'Interactive 7-day usage graph with hover tooltips showing hourly kWh consumption and peak load markers.'}
               </p>
             </div>
 
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
-                <i className="fas fa-microchip text-indigo-500"></i>
-                {lang === 'th' ? '2. ข้อมูลวิเคราะห์เชิงลึก (Analytics Tab)' : '2. Analytics Tab'}
+                <i className="fas fa-chart-pie text-indigo-500"></i>
+                {lang === 'th' ? '2. สัดส่วนการใช้ไฟฟ้าจำแนกตามอุปกรณ์ (Consumption Distribution)' : '2. Device Consumption Breakdown'}
               </h5>
               <p className={`${paragraphClass}`}>
                 {lang === 'th'
-                  ? 'ในหน้า Analytics จะมีกราฟวงกลมและตัวชี้วัดสุขภาพอุปกรณ์ (Health Indicators) รวมถึง Power Factor (ประสิทธิภาพไฟ) ช่วยในการบำรุงรักษาเชิงป้องกัน (Preventive Maintenance)'
-                  : 'The Analytics tab shows pie charts for power distribution, device health indicators, and Power Factor efficiency for preventive maintenance.'}
+                  ? 'กราฟวงกลมแสดงว่าเครื่องใช้ไฟฟ้าชนิดใดกินไฟมากที่สุดในบ้าน เช่น แอร์, เครื่องทำน้ำอุ่น หรือตู้เย็น เพื่อช่วยให้คุณวางแผนตัดลดได้อย่างตรงจุด'
+                  : 'Pie chart visualizing consumption percentages by device category to help identify power hogs.'}
+              </p>
+            </div>
+
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-heartbeat text-rose-500"></i>
+                {lang === 'th' ? '3. ตัวชี้วัดสุขภาพอุปกรณ์ (Device Health & PF Analysis)' : '3. Device Health & PF Diagnostics'}
+              </h5>
+              <p className={`${paragraphClass}`}>
+                {lang === 'th'
+                  ? 'ระบบประเมินค่า Power Factor และสุขภาพฮาร์ดแวร์เพื่อเตือนการบำรุงรักษาเชิงป้องกัน (Preventive Maintenance) ก่อนที่อุปกรณ์จะเสียหรือกินไฟผิดปกติ'
+                  : 'Monitors hardware health and Power Factor degradation to recommend preventive maintenance before breakdown.'}
               </p>
             </div>
           </div>
         )}
 
-        {/* ======================= TAB 4: NODES (DEVICES) ======================= */}
+        {/* ======================= TAB 4: NODES ======================= */}
         {activeTab === 'nodes' && (
           <div className="space-y-6 animate-fade-in text-sm leading-relaxed">
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
-                <i className="fas fa-sliders text-cyan-500"></i>
-                {lang === 'th' ? '1. เปิด/ปิดอุปกรณ์ และ ดูรายละเอียด' : '1. Toggle & Inspect'}
+                <i className="fas fa-plug text-cyan-500"></i>
+                {lang === 'th' ? '1. ควบคุมการเปิด/ปิด และแก้ไขข้อมูลอุปกรณ์' : '1. Device Control & Parameters'}
               </h5>
               <p className={`${paragraphClass}`}>
                 {lang === 'th'
-                  ? 'หน้า "จัดการอุปกรณ์" แสดงลิสต์เครื่องใช้ไฟฟ้าทั้งหมด คุณสามารถกดเปิด/ปิดสวิตช์อุปกรณ์เพื่อดูโหลดไฟรวมที่เปลี่ยนไป หรือกดปุ่มฟันเฟืองเพื่อแก้ไขข้อมูลวัตต์และชั่วโมงใช้งาน'
-                  : 'The Devices list allows you to toggle power state to see live load changes, or click the gear icon to edit wattage and usage hours.'}
+                  ? 'หน้าจัดการอุปกรณ์เปิดโอกาสให้คุณสับสวิตช์ เปิด/ปิด เครื่องใช้ไฟฟ้ารายชิ้น, แก้ไขกำลังไฟวัตต์ (Wattage), และปรับชั่วโมงการใช้งานต่อวัน เพื่อดูผลลัพธ์ทันที'
+                  : 'Toggle individual devices on/off, edit rated wattage, and update daily operating hours to inspect live load impact.'}
               </p>
-            </div>
-
-            <div className={`p-5 rounded-2xl border border-amber-500/30 bg-amber-500/5 flex gap-4`}>
-              <div className="w-8 h-8 rounded-lg bg-amber-500 text-white flex justify-center items-center font-bold">
-                <i className="fas fa-plug"></i>
-              </div>
-              <div>
-                <span className="font-bold text-amber-700 dark:text-amber-400">
-                  {lang === 'th' ? 'คู่มือตั้งค่ากำลังไฟพื้นฐาน (Wattage Guide)' : 'Wattage Setup Guide'}
-                </span>
-                <ul className="list-disc ps-4 mt-2 space-y-1 font-semibold opacity-90">
-                  <li>{lang === 'th' ? 'แอร์ 9000-18000 BTU: ~800W - 1800W' : 'AC 9k-18k BTU: ~800W - 1800W'}</li>
-                  <li>{lang === 'th' ? 'เครื่องทำน้ำอุ่น: ~3000W - 4500W' : 'Water Heater: ~3000W - 4500W'}</li>
-                  <li>{lang === 'th' ? 'ตู้เย็น: ~100W - 250W' : 'Refrigerator: ~100W - 250W'}</li>
-                  <li>{lang === 'th' ? 'Power Factor (PF): ปกติอยู่ที่ 0.85-0.95 (1.0 คือดีที่สุด ไม่มีไฟสูญเสีย)' : 'Power Factor: Typically 0.85-0.95 (1.0 is perfect efficiency)'}</li>
-                </ul>
-              </div>
             </div>
 
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
-                <i className="fas fa-balance-scale text-teal-500"></i>
-                {lang === 'th' ? '2. เปรียบเทียบอุปกรณ์ (Compare)' : '2. Compare Devices'}
+                <i className="fas fa-plus-circle text-emerald-500"></i>
+                {lang === 'th' ? '2. เพิ่มอุปกรณ์ใหม่เข้าสู่ระบบ (Add Custom Device)' : '2. Add Custom Device'}
               </h5>
               <p className={`${paragraphClass}`}>
                 {lang === 'th'
-                  ? 'เลือก Checkbox หน้าอุปกรณ์ 2 ตัวขึ้นไป แล้วกดปุ่ม "เปรียบเทียบ (Compare Selected)" ระบบจะสร้างตารางเปรียบเทียบว่าใครกินไฟสุดและใคร PF ดีสุด'
-                  : 'Check the boxes next to 2 or more devices and click "Compare Selected" to reveal side-by-side efficiency and consumption battles.'}
+                  ? 'กดปุ่ม "เพิ่มอุปกรณ์" เพื่อใส่ชื่อ, กำลังไฟ (W), หมวดหมู่ และเวลาใช้งาน เพื่อนำไปคำนวณบิลค่าไฟและจำลองแผน AI ได้แม่นยำยิ่งขึ้น'
+                  : 'Click "Add Device" to insert custom appliances with wattage and category data for precise billing simulation.'}
+              </p>
+            </div>
+
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-balance-scale text-amber-500"></i>
+                {lang === 'th' ? '3. เครื่องมือเปรียบเทียบอุปกรณ์ (Device Battle Comparison)' : '3. Device Battle Comparison'}
+              </h5>
+              <p className={`${paragraphClass}`}>
+                {lang === 'th'
+                  ? 'ติ๊กเลือก Checkbox หน้าอุปกรณ์ 2 ตัวขึ้นไป แล้วกด "เปรียบเทียบอุปกรณ์" เพื่อดูตารางเปรียบเทียบอัตราการกินไฟ ค่า PF และค่าใช้จ่ายแบบ Side-by-Side'
+                  : 'Select checkboxes next to 2+ devices and click "Compare Selected" to render a side-by-side battle chart.'}
+              </p>
+            </div>
+
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-power-off text-rose-500"></i>
+                {lang === 'th' ? '4. ปุ่มตัดไฟสแตนด์บายรวม (Batch Standby Cutoff)' : '4. Batch Standby Cutoff'}
+              </h5>
+              <p className={`${paragraphClass}`}>
+                {lang === 'th'
+                  ? 'กดปุ่มตัดไฟ Standby เพียงครั้งเดียวเพื่อสั่งสับตัดไฟอุปกรณ์ที่ไม่ได้เปิดสวิตช์ทำงานจริงทุกชิ้นในคราวเดียว'
+                  : 'One-click batch control to instantly cut off standby power across all non-active electronics.'}
               </p>
             </div>
           </div>
         )}
 
-        {/* ======================= TAB 5: AI HUB ======================= */}
+        {/* ======================= TAB 5: QUESTS ======================= */}
+        {activeTab === 'quests' && (
+          <div className="space-y-6 animate-fade-in text-sm leading-relaxed">
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-trophy text-amber-500"></i>
+                {lang === 'th' ? '1. ภารกิจประหยัดพลังงานกรีนกริต (Daily Energy Quests)' : '1. Daily Energy Quests'}
+              </h5>
+              <p className={`${paragraphClass}`}>
+                {lang === 'th'
+                  ? 'ระบบเกมภารกิจช่วยเปลี่ยนการประหยัดไฟให้สนุกยิ่งขึ้น โดยมีเควสให้ทำความสำเร็จ เช่น:'
+                  : 'Gamified quest engine designed to reward sustainable habits with tasks such as:'}
+              </p>
+              <ul className="list-disc ps-5 space-y-2 font-medium opacity-95">
+                <li><strong>Perfect Smart Grid:</strong> {lang === 'th' ? 'เปิดใช้งานโหมดประหยัดพลังงาน AI ครบทั้ง 4 โหมด' : 'Enable all 4 AI smart optimization modes.'}</li>
+                <li><strong>Zero Standby Active:</strong> {lang === 'th' ? 'สับสวิตช์ปิดการใช้งานอุปกรณ์ที่สแตนด์บายไว้อย่างน้อย 1 ชิ้น' : 'Turn off at least 1 idle standby device.'}</li>
+                <li><strong>Power Factor Master:</strong> {lang === 'th' ? 'ปรับค่า PF เฉลี่ยให้สูงกว่า 0.92' : 'Maintain average Power Factor above 0.92.'}</li>
+                <li><strong>Peak Shifter Pro:</strong> {lang === 'th' ? 'ย้ายการใช้ไฟไปช่วง Off-Peak มากกว่า 60%' : 'Shift over 60% load to TOU Off-Peak hours.'}</li>
+              </ul>
+            </div>
+
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-coins text-emerald-500"></i>
+                {lang === 'th' ? '2. การรับเหรียญรางวัล Green Tokens (GT) และ XP' : '2. Earning Green Tokens (GT) & XP'}
+              </h5>
+              <p className={`${paragraphClass}`}>
+                {lang === 'th'
+                  ? 'เมื่อทำเควสสำเร็จ ปุ่มจะเปลี่ยนเป็น "รับรางวัล 🎉" กดเพื่อสะสมคะแนน Green Tokens (GT) และเพิ่มเลเวลประสบการณ์ (XP) ของคุณ'
+                  : 'Upon completing a quest, click "Claim Reward 🎉" to earn Green Tokens (GT) and account XP.'}
+              </p>
+            </div>
+
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-store text-purple-500"></i>
+                {lang === 'th' ? '3. ร้านค้าสกิน อวาตาร์ และ วงล้อเสี่ยงโชค (Avatar Shop & Lucky Roll)' : '3. Avatar Shop & Lucky Roll'}
+              </h5>
+              <p className={`${paragraphClass}`}>
+                {lang === 'th'
+                  ? 'นำเหรียญ Green Tokens ที่สะสมได้ไปแลกซื้ออวาตาร์และกรอบโปรไฟล์ใหม่ หรือใช้เสี่ยงโชคหมุน Lucky Roll ลุ้นรับสกินหายาก!'
+                  : 'Spend GT tokens in the shop to unlock custom avatars, badge borders, or spin the Lucky Roll.'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* ======================= TAB 6: AI HUB ======================= */}
         {activeTab === 'ai' && (
           <div className="space-y-6 animate-fade-in text-sm leading-relaxed">
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
                 <i className="fas fa-brain text-purple-500"></i>
-                {lang === 'th' ? 'ระบบอัจฉริยะ (Energy Monitoring Hub)' : 'Energy Monitoring Hub'}
+                {lang === 'th' ? '1. ศูนย์วิเคราะห์แผนการประหยัดไฟ AI (Energy Monitoring Hub)' : '1. AI Energy Monitoring Hub'}
               </h5>
               <p className={`${paragraphClass}`}>
                 {lang === 'th'
-                  ? 'ระบบนี้เชื่อมโยงกับ Gemini AI เพื่อนำข้อมูลโหลดปัจจุบันทั้งหมดของคุณ ไปสร้างแผนการประหยัดพลังงาน (Optimization Plan) โดยคุณสามารถเห็นว่าถ้าทำตามคำแนะนำ จะประหยัดเงินได้กี่บาท'
-                  : 'This connects with Gemini AI to ingest all your current load data and formulate actionable Optimization Plans, highlighting exactly how much money you save.'}
+                  ? 'วิเคราะห์ข้อมูลโหลดไฟรวมของทั้งบ้านด้วย Gemini AI แล้วสร้างกลยุทธ์การลดค่าใช้จ่ายที่ออกแบบมาเฉพาะสำหรับรูปแบบการใช้ไฟของคุณ'
+                  : 'Ingests real-time home load data to craft customized energy savings recommendations via Gemini AI.'}
               </p>
-              
-              <div className="bg-purple-500/10 border border-purple-500/20 p-4 rounded-xl mt-4">
-                <p className="font-bold text-purple-700 dark:text-purple-300 flex items-center gap-2">
-                  <i className="fas fa-sparkles"></i> 
-                  {lang === 'th' ? 'เคล็ดลับ:' : 'Pro Tip:'}
-                </p>
-                <p className="mt-1 opacity-90">
-                  {lang === 'th' 
-                    ? 'หากคุณเพิ่มอุปกรณ์กินไฟหนักๆ ลงไปในหน้าจัดการอุปกรณ์ (เช่น เครื่องชาร์จ EV) AI จะให้คำแนะนำใหม่เกี่ยวกับการย้ายเวลาชาร์จ (TOU Shifting) โดยอัตโนมัติ!'
-                    : 'If you add heavy devices like an EV Charger in the Devices tab, the AI will dynamically adjust and recommend TOU Shifting schedules!'}
-                </p>
-              </div>
+            </div>
+
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-clock text-amber-500"></i>
+                {lang === 'th' ? '2. คำแนะนำตาราง TOU Auto-Scheduling' : '2. TOU Auto-Scheduling Recommendations'}
+              </h5>
+              <p className={`${paragraphClass}`}>
+                {lang === 'th'
+                  ? 'หากคุณมีอุปกรณ์กินไฟสูง เช่น เครื่องชาร์จรถยนต์ไฟฟ้า (EV) หรือเครื่องซักผ้า AI จะคำนวณช่วงเวลา On-Peak / Off-Peak และแนะนำเวลาเปิดใช้งานที่ช่วยประหยัดเงินได้สูงสุด'
+                  : 'Automatically advises the best time windows to run high-load appliances during Off-Peak TOU rates.'}
+              </p>
             </div>
           </div>
         )}
 
-        {/* ======================= TAB 6: CALCULATOR ======================= */}
+        {/* ======================= TAB 7: CALCULATOR ======================= */}
         {activeTab === 'calc' && (
           <div className="space-y-6 animate-fade-in text-sm leading-relaxed">
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
-                <i className="fas fa-calculator text-amber-500"></i>
-                {lang === 'th' ? 'การประเมินค่าไฟและงบประมาณ (Cost & Budget)' : 'Cost & Budget Estimation'}
+                <i className="fas fa-calculator text-teal-500"></i>
+                {lang === 'th' ? '1. จำลองการใช้อัตราค่าไฟ TOU และ สไลเดอร์พยากรณ์' : '1. TOU Rates & Forecast Slider'}
               </h5>
               <p className={`${paragraphClass}`}>
                 {lang === 'th'
-                  ? 'คุณสามารถใช้เครื่องมือนี้จำลองบิลค่าไฟได้ล่วงหน้า:'
-                  : 'Use this tool to simulate future bills and grid budgets:'}
+                  ? 'ปรับสไลเดอร์สัดส่วนการใช้ไฟกลางวัน/กลางคืน (On-Peak vs Off-Peak) และเลื่อนสไลเดอร์ระยะเวลาตั้งแต่ 1 วัน ถึง 365 วัน เพื่อพยากรณ์ยอดค่าไฟฟ้าในอนาคต'
+                  : 'Adjust On-Peak/Off-Peak ratio sliders and time horizon (1-365 days) to project long-term electricity bills.'}
               </p>
-              
-              <ul className="space-y-3 font-semibold opacity-90 mt-4">
-                <li className="flex items-start gap-2">
-                  <i className="fas fa-coins text-amber-500 mt-1"></i>
-                  {lang === 'th' 
-                    ? 'เปลี่ยนเรทค่าไฟ (Tariff Rate): กรอกตัวเลขบาท/หน่วย เพื่อจำลองสถานการณ์ค่าไฟขึ้นหรือลง' 
-                    : 'Change Tariff Rate (฿/kWh): Simulate bill impacts if energy prices rise or fall.'}
-                </li>
-                <li className="flex items-start gap-2">
-                  <i className="fas fa-calendar text-amber-500 mt-1"></i>
-                  {lang === 'th' 
-                    ? 'สไลเดอร์วัน (Forecast Slider): เลื่อนจาก 1 วัน ไปจนถึงรายปี 365 วัน' 
-                    : 'Forecast Slider: Slide from 1 day up to 365 days.'}
-                </li>
-                <li className="flex items-start gap-2">
-                  <i className="fas fa-wallet text-amber-500 mt-1"></i>
-                  {lang === 'th' 
-                    ? 'งบประมาณ (Grid Budget): ตั้งงบของคุณ แล้วระบบจะคำนวณว่าเงินจะหมดภายในกี่วันตามการใช้ไฟปัจจุบัน!' 
-                    : 'Grid Budget: Set a budget and let the system calculate in how many days your money will run out based on current usage!'}
-                </li>
-              </ul>
+            </div>
+
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-list-ol text-blue-500"></i>
+                {lang === 'th' ? '2. ตารางรายละเอียดอุปกรณ์รายชิ้น (Appliance Breakdown)' : '2. Individual Appliance Breakdown'}
+              </h5>
+              <p className={`${paragraphClass}`}>
+                {lang === 'th'
+                  ? 'แสดงตารางแยกแยะค่าใช้จ่ายของเครื่องใช้ไฟฟ้าแต่ละชิ้นเป็น บาท/วัน, บาท/เดือน และ บาท/ปี อย่างชัดเจน'
+                  : 'Detailed breakdown table showing daily, monthly, and annual running costs for each item.'}
+              </p>
+            </div>
+
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-wallet text-amber-500"></i>
+                {lang === 'th' ? '3. ตัวติดตามงบประมาณพลังงาน (Grid Budget Tracker)' : '3. Grid Budget Tracker'}
+              </h5>
+              <p className={`${paragraphClass}`}>
+                {lang === 'th'
+                  ? 'ตั้งค่าเงินงบประมาณคงเหลือที่คุณมี ระบบจะคำนวณความเร็วในการใช้เงินและแจ้งเตือนทันทีว่า "เงินจะหมดภายในกี่วัน" พร้อมเกจวัดสีส้ม/แดงเตือนล่วงหน้า'
+                  : 'Set a remaining energy budget; the system calculates exact remaining days before funds deplete.'}
+              </p>
+            </div>
+
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-file-pdf text-rose-500"></i>
+                {lang === 'th' ? '4. การส่งออกรายงานอนุรักษ์พลังงาน (PDF Audit Report Export)' : '4. PDF Energy Audit Report Export'}
+              </h5>
+              <p className={`${paragraphClass}`}>
+                {lang === 'th'
+                  ? 'กดปุ่ม "ดาวน์โหลดรายงาน PDF" เพื่อสร้างเอกสารรายงานการประหยัดพลังงานฉบับสมบูรณ์ สำหรับนำไปใช้เสนองานหรือเก็บเป็นบันทึกส่วนตัว'
+                  : 'Export a professional PDF energy audit report summarizing your savings, metrics, and devices.'}
+              </p>
             </div>
           </div>
         )}
 
-        {/* ======================= TAB 7: SECURITY ======================= */}
+        {/* ======================= TAB 8: SECURITY ======================= */}
         {activeTab === 'security' && (
           <div className="space-y-6 animate-fade-in text-sm leading-relaxed">
             <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
               <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
-                <i className="fas fa-shield-halved text-purple-500"></i>
-                {lang === 'th' ? 'ความปลอดภัยและการแจ้งเตือน (Alerts & Integrity)' : 'Alerts & Grid Integrity'}
+                <i className="fas fa-shield-alt text-rose-500"></i>
+                {lang === 'th' ? '1. การแจ้งเตือนเหตุการณ์เรียลไทม์ (Real-time Event Alerts)' : '1. Real-time Event Alerts'}
               </h5>
               <p className={`${paragraphClass}`}>
                 {lang === 'th'
-                  ? 'หน้า Noti/Security ทำหน้าที่รับบันทึกเหตุการณ์ต่างๆ (Event Logs) ไม่ว่าจะเป็นแอร์ทำงานหนักเกินไป หรือแรงดันไฟตก'
-                  : 'The Noti page records event logs, such as overloaded AC units or voltage drops.'}
+                  ? 'บันทึกแจ้งเตือนเหตุการณ์สำคัญในระบบไฟฟ้า เช่น แรงดันตก (Voltage Drop), โหลดเกินขนาด (Overload Spike) หรือแอร์ทำงานผิดปกติ'
+                  : 'Real-time logs capturing voltage sags, overload spikes, and hardware operational anomalies.'}
               </p>
             </div>
 
-            <div className={`p-6 rounded-[2rem] border ${isDarkMode ? 'border-purple-500/30 bg-purple-900/10' : 'border-purple-300 bg-purple-50'} space-y-4`}>
-              <h5 className={`font-display font-black text-base text-purple-600 dark:text-purple-400 flex items-center gap-2`}>
-                <i className="fas fa-microchip"></i>
-                {lang === 'th' ? 'AI Log Integrity Scan' : 'AI Log Integrity Scan'}
+            <div className={`p-6 rounded-[2rem] border ${cardBg} space-y-4`}>
+              <h5 className={`font-display font-black text-base ${textClass} flex items-center gap-2`}>
+                <i className="fas fa-microchip text-purple-500"></i>
+                {lang === 'th' ? '2. สแกนความมั่นคงปลอดภัย Log ด้วย AI (AI Log Integrity Scan)' : '2. AI Log Integrity Scan'}
               </h5>
               <p className={`${paragraphClass}`}>
                 {lang === 'th'
-                  ? 'คุณสามารถเลื่อนลงไปด้านล่างสุดของหน้าแจ้งเตือน เพื่อคลิกปุ่ม "วิเคราะห์ Log ด้วย AI" ระบบจะจับพฤติกรรมแปลกปลอมในเครือข่าย เช่น ตรวจพบการแอบใช้ไฟ (Cryptojacking) หรือสัญญาณรบกวนในระบบ โดยให้เรทติ้งความปลอดภัยแบบเรียลไทม์'
-                  : 'Scroll to the bottom of the alerts page to run an "AI Log Scan". The system detects anomalies like cryptojacking or harmonic distortion, providing a real-time security rating.'}
+                  ? 'กดปุ่ม "วิเคราะห์ Log ด้วย AI" ในหน้าแจ้งเตือน เพื่อให้ AI สแกนหารูปแบบภัยคุกคาม เช่น การลอบขุดเหมืองคริปโต (Cryptojacking) หรือสัญญาณรบกวนในระบบ พร้อมให้คะแนน Security Rating'
+                  : 'Run an AI Log Integrity Scan to detect cyber anomalies like cryptojacking or noise interference, outputting a live Security Score.'}
               </p>
             </div>
           </div>
@@ -522,17 +633,17 @@ const UserManual: React.FC<UserManualProps> = ({
       </div>
 
       {/* FOOTER AREA */}
-      <div className={`p-6 border-t ${borderThinClass} flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-100/40 dark:bg-slate-900/60 flex-shrink-0 relative z-10`}>
+      <div className={`p-5 border-t ${borderThinClass} flex flex-col sm:flex-row gap-3 justify-between items-center bg-slate-100/60 dark:bg-slate-900/80 flex-shrink-0 relative z-10`}>
         <div className="flex items-center gap-2">
           <i className="fas fa-graduation-cap text-primary text-xs"></i>
           <span className={`text-xs ${mutedTextClass} tracking-wider font-mono font-bold uppercase`}>
-            © 2026 EduEase Energy - Detailed Handbook
+            © 2026 EduEase Energy - Detailed Handbook & User Guide
           </span>
         </div>
         {!isInline && onClose && (
           <button
             onClick={onClose}
-            className="px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-black shadow-lg hover:bg-primary/90 transition-all"
+            className="px-5 py-2 bg-primary text-white rounded-xl text-xs font-black shadow-lg hover:bg-primary/90 transition-all cursor-pointer"
           >
             {t.close}
           </button>

@@ -15,7 +15,9 @@ export const ConsolidatedCalculator: React.FC<any> = ({
   globalBudget,
   setGlobalBudget,
   plannedKwh,
-  setPlannedKwh
+  setPlannedKwh,
+  devices,
+  setDevices
 }) => {
   const [activeMode, setActiveMode] = useState<"savings" | "billing">("savings");
 
@@ -83,6 +85,8 @@ export const ConsolidatedCalculator: React.FC<any> = ({
                   targetBudget={globalBudget}
                   setTargetBudget={setGlobalBudget}
                   onTotalKwhChange={setPlannedKwh}
+                  devices={devices}
+                  setDevices={setDevices}
                 />
               </motion.div>
             ) : (

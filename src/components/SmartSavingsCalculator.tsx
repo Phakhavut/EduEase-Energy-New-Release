@@ -75,6 +75,8 @@ export const SmartSavingsCalculator: React.FC<{
   targetBudget?: number;
   setTargetBudget?: (val: number) => void;
   onTotalKwhChange?: (kwh: number) => void;
+  devices?: any[];
+  setDevices?: (val: any[]) => void;
 }> = ({
   lang = 'th',
   isDarkMode = false,
@@ -86,6 +88,8 @@ export const SmartSavingsCalculator: React.FC<{
   targetBudget: propTargetBudget,
   setTargetBudget: propSetSetBudget,
   onTotalKwhChange,
+  devices,
+  setDevices,
 }) => {
   // --- Form & Configuration States (Controlled or Fallback to Local) ---
   const [localRate, setLocalRate] = useState<number>(0.3972);
@@ -103,6 +107,68 @@ export const SmartSavingsCalculator: React.FC<{
 
   const [onPeakPercent, setOnPeakPercent] = useState<number>(50); // ร้อยละใช้งานช่วง On-Peak
   const [appliances, setAppliances] = useState<ApplianceItem[]>(INITIAL_APPLIANCES);
+
+  // Synchronization with centralized devices (Single Source of Truth) if provided
+  useEffect(() => {
+    if (devices) {
+      const mapped = devices.map(d => {
+        let appCat: 'cooling' | 'kitchen' | 'office' | 'entertainment' | 'other' = 'other';
+        const lowerCat = d.category.toLowerCase();
+        if (lowerCat.includes('cool') || lowerCat.includes('hvac')) appCat = 'cooling';
+        else if (lowerCat.includes('kitchen') || lowerCat.includes('fridge')) appCat = 'kitchen';
+        if (lowerCat.includes('office') || lowerCat.includes('light')) appCat = 'office';
+        else if (lowerCat.includes('entertain') || lowerCat.includes('tv') || lowerCat.includes('cinema')) appCat = 'entertainment';
+        
+        return {
+          id: String(d.id),
+          nameTh: d.name,
+          nameEn: d.name,
+          watt: d.watt,
+          hoursPerDay: d.hours,
+          count: 1,
+          category: appCat
+        };
+      });
+      
+      // Only set state if actually different to prevent infinite looping
+      const serialize = (arr: any[]) => arr.map(a => `${a.id}:${a.watt}:${a.hoursPerDay}`).join('|');
+      if (serialize(mapped) !== serialize(appliances)) {
+        setAppliances(mapped);
+      }
+    }
+  }, [devices]);
+
+  // Propagate updates back to the parent state
+  const syncBackToDevices = (newAppliances: ApplianceItem[]) => {
+    if (setDevices && devices) {
+      const updatedDevices = newAppliances.map(app => {
+        const existing = devices.find(d => String(d.id) === app.id);
+        
+        let devCat = 'Other';
+        if (app.category === 'cooling') devCat = 'Cooling';
+        else if (app.category === 'kitchen') devCat = 'Kitchen';
+        else if (app.category === 'office') devCat = 'Lighting';
+        else if (app.category === 'entertainment') devCat = 'Entertainment';
+        
+        return {
+          id: existing ? existing.id : (Number(app.id.replace('custom_', '')) || Date.now()),
+          name: app.nameEn || app.nameTh,
+          watt: app.watt,
+          hours: app.hoursPerDay,
+          category: existing ? existing.category : devCat as any,
+          status: existing ? existing.status : 'active',
+          pf: existing ? existing.pf : 0.95,
+          logs: existing ? existing.logs : []
+        };
+      });
+      
+      // Only call parent update if different to prevent infinite loop
+      const serializeDev = (arr: any[]) => arr.map(a => `${a.id}:${a.watt}:${a.hours}`).join('|');
+      if (serializeDev(updatedDevices) !== serializeDev(devices)) {
+        setDevices(updatedDevices);
+      }
+    }
+  };
 
   // --- UI Layout States ---
   const [showTemplateModal, setShowTemplateModal] = useState(false);
@@ -305,16 +371,20 @@ export const SmartSavingsCalculator: React.FC<{
 
   // --- Interaction Handlers ---
   const handleUpdateAppliance = (id: string, field: keyof ApplianceItem, value: any) => {
-    setAppliances(prev => prev.map(app => {
+    const next = appliances.map(app => {
       if (app.id === id) {
         return { ...app, [field]: value };
       }
       return app;
-    }));
+    });
+    setAppliances(next);
+    syncBackToDevices(next);
   };
 
   const handleDeleteAppliance = (id: string) => {
-    setAppliances(prev => prev.filter(app => app.id !== id));
+    const next = appliances.filter(app => app.id !== id);
+    setAppliances(next);
+    syncBackToDevices(next);
     triggerToast(lang === 'th' ? 'ลบอุปกรณ์ออกจากตารางเรียบร้อย' : 'Appliance removed successfully');
   };
 
@@ -332,7 +402,9 @@ export const SmartSavingsCalculator: React.FC<{
       category: customCategory
     };
 
-    setAppliances(prev => [...prev, newApp]);
+    const next = [...appliances, newApp];
+    setAppliances(next);
+    syncBackToDevices(next);
     setCustomName('');
     setCustomWatt(100);
     setCustomHours(4);
@@ -351,7 +423,9 @@ export const SmartSavingsCalculator: React.FC<{
       ...app,
       id: `tmpl_${Date.now()}_${app.id}`
     }));
-    setAppliances(prev => [...prev, ...parsed]);
+    const next = [...appliances, ...parsed];
+    setAppliances(next);
+    syncBackToDevices(next);
     setShowTemplateModal(false);
     triggerToast(lang === 'th' ? 'เพิ่มอุปกรณ์ชุดจากเทมเพลตห้องเรียบร้อย!' : 'Added template appliances!');
     if (onTokensEarned) {
@@ -361,6 +435,7 @@ export const SmartSavingsCalculator: React.FC<{
 
   const handleResetToDefault = () => {
     setAppliances(INITIAL_APPLIANCES);
+    syncBackToDevices(INITIAL_APPLIANCES);
     setRate(0.3972);
     setDays(30);
     setOnPeakPercent(50);
@@ -509,7 +584,7 @@ export const SmartSavingsCalculator: React.FC<{
 
           {/* รายละเอียดอุปกรณ์รายชิ้น */}
           <div className="flex flex-col gap-3">
-            <h4 className="text-[11px] font-black font-display text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <h4 className="text-[11px] font-black font-display text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-2 py-0.5 leading-snug">
               <span>{lang === 'th' ? 'รายละเอียดอุปกรณ์รายชิ้น' : 'INDIVIDUAL APPLIANCE BREAKDOWN'}</span>
               <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[9px] font-bold font-mono text-slate-500">
                 {appliances.length}

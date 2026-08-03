@@ -80,6 +80,8 @@ export default function CalculatorTab({ shared }: { shared: any }) {
                       setGlobalBudget={setGlobalBudget}
                       plannedKwh={plannedKwh}
                       setPlannedKwh={setPlannedKwh}
+                      devices={multiDevices}
+                      setDevices={setMultiDevices}
                     />
                   </div>
                 </div>
