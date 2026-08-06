@@ -5,6 +5,14 @@ import { useState, useEffect } from 'react';
  * It listens to the window 'storage' event to keep state perfectly in sync reactively.
  */
 export function useOnboardingTour() {
+  const [neverShowAgain, setNeverShowAgainState] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('eudease_tour_never_show') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
   const [tourCompleted, setTourCompleted] = useState<boolean>(() => {
     try {
       return localStorage.getItem('eudease_tour_completed') === 'true';
@@ -24,6 +32,9 @@ export function useOnboardingTour() {
   // Track changes in other tabs
   useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'eudease_tour_never_show') {
+        setNeverShowAgainState(event.newValue === 'true');
+      }
       if (event.key === 'eudease_tour_completed') {
         setTourCompleted(event.newValue === 'true');
       }
@@ -38,16 +49,19 @@ export function useOnboardingTour() {
     };
   }, []);
 
-  const markCompleted = () => {
+  const setNeverShowAgain = (value: boolean) => {
     try {
-      localStorage.setItem('eudease_tour_completed', 'true');
-      // Dispatch storage event manually for the SAME tab to propagate if needed (though local state handles it)
+      if (value) {
+        localStorage.setItem('eudease_tour_never_show', 'true');
+      } else {
+        localStorage.removeItem('eudease_tour_never_show');
+      }
       window.dispatchEvent(new StorageEvent('storage', {
-        key: 'eudease_tour_completed',
-        newValue: 'true'
+        key: 'eudease_tour_never_show',
+        newValue: value ? 'true' : null
       }));
     } catch {}
-    setTourCompleted(true);
+    setNeverShowAgainState(value);
   };
 
   const setStartImmediate = (value: boolean) => {
@@ -65,12 +79,28 @@ export function useOnboardingTour() {
     setStartImmediately(value);
   };
 
+  const markCompleted = () => {
+    try {
+      localStorage.setItem('eudease_tour_completed', 'true');
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'eudease_tour_completed',
+        newValue: 'true'
+      }));
+    } catch {}
+    setTourCompleted(true);
+  };
+
   const resetTour = () => {
     try {
       localStorage.removeItem('eudease_tour_completed');
+      localStorage.removeItem('eudease_tour_never_show');
       localStorage.removeItem('eudease_tour_start_immediately');
       window.dispatchEvent(new StorageEvent('storage', {
         key: 'eudease_tour_completed',
+        newValue: null
+      }));
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'eudease_tour_never_show',
         newValue: null
       }));
       window.dispatchEvent(new StorageEvent('storage', {
@@ -79,14 +109,17 @@ export function useOnboardingTour() {
       }));
     } catch {}
     setTourCompleted(false);
+    setNeverShowAgainState(false);
     setStartImmediately(false);
   };
 
   return {
+    neverShowAgain,
     tourCompleted,
     startImmediately,
-    markCompleted,
+    setNeverShowAgain,
     setStartImmediate,
+    markCompleted,
     resetTour
   };
 }

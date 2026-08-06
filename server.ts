@@ -221,10 +221,9 @@ async function startServer() {
           - icon (string, FontAwesome class like "fa-microchip")`;
 
           const response = await ai.models.generateContent({
-            model: "gemini-3.1-pro-preview",
+            model: "gemini-2.5-flash",
             contents: prompt,
             config: {
-              thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
               responseMimeType: "application/json",
               responseSchema: {
                 type: Type.ARRAY,
@@ -352,10 +351,9 @@ async function startServer() {
           - maintenanceAdvice (string, specific troubleshooting actions based on logs)`;
 
           const response = await ai.models.generateContent({
-            model: "gemini-3.1-pro-preview",
+            model: "gemini-2.5-flash",
             contents: prompt,
             config: {
-              thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
               responseMimeType: "application/json",
               responseSchema: {
                 type: Type.OBJECT,
@@ -502,10 +500,9 @@ async function startServer() {
           `;
 
           const response = await ai.models.generateContent({
-            model: "gemini-3.1-pro-preview",
+            model: "gemini-2.5-flash",
             contents: prompt,
             config: {
-              thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
               systemInstruction: "You are the EnergyAI Assistant, a friendly and highly knowledgeable energy-saving expert. Always use actual grid parameters provided in the prompt to construct highly accurate, context-aware suggestions."
             }
           });
@@ -760,10 +757,9 @@ async function startServer() {
           }`;
 
           const response = await ai.models.generateContent({
-            model: "gemini-3.1-pro-preview",
+            model: "gemini-2.5-flash",
             contents: prompt,
             config: {
-              thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
               tools: [{ googleSearch: {} }],
               responseMimeType: "application/json",
               responseSchema: {
@@ -1211,10 +1207,9 @@ async function startServer() {
           }`;
 
           const response = await ai.models.generateContent({
-            model: "gemini-3.1-pro-preview",
+            model: "gemini-2.5-flash",
             contents: prompt,
             config: {
-              thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
               responseMimeType: "application/json",
               responseSchema: {
                 type: Type.OBJECT,
@@ -1448,10 +1443,9 @@ async function startServer() {
           }`;
 
           const response = await ai.models.generateContent({
-            model: "gemini-3.1-pro-preview",
+            model: "gemini-2.5-flash",
             contents: prompt,
             config: {
-              thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
               responseMimeType: "application/json",
               responseSchema: {
                 type: Type.OBJECT,

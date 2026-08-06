@@ -1,6 +1,6 @@
 {
   "name": "EduEase Energy",
-  "description": "Professional energy management and educational property portal with secure sector access and AI optimization.",
+  "description": "A gamified AI Energy Productivity app for young users featuring Voltie the AI Coach, daily green missions, budget planning, TOU rate simulation, and rewards.",
   "requestFramePermissions": [
     "geolocation"
   ],
