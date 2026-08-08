@@ -7,7 +7,7 @@ import { AiCoachView } from "./views/AiCoachView";
 import { AppliancesView } from "./views/AppliancesView";
 import { BudgetView } from "./views/BudgetView";
 import { AnalyticsView } from "./views/AnalyticsView";
-import { calculateTotalBill } from "@/utils/calculations";
+import { calculateTotalBill } from "../utils/calculations";
 import { AchievementsView } from "./views/AchievementsView";
 import { ProfileView } from "./views/ProfileView";
 import { SettingsView } from "./views/SettingsView";

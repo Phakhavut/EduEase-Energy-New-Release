@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { calculateApplianceEnergy } from '@/utils/calculations';
+import { calculateApplianceEnergy } from '../../utils/calculations';
 import { 
   X, 
   Sparkles, 
