@@ -469,9 +469,12 @@ async function startServer() {
   app.post("/api/ai/chat", async (req, res) => {
     try {
       const key = process.env.GEMINI_API_KEY;
-      const { messages, devices, analytics } = req.body;
+      const { messages, message, devices, analytics, useThinkingMode } = req.body;
+      
+      // Support both {messages: [...]} format and {message: "text"} format
+      const messagesList = messages || (message ? [{ role: 'user', content: message }] : []);
 
-      if (!messages || messages.length === 0) {
+      if (!messagesList || messagesList.length === 0) {
         return res.status(400).json({ error: "Messages list is required." });
       }
 
@@ -496,13 +499,18 @@ async function startServer() {
           - Point out exactly how much they can save by toggling local controls (e.g., Smart AC, Eco Standby, TOU Shift, and Power Factor corrections, which combine to save up to 22%).
 
           Here is the conversation history:
-          ${messages.map((m: any) => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join("\n")}
+          ${messagesList.map((m: any) => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join("\n")}
           `;
 
           const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: useThinkingMode ? "gemini-3.1-pro-preview" : "gemini-2.5-flash",
             contents: prompt,
             config: {
+              ...(useThinkingMode ? {
+                thinkingConfig: {
+                  thinkingLevel: ThinkingLevel.HIGH,
+                }
+              } : {}),
               systemInstruction: "You are the EnergyAI Assistant, a friendly and highly knowledgeable energy-saving expert. Always use actual grid parameters provided in the prompt to construct highly accurate, context-aware suggestions."
             }
           });

@@ -282,7 +282,7 @@ export default function Dashboard({
     );
   };
 
-  const handleSendMessage = async (text: string) => {
+  const handleSendMessage = async (text: string, useThinkingMode?: boolean) => {
     const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const newMsg = { role: 'user' as const, text, time: timeStr };
     setChatMessages((prev) => [...prev, newMsg]);
@@ -292,7 +292,7 @@ export default function Dashboard({
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, lang })
+        body: JSON.stringify({ message: text, lang, useThinkingMode })
       });
       const data = await res.json();
       const replyText = data?.reply || (

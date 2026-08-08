@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { calculateApplianceEnergy } from '../../utils/calculations';
 import { 
   X, 
   Sparkles, 
@@ -110,14 +111,15 @@ export const LearningModal: React.FC<LearningModalProps> = ({
   };
 
   // Calculations for interactive lesson widgets
-  const monthlyCostDemo = Math.round(((wattsInput * hoursInput * 30) / 1000) * 4.2);
+  const { monthlyCost: monthlyCostDemoExact } = calculateApplianceEnergy(wattsInput, hoursInput);
+  const monthlyCostDemo = Math.round(monthlyCostDemoExact);
   const acSavingPct = (acTemp - 24) * 8 + (useFan ? 6 : 0);
   const acCostEstimate = Math.max(350, Math.round(1400 * (1 - acSavingPct / 100)));
 
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center bg-slate-950/70 backdrop-blur-md transition-all">
-        {showConfetti && <Confetti />}
+        {showConfetti && <Confetti triggerCount={showConfetti ? 1 : 0} />}
 
         {/* Modal Container: Mobile Bottom Sheet (<768px) vs Desktop Dialog (>=768px) */}
         <motion.div

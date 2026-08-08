@@ -147,6 +147,8 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
 }) => {
   const [isPaused, setIsPaused] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isScrollingTarget, setIsScrollingTarget] = useState(false);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
   const [spotlightRect, setSpotlightRect] = useState<{
     top: number;
     left: number;
@@ -158,7 +160,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
 
   // Helper function to calculate target element bounds
   const updateSpotlightPosition = useCallback(() => {
-    if (!isActive || showPrompt || !currentStep) {
+    if (!isActive || showPrompt || !currentStep || isScrollingTarget) {
       setSpotlightRect(null);
       return;
     }
@@ -175,14 +177,21 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
     } else {
       setSpotlightRect(null);
     }
-  }, [isActive, showPrompt, currentStep]);
+  }, [isActive, showPrompt, currentStep, isScrollingTarget]);
 
   // Scroll target into view
   const scrollTargetIntoView = useCallback(() => {
     if (!isActive || showPrompt || !currentStep) return;
     const element = document.getElementById(currentStep.targetId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (typeof window !== 'undefined' && window.innerWidth < 768) {
+        // On mobile, the bottom sheet covers the bottom 50% of the screen.
+        // We need to position the element in the top 30-40% of the screen.
+        const y = element.getBoundingClientRect().top + window.scrollY - (window.innerHeight * 0.25);
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      } else {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
   }, [isActive, showPrompt, currentStep]);
 
@@ -194,27 +203,56 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
       setCurrentPage(currentStep.targetPage);
     }
 
-    const t = setTimeout(() => {
-      scrollTargetIntoView();
-      updateSpotlightPosition();
-    }, 180);
+    setIsScrollingTarget(true);
 
-    return () => clearTimeout(t);
-  }, [stepIndex, showPrompt, currentStep, currentPage, setCurrentPage, isActive, scrollTargetIntoView, updateSpotlightPosition]);
+    // Give time for React to render the new page/tab if it just switched
+    const startScrollTimer = setTimeout(() => {
+      scrollTargetIntoView();
+      
+      // Assume smooth scroll takes around 600ms to settle
+      const endScrollTimer = setTimeout(() => {
+        setIsScrollingTarget(false);
+        // Force an immediate update
+        const el = document.getElementById(currentStep.targetId);
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          setSpotlightRect({
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+          });
+        }
+      }, 700);
+
+      return () => clearTimeout(endScrollTimer);
+    }, 100);
+
+    return () => clearTimeout(startScrollTimer);
+  }, [stepIndex, showPrompt, currentStep, currentPage, setCurrentPage, isActive, scrollTargetIntoView]);
 
   // Track window scroll and resize
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsMobile(window.innerWidth < 768);
+    }
+    
     if (!isActive || showPrompt) return;
 
+    const handleResizeOrScroll = () => {
+      updateSpotlightPosition();
+      setIsMobile(window.innerWidth < 768);
+    };
+
     updateSpotlightPosition();
-    window.addEventListener('resize', updateSpotlightPosition, { passive: true });
-    window.addEventListener('scroll', updateSpotlightPosition, { passive: true });
+    window.addEventListener('resize', handleResizeOrScroll, { passive: true });
+    window.addEventListener('scroll', handleResizeOrScroll, { passive: true });
 
     const timeouts = [100, 300, 600, 1000].map(d => setTimeout(updateSpotlightPosition, d));
 
     return () => {
-      window.removeEventListener('resize', updateSpotlightPosition);
-      window.removeEventListener('scroll', updateSpotlightPosition);
+      window.removeEventListener('resize', handleResizeOrScroll);
+      window.removeEventListener('scroll', handleResizeOrScroll);
       timeouts.forEach(clearTimeout);
     };
   }, [stepIndex, showPrompt, currentPage, updateSpotlightPosition, isActive]);
@@ -418,7 +456,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
 
       {/* FLOATING TOUR STEP CARD */}
       <AnimatePresence>
-        {!showPrompt && (
+        {!showPrompt && !isScrollingTarget && (
           isMinimized ? (
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
@@ -436,12 +474,15 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
             </motion.div>
           ) : (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 15 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 15 }}
+              initial={isMobile ? { opacity: 0, y: "100%" } : { opacity: 0, scale: 0.9, y: 15 }}
+              animate={isMobile ? { opacity: 1, y: 0 } : { opacity: 1, scale: 1, y: 0 }}
+              exit={isMobile ? { opacity: 0, y: "100%" } : { opacity: 0, scale: 0.9, y: 15 }}
               transition={{ type: "spring", stiffness: 100, damping: 15 }}
-              className="fixed z-[9995] w-full max-w-md px-4 sm:px-0 pointer-events-auto"
-              style={{
+              className={isMobile 
+                ? "fixed z-[9995] bottom-0 left-0 right-0 w-full pointer-events-auto shadow-[0_-10px_40px_rgba(0,0,0,0.15)] rounded-t-[24px]" 
+                : "fixed z-[9995] w-full max-w-md px-4 sm:px-0 pointer-events-auto"
+              }
+              style={isMobile ? undefined : {
                 top: spotlightRect 
                   ? (typeof window !== 'undefined' && spotlightRect.top + spotlightRect.height + 20 > window.innerHeight - 280
                       ? Math.max(16, spotlightRect.top - 250)
@@ -449,89 +490,107 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                   : '30%',
                 left: spotlightRect
                   ? (typeof window !== 'undefined'
-                      ? Math.min(window.innerWidth - 420, Math.max(16, spotlightRect.left + (spotlightRect.width / 2) - 210))
+                      ? window.innerWidth < 500
+                        ? '0px'
+                        : Math.min(window.innerWidth - 460, Math.max(16, spotlightRect.left + (spotlightRect.width / 2) - 224))
                       : '50%')
                   : '50%',
-                transform: spotlightRect ? 'none' : 'translate(-50%, -50%)',
+                transform: spotlightRect 
+                  ? 'none' 
+                  : 'translate(-50%, -50%)',
               }}
             >
-              <div className={`p-5 md:p-6 rounded-[2rem] border-2 shadow-2xl backdrop-blur-xl relative transition-all ${
-                isDarkMode 
-                  ? 'bg-slate-950/95 border-emerald-500/40 text-white shadow-emerald-950/60' 
-                  : 'bg-white/95 border-emerald-400 text-slate-800 shadow-slate-300'
-              }`}>
-                {/* Header Row */}
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    {/* Explicit Progress Requirement: ขั้นที่ X จาก 7 */}
-                    <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs font-mono">
-                      {lang === 'th' ? `ขั้นที่ ${stepIndex + 1} จาก 7` : `Step ${stepIndex + 1} of 7`}
-                    </span>
-                    {isPaused && (
-                      <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500 font-extrabold text-[0.65rem] uppercase">
-                        {lang === 'th' ? 'ทดลองอิสระ' : 'Paused'}
+              <div className={isMobile
+                ? `flex flex-col w-full rounded-t-[24px] overflow-hidden transition-all ${
+                    isDarkMode ? 'bg-slate-900 border-t-2 border-emerald-500/40 text-white' : 'bg-white border-t-2 border-emerald-400 text-slate-800'
+                  }`
+                : `p-5 md:p-6 rounded-[2rem] border-2 shadow-2xl backdrop-blur-xl relative transition-all ${
+                    isDarkMode 
+                      ? 'bg-slate-950/95 border-emerald-500/40 text-white shadow-emerald-950/60' 
+                      : 'bg-white/95 border-emerald-400 text-slate-800 shadow-slate-300'
+                  }`
+              }>
+                
+                {/* Scrollable Body */}
+                <div className={isMobile ? "p-5 md:p-6 pb-2 overflow-y-auto max-h-[50vh] sm:max-h-[60vh] flex flex-col" : "flex flex-col"}>
+                  {/* Header Row */}
+                  <div className="flex items-center justify-between mb-2 shrink-0">
+                    <div className="flex items-center gap-2">
+                      <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs font-mono whitespace-nowrap">
+                        {lang === 'th' ? `ขั้นที่ ${stepIndex + 1} จาก 7` : `Step ${stepIndex + 1} of 7`}
                       </span>
+                      {isPaused && (
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500 font-extrabold text-[0.65rem] uppercase shrink-0">
+                          {lang === 'th' ? 'ทดลองอิสระ' : 'Paused'}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => setIsMinimized(true)}
+                        className="p-1 text-slate-400 hover:text-emerald-500 transition-colors"
+                        title={lang === 'th' ? 'ย่อหน้าต่าง' : 'Minimize'}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={onClose}
+                        className="p-1 text-slate-400 hover:text-rose-500 transition-colors"
+                        title={lang === 'th' ? 'ข้ามและปิด' : 'Close'}
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full mb-4 overflow-hidden shrink-0">
+                    <motion.div
+                      className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
+                      initial={{ width: '0%' }}
+                      animate={{ width: `${((stepIndex + 1) / QUICK_START_STEPS.length) * 100}%` }}
+                      transition={{ type: "spring", stiffness: 80, damping: 15 }}
+                    />
+                  </div>
+
+                  {/* Step Content */}
+                  <div className="space-y-3 mb-5 shrink-0">
+                    <h4 className="font-extrabold text-base md:text-lg font-display text-emerald-600 dark:text-emerald-400 flex items-start gap-2">
+                      <Sparkles className="w-4 h-4 text-emerald-500 shrink-0 mt-1" />
+                      <span className="break-words">{lang === 'th' ? currentStep.titleTh : currentStep.titleEn}</span>
+                    </h4>
+
+                    <p className="text-xs md:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium break-words">
+                      {lang === 'th' ? currentStep.descTh : currentStep.descEn}
+                    </p>
+
+                    {/* Microcopy Tip */}
+                    {currentStep.tipTh && (
+                      <div className={`p-3 rounded-xl text-xs font-semibold border ${
+                        isDarkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                      }`}>
+                        {lang === 'th' ? currentStep.tipTh : currentStep.tipEn}
+                      </div>
                     )}
                   </div>
-
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => setIsMinimized(true)}
-                      className="p-1 text-slate-400 hover:text-emerald-500 transition-colors"
-                      title={lang === 'th' ? 'ย่อหน้าต่าง' : 'Minimize'}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={onClose}
-                      className="p-1 text-slate-400 hover:text-rose-500 transition-colors"
-                      title={lang === 'th' ? 'ข้ามและปิด' : 'Close'}
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full mb-4 overflow-hidden">
-                  <motion.div
-                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
-                    initial={{ width: '0%' }}
-                    animate={{ width: `${((stepIndex + 1) / QUICK_START_STEPS.length) * 100}%` }}
-                    transition={{ type: "spring", stiffness: 80, damping: 15 }}
-                  />
-                </div>
-
-                {/* Step Content */}
-                <div className="space-y-3 mb-5">
-                  <h4 className="font-extrabold text-base md:text-lg font-display text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>{lang === 'th' ? currentStep.titleTh : currentStep.titleEn}</span>
-                  </h4>
-
-                  <p className="text-xs md:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
-                    {lang === 'th' ? currentStep.descTh : currentStep.descEn}
-                  </p>
-
-                  {/* Microcopy Tip */}
-                  {currentStep.tipTh && (
-                    <div className={`p-3 rounded-xl text-xs font-semibold border ${
-                      isDarkMode ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : 'bg-emerald-50 border-emerald-200 text-emerald-800'
-                    }`}>
-                      {lang === 'th' ? currentStep.tipTh : currentStep.tipEn}
-                    </div>
-                  )}
-                </div>
-
-                {/* Bottom Control Bar */}
-                <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800">
+                {/* Bottom Control Bar (Pinned on mobile) */}
+                <div 
+                  className={`flex items-center justify-between border-t border-slate-200 dark:border-slate-800 shrink-0 ${
+                    isMobile ? 'p-5 md:p-6 bg-slate-50 dark:bg-slate-800/50' : 'pt-3'
+                  }`}
+                  style={isMobile ? { paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.5rem)' } : undefined}
+                >
                   <button
                     onClick={() => setIsPaused(!isPaused)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    className={`px-3 py-2 sm:py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                       isPaused 
                         ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30' 
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                     }`}
+                    style={isMobile ? { minHeight: '56px' } : undefined}
                   >
                     {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
                     <span>{isPaused ? (lang === 'th' ? 'เล่นต่อ' : 'Resume') : (lang === 'th' ? 'ทดลองอิสระ' : 'Pause')}</span>
@@ -541,11 +600,12 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                     <button
                       onClick={handlePrev}
                       disabled={stepIndex === 0}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 ${
+                      className={`px-3 py-2 sm:py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 ${
                         stepIndex === 0
                           ? 'opacity-30 cursor-not-allowed text-slate-400'
                           : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200'
                       }`}
+                      style={isMobile ? { minHeight: '56px' } : undefined}
                     >
                       <ChevronLeft className="w-4 h-4" />
                       <span>{lang === 'th' ? 'ย้อน' : 'Back'}</span>
@@ -553,7 +613,8 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
 
                     <button
                       onClick={handleNext}
-                      className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-extrabold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1 hover:scale-105 active:scale-95"
+                      className="px-4 py-2 sm:py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-extrabold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1 hover:scale-105 active:scale-95"
+                      style={isMobile ? { minHeight: '56px' } : undefined}
                     >
                       <span>{stepIndex === QUICK_START_STEPS.length - 1 ? (lang === 'th' ? 'เสร็จสิ้น' : 'Finish') : (lang === 'th' ? 'ถัดไป' : 'Next')}</span>
                       <ChevronRight className="w-4 h-4" />

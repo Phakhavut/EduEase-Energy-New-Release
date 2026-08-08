@@ -25,7 +25,7 @@ interface AiCoachViewProps {
   recommendations: AICoachRecommendation[];
   onApplyRecommendation: (id: string) => void;
   chatMessages: { role: 'user' | 'assistant'; text: string; time?: string }[];
-  onSendMessage: (text: string) => void;
+  onSendMessage: (text: string, useThinkingMode: boolean) => void;
   isSendingChat: boolean;
   infoDetailMode: InfoDetailMode;
   onStartPageTour?: (stepIndex: number) => void;
@@ -43,6 +43,7 @@ export const AiCoachView: React.FC<AiCoachViewProps> = ({
   onStartPageTour,
 }) => {
   const [input, setInput] = useState('');
+  const [useThinkingMode, setUseThinkingMode] = useState(false);
 
   const quickPrompts = [
     { th: 'ทำอย่างไรให้ประหยัดค่าไฟ ฿500 เดือนนี้?', en: 'How to save ฿500 this month?' },
@@ -54,7 +55,7 @@ export const AiCoachView: React.FC<AiCoachViewProps> = ({
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isSendingChat) return;
-    onSendMessage(input.trim());
+    onSendMessage(input.trim(), useThinkingMode);
     setInput('');
   };
 
@@ -238,7 +239,7 @@ export const AiCoachView: React.FC<AiCoachViewProps> = ({
             {quickPrompts.map((prompt, idx) => (
               <button
                 key={idx}
-                onClick={() => onSendMessage(lang === 'th' ? prompt.th : prompt.en)}
+                onClick={() => onSendMessage(lang === 'th' ? prompt.th : prompt.en, useThinkingMode)}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap border transition-all shrink-0 ${
                   isDarkMode 
                     ? 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-200' 
@@ -248,6 +249,29 @@ export const AiCoachView: React.FC<AiCoachViewProps> = ({
                 ✨ {lang === 'th' ? prompt.th : prompt.en}
               </button>
             ))}
+          </div>
+
+          {/* Thinking Mode Toggle */}
+          <div className="flex items-center gap-2 mt-3 px-1">
+            <button
+              type="button"
+              onClick={() => setUseThinkingMode(!useThinkingMode)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold transition-all ${
+                useThinkingMode
+                  ? 'bg-purple-500/10 border-purple-500/30 text-purple-600 dark:text-purple-400 shadow-sm'
+                  : isDarkMode
+                    ? 'bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200'
+                    : 'bg-white border-slate-200 text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <div className={`w-3.5 h-3.5 rounded-full flex items-center justify-center ${useThinkingMode ? 'bg-purple-500 text-white' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                {useThinkingMode && <Sparkles className="w-2.5 h-2.5" />}
+              </div>
+              {lang === 'th' ? 'โหมดคิดวิเคราะห์เชิงลึก' : 'Enable High Thinking'}
+            </button>
+            <span className="text-[10px] text-slate-400">
+              {lang === 'th' ? '(ใช้สำหรับคำถามซับซ้อน)' : '(For complex queries)'}
+            </span>
           </div>
 
           {/* Input Bar */}

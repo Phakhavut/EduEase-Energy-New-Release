@@ -239,6 +239,7 @@ export interface LearningPath {
   titleTh: string;
   titleEn: string;
   descTh: string;
+  descEn?: string;
   icon: string;
   lessons: Lesson[];
 }

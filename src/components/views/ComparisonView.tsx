@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { calculateApplianceEnergy } from "../../utils/calculations";
 import { 
   BarChart, 
   Bar, 
@@ -172,20 +173,14 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
   };
 
   // Calculation logic (Tariff = 4.20 THB/kWh)
-  const RATE_PER_KWH = 4.20;
-  
   const calculatedItems = selectedItems.map(item => {
-    const dailyKwh = (item.watt * item.hoursPerDay * item.quantity) / 1000;
-    const monthlyKwh = dailyKwh * 30;
-    const dailyCost = dailyKwh * RATE_PER_KWH;
-    const monthlyCost = monthlyKwh * RATE_PER_KWH;
-
+    const energy = calculateApplianceEnergy(item.watt * item.quantity, item.hoursPerDay);
     return {
       ...item,
-      dailyKwh,
-      monthlyKwh,
-      dailyCost,
-      monthlyCost,
+      dailyKwh: energy.dailyKwh,
+      monthlyKwh: energy.monthlyKwh,
+      dailyCost: energy.dailyCost,
+      monthlyCost: energy.monthlyCost,
     };
   });
 

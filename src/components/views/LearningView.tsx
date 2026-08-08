@@ -29,7 +29,7 @@ import {
 import { LearningPath, Lesson, GlossaryTerm, InfoDetailMode, SkillTreeNode, LearningQuest } from '../../types';
 import { SkillTree } from '../gamification/SkillTree';
 import { MiniGamesHub } from '../gamification/MiniGamesHub';
-import { LearningModal } from '../common/LearningModal';
+import { FullScreenLearningExperience } from '../learning/FullScreenLearningExperience';
 import { INITIAL_SKILL_TREE_NODES, INITIAL_LEARNING_QUESTS } from '../../data/gamificationData';
 
 interface LearningViewProps {
@@ -481,16 +481,29 @@ export const LearningView: React.FC<LearningViewProps> = ({
         </div>
       )}
 
-      {/* Mobile-First Learning Bottom Sheet Modal */}
-      <LearningModal
-        isOpen={selectedLesson !== null}
-        onClose={() => setSelectedLesson(null)}
-        lesson={selectedLesson}
-        onCompleteLesson={onCompleteLesson}
-        onRewardCoins={onRewardCoins}
-        lang={lang}
-        isDarkMode={isDarkMode}
-      />
+      {/* Dedicated Full-Screen Learning Experience Page */}
+      {selectedLesson && (
+        <FullScreenLearningExperience
+          lesson={selectedLesson}
+          pathTitle={learningPaths.find(p => p.lessons.some(l => l.id === selectedLesson.id))?.titleTh || 'Energy Academy'}
+          onClose={() => setSelectedLesson(null)}
+          onCompleteLesson={onCompleteLesson}
+          onRewardCoins={onRewardCoins}
+          lang={lang}
+          isDarkMode={isDarkMode}
+          detailMode={infoDetailMode}
+          onNextLesson={() => {
+            // Find next lesson
+            const allLessons = learningPaths.flatMap(p => p.lessons);
+            const idx = allLessons.findIndex(l => l.id === selectedLesson.id);
+            if (idx !== -1 && idx < allLessons.length - 1) {
+              setSelectedLesson(allLessons[idx + 1]);
+            } else {
+              setSelectedLesson(null);
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
