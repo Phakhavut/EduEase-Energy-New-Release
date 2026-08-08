@@ -7,6 +7,7 @@ import { AiCoachView } from "./views/AiCoachView";
 import { AppliancesView } from "./views/AppliancesView";
 import { BudgetView } from "./views/BudgetView";
 import { AnalyticsView } from "./views/AnalyticsView";
+import { calculateTotalBill } from "@/utils/calculations";
 import { AchievementsView } from "./views/AchievementsView";
 import { ProfileView } from "./views/ProfileView";
 import { SettingsView } from "./views/SettingsView";
@@ -132,12 +133,13 @@ export default function Dashboard({
 
   // Energy & Budget state
   const [monthlyBudget, setMonthlyBudget] = useState(2500);
-  const [monthlyEstimate, setMonthlyEstimate] = useState(1850);
-  const [todayCost, setTodayCost] = useState(42.50);
-  const [moneySavedMonth, setMoneySavedMonth] = useState(320);
+      const [moneySavedMonth, setMoneySavedMonth] = useState(320);
 
   // Collections state
   const [appliances, setAppliances] = useState(INITIAL_APPLIANCES);
+  const { totalDailyKwh, totalMonthlyCost } = calculateTotalBill(appliances);
+  const todayCost = totalDailyKwh * 4.7; // Approx derived today cost for UI
+  const monthlyEstimate = totalMonthlyCost;
   const [missions, setMissions] = useState(INITIAL_MISSIONS);
   const [badges, setBadges] = useState(INITIAL_BADGES);
   const [skins, setSkins] = useState(INITIAL_SKINS);
@@ -188,7 +190,6 @@ export default function Dashboard({
     const loc = locations.find(l => l.id === locId);
     if (loc) {
       setMonthlyBudget(loc.budget);
-      setMonthlyEstimate(loc.estimatedBill);
     }
   };
 
@@ -203,7 +204,6 @@ export default function Dashboard({
     setLocations([...locations, createdLoc]);
     setCurrentLocationId(newId);
     setMonthlyBudget(createdLoc.budget);
-    setMonthlyEstimate(createdLoc.estimatedBill);
   };
 
   const handleMarkNotifRead = (id: string) => {
