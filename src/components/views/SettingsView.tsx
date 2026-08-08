@@ -13,8 +13,11 @@ import {
   Zap,
   Sparkles,
   RotateCcw,
-  Compass
+  Compass,
+  ShieldCheck,
+  ArrowRight
 } from 'lucide-react';
+import { AppPage } from '../../types';
 
 interface SettingsViewProps {
   lang: 'th' | 'en';
@@ -26,6 +29,7 @@ interface SettingsViewProps {
   onStartTour?: () => void;
   neverShowAgain?: boolean;
   setNeverShowAgain?: (val: boolean) => void;
+  onNavigatePage?: (page: AppPage) => void;
 }
 
 export const SettingsView: React.FC<SettingsViewProps> = ({
@@ -38,6 +42,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   onStartTour,
   neverShowAgain = false,
   setNeverShowAgain,
+  onNavigatePage,
 }) => {
   const [currency, setCurrency] = useState<'THB' | 'USD'>('THB');
   const [aiTone, setAiTone] = useState<'friendly' | 'minimal' | 'gamer'>('friendly');
@@ -199,6 +204,33 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             ))}
           </div>
         </div>
+
+        {/* Trust & Transparency Banner */}
+        {onNavigatePage && (
+          <div className="p-5 rounded-3xl bg-slate-900 text-white border border-teal-500/30 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-2xl bg-teal-500/20 text-teal-400 border border-teal-500/30">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-sm md:text-base font-display text-teal-400">
+                  {lang === 'th' ? 'ศูนย์ความน่าเชื่อถือและความโปร่งใส (Trust Center)' : 'Trust & Transparency Center'}
+                </h3>
+                <p className="text-xs text-slate-300">
+                  {lang === 'th' ? 'ดูความน่าเชื่อถือของ AI, แหล่งข้อมูล, และประวัติคำแนะนำย้อนหลัง' : 'Review AI models, data quality, formulas, and decision logs'}
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => onNavigatePage('trust-center')}
+              className="px-4 py-2 rounded-2xl bg-teal-500 hover:bg-teal-400 text-white font-extrabold text-xs shadow-md shadow-teal-500/20 transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+            >
+              <span>{lang === 'th' ? 'เข้าสู่ศูนย์ความโปร่งใส' : 'Open Trust Center'}</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* Notifications */}
         <div className="flex items-center justify-between">

@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { AICoachRecommendation, InfoDetailMode } from '../../types';
 import { ProgressiveCard } from '../common/ProgressiveCard';
+import { WhyButton } from '../trust/WhyButton';
 
 interface AiCoachViewProps {
   lang: 'th' | 'en';
@@ -111,36 +112,54 @@ export const AiCoachView: React.FC<AiCoachViewProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {recommendations.map((rec) => (
-            <ProgressiveCard
-              key={rec.id}
-              mode={infoDetailMode}
-              lang={lang}
-              isDarkMode={isDarkMode}
-              title={lang === 'th' ? rec.title : rec.titleEn}
-              icon={<Sparkles className="w-4 h-4 text-purple-500" />}
-              summaryValue={`+฿${rec.moneySavedMonth} / เดือน`}
-              summarySubtitle={lang === 'th' ? `ระดับความยาก: ${rec.difficulty}` : `Difficulty: ${rec.difficulty}`}
-              badgeText={rec.applied ? (lang === 'th' ? 'ปรับใช้แล้ว ✓' : 'Applied ✓') : `Match ${rec.confidence}%`}
-              badgeType={rec.applied ? 'success' : 'info'}
-              explanationTitle={lang === 'th' ? 'ทำไมถึงแนะนำ?' : 'Why Recommended?'}
-              explanationText={lang === 'th' ? rec.description : rec.descriptionEn}
-              comparisonText={lang === 'th' ? `ช่วยประหยัดไฟขึ้นเมื่อเทียบกับพฤติกรรมเดิม (${rec.timeRequired})` : `Saves energy compared to previous usage pattern (${rec.timeRequired})`}
-              formula={`Potential Savings = Delta kWh (18.2 kWh) × TOU Peak Tariff (5.26 THB) = ฿${rec.moneySavedMonth}`}
-              rawMetrics={[
-                { label: lang === 'th' ? 'ความมั่นใจ AI' : 'AI Confidence', value: `${rec.confidence}%` },
-                { label: lang === 'th' ? 'เวลาที่ต้องใช้' : 'Time Required', value: rec.timeRequired },
-                { label: lang === 'th' ? 'ประเภทการทำงาน' : 'Action Type', value: rec.actionType },
-              ]}
-              tariffBreakdown="PEA TOU Rate Schedule 1.1.2"
-              meterSource="Voltie AI Engine v3.0 ML Predictor"
-              timestamp="2026-08-06 14:32:05"
-              confidenceScore={`${rec.confidence}% AI Accuracy`}
-              recommendedAction={{
-                label: lang === 'th' ? 'ปรับใช้โหมดประหยัดนี้ทันที' : 'Apply this saving mode immediately',
-                actionText: rec.applied ? (lang === 'th' ? 'เรียบร้อย' : 'Done') : (lang === 'th' ? 'ปรับใช้' : 'Apply'),
-                onExecute: () => onApplyRecommendation(rec.id)
-              }}
-            />
+            <div key={rec.id} className="relative group">
+              <div className="absolute top-3 right-3 z-20">
+                <WhyButton
+                  data={{
+                    whatHappenedTh: rec.description,
+                    whyDetectedTh: `ตรวจพบจากการวิเคราะห์รูปแบบการใช้งานย้อนหลังและสเปกเครื่องใช้ไฟฟ้า (${rec.title})`,
+                    dataUsedTh: ['มิเตอร์ย้อนหลัง 30 วัน', 'อัตราค่าไฟ PEA TOU 1.1.2', 'ข้อมูลสภาพอากาศในพื้นที่'],
+                    assumptionsTh: ['ใช้อัตราค่าไฟฐาน ฿4.20/หน่วย', 'เปิดใช้งานเฉลี่ยตามสถิติล่าสุด'],
+                    confidence: rec.confidence,
+                    source: 'predicted',
+                    ifIgnoredImpactTh: `หากไม่ปรับใช้ คุณอาจสูญเสียโอกาสประหยัดเงินประมาณ ฿${rec.moneySavedMonth}/เดือน`,
+                    expectedSavingThb: rec.moneySavedMonth
+                  }}
+                  lang={lang}
+                  variant="button"
+                />
+              </div>
+
+              <ProgressiveCard
+                mode={infoDetailMode}
+                lang={lang}
+                isDarkMode={isDarkMode}
+                title={lang === 'th' ? rec.title : rec.titleEn}
+                icon={<Sparkles className="w-4 h-4 text-purple-500" />}
+                summaryValue={`+฿${rec.moneySavedMonth} / เดือน`}
+                summarySubtitle={lang === 'th' ? `ระดับความยาก: ${rec.difficulty}` : `Difficulty: ${rec.difficulty}`}
+                badgeText={rec.applied ? (lang === 'th' ? 'ปรับใช้แล้ว ✓' : 'Applied ✓') : `Match ${rec.confidence}%`}
+                badgeType={rec.applied ? 'success' : 'info'}
+                explanationTitle={lang === 'th' ? 'ทำไมถึงแนะนำ?' : 'Why Recommended?'}
+                explanationText={lang === 'th' ? rec.description : rec.descriptionEn}
+                comparisonText={lang === 'th' ? `ช่วยประหยัดไฟขึ้นเมื่อเทียบกับพฤติกรรมเดิม (${rec.timeRequired})` : `Saves energy compared to previous usage pattern (${rec.timeRequired})`}
+                formula={`Potential Savings = Delta kWh (18.2 kWh) × TOU Peak Tariff (5.26 THB) = ฿${rec.moneySavedMonth}`}
+                rawMetrics={[
+                  { label: lang === 'th' ? 'ความมั่นใจ AI' : 'AI Confidence', value: `${rec.confidence}%` },
+                  { label: lang === 'th' ? 'เวลาที่ต้องใช้' : 'Time Required', value: rec.timeRequired },
+                  { label: lang === 'th' ? 'ประเภทการทำงาน' : 'Action Type', value: rec.actionType },
+                ]}
+                tariffBreakdown="PEA TOU Rate Schedule 1.1.2"
+                meterSource="Voltie AI Engine v3.0 ML Predictor"
+                timestamp="2026-08-06 14:32:05"
+                confidenceScore={`${rec.confidence}% AI Accuracy`}
+                recommendedAction={{
+                  label: lang === 'th' ? 'ปรับใช้โหมดประหยัดนี้ทันที' : 'Apply this saving mode immediately',
+                  actionText: rec.applied ? (lang === 'th' ? 'เรียบร้อย' : 'Done') : (lang === 'th' ? 'ปรับใช้' : 'Apply'),
+                  onExecute: () => onApplyRecommendation(rec.id)
+                }}
+              />
+            </div>
           ))}
         </div>
       </div>

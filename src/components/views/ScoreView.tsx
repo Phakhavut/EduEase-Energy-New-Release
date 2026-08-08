@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { InfoDetailMode, AppPage, EnergySavingScoreBreakdown } from '../../types';
 import { ProgressiveCard } from '../common/ProgressiveCard';
+import { DataQualityCard } from '../trust/DataQualityCard';
+import { WhyButton } from '../trust/WhyButton';
 
 interface ScoreViewProps {
   lang: 'th' | 'en';
@@ -380,6 +382,13 @@ export const ScoreView: React.FC<ScoreViewProps> = ({
           })}
         </div>
       </div>
+
+      {/* Data Quality Score Impact */}
+      <DataQualityCard
+        lang={lang}
+        isDarkMode={isDarkMode}
+        onNavigatePage={setCurrentPage}
+      />
 
       {/* 4. LEARNING INTEGRATION BANNER */}
       <div className={`p-6 rounded-[2rem] border shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 ${

@@ -17,6 +17,11 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Mission, Badge, CharacterSkin } from '../../types';
+import { DynamicMissionsHub } from '../gamification/DynamicMissionsHub';
+import { EnergyPassport } from '../gamification/EnergyPassport';
+import { EnergyTreeEcosystem } from '../gamification/EnergyTreeEcosystem';
+import { EduVerseHub } from '../gamification/EduVerseHub';
+import { INITIAL_PASSPORT_STAMPS } from '../../data/gamificationData';
 
 interface AchievementsViewProps {
   lang: 'th' | 'en';
@@ -55,7 +60,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
   leaderboard,
   onStartPageTour,
 }) => {
-  const [activeTab, setActiveTab] = useState<'missions' | 'tree' | 'badges' | 'skins' | 'leaderboard'>('missions');
+  const [activeTab, setActiveTab] = useState<'eduverse' | 'missions' | 'passport' | 'tree' | 'badges' | 'skins' | 'leaderboard'>('eduverse');
   const [isLootBoxOpen, setIsLootBoxOpen] = useState(false);
   const [lootBoxReward, setLootBoxReward] = useState<{ xp: number; coins: number; item: string } | null>(null);
 
@@ -153,7 +158,9 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
       {/* 2. TAB NAVIGATION */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         {[
-          { id: 'missions', th: '🎯 ภารกิจ (Missions)', en: '🎯 Missions' },
+          { id: 'eduverse', th: '🌐 EduVerse โลกเสมือนชีวิต', en: '🌐 EduVerse World' },
+          { id: 'missions', th: '🎯 ศูนย์ภารกิจ 2.0 (Missions)', en: '🎯 Missions' },
+          { id: 'passport', th: '📘 พาสปอร์ตพลังงาน (Passport)', en: '📘 Passport' },
           { id: 'tree', th: '🌳 ต้นไม้พลังงาน (Energy Tree)', en: '🌳 Energy Tree' },
           { id: 'badges', th: '🏅 เข็มกลัดเกียรติยศ (Badges)', en: '🏅 Badges' },
           { id: 'skins', th: '🎨 สกิน & อวตาร (Skins)', en: '🎨 Skins' },
@@ -162,7 +169,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shrink-0 ${
+            className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
               activeTab === tab.id
                 ? 'bg-amber-500 text-white shadow-md shadow-amber-500/20'
                 : isDarkMode
@@ -175,7 +182,20 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
         ))}
       </div>
 
-      {/* 3. MISSIONS VIEW */}
+      {/* 2.5 EDUVERSE VIRTUAL WORLD TAB VIEW */}
+      {activeTab === 'eduverse' && (
+        <EduVerseHub
+          lang={lang}
+          isDarkMode={isDarkMode}
+          userXp={userXp}
+          userCoins={userCoins}
+          userStreak={userStreak}
+          savingScore={88}
+          onStartPageTour={onStartPageTour ? () => onStartPageTour(6) : undefined}
+        />
+      )}
+
+      {/* 3. DYNAMIC MISSIONS HUB VIEW */}
       {activeTab === 'missions' && (
         <div className="space-y-6">
           {/* Daily Mystery Box */}
@@ -203,7 +223,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
             <button
               onClick={handleOpenLootBox}
               disabled={isLootBoxOpen}
-              className={`px-6 py-3 rounded-2xl font-bold text-xs shadow-lg transition-all ${
+              className={`px-6 py-3 rounded-2xl font-bold text-xs shadow-lg transition-all cursor-pointer ${
                 isLootBoxOpen
                   ? 'bg-slate-200 text-slate-500 dark:bg-slate-800 cursor-not-allowed'
                   : 'bg-purple-600 hover:bg-purple-500 text-white shadow-purple-500/20 hover:scale-105 active:scale-95'
@@ -213,83 +233,40 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
             </button>
           </motion.div>
 
-          {/* Missions List */}
-          <div className="space-y-3">
-            {missions.map((mission) => (
-              <motion.div
-                key={mission.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`p-5 rounded-[2rem] border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
-                  isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-100 shadow-sm'
-                }`}
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[0.65rem] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-                      +{mission.xpReward} XP
-                    </span>
-                    <span className="text-[0.65rem] font-bold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-700 dark:text-amber-300">
-                      +{mission.coinReward} Coins
-                    </span>
-                    <span className="text-[0.65rem] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                      {mission.category}
-                    </span>
-                  </div>
-
-                  <h4 className="font-extrabold text-sm md:text-base text-slate-900 dark:text-white">
-                    {lang === 'th' ? mission.title : mission.titleEn}
-                  </h4>
-                  <p className="text-xs text-slate-600 dark:text-slate-300">
-                    {lang === 'th' ? mission.description : mission.descriptionEn}
-                  </p>
-                </div>
-
-                <button
-                  onClick={() => {
-                    if (!mission.completed) {
-                      onCompleteMission(mission.id);
-                      triggerConfetti();
-                    }
-                  }}
-                  disabled={mission.completed}
-                  className={`px-5 py-2.5 rounded-2xl font-bold text-xs shadow-md transition-all shrink-0 ${
-                    mission.completed
-                      ? 'bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-400 cursor-not-allowed'
-                      : 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-emerald-500/20 hover:scale-105 active:scale-95'
-                  }`}
-                >
-                  {mission.completed ? (lang === 'th' ? 'ทำเสร็จแล้ว ✓' : 'Completed ✓') : (lang === 'th' ? 'ทำภารกิจ' : 'Complete')}
-                </button>
-              </motion.div>
-            ))}
-          </div>
+          {/* Dynamic Missions Hub Component */}
+          <DynamicMissionsHub
+            lang={lang}
+            isDarkMode={isDarkMode}
+            userLevel={userLevel}
+            userXp={userXp}
+            userXpMax={userXpMax}
+            userCoins={userCoins}
+            userStreak={userStreak}
+            onCompleteMission={(id) => onCompleteMission(id)}
+            onStartPageTour={onStartPageTour}
+          />
         </div>
+      )}
+
+      {/* 4. ENERGY PASSPORT STAMPS VIEW */}
+      {activeTab === 'passport' && (
+        <EnergyPassport
+          stamps={INITIAL_PASSPORT_STAMPS}
+          lang={lang}
+          isDarkMode={isDarkMode}
+        />
       )}
 
       {/* 4. ENERGY TREE EVOLUTION VIEW */}
       {activeTab === 'tree' && (
-        <motion.div
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`p-8 rounded-[2.5rem] border text-center space-y-6 ${
-            isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-100 shadow-sm'
-          }`}
-        >
-          <div className="w-28 h-28 mx-auto rounded-full bg-gradient-to-tr from-emerald-500 via-teal-400 to-emerald-300 flex items-center justify-center text-6xl shadow-2xl animate-pulse">
-            🌳
-          </div>
-          <div className="space-y-2 max-w-md mx-auto">
-            <h3 className="text-2xl font-extrabold font-display">
-              {lang === 'th' ? 'ต้นไม้พลังงานของฉัน (Level 7 Eco Tree)' : 'My Energy Tree (Level 7 Eco Tree)'}
-            </h3>
-            <p className="text-xs text-slate-500">
-              {lang === 'th'
-                ? 'ทุกๆ การประหยัดไฟของคุณเปลี่ยนเป็นปุ๋ยบำรุงต้นไม้ให้เจริญเติบโต ยิ่งงบไม่เกิน ต้นไม้ยิ่งแตกกิ่งก้านสมบูรณ์!'
-                : 'Every kilowatt saved feeds your energy tree. Keep under budget to help it grow into a world tree!'}
-            </p>
-          </div>
-        </motion.div>
+        <EnergyTreeEcosystem
+          lang={lang}
+          isDarkMode={isDarkMode}
+          savingScore={84}
+          userStreak={userStreak}
+          monthlyBudget={2500}
+          currentBillEstimate={1950}
+        />
       )}
 
       {/* 5. BADGES COLLECTION VIEW */}

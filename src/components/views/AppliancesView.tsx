@@ -23,6 +23,7 @@ import {
   Microwave
 } from 'lucide-react';
 import { Appliance, InfoDetailMode } from '../../types';
+import { SourceBadge } from '../trust/SourceBadge';
 
 interface AppliancesViewProps {
   lang: 'th' | 'en';
@@ -201,22 +202,29 @@ export const AppliancesView: React.FC<AppliancesViewProps> = ({
               </div>
 
               {/* Costs Breakdown */}
-              <div className="grid grid-cols-2 gap-2 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 mb-3">
-                <div>
-                  <span className="text-[0.65rem] font-bold text-slate-400 uppercase">
-                    {lang === 'th' ? 'วันนี้' : 'Today'}
-                  </span>
-                  <div className="font-extrabold font-mono text-sm text-slate-900 dark:text-white">
-                    ฿{app.todayCost.toFixed(2)}
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 mb-3 space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <span className="text-[0.65rem] font-bold text-slate-400 uppercase">
+                      {lang === 'th' ? 'วันนี้' : 'Today'}
+                    </span>
+                    <div className="font-extrabold font-mono text-sm text-slate-900 dark:text-white">
+                      ฿{app.todayCost.toFixed(2)}
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-[0.65rem] font-bold text-slate-400 uppercase">
+                      {lang === 'th' ? 'คาดการณ์เดือนนี้' : 'Est. Month'}
+                    </span>
+                    <div className="font-extrabold font-mono text-sm text-emerald-600 dark:text-emerald-400">
+                      ฿{app.monthlyCost.toFixed(2)}
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <span className="text-[0.65rem] font-bold text-slate-400 uppercase">
-                    {lang === 'th' ? 'คาดการณ์เดือนนี้' : 'Est. Month'}
-                  </span>
-                  <div className="font-extrabold font-mono text-sm text-emerald-600 dark:text-emerald-400">
-                    ฿{app.monthlyCost.toFixed(2)}
-                  </div>
+
+                <div className="pt-1 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between">
+                  <span className="text-[0.65rem] text-slate-400">{lang === 'th' ? 'ที่มาข้อมูล:' : 'Data Source:'}</span>
+                  <SourceBadge source={app.watt > 1500 ? 'measured' : 'estimated'} lang={lang} />
                 </div>
               </div>
 

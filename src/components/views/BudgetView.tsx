@@ -16,6 +16,8 @@ import {
 
 import { InfoDetailMode } from '../../types';
 import { ProgressiveCard } from '../common/ProgressiveCard';
+import { CalculationTree } from '../trust/CalculationTree';
+import { AssumptionCard } from '../trust/AssumptionCard';
 
 interface BudgetViewProps {
   lang: 'th' | 'en';
@@ -168,6 +170,20 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
           </p>
         </div>
       </motion.div>
+
+      {/* Transparent Bill Calculation Trace & Assumptions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <CalculationTree
+          mode={infoDetailMode}
+          lang={lang}
+          isDarkMode={isDarkMode}
+        />
+
+        <AssumptionCard
+          lang={lang}
+          isDarkMode={isDarkMode}
+        />
+      </div>
 
       {/* 3. TIME-OF-USE (TOU) TARIFF SIMULATOR */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

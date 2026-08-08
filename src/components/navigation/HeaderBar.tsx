@@ -15,7 +15,9 @@ import {
   Flame, 
   Coins, 
   X,
-  Info
+  Info,
+  Search,
+  Command
 } from 'lucide-react';
 import { LocationItem, InfoDetailMode, NotificationItem, AppPage } from '../../types';
 
@@ -28,6 +30,7 @@ interface HeaderBarProps {
   onChangeDetailMode: (mode: InfoDetailMode) => void;
   notifications: NotificationItem[];
   onOpenNotifications: () => void;
+  onOpenSearch?: () => void;
   userLevel: number;
   userStreak: number;
   userCoins: number;
@@ -45,6 +48,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   onChangeDetailMode,
   notifications,
   onOpenNotifications,
+  onOpenSearch,
   userLevel,
   userStreak,
   userCoins,
@@ -219,8 +223,25 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
         </div>
       </div>
 
-      {/* Right: Notifications & User Level Badge */}
-      <div className="flex items-center gap-3">
+      {/* Right: Search, Notifications & User Level Badge */}
+      <div className="flex items-center gap-2.5">
+        {/* Quick Global Search Trigger */}
+        <button
+          onClick={onOpenSearch}
+          className={`flex items-center gap-2 px-3 py-2 rounded-2xl border transition-all text-xs font-bold ${
+            isDarkMode
+              ? 'bg-slate-800/80 border-slate-700 text-slate-300 hover:bg-slate-800 hover:border-emerald-500/40'
+              : 'bg-slate-100/80 border-slate-200 text-slate-700 hover:bg-slate-200 hover:border-emerald-300'
+          }`}
+          title="ค้นหาครอบจักรวาล (Cmd + K)"
+        >
+          <Search className="w-3.5 h-3.5 text-emerald-500" />
+          <span className="hidden xl:inline">{lang === 'th' ? 'ค้นหา...' : 'Search...'}</span>
+          <kbd className="hidden xl:inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-lg bg-slate-200/60 dark:bg-slate-700/60 text-[0.62rem] font-mono text-slate-500 dark:text-slate-400">
+            <Command className="w-2.5 h-2.5" />K
+          </kbd>
+        </button>
+
         {/* Notification Bell */}
         <button
           onClick={onOpenNotifications}

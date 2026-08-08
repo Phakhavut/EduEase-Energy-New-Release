@@ -19,7 +19,9 @@ import {
   Globe,
   LogOut,
   Scale,
-  Award
+  Award,
+  BrainCircuit,
+  ShieldCheck
 } from 'lucide-react';
 import { AppPage } from '../../types';
 
@@ -56,6 +58,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const navItems = [
     { id: 'home' as AppPage, labelTh: 'หน้าหลัก', labelEn: 'Home', icon: Home, badge: undefined },
+    { id: 'insights' as AppPage, labelTh: 'Smart Insights', labelEn: 'Smart Insights', icon: BrainCircuit, badge: 'AI' },
     { id: 'ai-coach' as AppPage, labelTh: 'AI Coach', labelEn: 'AI Coach', icon: Bot, badge: 'AI' },
     { id: 'compare' as AppPage, labelTh: 'เปรียบเทียบอุปกรณ์', labelEn: 'Compare Lab', icon: Scale, badge: 'Lab' },
     { id: 'score' as AppPage, labelTh: 'ดัชนีการประหยัดไฟ', labelEn: 'Saving Score', icon: Trophy, badge: '88 Pts' },
@@ -66,6 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'learning' as AppPage, labelTh: 'เรียนรู้ & คู่มือ', labelEn: 'Learning & Guide', icon: GraduationCap, badge: 'New' },
     { id: 'achievements' as AppPage, labelTh: 'ภารกิจ & รางวัล', labelEn: 'Missions', icon: Award, badge: undefined },
     { id: 'profile' as AppPage, labelTh: 'โปรไฟล์', labelEn: 'Profile', icon: User, badge: undefined },
+    { id: 'trust-center' as AppPage, labelTh: 'ศูนย์ความน่าเชื่อถือ & AI', labelEn: 'Trust & Transparency', icon: ShieldCheck, badge: 'Trust' },
     { id: 'settings' as AppPage, labelTh: 'ตั้งค่า', labelEn: 'Settings', icon: Settings, badge: undefined },
   ];
 

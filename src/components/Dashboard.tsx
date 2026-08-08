@@ -14,11 +14,14 @@ import { LocationsView } from "./views/LocationsView";
 import { LearningView } from "./views/LearningView";
 import { ComparisonView } from "./views/ComparisonView";
 import { ScoreView } from "./views/ScoreView";
+import { SmartInsightsHub } from "./insights/SmartInsightsHub";
+import { TrustCenterView } from "./trust/TrustCenterView";
 import { OnboardingModal } from "./OnboardingModal";
 import { NotificationModal } from "./NotificationModal";
+import { GlobalSearchModal } from "./common/GlobalSearchModal";
 import { GuidedTour } from "./GuidedTour";
 import { useOnboardingTour } from "../hooks/useOnboardingTour";
-import { AppPage, LocationItem, InfoDetailMode, NotificationItem } from "../types";
+import { AppPage, LocationItem, InfoDetailMode, NotificationItem, SmartGoal, EnergyDiaryNote } from "../types";
 import { 
   INITIAL_APPLIANCES, 
   INITIAL_MISSIONS, 
@@ -31,6 +34,15 @@ import {
   INITIAL_NOTIFICATIONS,
   LEADERBOARD_USERS 
 } from "../data/initialData";
+import {
+  initialAnomalies,
+  initialGoals,
+  householdBenchmarks,
+  seasonalInsights,
+  initialActionTimeline,
+  whatIfScenarios,
+  initialDiaryNotes
+} from "../data/smartInsightsData";
 import { jsPDF } from "jspdf";
 
 interface DashboardProps {
@@ -85,6 +97,19 @@ export default function Dashboard({
   // Modals state
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
+
+  // Global Keyboard Shortcuts (Cmd+K / Ctrl+K for search)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowSearchModal(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Locations state
   const [locations, setLocations] = useState<LocationItem[]>(INITIAL_LOCATIONS);
@@ -117,6 +142,31 @@ export default function Dashboard({
   const [badges, setBadges] = useState(INITIAL_BADGES);
   const [skins, setSkins] = useState(INITIAL_SKINS);
   const [recommendations, setRecommendations] = useState(INITIAL_RECOMMENDATIONS);
+
+  // Smart Insights state
+  const [anomalies, setAnomalies] = useState(initialAnomalies);
+  const [goals, setGoals] = useState(initialGoals);
+  const [benchmarks] = useState(householdBenchmarks);
+  const [seasonalInsightsList] = useState(seasonalInsights);
+  const [actionTimeline, setActionTimeline] = useState(initialActionTimeline);
+  const [scenarios] = useState(whatIfScenarios);
+  const [diaryNotes, setDiaryNotes] = useState(initialDiaryNotes);
+
+  const handleResolveAnomaly = (id: string) => {
+    setAnomalies(prev => prev.map(a => a.id === id ? { ...a, resolved: true } : a));
+  };
+
+  const handleAddGoal = (goal: SmartGoal) => {
+    setGoals(prev => [goal, ...prev]);
+  };
+
+  const handleToggleGoalComplete = (id: string) => {
+    setGoals(prev => prev.map(g => g.id === id ? { ...g, completed: !g.completed } : g));
+  };
+
+  const handleAddDiaryNote = (note: EnergyDiaryNote) => {
+    setDiaryNotes(prev => [note, ...prev]);
+  };
 
   // AI Chat state
   const [chatMessages, setChatMessages] = useState<
@@ -330,6 +380,7 @@ export default function Dashboard({
           onChangeDetailMode={setInfoDetailMode}
           notifications={notifications}
           onOpenNotifications={() => setShowNotifications(true)}
+          onOpenSearch={() => setShowSearchModal(true)}
           userLevel={userLevel}
           userStreak={userStreak}
           userCoins={userCoins}
@@ -337,6 +388,26 @@ export default function Dashboard({
           isDarkMode={isDarkMode}
           lang={lang}
         />
+
+        {currentPage === 'insights' && (
+          <SmartInsightsHub
+            lang={lang}
+            isDarkMode={isDarkMode}
+            infoDetailMode={infoDetailMode}
+            anomalies={anomalies}
+            goals={goals}
+            benchmarks={benchmarks}
+            seasonalInsights={seasonalInsightsList}
+            actionTimeline={actionTimeline}
+            scenarios={scenarios}
+            diaryNotes={diaryNotes}
+            onResolveAnomaly={handleResolveAnomaly}
+            onAddGoal={handleAddGoal}
+            onToggleGoalComplete={handleToggleGoalComplete}
+            onAddDiaryNote={handleAddDiaryNote}
+            onNavigatePage={setCurrentPage}
+          />
+        )}
 
         {currentPage === 'home' && (
           <HomeView
@@ -463,6 +534,15 @@ export default function Dashboard({
           />
         )}
 
+        {currentPage === 'trust-center' && (
+          <TrustCenterView
+            lang={lang}
+            isDarkMode={isDarkMode}
+            infoDetailMode={infoDetailMode}
+            onNavigatePage={setCurrentPage}
+          />
+        )}
+
         {currentPage === 'achievements' && (
           <AchievementsView
             lang={lang}
@@ -510,6 +590,7 @@ export default function Dashboard({
             onStartTour={() => handleStartTour(0)}
             neverShowAgain={neverShowAgain}
             setNeverShowAgain={setNeverShowAgain}
+            onNavigatePage={setCurrentPage}
           />
         )}
 
@@ -549,6 +630,14 @@ export default function Dashboard({
           onMarkAsRead={handleMarkNotifRead}
           onMarkAllAsRead={handleMarkAllNotifsRead}
           onNavigateToPage={setCurrentPage}
+          isDarkMode={isDarkMode}
+          lang={lang}
+        />
+
+        <GlobalSearchModal
+          isOpen={showSearchModal}
+          onClose={() => setShowSearchModal(false)}
+          onNavigatePage={setCurrentPage}
           isDarkMode={isDarkMode}
           lang={lang}
         />

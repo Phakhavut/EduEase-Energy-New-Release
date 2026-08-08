@@ -257,8 +257,38 @@ export const HomeView: React.FC<HomeViewProps> = ({
         />
       </div>
 
-      {/* Quick Launch Features Banner: Comparison Lab & Saving Score */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Quick Launch Features Banner: Smart Insights, Comparison Lab & Saving Score */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Smart Insights Banner */}
+        <div 
+          onClick={() => setCurrentPage('insights')}
+          className={`p-5 rounded-3xl border transition-all cursor-pointer group flex items-center justify-between ${
+            isDarkMode 
+              ? 'bg-gradient-to-r from-purple-950/50 to-slate-900 border-purple-800/40 hover:border-purple-500/60' 
+              : 'bg-gradient-to-r from-purple-50 via-indigo-50/30 to-white border-purple-200 hover:border-purple-400 shadow-sm'
+          }`}
+        >
+          <div className="flex items-center gap-3.5">
+            <div className="p-3 rounded-2xl bg-purple-600 text-white font-extrabold shadow-md group-hover:scale-110 transition-transform">
+              🧠
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-sm text-slate-900 dark:text-white font-display">
+                  {lang === 'th' ? 'Smart Insights' : 'Smart Insights'}
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-400 font-extrabold text-[0.65rem] uppercase">
+                  AI Layer
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                {lang === 'th' ? 'ตรวจจับกระชาก บันทึกไดอารี่ & What-If' : 'Anomalies, Diary & What-If Simulator'}
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="w-5 h-5 text-purple-500 group-hover:translate-x-1 transition-transform" />
+        </div>
+
         {/* Compare Lab Banner */}
         <div 
           onClick={() => setCurrentPage('compare')}
@@ -275,14 +305,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-black text-sm text-slate-900 dark:text-white font-display">
-                  {lang === 'th' ? 'ห้องทดลองเปรียบเทียบอุปกรณ์' : 'Appliance Comparison Lab'}
+                  {lang === 'th' ? 'เปรียบเทียบอุปกรณ์' : 'Appliance Lab'}
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-extrabold text-[0.65rem] uppercase">
-                  New
+                  Lab
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {lang === 'th' ? 'เปรียบเทียบค่าไฟ 2-5 อุปกรณ์ พร้อมกราฟและ AI สรุปผล' : 'Compare 2-5 devices with charts & AI verdict'}
+                {lang === 'th' ? 'เทียบ 2-5 อุปกรณ์ พร้อมกราฟ' : 'Compare 2-5 devices'}
               </p>
             </div>
           </div>
@@ -305,14 +335,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-black text-sm text-slate-900 dark:text-white font-display">
-                  {lang === 'th' ? 'ดัชนีการประหยัดไฟ (88/100)' : 'Energy Saving Score (88/100)'}
+                  {lang === 'th' ? 'ดัชนีประหยัดไฟ' : 'Saving Score'}
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 font-extrabold text-[0.65rem] uppercase">
-                  +5 Pts
+                  88 Pts
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {lang === 'th' ? 'ระดับ Smart Saver • ดูจุดพัฒนาและวิเคราะห์ 5 มิติ' : 'Smart Saver tier • See 5-dimension breakdown'}
+                {lang === 'th' ? 'คะแนนประสิทธิภาพและวิธีเพิ่ม' : 'Efficiency score & tips'}
               </p>
             </div>
           </div>
