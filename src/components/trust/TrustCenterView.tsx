@@ -18,12 +18,14 @@ import {
   Award,
   Zap,
   Cpu,
-  Server
+  Server,
+  Settings
 } from 'lucide-react';
 import { InfoDetailMode, AppPage } from '../../types';
 import { TRUST_FAQS } from '../../data/trustData';
 import { DataQualityCard } from './DataQualityCard';
 import { AIDecisionHistoryCard } from './AIDecisionHistoryCard';
+import { OfficialReferencesDirectory } from './OfficialReferencesDirectory';
 
 interface TrustCenterViewProps {
   lang: 'th' | 'en';
@@ -41,7 +43,24 @@ export const TrustCenterView: React.FC<TrustCenterViewProps> = ({
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   return (
-    <div className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+    <div id="tour-step-trust" className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+      {/* Settings & Trust Hub Sub-Tabs */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto self-start border border-slate-300/50 dark:border-slate-700/50">
+        <button
+          onClick={() => onNavigatePage && onNavigatePage('settings')}
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        >
+          <Settings className="w-4 h-4 text-emerald-500" />
+          <span>{lang === 'th' ? 'การตั้งค่าแอป (App Settings)' : 'App Settings'}</span>
+        </button>
+        <button
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm"
+        >
+          <ShieldCheck className="w-4 h-4 text-emerald-500" />
+          <span>{lang === 'th' ? 'ศูนย์ความน่าเชื่อถือ & AI (Trust Center)' : 'Trust Center'}</span>
+        </button>
+      </div>
+
       {/* 1. Hero Banner */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -185,7 +204,13 @@ export const TrustCenterView: React.FC<TrustCenterViewProps> = ({
         </div>
       </div>
 
-      {/* 5. FAQs Accordion */}
+      {/* 5. Official References & Standards Directory */}
+      <OfficialReferencesDirectory
+        lang={lang}
+        isDarkMode={isDarkMode}
+      />
+
+      {/* 6. FAQs Accordion */}
       <div className={`p-6 md:p-8 rounded-[2.5rem] border shadow-sm transition-all space-y-4 ${
         isDarkMode ? 'bg-slate-900/90 border-slate-800 text-white' : 'bg-white border-slate-100 text-slate-800'
       }`}>

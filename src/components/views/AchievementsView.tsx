@@ -13,10 +13,11 @@ import {
   Crown, 
   Zap, 
   Award,
-  ChevronRight
+  ChevronRight,
+  User
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { Mission, Badge, CharacterSkin } from '../../types';
+import { Mission, Badge, CharacterSkin, AppPage } from '../../types';
 import { DynamicMissionsHub } from '../gamification/DynamicMissionsHub';
 import { EnergyPassport } from '../gamification/EnergyPassport';
 import { EnergyTreeEcosystem } from '../gamification/EnergyTreeEcosystem';
@@ -40,6 +41,7 @@ interface AchievementsViewProps {
   setCurrentAvatar: (avatar: string) => void;
   leaderboard: any[];
   onStartPageTour?: (stepIndex: number) => void;
+  onNavigatePage?: (page: AppPage) => void;
 }
 
 export const AchievementsView: React.FC<AchievementsViewProps> = ({
@@ -59,6 +61,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
   setCurrentAvatar,
   leaderboard,
   onStartPageTour,
+  onNavigatePage,
 }) => {
   const [activeTab, setActiveTab] = useState<'eduverse' | 'missions' | 'passport' | 'tree' | 'badges' | 'skins' | 'leaderboard'>('eduverse');
   const [isLootBoxOpen, setIsLootBoxOpen] = useState(false);
@@ -85,6 +88,29 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
 
   return (
     <div id="tour-step-missions" className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+      {/* Profile & Score Hub Sub-Tabs */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto self-start border border-slate-300/50 dark:border-slate-700/50">
+        <button
+          onClick={() => onNavigatePage && onNavigatePage('profile')}
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        >
+          <User className="w-4 h-4 text-indigo-500" />
+          <span>{lang === 'th' ? 'โปรไฟล์ผู้ใช้ (Profile)' : 'Profile'}</span>
+        </button>
+        <button
+          onClick={() => onNavigatePage && onNavigatePage('score')}
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        >
+          <Trophy className="w-4 h-4 text-amber-500" />
+          <span>{lang === 'th' ? 'ดัชนีประหยัดไฟ (Saving Score)' : 'Saving Score'}</span>
+        </button>
+        <button
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-300 shadow-sm"
+        >
+          <Award className="w-4 h-4 text-emerald-500" />
+          <span>{lang === 'th' ? 'ตราความสำเร็จ (Badges)' : 'Badges & Skins'}</span>
+        </button>
+      </div>
       {/* 1. GAMIFIED HEADER CARD (Duolingo Style) */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
@@ -111,7 +137,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
 
                 {onStartPageTour && (
                   <button
-                    onClick={() => onStartPageTour(6)}
+                    onClick={() => onStartPageTour(8)}
                     className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-xs border border-amber-500/30 hover:bg-amber-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-bounce" />
@@ -191,7 +217,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
           userCoins={userCoins}
           userStreak={userStreak}
           savingScore={88}
-          onStartPageTour={onStartPageTour ? () => onStartPageTour(6) : undefined}
+          onStartPageTour={onStartPageTour ? () => onStartPageTour(8) : undefined}
         />
       )}
 
@@ -333,6 +359,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
                   if (skin.unlocked) {
                     setCurrentAvatar(skin.avatarUrl);
                   } else {
+                    triggerConfetti();
                     onUnlockSkin(skin.id, skin.priceCoins);
                   }
                 }}

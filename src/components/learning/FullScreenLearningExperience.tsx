@@ -32,10 +32,17 @@ import {
   Star,
   Check,
   Layers,
-  Info
+  Info,
+  Hammer,
+  SunMedium,
+  AlertTriangle,
+  Tag,
+  Cpu,
+  Wrench
 } from 'lucide-react';
-import { Lesson, LearningPath, InfoDetailMode } from '../../types';
+import { Lesson, LearningPath, InfoDetailMode, LessonDifficulty } from '../../types';
 import { Confetti } from '../Confetti';
+import { LessonComprehensionQuiz } from './LessonComprehensionQuiz';
 
 interface FullScreenLearningExperienceProps {
   lesson: Lesson;
@@ -43,6 +50,7 @@ interface FullScreenLearningExperienceProps {
   onClose: () => void;
   onCompleteLesson: (lessonId: string, xp: number) => void;
   onRewardCoins?: (coins: number, xp: number) => void;
+  onRewardCertificationPoints?: (bonusCp: number) => void;
   lang: 'th' | 'en';
   isDarkMode: boolean;
   detailMode?: InfoDetailMode;
@@ -55,15 +63,22 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
   onClose,
   onCompleteLesson,
   onRewardCoins,
+  onRewardCertificationPoints,
   lang,
   isDarkMode,
   detailMode = 'balanced',
   onNextLesson
 }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedOption, setSelectedOption] = useState<number | null>(null);
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
+  const [quizPassed, setQuizPassed] = useState(false);
+  const [earnedBonusCp, setEarnedBonusCp] = useState<number>(() => {
+    switch (lesson.difficulty) {
+      case 'expert': return 100;
+      case 'hard': return 80;
+      case 'medium': return 65;
+      default: return 50;
+    }
+  });
   const [showConfetti, setShowConfetti] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [expandedHabit, setExpandedHabit] = useState<string | null>('habit_1');
@@ -92,14 +107,8 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
   const handleNextStep = () => {
     if (currentStep < 7) {
       setCurrentStep(prev => prev + 1);
-    } else if (currentStep === 7) {
-      // Complete lesson & move to Step 8 Celebration
-      onCompleteLesson(lesson.id, lesson.xpReward);
-      if (onRewardCoins) {
-        onRewardCoins(25, lesson.xpReward);
-      }
-      setShowConfetti(true);
-      setCurrentStep(8);
+    } else if (currentStep === 7 && quizPassed) {
+      handleQuizContinue();
     }
   };
 
@@ -109,15 +118,22 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
     }
   };
 
-  const handleQuizSubmit = () => {
-    if (selectedOption === null) return;
-    const correct = selectedOption === lesson.correctIndex;
-    setQuizSubmitted(true);
-    setIsCorrect(correct);
-    if (correct) {
-      setShowConfetti(true);
-      if (onRewardCoins) onRewardCoins(30, lesson.xpReward);
+  const handlePassQuiz = (bonusCp: number, xpReward: number, coins: number) => {
+    setEarnedBonusCp(bonusCp);
+    setQuizPassed(true);
+    setShowConfetti(true);
+    if (onRewardCertificationPoints) {
+      onRewardCertificationPoints(bonusCp);
     }
+    if (onRewardCoins) {
+      onRewardCoins(coins, xpReward);
+    }
+  };
+
+  const handleQuizContinue = () => {
+    onCompleteLesson(lesson.id, lesson.xpReward);
+    setShowConfetti(true);
+    setCurrentStep(8);
   };
 
   const handleAskAiTutor = (promptType: 'simplify' | 'formula' | 'example' | 'why') => {
@@ -242,66 +258,116 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
         <div className="max-w-3xl mx-auto space-y-6">
 
           {/* HERO INTRO CARD (Always visible on Step 1) */}
-          {currentStep === 1 && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`p-6 md:p-8 rounded-[28px] border shadow-xl relative overflow-hidden space-y-6 ${
-                isDarkMode 
-                  ? 'bg-gradient-to-br from-slate-900 via-emerald-950/30 to-slate-900 border-slate-800' 
-                  : 'bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-white border-emerald-100'
-              }`}
-            >
-              {/* Background Glow */}
-              <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none" />
+          {currentStep === 1 && (() => {
+            const diffStars = lesson.difficulty === 'expert' ? 4 : lesson.difficulty === 'hard' ? 3 : lesson.difficulty === 'medium' ? 2 : 1;
+            const diffLabel = {
+              easy: { th: 'ระดับ 1: ง่าย (ในบ้าน)', en: 'Tier 1: Easy (Home)' },
+              medium: { th: 'ระดับ 2: ปานกลาง (นอกบ้าน/โซลาร์)', en: 'Tier 2: Medium (Solar)' },
+              hard: { th: 'ระดับ 3: ทักษะช่างไฟ (ตู้ไฟ/สายไฟ)', en: 'Tier 3: Hard (Wiring)' },
+              expert: { th: 'ระดับ 4: ช่างไฟมือโปร (ตรวจซ่อม/วิเคราะห์)', en: 'Tier 4: Expert (Pro Diagnostics)' }
+            }[lesson.difficulty || 'easy'];
 
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs uppercase tracking-wider">
-                  <Zap className="w-3.5 h-3.5 fill-emerald-500" />
-                  {lang === 'th' ? 'บทเรียนสำคัญประจำวัน' : 'Core Academy Lesson'}
-                </div>
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`p-6 md:p-8 rounded-[28px] border shadow-xl relative overflow-hidden space-y-6 ${
+                  isDarkMode 
+                    ? 'bg-gradient-to-br from-slate-900 via-emerald-950/30 to-slate-900 border-slate-800' 
+                    : 'bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-white border-emerald-100'
+                }`}
+              >
+                {/* Background Glow */}
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 rounded-full bg-emerald-500/15 blur-3xl pointer-events-none" />
 
-                {/* Difficulty Stars */}
-                <div className="flex items-center gap-1 text-amber-400 text-xs font-extrabold">
-                  <span className="text-slate-400 font-bold mr-1">{lang === 'th' ? 'ระดับความยาก:' : 'Difficulty:'}</span>
-                  <Star className="w-4 h-4 fill-amber-400" />
-                  <Star className="w-4 h-4 fill-amber-400" />
-                  <Star className="w-4 h-4 text-slate-300 dark:text-slate-700" />
-                </div>
-              </div>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs uppercase tracking-wider">
+                    <Zap className="w-3.5 h-3.5 fill-emerald-500" />
+                    {lang === 'th' ? diffLabel.th : diffLabel.en}
+                  </div>
 
-              <div className="space-y-3">
-                <h2 className="text-2xl md:text-3xl font-black font-display leading-tight text-slate-900 dark:text-white">
-                  {lang === 'th' ? lesson.titleTh : lesson.titleEn}
-                </h2>
-                <p className="text-base text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-                  {lang === 'th' ? lesson.contentTh : lesson.contentEn}
-                </p>
-              </div>
-
-              {/* Reward Badges Grid */}
-              <div className="grid grid-cols-3 gap-3 pt-2">
-                <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center space-y-1">
-                  <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">{lang === 'th' ? 'เวลาอ่าน' : 'Duration'}</div>
-                  <div className="text-sm md:text-base font-black font-mono text-emerald-600 dark:text-emerald-400">{lesson.readTime}</div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-center space-y-1">
-                  <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">XP Reward</div>
-                  <div className="text-sm md:text-base font-black font-mono text-amber-500 flex items-center justify-center gap-1">
-                    <Zap className="w-4 h-4 fill-amber-500" /> +{lesson.xpReward}
+                  {/* Difficulty Stars */}
+                  <div className="flex items-center gap-1 text-amber-400 text-xs font-extrabold">
+                    <span className="text-slate-400 font-bold mr-1">{lang === 'th' ? 'ระดับความยาก:' : 'Tier:'}</span>
+                    {[1, 2, 3, 4].map((starIdx) => (
+                      <Star
+                        key={starIdx}
+                        className={`w-4 h-4 ${starIdx <= diffStars ? 'fill-amber-400 text-amber-400' : 'text-slate-300 dark:text-slate-700'}`}
+                      />
+                    ))}
                   </div>
                 </div>
 
-                <div className="p-3.5 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-center space-y-1">
-                  <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Coins</div>
-                  <div className="text-sm md:text-base font-black font-mono text-teal-500 flex items-center justify-center gap-1">
-                    <Coins className="w-4 h-4 text-teal-500" /> +25
+                <div className="space-y-3">
+                  <h2 className="text-2xl md:text-3xl font-black font-display leading-tight text-slate-900 dark:text-white">
+                    {lang === 'th' ? lesson.titleTh : lesson.titleEn}
+                  </h2>
+                  <p className="text-base text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+                    {lang === 'th' ? lesson.contentTh : lesson.contentEn}
+                  </p>
+
+                  {/* Tags */}
+                  {lesson.tags && lesson.tags.length > 0 && (
+                    <div className="flex items-center gap-2 flex-wrap pt-1">
+                      {lesson.tags.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold text-xs flex items-center gap-1"
+                        >
+                          <Tag className="w-3 h-3 text-teal-500" /> #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Reward Badges Grid - Sleek Horizontal Badges */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                  <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        {lang === 'th' ? 'เวลาอ่าน' : 'Duration'}
+                      </span>
+                      <span className="text-sm sm:text-base font-black font-mono text-emerald-600 dark:text-emerald-400 truncate block">
+                        {lesson.readTime}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center shrink-0">
+                      <Zap className="w-5 h-5 fill-amber-500" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        XP Reward
+                      </span>
+                      <span className="text-sm sm:text-base font-black font-mono text-amber-500 truncate block">
+                        +{lesson.xpReward} XP
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-teal-500/10 border border-teal-500/20 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-teal-500/20 text-teal-500 flex items-center justify-center shrink-0">
+                      <Coins className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+                        {lang === 'th' ? 'เหรียญสะสม' : 'Coins'}
+                      </span>
+                      <span className="text-sm sm:text-base font-black font-mono text-teal-500 truncate block">
+                        +25 Coins
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            );
+          })()}
 
           {/* STEP 1 CONTENT: Why Should I Care? */}
           {currentStep === 1 && (
@@ -315,26 +381,43 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
               }`}>
                 <h3 className="text-lg font-extrabold font-display text-slate-900 dark:text-white flex items-center gap-2">
                   <Lightbulb className="w-5 h-5 text-amber-500 shrink-0" />
-                  {lang === 'th' ? '1. ทำไมเรื่องนี้ถึงสำคัญกับกระเป๋าเงินของคุณ?' : '1. Why Should You Care?'}
+                  {lang === 'th' ? '1. ทำไมบทเรียนนี้ถึงสำคัญกับคุณและงานไฟฟ้า?' : '1. Why Does This Matter?'}
                 </h3>
 
                 <p className="text-sm md:text-base text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
                   {lang === 'th'
-                    ? 'ผู้คนส่วนใหญ่ตกใจกับบิลค่าไฟทุกสิ้นเดือน แต่กลับไม่เคยรู้เลยว่าเครื่องใช้ไฟฟ้าชิ้นไหนที่เป็นแชมป์สูบไฟตัวจริง การเข้าใจหลักการทำงานของการใช้ไฟฟ้าจะช่วยให้คุณตัดค่าใช้จ่ายรั่วไหลได้ถึง 15–30% โดยไม่กระทบต่อความสบายในชีวิตประจำวัน'
-                    : 'Most people are shocked by monthly electric bills, but never know which appliances drive the costs. Mastering power fundamentals lets you save 15-30% effortlessly.'}
+                    ? 'การเข้าใจหลักการไฟฟ้าอย่างถูกต้องช่วยทั้งการประหยัดค่าไฟในบ้าน และป้องกันอันตรายจากไฟฟ้าลัดวงจร ไฟช็อต รวมถึงสามารถตรวจเช็กแก้ปัญหาเบื้องต้นได้เหมือนช่างไฟฟ้ามืออาชีพ'
+                    : 'Mastering electrical principles saves substantial power bills and protects against electrical fires and shock, empowering you with electrician-grade diagnostic confidence.'}
                 </p>
 
-                {/* Impact Highlight Box */}
-                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-black shrink-0">
-                    ฿
+                {/* Formula Snippet if present */}
+                {lesson.formula && (
+                  <div className="p-4 rounded-2xl bg-purple-500/10 border border-purple-500/30 space-y-1">
+                    <span className="text-[11px] font-black uppercase text-purple-600 dark:text-purple-300 flex items-center gap-1">
+                      <Cpu className="w-3.5 h-3.5" /> {lang === 'th' ? 'สูตร & ค่ามาตรฐานประจำบทเรียน:' : 'Key Engineering Formula:'}
+                    </span>
+                    <div className="font-mono text-sm md:text-base font-black text-purple-700 dark:text-purple-200">
+                      {lesson.formula}
+                    </div>
                   </div>
-                  <div className="text-xs md:text-sm font-extrabold text-emerald-800 dark:text-emerald-300">
-                    {lang === 'th'
-                      ? 'ประหยัดเฉลี่ย ฿200 - ฿600 บาท/เดือน เมื่อปฏิบัติตามบทเรียนนี้อย่างถูกวิธี!'
-                      : 'Save ฿200 - ฿600 / month on average by following this lesson!'}
+                )}
+
+                {/* Electrician Pro Tip Highlight */}
+                {lesson.electricianTipTh && (
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black shrink-0 mt-0.5">
+                      <Hammer className="w-4 h-4" />
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-xs font-black uppercase text-amber-700 dark:text-amber-300">
+                        {lang === 'th' ? 'เคล็ดลับช่างไฟฟ้า (Electrician Pro Insight)' : 'Electrician Pro Tip'}
+                      </span>
+                      <p className="text-xs md:text-sm font-semibold text-slate-700 dark:text-slate-200 leading-snug">
+                        {lang === 'th' ? lesson.electricianTipTh : lesson.electricianTipEn || lesson.electricianTipTh}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -348,61 +431,48 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
             >
               <div className="space-y-2">
                 <span className="px-3 py-1 rounded-full bg-teal-500/15 text-teal-600 dark:text-teal-400 font-extrabold text-xs uppercase tracking-wider">
-                  Step 2 • {lang === 'th' ? 'แนวคิดหลัก' : 'Core Concept'}
+                  Step 2 • {lang === 'th' ? 'แนวคิดหลัก & การทำงาน' : 'Core Concept & Mechanics'}
                 </span>
                 <h2 className="text-2xl font-black font-display text-slate-900 dark:text-white">
-                  {lang === 'th' ? 'ทำความเข้าใจหลักการทำงาน' : 'Understanding the Mechanics'}
+                  {lang === 'th' ? 'ทำความเข้าใจหลักการทำงานเชิงลึก' : 'Deep-Dive Mechanics'}
                 </h2>
               </div>
 
               {/* Detail Mode Mode Specific Content */}
-              <div className={`p-6 rounded-[24px] border shadow-sm space-y-4 ${
+              <div className={`p-6 rounded-[24px] border shadow-sm space-y-5 ${
                 isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
               }`}>
-                {detailMode === 'simple' && (
-                  <div className="space-y-3">
-                    <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 font-bold text-sm text-amber-800 dark:text-amber-300 flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-amber-500 shrink-0" />
-                      <span>{lang === 'th' ? 'โหมดเข้าใจง่าย (Beginner View)' : 'Simple View Mode'}</span>
-                    </div>
-                    <p className="text-base font-medium text-slate-700 dark:text-slate-200 leading-relaxed">
-                      เปรียบเครื่องใช้ไฟฟ้าเหมือน **"รถยนต์"**:
-                      <br />
-                      • **วัตต์ (Watts)** คือ ความเร็วเข็มไมล์ ยิ่งวัตต์เยอะ ยิ่งวิ่งเร็ว เปลืองน้ำมัน
-                      <br />
-                      • **ชั่วโมง (Hours)** คือ ระยะทางที่คุณขับรถ
-                      <br />
-                      • **หน่วยไฟ (kWh)** คือ ปริมาณน้ำมันทั้งหมดที่ถูกเติมลงถังและถูกคิดเงินในบิล!
-                    </p>
-                  </div>
-                )}
+                {/* General Explanation */}
+                <p className="text-base font-medium text-slate-700 dark:text-slate-200 leading-relaxed">
+                  {lang === 'th' ? lesson.contentTh : lesson.contentEn}
+                </p>
 
-                {detailMode === 'balanced' && (
-                  <div className="space-y-3">
-                    <p className="text-base font-medium text-slate-700 dark:text-slate-200 leading-relaxed">
-                      {lang === 'th'
-                        ? 'กำลังไฟฟ้าของเครื่องใช้ไฟฟ้าแต่ละชนิดมีหน่วยเป็น วัตต์ (W) เช่น พัดลม 50W, แอร์ 1,200W, กาต้มน้ำ 2,000W การไฟฟ้าจะไม่ได้คิดเงินตามกำลังวัตต์ตรงๆ แต่คิดตาม "หน่วยไฟสะสม" หรือ Kilowatt-hour (kWh)'
-                        : 'Appliance power is measured in Watts (W). The utility company charges by total accumulated Kilowatt-hours (kWh) rather than instantaneous Watts.'}
-                    </p>
-                    <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 font-mono text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                      kWh = (Watts × Hours) ÷ 1,000
+                {/* Lesson Specific Formula Block */}
+                {lesson.formula && (
+                  <div className="p-5 rounded-2xl bg-slate-950 text-emerald-400 font-mono space-y-2 border border-slate-800 shadow-inner">
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                      <span>📐 Engineering Formula & Limits</span>
+                      <span className="text-teal-400 text-[10px]">{lesson.tags?.join(' • ')}</span>
+                    </div>
+                    <div className="text-base md:text-lg font-black text-emerald-300">
+                      {lesson.formula}
                     </div>
                   </div>
                 )}
 
-                {detailMode === 'detailed' && (
-                  <div className="space-y-3">
-                    <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 font-mono text-xs font-bold text-purple-600 dark:text-purple-300">
-                      ENGINEERING & FORMULA VIEW
+                {/* Electrician Field Pro Tip in Step 2 */}
+                {lesson.electricianTipTh && (
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black shrink-0">
+                      <Wrench className="w-4 h-4" />
                     </div>
-                    <p className="text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-300">
-                      การคิดค่าไฟฟ้านอกจากหน่วยสะสม kWh แล้ว ยังประกอบไปด้วยอัตราก้าวหน้า (Progressive Tariff Rate), ค่า Ft (Float Time adjustment rate) และภาษีมูลค่าเพิ่ม (VAT 7%):
-                    </p>
-                    <div className="p-4 rounded-2xl bg-slate-950 text-emerald-400 font-mono text-xs space-y-1.5 overflow-x-auto">
-                      <div>P (kW) = Power (Watts) / 1000</div>
-                      <div>Energy (kWh) = P (kW) × Time (Hours)</div>
-                      <div>Total Bill = (kWh × Tariff) + (kWh × Ft) + VAT 7%</div>
-                      <div>Power Factor (PF) = Real Power (kW) / Apparent Power (kVA)</div>
+                    <div className="space-y-1">
+                      <span className="text-xs font-black uppercase text-amber-700 dark:text-amber-300">
+                        {lang === 'th' ? 'กฎเหล็กของช่างไฟฟ้า (Electrician Standard)' : 'Electrician Pro Standard'}
+                      </span>
+                      <p className="text-xs md:text-sm font-semibold text-slate-700 dark:text-slate-200">
+                        {lang === 'th' ? lesson.electricianTipTh : lesson.electricianTipEn || lesson.electricianTipTh}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -419,50 +489,79 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
             >
               <div className="space-y-2">
                 <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs uppercase tracking-wider">
-                  Step 3 • {lang === 'th' ? 'การเปรียบเทียบเชิงมิติภาพ' : 'Visual Comparison'}
+                  Step 3 • {lang === 'th' ? 'การเปรียบเทียบ & ไดอะแกรมระบบ' : 'Visual Diagram & Comparison'}
                 </span>
                 <h2 className="text-2xl font-black font-display text-slate-900 dark:text-white">
-                  {lang === 'th' ? 'เปรียบเทียบแอร์ธรรมดา VS แอร์ Inverter' : 'Inverter vs Standard AC'}
+                  {lang === 'th' 
+                    ? (lesson.diagramTh ? 'ผังวงจรและมาตรฐานการติดตั้ง' : 'เปรียบเทียบประสิทธิภาพระบบ')
+                    : (lesson.diagramEn ? 'Circuit Schematic & Standards' : 'System Efficiency Comparison')}
                 </h2>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Non-Inverter Card */}
-                <div className="p-5 rounded-[24px] bg-rose-500/10 border border-rose-500/20 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-extrabold text-rose-600 dark:text-rose-400 text-base">
-                      ❌ แอร์ธรรมดา (Non-Inverter)
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-600 text-xs font-bold">
-                      กินไฟหนัก
+              {/* Dynamic Diagram Render if defined */}
+              {lesson.diagramTh ? (
+                <div className={`p-6 rounded-[28px] border shadow-lg space-y-4 ${
+                  isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-gradient-to-br from-teal-500/10 via-white to-emerald-500/10 border-teal-200'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    <span className="px-3 py-1 rounded-full bg-teal-500 text-white font-extrabold text-xs flex items-center gap-1">
+                      <Cpu className="w-3.5 h-3.5" />
+                      {lang === 'th' ? 'ผังระบบ & วงจรไฟฟ้า' : 'Electrical System Flow'}
                     </span>
                   </div>
-                  <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-                    คอมเพรสเซอร์ทำงานแบบ "ติด-ดับ" กระชากกระแสไฟวัตต์สูงทุกครั้งที่สตาร์ทใหม่ ทำให้อุณหภูมิสวิง และเปลืองไฟเพิ่มขึ้น 30–40%
-                  </p>
-                  <div className="p-3 rounded-xl bg-white/60 dark:bg-slate-900/60 font-mono text-xs font-bold text-rose-600">
-                    ⚡ ค่าไฟเฉลี่ย: ~฿1,200 - ฿1,600 / เดือน
-                  </div>
-                </div>
 
-                {/* Inverter Card */}
-                <div className="p-5 rounded-[24px] bg-emerald-500/10 border border-emerald-500/20 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-base">
-                      ✅ แอร์ Inverter เบอร์ 5
-                    </span>
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 text-xs font-bold">
-                      ประหยัดสูงสุด
-                    </span>
+                  <div className="p-4 rounded-2xl bg-slate-950 text-slate-100 font-mono text-sm md:text-base font-bold border border-slate-800 leading-relaxed">
+                    {lang === 'th' ? lesson.diagramTh : lesson.diagramEn || lesson.diagramTh}
                   </div>
-                  <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-                    ปรับรอบหมุนคอมเพรสเซอร์แปรผันตามความเย็น รักษาอุณหภูมินิ่ง ไร้เสียงรบกวน ไร้การกระชากไฟ ประหยัดเงินในกระเป๋าอย่างยั่งยืน
-                  </p>
-                  <div className="p-3 rounded-xl bg-white/60 dark:bg-slate-900/60 font-mono text-xs font-bold text-emerald-600">
-                    ⚡ ค่าไฟเฉลี่ย: ~฿750 - ฿950 / เดือน
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs font-semibold text-emerald-800 dark:text-emerald-300">
+                      ✓ {lang === 'th' ? 'สอดคล้องตามมาตรฐาน วสท. / มอก. 11-2553' : 'Compliant with TIS / EIT Wiring Regulations'}
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs font-semibold text-amber-800 dark:text-amber-300">
+                      ⚡ {lang === 'th' ? 'เน้นความปลอดภัยต่อชีวิตและทรัพย์สิน 100%' : '100% Life and Property Safety Focused'}
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Non-Inverter Card */}
+                  <div className="p-5 rounded-[24px] bg-rose-500/10 border border-rose-500/20 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-rose-600 dark:text-rose-400 text-base">
+                        ❌ แอร์ธรรมดา (Non-Inverter)
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-600 text-xs font-bold">
+                        กินไฟหนัก
+                      </span>
+                    </div>
+                    <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+                      คอมเพรสเซอร์ทำงานแบบ "ติด-ดับ" กระชากกระแสไฟวัตต์สูงทุกครั้งที่สตาร์ทใหม่ ทำให้อุณหภูมิสวิง และเปลืองไฟเพิ่มขึ้น 30–40%
+                    </p>
+                    <div className="p-3 rounded-xl bg-white/60 dark:bg-slate-900/60 font-mono text-xs font-bold text-rose-600">
+                      ⚡ ค่าไฟเฉลี่ย: ~฿1,200 - ฿1,600 / เดือน
+                    </div>
+                  </div>
+
+                  {/* Inverter Card */}
+                  <div className="p-5 rounded-[24px] bg-emerald-500/10 border border-emerald-500/20 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-emerald-600 dark:text-emerald-400 text-base">
+                        ✅ แอร์ Inverter เบอร์ 5
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 text-xs font-bold">
+                        ประหยัดสูงสุด
+                      </span>
+                    </div>
+                    <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+                      ปรับรอบหมุนคอมเพรสเซอร์แปรผันตามความเย็น รักษาอุณหภูมินิ่ง ไร้เสียงรบกวน ไร้การกระชากไฟ ประหยัดเงินในกระเป๋าอย่างยั่งยืน
+                    </p>
+                    <div className="p-3 rounded-xl bg-white/60 dark:bg-slate-900/60 font-mono text-xs font-bold text-emerald-600">
+                      ⚡ ค่าไฟเฉลี่ย: ~฿750 - ฿950 / เดือน
+                    </div>
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -564,7 +663,7 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
             </motion.div>
           )}
 
-          {/* STEP 5 CONTENT: Actionable Habits Checklist */}
+          {/* STEP 5 CONTENT: Actionable Habits Checklist & Electrician Safety Rules */}
           {currentStep === 5 && (
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -573,12 +672,25 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
             >
               <div className="space-y-2">
                 <span className="px-3 py-1 rounded-full bg-teal-500/15 text-teal-600 dark:text-teal-400 font-extrabold text-xs uppercase tracking-wider">
-                  Step 5 • {lang === 'th' ? 'นิสัยที่นำไปใช้ได้ทันที' : 'Actionable Habits'}
+                  Step 5 • {lang === 'th' ? 'นิสัยและการปฏิบัติตามมาตรฐาน' : 'Actionable Habits & Safety Rules'}
                 </span>
                 <h2 className="text-2xl font-black font-display text-slate-900 dark:text-white">
-                  {lang === 'th' ? '3 นิสัยประหยัดไฟที่ทำตามได้เลยคืนนี้' : '3 Quick Habits to Start Tonight'}
+                  {lang === 'th' ? 'แนวทางปฏิบัติ & ความปลอดภัยระดับช่างไฟ' : 'Pro Safety Rules & Best Habits'}
                 </h2>
               </div>
+
+              {/* Electrician Field Pro Tip Highlight Banner in Step 5 */}
+              {lesson.electricianTipTh && (
+                <div className="p-5 rounded-[24px] bg-amber-500/10 border border-amber-500/30 space-y-2">
+                  <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300 font-extrabold text-sm">
+                    <ShieldCheck className="w-5 h-5 text-amber-500 shrink-0" />
+                    <span>{lang === 'th' ? 'กฎเหล็กความปลอดภัยของช่างไฟมืออาชีพ:' : 'Electrician Safety & Standards Rule:'}</span>
+                  </div>
+                  <p className="text-sm font-semibold text-slate-700 dark:text-slate-200 pl-7 leading-relaxed">
+                    {lang === 'th' ? lesson.electricianTipTh : lesson.electricianTipEn || lesson.electricianTipTh}
+                  </p>
+                </div>
+              )}
 
               <div className="space-y-3">
                 {[
@@ -687,76 +799,15 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
             </motion.div>
           )}
 
-          {/* STEP 7 CONTENT: Knowledge Check Quiz */}
+          {/* STEP 7 CONTENT: Interactive Comprehension Quiz & Certification Points */}
           {currentStep === 7 && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="space-y-6"
-            >
-              <div className="space-y-2">
-                <span className="px-3 py-1 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-xs uppercase tracking-wider flex items-center gap-1 w-max">
-                  <Award className="w-4 h-4 text-amber-500" />
-                  {lang === 'th' ? 'แบบทดสอบวัดความรู้' : 'Knowledge Check Quiz'}
-                </span>
-                <h2 className="text-2xl font-black font-display text-slate-900 dark:text-white">
-                  {lang === 'th' ? lesson.questionTh : (lesson as any).questionEn || lesson.questionTh}
-                </h2>
-              </div>
-
-              {/* Options */}
-              <div className="space-y-3">
-                {lesson.optionsTh.map((optionText, idx) => {
-                  const isSelected = selectedOption === idx;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => !quizSubmitted && setSelectedOption(idx)}
-                      disabled={quizSubmitted}
-                      className={`w-full p-4 rounded-[20px] border text-left font-bold text-base transition-all flex items-center justify-between min-h-[56px] cursor-pointer ${
-                        isSelected
-                          ? 'bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20'
-                          : isDarkMode
-                            ? 'bg-slate-900 border-slate-800 text-slate-200 hover:border-emerald-500/40'
-                            : 'bg-white border-slate-200 text-slate-800 hover:border-emerald-300'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className={`w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs font-black shrink-0 ${
-                          isSelected ? 'bg-white text-emerald-600' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'
-                        }`}>
-                          {String.fromCharCode(65 + idx)}
-                        </span>
-                        <span>{optionText}</span>
-                      </div>
-                      {isSelected && <CheckCircle2 className="w-5 h-5 text-white shrink-0" />}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Submit Quiz Action */}
-              {!quizSubmitted ? (
-                <button
-                  onClick={handleQuizSubmit}
-                  disabled={selectedOption === null}
-                  className="w-full h-[56px] rounded-2xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-white font-extrabold text-base shadow-lg shadow-emerald-500/25 transition-all cursor-pointer"
-                >
-                  {lang === 'th' ? 'ส่งคำตอบตรวจผล ✓' : 'Submit Answer ✓'}
-                </button>
-              ) : (
-                <div className={`p-5 rounded-[20px] border text-center space-y-2 ${
-                  isCorrect ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-800 dark:text-emerald-300' : 'bg-rose-500/15 border-rose-500/30 text-rose-800 dark:text-rose-300'
-                }`}>
-                  <h4 className="text-xl font-black font-display">
-                    {isCorrect ? '🎉 ถูกต้องแม่นยำ!' : '💡 เกือบถูกแล้ว!'}
-                  </h4>
-                  <p className="text-sm font-medium leading-relaxed">
-                    {lesson.explanationTh}
-                  </p>
-                </div>
-              )}
-            </motion.div>
+            <LessonComprehensionQuiz
+              lesson={lesson}
+              lang={lang}
+              isDarkMode={isDarkMode}
+              onPassQuiz={handlePassQuiz}
+              onContinueNext={handleQuizContinue}
+            />
           )}
 
           {/* STEP 8: LESSON COMPLETE CELEBRATION VIEW */}
@@ -778,31 +829,47 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
 
               <div className="space-y-2">
                 <span className="px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-black text-xs uppercase tracking-wider">
-                  Lesson Completed!
+                  Lesson Completed & Verified!
                 </span>
                 <h2 className="text-3xl font-black font-display text-slate-900 dark:text-white">
-                  {lang === 'th' ? 'ยินดีด้วย! จบบทเรียนเรียบร้อย' : 'Congratulations! Lesson Finished'}
+                  {lang === 'th' ? 'ยินดีด้วย! จบบทเรียนและผ่านแบบทดสอบเรียบร้อย' : 'Congratulations! Lesson & Quiz Completed'}
                 </h2>
                 <p className="text-base text-slate-500 dark:text-slate-400 font-medium">
-                  คุณได้รับรางวัลพัฒนาทักษะและปลดล็อกโหนดความรู้ถัดไป
+                  {lang === 'th'
+                    ? 'คุณได้รับหน่วยคะแนนวิชาชีพ (Certification Points) และเหรียญรางวัลพิเศษ'
+                    : 'You earned Certification Points (CP), XP, and reward coins!'}
                 </p>
               </div>
 
-              {/* Rewards Summary Box */}
-              <div className="p-6 rounded-[28px] bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-emerald-500/15 border border-emerald-500/30 grid grid-cols-2 gap-4">
-                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center gap-3">
-                  <Zap className="w-6 h-6 fill-amber-500 text-amber-500" />
-                  <div className="text-left">
-                    <span className="text-xs font-extrabold text-slate-400 uppercase block">XP Earned</span>
-                    <span className="text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono">+{lesson.xpReward} XP</span>
+              {/* Rewards Summary Box - 3 Cards */}
+              <div className="p-6 rounded-[28px] bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-amber-500/15 border border-emerald-500/30 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 shadow-sm flex items-center gap-3.5 border border-slate-100 dark:border-slate-800">
+                  <div className="w-11 h-11 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0">
+                    <Zap className="w-6 h-6 fill-amber-500 text-amber-500" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">XP Earned</span>
+                    <span className="text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono block">+{lesson.xpReward} XP</span>
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 shadow-sm flex items-center justify-center gap-3">
-                  <Coins className="w-6 h-6 text-amber-500" />
-                  <div className="text-left">
-                    <span className="text-xs font-extrabold text-slate-400 uppercase block">Coins Reward</span>
-                    <span className="text-xl font-black text-amber-500 font-mono">+25 Coins</span>
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 shadow-sm flex items-center gap-3.5 border border-slate-100 dark:border-slate-800">
+                  <div className="w-11 h-11 rounded-xl bg-teal-500/15 text-teal-500 flex items-center justify-center shrink-0">
+                    <Coins className="w-6 h-6 text-teal-500" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">Coins Reward</span>
+                    <span className="text-xl font-black text-teal-500 font-mono block">+35 Coins</span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 shadow-sm flex items-center gap-3.5 border border-amber-500/30 bg-amber-500/5">
+                  <div className="w-11 h-11 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center shrink-0">
+                    <Award className="w-6 h-6 text-amber-500" />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <span className="text-[11px] font-extrabold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">Cert Points</span>
+                    <span className="text-xl font-black text-amber-600 dark:text-amber-400 font-mono block">+{earnedBonusCp} CP</span>
                   </div>
                 </div>
               </div>
@@ -814,8 +881,8 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
                 </div>
                 <div className="text-xs md:text-sm font-semibold text-slate-600 dark:text-slate-300">
                   {lang === 'th'
-                    ? 'ต้นไม้พลังงาน (Energy Tree) ของคุณเติบโตขึ้น 2% จากบทเรียนนี้!'
-                    : 'Your Energy Tree grew by 2% from completing this lesson!'}
+                    ? 'ต้นไม้พลังงาน (Energy Tree) ของคุณเติบโตขึ้น 2% และบันทึกคะแนนสะสมสู่ใบประกาศนียบัตรแล้ว!'
+                    : 'Your Energy Tree grew by 2% and your certification roadmap has been updated!'}
                 </div>
               </div>
 
@@ -941,7 +1008,7 @@ export const FullScreenLearningExperience: React.FC<FullScreenLearningExperience
 
             <button
               onClick={handleNextStep}
-              disabled={currentStep === 7 && !quizSubmitted}
+              disabled={currentStep === 7 && !quizPassed}
               className="flex-1 md:flex-initial h-[56px] px-8 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 text-white font-extrabold text-base shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               <span>

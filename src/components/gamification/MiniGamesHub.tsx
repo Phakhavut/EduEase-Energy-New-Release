@@ -30,6 +30,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { Appliance, MiniGameMeta, GameHistoryRecord, MiniGameCategory } from '../../types';
+import confetti from 'canvas-confetti';
 import { 
   MINI_GAME_LIST, 
   WEEKLY_SPECIAL_EVENT, 
@@ -79,6 +80,7 @@ export const MiniGamesHub: React.FC<MiniGamesHubProps> = ({
       const newScore = battleScore + 1;
       setBattleScore(newScore);
       setBattleResultText(lang === 'th' ? 'ถูกต้อง! +20 XP, +10 Coins' : 'Correct! +20 XP, +10 Coins');
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
       if (onRewardCoins) onRewardCoins(10, 20);
       setTimeout(() => {
         setBattleResultText(null);
@@ -113,6 +115,7 @@ export const MiniGamesHub: React.FC<MiniGamesHubProps> = ({
     setVampireItems(updated);
     if (updated.every(item => item.tapped)) {
       setVampireCleared(true);
+      confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
       if (onRewardCoins) onRewardCoins(25, 60);
     }
   };
@@ -143,6 +146,7 @@ export const MiniGamesHub: React.FC<MiniGamesHubProps> = ({
   const handleCalculateBill = () => {
     setShowBillResult(true);
     const diff = Math.abs(calculatedBill - guessedBill);
+    confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
     if (diff <= 150) {
       if (onRewardCoins) onRewardCoins(40, 100);
     } else {
@@ -179,8 +183,11 @@ export const MiniGamesHub: React.FC<MiniGamesHubProps> = ({
   const handleInspectLeak = (id: number) => {
     const updated = inspectorLeaks.map(item => item.id === id ? { ...item, found: true } : item);
     setInspectorLeaks(updated);
-    if (updated.every(i => i.found) && onRewardCoins) {
-      onRewardCoins(30, 80);
+    if (updated.every(i => i.found)) {
+      confetti({ particleCount: 95, spread: 85, origin: { y: 0.6 } });
+      if (onRewardCoins) {
+        onRewardCoins(30, 80);
+      }
     }
   };
 
@@ -234,6 +241,7 @@ export const MiniGamesHub: React.FC<MiniGamesHubProps> = ({
     } else {
       setDailyFinished(true);
       setDailyActive(false);
+      confetti({ particleCount: 110, spread: 90, origin: { y: 0.6 } });
       if (onRewardCoins) onRewardCoins(35, 70);
     }
   };

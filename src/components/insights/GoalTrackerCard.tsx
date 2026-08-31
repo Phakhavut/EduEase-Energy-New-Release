@@ -18,7 +18,7 @@ import { SmartGoal, InfoDetailMode } from '../../types';
 
 interface GoalTrackerCardProps {
   goals: SmartGoal[];
-  mode: InfoDetailMode;
+  mode?: InfoDetailMode;
   lang: 'th' | 'en';
   isDarkMode: boolean;
   onAddGoal: (goal: SmartGoal) => void;
@@ -37,6 +37,14 @@ export const GoalTrackerCard: React.FC<GoalTrackerCardProps> = ({
   const [title, setTitle] = useState('');
   const [targetType, setTargetType] = useState<SmartGoal['targetType']>('bill_limit');
   const [targetValue, setTargetValue] = useState(1500);
+  const [expandedGoals, setExpandedGoals] = useState<Record<string, boolean>>({});
+
+  const toggleExpand = (id: string) => {
+    setExpandedGoals(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
 
   const handleCreateGoal = (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,7 +154,7 @@ export const GoalTrackerCard: React.FC<GoalTrackerCardProps> = ({
               </div>
 
               {/* Progress Bar */}
-              <div className="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden mb-3">
+              <div className="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden mb-2">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${pct}%` }}
@@ -155,15 +163,45 @@ export const GoalTrackerCard: React.FC<GoalTrackerCardProps> = ({
                 />
               </div>
 
-              {/* AI Coaching Feedback */}
-              {mode !== 'simple' && (
-                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-slate-700 dark:text-slate-200 flex items-start gap-2">
-                  <BrainCircuit className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                  <p className="leading-relaxed">
-                    <strong>AI Advice:</strong> {lang === 'th' ? goal.coachingTipTh : goal.coachingTipEn}
-                  </p>
-                </div>
-              )}
+              {/* Progressive Disclosure: AI Coaching Advice */}
+              <div className="pt-1">
+                <button
+                  onClick={() => toggleExpand(goal.id)}
+                  className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer border ${
+                    expandedGoals[goal.id]
+                      ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm'
+                      : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-emerald-400'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>
+                    {expandedGoals[goal.id]
+                      ? (lang === 'th' ? 'ซ่อนคำแนะนำ AI' : 'Hide AI Advice')
+                      : (lang === 'th' ? '💡 ดูคำแนะนำ AI' : '💡 View AI Advice')}
+                  </span>
+                </button>
+              </div>
+
+              <AnimatePresence>
+                {expandedGoals[goal.id] && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden mt-2"
+                  >
+                    <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-slate-700 dark:text-slate-200 flex items-start gap-2.5">
+                      <BrainCircuit className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+                      <div className="leading-relaxed">
+                        <strong className="block mb-0.5 text-emerald-700 dark:text-emerald-300 font-bold">
+                          {lang === 'th' ? 'คำแนะนำจาก Voltie AI Coach:' : 'Voltie AI Coaching:'}
+                        </strong>
+                        {lang === 'th' ? goal.coachingTipTh : goal.coachingTipEn}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           );
         })}

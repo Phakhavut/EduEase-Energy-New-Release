@@ -1,6 +1,6 @@
 {
   "name": "EduEase Energy",
-  "description": "A gamified AI Energy Productivity app for young users featuring Voltie the AI Coach, daily green missions, budget planning, TOU rate simulation, and rewards.",
+  "description": "A gamified AI Energy Productivity app featuring Voltie AI Coach, multi-channel energy notifications (Web Push, LINE Notify, and Daily Energy Digest), consumption forecasting, 5-tier certification, and industrial PM/diagnostic modules.",
   "requestFramePermissions": [
     "geolocation"
   ],

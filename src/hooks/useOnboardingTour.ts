@@ -56,10 +56,7 @@ export function useOnboardingTour() {
       } else {
         localStorage.removeItem('eudease_tour_never_show');
       }
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'eudease_tour_never_show',
-        newValue: value ? 'true' : null
-      }));
+      window.dispatchEvent(new Event('storage'));
     } catch {}
     setNeverShowAgainState(value);
   };
@@ -71,10 +68,7 @@ export function useOnboardingTour() {
       } else {
         localStorage.removeItem('eudease_tour_start_immediately');
       }
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'eudease_tour_start_immediately',
-        newValue: value ? 'true' : null
-      }));
+      window.dispatchEvent(new Event('storage'));
     } catch {}
     setStartImmediately(value);
   };
@@ -82,10 +76,7 @@ export function useOnboardingTour() {
   const markCompleted = () => {
     try {
       localStorage.setItem('eudease_tour_completed', 'true');
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'eudease_tour_completed',
-        newValue: 'true'
-      }));
+      window.dispatchEvent(new Event('storage'));
     } catch {}
     setTourCompleted(true);
   };
@@ -95,18 +86,7 @@ export function useOnboardingTour() {
       localStorage.removeItem('eudease_tour_completed');
       localStorage.removeItem('eudease_tour_never_show');
       localStorage.removeItem('eudease_tour_start_immediately');
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'eudease_tour_completed',
-        newValue: null
-      }));
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'eudease_tour_never_show',
-        newValue: null
-      }));
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'eudease_tour_start_immediately',
-        newValue: null
-      }));
+      window.dispatchEvent(new Event('storage'));
     } catch {}
     setTourCompleted(false);
     setNeverShowAgainState(false);

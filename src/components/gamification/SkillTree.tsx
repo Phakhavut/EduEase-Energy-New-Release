@@ -19,6 +19,7 @@ import {
   Award
 } from 'lucide-react';
 import { SkillTreeNode, KnowledgeLevelType } from '../../types';
+import confetti from 'canvas-confetti';
 
 interface SkillTreeProps {
   nodes: SkillTreeNode[];
@@ -83,8 +84,15 @@ export const SkillTree: React.FC<SkillTreeProps> = ({
       const correct = selectedOption === quizNode.correctIndex;
       setQuizSubmitted(true);
       setIsCorrect(correct);
-      if (correct && onCompleteNode) {
-        onCompleteNode(quizNode.id);
+      if (correct) {
+        confetti({
+          particleCount: 90,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+        if (onCompleteNode) {
+          onCompleteNode(quizNode.id);
+        }
       }
     }
   };

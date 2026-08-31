@@ -21,9 +21,12 @@ import {
   Scale,
   Award,
   BrainCircuit,
-  ShieldCheck
+  ShieldCheck,
+  Gamepad2,
+  Building2
 } from 'lucide-react';
-import { AppPage } from '../../types';
+import { AppPage, GamificationSettings, DEFAULT_GAMIFICATION_SETTINGS, UserPersona } from '../../types';
+import { getPersonaConfig } from '../../data/personaThemes';
 
 interface SidebarProps {
   currentPage: AppPage;
@@ -39,6 +42,8 @@ interface SidebarProps {
   userCoins: number;
   userStreak: number;
   currentAvatar: string;
+  gamificationSettings?: GamificationSettings;
+  persona?: UserPersona;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -55,26 +60,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
   userCoins,
   userStreak,
   currentAvatar,
+  gamificationSettings = DEFAULT_GAMIFICATION_SETTINGS,
+  persona = 'student',
 }) => {
+  const isCleanMode = gamificationSettings.cleanUtilityMode;
+  const personaConfig = getPersonaConfig(persona);
+  const menu = personaConfig.menuCopy;
+
   const navItems = [
-    { id: 'home' as AppPage, labelTh: 'หน้าหลัก', labelEn: 'Home', icon: Home, badge: undefined },
-    { id: 'insights' as AppPage, labelTh: 'Smart Insights', labelEn: 'Smart Insights', icon: BrainCircuit, badge: 'AI' },
-    { id: 'ai-coach' as AppPage, labelTh: 'AI Coach', labelEn: 'AI Coach', icon: Bot, badge: 'AI' },
-    { id: 'compare' as AppPage, labelTh: 'เปรียบเทียบอุปกรณ์', labelEn: 'Compare Lab', icon: Scale, badge: 'Lab' },
-    { id: 'score' as AppPage, labelTh: 'ดัชนีการประหยัดไฟ', labelEn: 'Saving Score', icon: Trophy, badge: '88 Pts' },
-    { id: 'locations' as AppPage, labelTh: 'สถานที่ของฉัน', labelEn: 'My Locations', icon: MapPin, badge: undefined },
-    { id: 'appliances' as AppPage, labelTh: 'เครื่องใช้ไฟฟ้า', labelEn: 'Appliances', icon: Plug, badge: undefined },
-    { id: 'budget' as AppPage, labelTh: 'ค่าไฟ & งบประมาณ', labelEn: 'Budget & Bills', icon: Wallet, badge: undefined },
-    { id: 'analytics' as AppPage, labelTh: 'วิเคราะห์การใช้ไฟ', labelEn: 'Analytics', icon: BarChart3, badge: undefined },
-    { id: 'learning' as AppPage, labelTh: 'เรียนรู้ & คู่มือ', labelEn: 'Learning & Guide', icon: GraduationCap, badge: 'New' },
-    { id: 'achievements' as AppPage, labelTh: 'ภารกิจ & รางวัล', labelEn: 'Missions', icon: Award, badge: undefined },
-    { id: 'profile' as AppPage, labelTh: 'โปรไฟล์', labelEn: 'Profile', icon: User, badge: undefined },
-    { id: 'trust-center' as AppPage, labelTh: 'ศูนย์ความน่าเชื่อถือ & AI', labelEn: 'Trust & Transparency', icon: ShieldCheck, badge: 'Trust' },
-    { id: 'settings' as AppPage, labelTh: 'ตั้งค่า', labelEn: 'Settings', icon: Settings, badge: undefined },
+    { id: 'home' as AppPage, subIds: ['home'], labelTh: 'หน้าหลัก', labelEn: 'Home', icon: Home, badge: undefined },
+    { id: 'appliances' as AppPage, subIds: ['appliances', 'compare'], labelTh: 'เครื่องใช้ไฟฟ้า & เปรียบเทียบ', labelEn: 'Appliances & Compare', icon: Plug, badge: undefined },
+    { id: 'budget' as AppPage, subIds: ['budget'], labelTh: 'งบประมาณ & ตัดไฟ', labelEn: 'Budget & Eco Cut', icon: Wallet, badge: undefined },
+    { id: 'insights' as AppPage, subIds: ['insights', 'ai-coach', 'analytics'], labelTh: menu.insightsTh, labelEn: menu.insightsEn, icon: BrainCircuit, badge: menu.insightsBadge },
+    { id: 'learning' as AppPage, subIds: ['learning', 'game', 'city'], labelTh: menu.learningTh, labelEn: menu.learningEn, icon: GraduationCap, badge: menu.learningBadge },
+    { id: 'locations' as AppPage, subIds: ['locations'], labelTh: personaConfig.spaceTypeLabelTh, labelEn: personaConfig.spaceTypeLabelEn, icon: MapPin, badge: undefined },
+    { id: 'profile' as AppPage, subIds: ['profile', 'score', 'achievements'], labelTh: menu.profileTh, labelEn: menu.profileEn, icon: User, badge: undefined },
+    { id: 'settings' as AppPage, subIds: ['settings', 'trust-center'], labelTh: 'ตั้งค่า & ความน่าเชื่อถือ', labelEn: 'Settings & Trust', icon: Settings, badge: undefined },
   ];
 
   return (
-    <aside className="hidden lg:flex flex-col w-72 h-[calc(100vh-2rem)] sticky top-4 left-4 z-40 my-4 ml-4">
+    <aside className="hidden lg:flex flex-col w-64 xl:w-72 shrink-0 h-[calc(100vh-2rem)] sticky top-4 left-4 z-40 my-4 ml-4">
       <div className={`flex flex-col justify-between h-full p-5 rounded-[2rem] border transition-all duration-300 shadow-xl overflow-y-auto ${
         isDarkMode 
           ? 'bg-slate-900/90 border-slate-800/80 text-white shadow-emerald-950/20 backdrop-blur-xl' 
@@ -101,63 +106,93 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           </div>
 
-          {/* User Status Card (Duolingo Style Gamified Pill) */}
-          <div className={`p-3.5 rounded-2xl mb-6 border transition-all ${
-            isDarkMode 
-              ? 'bg-slate-800/60 border-slate-700/60 hover:border-emerald-500/30' 
-              : 'bg-emerald-50/70 border-emerald-100 hover:border-emerald-200'
-          }`}>
-            <div className="flex items-center gap-3 mb-2.5">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-xl shadow-md shrink-0">
-                {currentAvatar || '⚡'}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-xs truncate">Namyen</span>
-                  <span className="text-[0.65rem] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                    Lv. {userLevel}
-                  </span>
+          {/* User Status Card (Duolingo Style Gamified Pill or Clean Utility Badge) */}
+          {isCleanMode ? (
+            <div className={`p-3.5 rounded-2xl mb-6 border transition-all ${
+              isDarkMode 
+                ? 'bg-slate-800/60 border-slate-700/60' 
+                : 'bg-emerald-50/70 border-emerald-100'
+            }`}>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-white text-base shadow-sm shrink-0">
+                  ⚡
                 </div>
-                <p className="text-[0.68rem] text-slate-500 dark:text-slate-400 font-medium truncate">
-                  Eco Master
-                </p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs truncate">
+                      {lang === 'th' ? personaConfig.defaultLocationNameTh : personaConfig.defaultLocationNameEn}
+                    </span>
+                    <span className="text-[0.62rem] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      {lang === 'th' ? 'โหมดมือโปร' : 'Clean Mode'}
+                    </span>
+                  </div>
+                  <p className="text-[0.68rem] text-slate-500 dark:text-slate-400 font-medium truncate mt-0.5">
+                    {lang === 'th' ? personaConfig.roleBadgeTh : personaConfig.roleBadgeEn}
+                  </p>
+                </div>
               </div>
             </div>
+          ) : (
+            <div className={`p-3.5 rounded-2xl mb-6 border transition-all ${
+              isDarkMode 
+                ? 'bg-slate-800/60 border-slate-700/60 hover:border-emerald-500/30' 
+                : 'bg-emerald-50/70 border-emerald-100 hover:border-emerald-200'
+            }`}>
+              <div className="flex items-center gap-3 mb-2.5">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-xl shadow-md shrink-0">
+                  {currentAvatar || '⚡'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-xs truncate">
+                      {lang === 'th' ? personaConfig.defaultLocationNameTh : personaConfig.defaultLocationNameEn}
+                    </span>
+                    <span className="text-[0.65rem] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      Lv. {userLevel}
+                    </span>
+                  </div>
+                  <p className="text-[0.68rem] text-slate-500 dark:text-slate-400 font-medium truncate">
+                    {lang === 'th' ? personaConfig.roleBadgeTh : personaConfig.roleBadgeEn}
+                  </p>
+                </div>
+              </div>
 
-            {/* Streak & Coins Badges */}
-            <div className="grid grid-cols-2 gap-2 mb-2">
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs">
-                <Flame className="w-4 h-4 fill-amber-500 text-amber-500 animate-bounce" />
-                <span>{userStreak} {lang === 'th' ? 'วัน' : 'Days'}</span>
+              {/* Streak & Coins Badges */}
+              <div className="grid grid-cols-2 gap-2 mb-2">
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 font-bold text-xs">
+                  <Flame className="w-4 h-4 fill-amber-500 text-amber-500 animate-bounce" />
+                  <span>{userStreak} {lang === 'th' ? 'วัน' : 'Days'}</span>
+                </div>
+                <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-700 dark:text-amber-300 font-bold text-xs">
+                  <Coins className="w-4 h-4 text-amber-500" />
+                  <span>{userCoins}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-700 dark:text-amber-300 font-bold text-xs">
-                <Coins className="w-4 h-4 text-amber-500" />
-                <span>{userCoins}</span>
-              </div>
-            </div>
 
-            {/* XP Progress Bar */}
-            <div>
-              <div className="flex justify-between text-[0.65rem] font-bold text-slate-500 dark:text-slate-400 mb-1">
-                <span>XP Progress</span>
-                <span>{userXp} / {userXpMax}</span>
-              </div>
-              <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-                <motion.div 
-                  className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${Math.min(100, (userXp / userXpMax) * 100)}%` }}
-                  transition={{ duration: 0.8 }}
-                />
+              {/* XP Progress Bar */}
+              <div>
+                <div className="flex justify-between text-[0.65rem] font-bold text-slate-500 dark:text-slate-400 mb-1">
+                  <span>XP Progress</span>
+                  <span>{userXp} / {userXpMax}</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                  <motion.div 
+                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.min(100, (userXp / userXpMax) * 100)}%` }}
+                    transition={{ duration: 0.8 }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
 
           {/* Navigation Items */}
           <nav className="space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = currentPage === item.id;
+              const isActive = item.subIds ? item.subIds.includes(currentPage) : currentPage === item.id;
               return (
                 <button
                   key={item.id}

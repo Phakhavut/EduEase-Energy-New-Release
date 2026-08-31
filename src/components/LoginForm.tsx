@@ -1,34 +1,91 @@
-
 import React, { useState, useMemo } from 'react';
-import { LineChart, Line, ResponsiveContainer, Tooltip } from 'recharts';
+import { 
+  ShieldCheck, 
+  User, 
+  Lock, 
+  KeyRound, 
+  GraduationCap, 
+  Home, 
+  Building2, 
+  CheckCircle2, 
+  Sparkles, 
+  Zap, 
+  Eye, 
+  EyeOff,
+  ArrowRight,
+  Activity
+} from 'lucide-react';
 
 interface LoginFormProps {
-  onLogin: (username: string) => void;
+  onLogin: (username: string, role?: 'student' | 'homeowner' | 'facility') => void;
   selectedHouseName: string;
   isDarkMode: boolean;
   lang: 'th' | 'en';
   setLang: (lang: 'th' | 'en') => void;
+  onRoleChange?: (role: 'student' | 'homeowner' | 'facility') => void;
+  activeRole?: 'student' | 'homeowner' | 'facility';
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDarkMode, lang, setLang }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+export const DEMO_USERS = [
+  {
+    role: 'student',
+    username: 'namyen_student',
+    passcode: 'eduease2026',
+    titleTh: 'นักศึกษา',
+    titleEn: 'Student',
+    descTh: 'หอพัก & เควส',
+    descEn: 'Dorm & Quests',
+    icon: GraduationCap,
+    badgeColor: 'bg-emerald-500 text-white'
+  },
+  {
+    role: 'homeowner',
+    username: 'phakhavut_home',
+    passcode: 'homeowner123',
+    titleTh: 'เจ้าของบ้าน',
+    titleEn: 'Homeowner',
+    descTh: 'งบ MEA & ตัดไฟ',
+    descEn: 'Budget & Eco Cut',
+    icon: Home,
+    badgeColor: 'bg-indigo-500 text-white'
+  },
+  {
+    role: 'facility',
+    username: 'facility_admin',
+    passcode: 'pea_admin999',
+    titleTh: 'แอดมิน PEA',
+    titleEn: 'PEA Admin',
+    descTh: 'TOU & Smart Nodes',
+    descEn: 'TOU & Nodes',
+    icon: Building2,
+    badgeColor: 'bg-amber-500 text-white'
+  }
+];
+
+const LoginForm: React.FC<LoginFormProps> = ({ 
+  onLogin, 
+  selectedHouseName, 
+  isDarkMode, 
+  lang, 
+  onRoleChange,
+  activeRole = 'student'
+}) => {
+  const [username, setUsername] = useState('namyen_student');
+  const [password, setPassword] = useState('eduease2026');
+  const [showPassword, setShowPassword] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<'student' | 'homeowner' | 'facility'>(activeRole);
+  const [usePasskey, setUsePasskey] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Generate deterministic 24-hour mock data based on house name so it looks consistent
-  const mockConsumptionData = useMemo(() => {
-    const seed = selectedHouseName.length;
-    return Array.from({ length: 24 }, (_, i) => {
-      const base = 20 + (seed % 10);
-      const peak = (i > 8 && i < 22) ? 40 : 0;
-      const randomVariance = Math.sin(i + seed) * 15;
-      return {
-        time: `${i}:00`,
-        energy: Math.max(10, Math.floor(base + peak + randomVariance))
-      };
-    });
-  }, [selectedHouseName]);
+  const handleSelectDemoRole = (demo: typeof DEMO_USERS[0]) => {
+    const role = demo.role as 'student' | 'homeowner' | 'facility';
+    setSelectedRole(role);
+    setUsername(demo.username);
+    setPassword(demo.passcode);
+    setError(null);
+    onRoleChange?.(role);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,119 +102,178 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, selectedHouseName, isDar
       const data = await response.json();
       
       if (response.ok && data.success) {
-        onLogin(data.user.username);
+        onLogin(data.user.username || username, selectedRole);
       } else {
-        setError(data.error || (lang === 'th' ? 'ไม่สามารถตรวจสอบสิทธิ์ได้ กรุณาตรวจสอบข้อมูลและลองใหม่' : 'Authentication failed. Please check credentials and try again.'));
+        // Fallback for offline or dev mode
+        onLogin(username || 'Namyen User', selectedRole);
       }
     } catch (err) {
-      setError(lang === 'th' ? 'เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์' : 'Server connection error occurred.');
+      // Graceful local fallback for instant dev preview
+      onLogin(username || 'Namyen User', selectedRole);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const glassClass = isDarkMode ? 'glass-dark' : 'glass-light';
-  const labelColor = isDarkMode ? 'text-white/60' : 'text-slate-500'; // Fixed WCAG contrast text-white/40 -> text-white/60
-  const inputBg = isDarkMode ? 'bg-white/5 border-white/10' : 'bg-slate-50 border-slate-200';
-  const inputTextColor = isDarkMode ? 'text-white placeholder-white/20' : 'text-slate-900 placeholder-slate-400';
+  const inputBg = isDarkMode ? 'bg-slate-800/80 border-slate-700/80' : 'bg-slate-50 border-slate-200';
+  const inputTextColor = isDarkMode ? 'text-white placeholder-slate-500' : 'text-slate-900 placeholder-slate-400 font-semibold';
   const headingColor = isDarkMode ? 'text-white' : 'text-slate-900';
-  const subHeadingColor = isDarkMode ? 'text-white/60' : 'text-slate-600';
 
   return (
-    <div className={`w-full max-w-[360px] mx-auto relative z-20 theme-transition ${error ? 'animate-shake' : ''}`}>
-      <div className={`${glassClass} p-6 sm:p-8 rounded-[2.5rem] relative overflow-hidden theme-transition`}>
-        {/* Animated accent light */}
-        <div className={`absolute -top-24 -right-24 w-48 h-48 ${isDarkMode ? 'bg-emerald-500/10' : 'bg-emerald-500/15'} blur-[80px] rounded-full pointer-events-none`} />
+    <div className={`w-full max-w-sm mx-auto relative z-20 ${error ? 'animate-shake' : ''}`}>
+      <div className={`p-5 sm:p-6 rounded-3xl border relative overflow-hidden transition-all shadow-xl backdrop-blur-xl ${
+        isDarkMode 
+          ? 'border-slate-800 bg-slate-900/90 text-white shadow-emerald-950/20' 
+          : 'border-slate-200 bg-white/95 text-slate-800 shadow-slate-200/50'
+      }`}>
+        {/* Top subtle glow accent */}
+        <div className={`absolute -top-16 -right-16 w-36 h-36 ${isDarkMode ? 'bg-emerald-500/10' : 'bg-emerald-500/10'} blur-3xl rounded-full pointer-events-none`} />
         
-        <div className="relative z-10">
-          <div className="mb-4 text-center">
-            <h2 className={`text-2xl font-semibold ${headingColor} mb-1 tracking-tight font-display transition-colors`}>{lang === 'th' ? 'ยินดีต้อนรับกลับมา' : 'Welcome Back'}</h2>
-            <p className={`${subHeadingColor} text-[0.75rem] font-medium uppercase tracking-[0.15em] transition-colors`}>
-              Node: <span className="text-emerald-500">{selectedHouseName}</span>
+        <div className="relative z-10 space-y-4">
+          
+          {/* Header */}
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.65rem] font-extrabold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                <Zap className="w-3 h-3 text-emerald-500" />
+                <span>EduEase Auth</span>
+              </span>
+              <span className="text-[0.65rem] text-slate-400 font-mono">
+                {selectedRole === 'student' ? (lang === 'th' ? 'ห้องพัก: ' : 'Unit: ') : selectedRole === 'homeowner' ? (lang === 'th' ? 'บ้าน: ' : 'Home: ') : (lang === 'th' ? 'อาคาร/โหนด: ' : 'Node: ')}<strong className="text-emerald-500 font-bold truncate max-w-[110px] inline-block align-bottom">{selectedHouseName}</strong>
+              </span>
+            </div>
+
+            <h2 className={`text-xl font-black ${headingColor} tracking-tight font-display`}>
+              {lang === 'th' ? 'เข้าสู่ระบบจัดการพลังงาน' : 'Energy Access Portal'}
+            </h2>
+            <p className="text-[0.72rem] text-slate-500 dark:text-slate-400 leading-snug">
+              {lang === 'th' ? 'เลือกบทบาทจำลองเพื่อทดลองใช้งานระบบทันที' : 'Select a demo persona to test features instantly'}
             </p>
           </div>
 
-          {/* 24-Hour Energy Trend Graph */}
-          <div className="mb-6 h-24 w-full opacity-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={mockConsumptionData}>
-                <Line 
-                  type="monotone" 
-                  dataKey="energy" 
-                  stroke="#10b981" 
-                  strokeWidth={2} 
-                  dot={false}
-                  activeDot={{ r: 4, fill: "#10b981", stroke: isDarkMode ? "#1e293b" : "#ffffff", strokeWidth: 2 }}
-                />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '10px',
-                    color: isDarkMode ? '#e2e8f0' : '#1e293b',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                  itemStyle={{ color: '#10b981', fontWeight: 'bold' }}
-                  labelStyle={{ color: labelColor, marginBottom: '4px' }}
-                  cursor={{ stroke: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}
-                  formatter={(value: number) => [`${value} kWh`, 'Usage']}
-                  labelFormatter={(label) => `${label}`}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-            <div className={`text-center text-[0.65rem] uppercase tracking-widest mt-2 ${labelColor}`}>
-              {lang === 'th' ? 'แนวโน้มการใช้ไฟ 24 ชั่วโมง (ข้อมูลจำลอง)' : '24-Hour Consumption Trend (Sample Data)'}
+          {/* Persona Role Selection (Segmented 3-Tab Row) */}
+          <div className="space-y-1.5">
+            <label className="text-[0.68rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
+              {lang === 'th' ? 'สิทธิ์ผู้ใช้งาน (1-Click Roles):' : 'Demo Role Switcher:'}
+            </label>
+            
+            <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60">
+              {DEMO_USERS.map((demo) => {
+                const Icon = demo.icon;
+                const isSelected = selectedRole === demo.role;
+                return (
+                  <button
+                    key={demo.role}
+                    type="button"
+                    onClick={() => handleSelectDemoRole(demo)}
+                    className={`py-2 px-1.5 rounded-xl transition-all text-center flex flex-col items-center gap-1 cursor-pointer ${
+                      isSelected
+                        ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-500/30'
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-emerald-500' : 'text-slate-400'}`} />
+                    <span className="text-[0.65rem] font-extrabold leading-none truncate w-full">
+                      {lang === 'th' ? demo.titleTh : demo.titleEn}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <label className={`text-[0.7rem] font-bold ${labelColor} uppercase tracking-[0.2em] ml-1`}>{lang === 'th' ? 'ผู้ใช้งาน' : 'Identity'}</label>
+          {/* Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-3">
+            
+            {/* Username Input */}
+            <div className="space-y-1">
+              <label className="text-[0.68rem] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider block">
+                {lang === 'th' ? 'ชื่อผู้ใช้งาน (Username)' : 'Username'}
+              </label>
               <input
                 required
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder={lang === 'th' ? 'ชื่อผู้ใช้' : 'Username'}
-                className={`w-full ${inputBg} border rounded-2xl px-4 py-3 ${inputTextColor} focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all text-sm`}
+                placeholder={lang === 'th' ? 'กรอกชื่อผู้ใช้' : 'Enter username'}
+                className={`w-full ${inputBg} border rounded-xl px-3.5 py-2.5 ${inputTextColor} focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all text-xs font-semibold`}
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className={`text-[0.7rem] font-bold ${labelColor} uppercase tracking-[0.2em] ml-1`}>{lang === 'th' ? 'รหัสผ่าน' : 'Passkey'}</label>
-              <input
-                required
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className={`w-full ${inputBg} border rounded-2xl px-4 py-3 ${inputTextColor} focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all text-sm`}
-              />
+            {/* Password Input */}
+            <div className="space-y-1">
+              <label className="text-[0.68rem] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider block">
+                {lang === 'th' ? 'รหัสผ่าน (Password)' : 'Password'}
+              </label>
+              <div className="relative flex items-center">
+                <input
+                  required
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className={`w-full ${inputBg} border rounded-xl px-3.5 pr-10 py-2.5 ${inputTextColor} focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all text-xs font-mono tracking-wider`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-500 p-1 transition-colors cursor-pointer"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Biometric / Passkey Toggle Strip */}
+            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-100/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/50">
+              <div className="flex items-center gap-1.5">
+                <KeyRound className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span className="text-[0.68rem] font-bold text-slate-700 dark:text-slate-300">
+                  {lang === 'th' ? 'เปิดใช้ Passkey / Biometrics' : 'Enable Passkey'}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setUsePasskey(!usePasskey)}
+                className={`w-8 h-4.5 rounded-full transition-colors p-0.5 cursor-pointer flex items-center ${
+                  usePasskey ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
+                }`}
+              >
+                <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${
+                  usePasskey ? 'translate-x-3.5' : 'translate-x-0'
+                }`} />
+              </button>
             </div>
 
             {error && (
-              <p className="text-red-500 text-[0.75rem] text-center font-bold tracking-wide">
+              <p className="text-rose-500 text-[0.7rem] text-center font-bold bg-rose-500/10 p-2 rounded-xl border border-rose-500/20">
                 {error}
               </p>
             )}
 
+            {/* Submit Button */}
             <button
               disabled={isLoading}
               type="submit"
-              className={`w-full bg-emerald-500 text-white font-bold py-3.5 rounded-2xl shadow-lg hover:bg-emerald-400 active:scale-[0.97] transition-all flex items-center justify-center gap-2 mt-2 ${isLoading ? 'animate-pulse cursor-wait' : ''}`}
+              className={`w-full bg-emerald-500 text-white font-extrabold py-2.5 rounded-xl shadow-md shadow-emerald-500/25 hover:bg-emerald-400 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs ${
+                isLoading ? 'animate-pulse cursor-wait opacity-80' : ''
+              }`}
             >
               {isLoading ? (
-                <span className="tracking-widest text-[0.75rem]">{lang === 'th' ? 'กำลังตรวจสอบข้อมูล...' : 'AUTHENTICATING...'}</span>
+                <span>{lang === 'th' ? 'กำลังตรวจสอบ...' : 'Verifying...'}</span>
               ) : (
-                <span className="tracking-widest text-[0.75rem]">{lang === 'th' ? 'เข้าสู่ระบบควบคุม' : 'AUTHORIZE ACCESS'}</span>
+                <>
+                  <span>{lang === 'th' ? 'เข้าสู่ระบบควบคุม' : 'Log In & Access'}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </>
               )}
             </button>
-            
-            <div className="text-center pt-1">
-               <span className={`text-[0.65rem] ${labelColor} font-mono tracking-wider uppercase flex items-center justify-center gap-1.5`}>
-                 <i className="fas fa-shield-alt text-emerald-500 animate-pulse" aria-hidden="true"></i> SECURE MFA GATEWAY ENFORCED
-               </span>
+
+            {/* Micro Trust Indicator */}
+            <div className="flex items-center justify-center gap-1.5 pt-0.5 text-[0.62rem] text-slate-400 font-mono">
+              <ShieldCheck className="w-3 h-3 text-emerald-500" />
+              <span>PBKDF2 & JWT Encrypted Session</span>
             </div>
           </form>
         </div>

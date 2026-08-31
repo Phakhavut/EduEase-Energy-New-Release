@@ -19,9 +19,14 @@ import {
   MapPin,
   X,
   Scale,
-  Sliders
+  Sliders,
+  ShieldCheck,
+  Gamepad2,
+  Building2,
+  BrainCircuit
 } from 'lucide-react';
-import { AppPage, InfoDetailMode } from '../../types';
+import { AppPage, InfoDetailMode, UserPersona } from '../../types';
+import { getPersonaConfig } from '../../data/personaThemes';
 
 interface MobileNavbarProps {
   currentPage: AppPage;
@@ -34,6 +39,7 @@ interface MobileNavbarProps {
   userCoins: number;
   infoDetailMode?: InfoDetailMode;
   onChangeDetailMode?: (mode: InfoDetailMode) => void;
+  persona?: UserPersona;
 }
 
 export const MobileNavbar: React.FC<MobileNavbarProps> = ({
@@ -47,25 +53,24 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
   userCoins,
   infoDetailMode = 'simple',
   onChangeDetailMode,
+  persona = 'student',
 }) => {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const personaConfig = getPersonaConfig(persona);
+  const menu = personaConfig.menuCopy;
 
   const bottomNavItems = [
-    { id: 'home' as AppPage, labelTh: 'หน้าหลัก', labelEn: 'Home', icon: Home },
-    { id: 'ai-coach' as AppPage, labelTh: 'AI Coach', labelEn: 'Coach', icon: Bot },
-    { id: 'appliances' as AppPage, labelTh: 'อุปกรณ์', labelEn: 'Devices', icon: Plug },
-    { id: 'learning' as AppPage, labelTh: 'เรียนรู้', labelEn: 'Learn', icon: GraduationCap },
+    { id: 'home' as AppPage, subIds: ['home'], labelTh: 'หน้าหลัก', labelEn: 'Home', icon: Home },
+    { id: 'appliances' as AppPage, subIds: ['appliances', 'compare'], labelTh: 'อุปกรณ์ & เทียบ', labelEn: 'Devices', icon: Plug },
+    { id: 'budget' as AppPage, subIds: ['budget'], labelTh: 'งบ & ตัดไฟ', labelEn: 'Budget', icon: Wallet },
+    { id: 'insights' as AppPage, subIds: ['insights', 'ai-coach', 'analytics'], labelTh: menu.insightsTh, labelEn: menu.insightsEn, icon: BrainCircuit },
   ];
 
   const moreMenuItems = [
-    { id: 'compare' as AppPage, labelTh: 'เปรียบเทียบอุปกรณ์', labelEn: 'Compare Lab', icon: Scale },
-    { id: 'score' as AppPage, labelTh: 'ดัชนีการประหยัดไฟ', labelEn: 'Saving Score', icon: Trophy },
-    { id: 'locations' as AppPage, labelTh: 'สถานที่ของฉัน', labelEn: 'My Locations', icon: MapPin },
-    { id: 'budget' as AppPage, labelTh: 'ค่าไฟ & งบประมาณ', labelEn: 'Budget & Bills', icon: Wallet },
-    { id: 'analytics' as AppPage, labelTh: 'วิเคราะห์การใช้ไฟ', labelEn: 'Analytics', icon: BarChart3 },
-    { id: 'achievements' as AppPage, labelTh: 'ภารกิจ & รางวัล', labelEn: 'Missions', icon: Trophy },
-    { id: 'profile' as AppPage, labelTh: 'โปรไฟล์', labelEn: 'Profile', icon: User },
-    { id: 'settings' as AppPage, labelTh: 'ตั้งค่า', labelEn: 'Settings', icon: Settings },
+    { id: 'learning' as AppPage, subIds: ['learning', 'game', 'city'], labelTh: menu.learningTh, labelEn: menu.learningEn, icon: GraduationCap },
+    { id: 'locations' as AppPage, subIds: ['locations'], labelTh: personaConfig.spaceTypeLabelTh, labelEn: personaConfig.spaceTypeLabelEn, icon: MapPin },
+    { id: 'profile' as AppPage, subIds: ['profile', 'score', 'achievements'], labelTh: menu.profileTh, labelEn: menu.profileEn, icon: User },
+    { id: 'settings' as AppPage, subIds: ['settings', 'trust-center'], labelTh: 'ตั้งค่า & ความโปร่งใส', labelEn: 'Settings & Trust', icon: Settings },
   ];
 
   return (
@@ -143,39 +148,10 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
                 </button>
               </div>
 
-              {/* Mode Selector in Mobile Sheet */}
-              {onChangeDetailMode && (
-                <div className="mb-4 p-3 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 space-y-2">
-                  <div className="text-[0.68rem] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                    <Sliders className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>{lang === 'th' ? 'ระดับความลึกของข้อมูล (Detail Level)' : 'Information Depth'}</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {[
-                      { id: 'simple', th: 'เข้าใจง่าย', en: 'Simple' },
-                      { id: 'balanced', th: 'สมดุล', en: 'Balanced' },
-                      { id: 'detailed', th: 'ละเอียด', en: 'Detailed' },
-                    ].map((m) => (
-                      <button
-                        key={m.id}
-                        onClick={() => onChangeDetailMode(m.id as any)}
-                        className={`py-2 px-2 rounded-xl text-xs font-bold transition-all text-center cursor-pointer ${
-                          infoDetailMode === m.id
-                            ? 'bg-emerald-500 text-white shadow-sm'
-                            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                        }`}
-                      >
-                        {lang === 'th' ? m.th : m.en}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               <div className="grid grid-cols-2 gap-3 mb-2">
                 {moreMenuItems.map((item) => {
                   const Icon = item.icon;
-                  const isActive = currentPage === item.id;
+                  const isActive = item.subIds ? item.subIds.includes(currentPage) : currentPage === item.id;
                   return (
                     <button
                       key={item.id}
@@ -213,7 +189,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
         }`}>
           {bottomNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = currentPage === item.id;
+            const isActive = item.subIds ? item.subIds.includes(currentPage) : currentPage === item.id;
             return (
               <button
                 key={item.id}

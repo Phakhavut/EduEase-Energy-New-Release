@@ -6,6 +6,8 @@ export interface House {
   description: string;
 }
 
+export type UserPersona = 'student' | 'homeowner' | 'facility';
+
 export type AppPage = 
   | 'home' 
   | 'insights'
@@ -20,7 +22,9 @@ export type AppPage =
   | 'settings'
   | 'compare'
   | 'score'
-  | 'trust-center';
+  | 'trust-center'
+  | 'game'
+  | 'city';
 
 export type InfoDetailMode = 'simple' | 'balanced' | 'detailed';
 
@@ -218,6 +222,8 @@ export interface GlossaryTerm {
   relatedPage?: AppPage;
 }
 
+export type LessonDifficulty = 'easy' | 'medium' | 'hard' | 'expert';
+
 export interface Lesson {
   id: string;
   pathId: string;
@@ -225,12 +231,24 @@ export interface Lesson {
   titleEn: string;
   readTime: string;
   xpReward: number;
+  difficulty?: LessonDifficulty;
+  category?: 'personal' | 'external' | 'electrician' | 'diagnostics' | 'maintenance';
+  tags?: string[];
   contentTh: string;
   contentEn: string;
+  formula?: string;
+  diagramTh?: string;
+  diagramEn?: string;
+  electricianTipTh?: string;
+  electricianTipEn?: string;
   questionTh: string;
+  questionEn?: string;
   optionsTh: string[];
+  optionsEn?: string[];
   correctIndex: number;
   explanationTh: string;
+  explanationEn?: string;
+  certificationPointsReward?: number;
   completed?: boolean;
 }
 
@@ -241,7 +259,55 @@ export interface LearningPath {
   descTh: string;
   descEn?: string;
   icon: string;
+  difficulty?: LessonDifficulty;
+  category?: 'personal' | 'external' | 'electrician' | 'diagnostics' | 'maintenance';
+  badgeLabelTh?: string;
+  badgeLabelEn?: string;
   lessons: Lesson[];
+}
+
+export type CertificationTierId = 'tier1_apprentice' | 'tier2_auditor' | 'tier3_specialist' | 'tier4_manager' | 'tier5_grandmaster';
+
+export interface CertificationTier {
+  id: CertificationTierId;
+  tierLevel: number;
+  badgeCode: string;
+  titleTh: string;
+  titleEn: string;
+  roleTitleTh: string;
+  roleTitleEn: string;
+  requiredLessons: number;
+  summaryTh: string;
+  summaryEn: string;
+  icon: string;
+  accentGradient: string;
+  badgeBorder: string;
+  badgeBg: string;
+  textColor: string;
+  keyCompetenciesTh: string[];
+  keyCompetenciesEn: string[];
+  authorizedScopesTh: string[];
+  authorizedScopesEn: string[];
+  sealLabel: string;
+}
+
+export interface UserCertificationProgress {
+  currentTier: CertificationTier;
+  nextTier: CertificationTier | null;
+  completedCount: number;
+  totalCount: number;
+  completionPercent: number;
+  lessonsToNextTier: number;
+  nextTierPercent: number;
+  certificationPoints: number;
+  bonusQuizPointsEarned: number;
+  categoryBreakdown: {
+    personal: { completed: number; total: number; percent: number; labelTh: string; labelEn: string; icon: string };
+    external: { completed: number; total: number; percent: number; labelTh: string; labelEn: string; icon: string };
+    electrician: { completed: number; total: number; percent: number; labelTh: string; labelEn: string; icon: string };
+    diagnostics: { completed: number; total: number; percent: number; labelTh: string; labelEn: string; icon: string };
+    maintenance?: { completed: number; total: number; percent: number; labelTh: string; labelEn: string; icon: string };
+  };
 }
 
 export interface NotificationItem {
@@ -844,6 +910,174 @@ export interface WeeklySpecialEvent {
   icon: string;
   active: boolean;
 }
+
+// ==========================================
+// ENERGY GUARDIAN GAME SYSTEM TYPES
+// ==========================================
+
+export type BossId = 'overload' | 'cold_phantom' | 'watt_devourer' | 'bill_eater' | 'climate_beast';
+
+export type QuestionType = 'mc' | 'tf' | 'calc' | 'scenario' | 'detective' | 'match';
+
+export interface BattleQuestion {
+  id: string;
+  type: QuestionType;
+  topicTh: string;
+  topicEn: string;
+  questionTh: string;
+  questionEn: string;
+  optionsTh?: string[];
+  optionsEn?: string[];
+  correctAnswer: number | string | boolean;
+  explanationTh: string;
+  explanationEn: string;
+  hintTh: string;
+  hintEn: string;
+  damage: number;
+  xpReward: number;
+  dataPoints?: {
+    watts?: number;
+    hours?: number;
+    rate?: number;
+    items?: Array<{ id: string; nameTh: string; nameEn: string; watts: number }>;
+  };
+}
+
+export interface BossPhase {
+  phaseNumber: number; // 1, 2, 3
+  hpThresholdPercent: number; // e.g. 70, 30, 0
+  difficulty: 'Easy' | 'Medium' | 'Hard';
+  titleTh: string;
+  titleEn: string;
+  dialogueTh: string;
+  dialogueEn: string;
+}
+
+export interface EnergyBoss {
+  id: BossId;
+  nameTh: string;
+  nameEn: string;
+  titleTh: string;
+  titleEn: string;
+  element: 'Overload' | 'Cooling' | 'Voltage' | 'Tariff' | 'Climate';
+  elementColor: string; // TailWind color key or hex
+  icon: string;
+  difficulty: number; // 1 to 5
+  level: number;
+  totalHp: number;
+  attack: number;
+  defense: number;
+  weaknessTh: string;
+  weaknessEn: string;
+  descriptionTh: string;
+  descriptionEn: string;
+  loreTh: string;
+  loreEn: string;
+  phases: BossPhase[];
+  rewards: {
+    xp: number;
+    coins: number;
+    crystals: number;
+    blueprintId?: string;
+    seedId?: string;
+    badgeId?: string;
+  };
+  unlockRequirementTh: string;
+  unlockRequirementEn: string;
+  unlocked: boolean;
+  questionPool: BattleQuestion[];
+}
+
+export type CityBuildingZone = 'residential' | 'green' | 'energy' | 'transport' | 'commercial' | 'smart';
+
+export interface CityBuilding {
+  id: string;
+  zone: CityBuildingZone;
+  nameTh: string;
+  nameEn: string;
+  descriptionTh: string;
+  descriptionEn: string;
+  level: number;
+  costCoins: number;
+  costCrystals: number;
+  blueprintReqId?: string;
+  sustainabilityBonus: number;
+  efficiencyBonus: number;
+  co2Bonus: number;
+  happinessBonus: number;
+  icon: string;
+  isUnlocked: boolean;
+  countPlaced: number;
+}
+
+export interface PlacedCityItem {
+  id: string;
+  buildingId: string;
+  zone: CityBuildingZone;
+  placedAt: string;
+  gridX: number;
+  gridY: number;
+}
+
+export interface CityState {
+  level: number;
+  nameTh: string;
+  nameEn: string;
+  sustainability: number; // 0..100
+  efficiency: number; // 0..100
+  co2Reduction: number; // 0..100
+  citizenHappiness: number; // 0..100
+  economy: number; // 0..100
+  renewablePercent: number; // 0..100
+  placedItems: PlacedCityItem[];
+}
+
+export interface GuardianInventoryItem {
+  id: string;
+  category: 'blueprint' | 'seed' | 'building' | 'decoration' | 'crystal' | 'badge';
+  nameTh: string;
+  nameEn: string;
+  descriptionTh: string;
+  descriptionEn: string;
+  count: number;
+  icon: string;
+  rarity: 'Common' | 'Rare' | 'Epic' | 'Legendary';
+}
+
+export interface EnergyGuardianState {
+  level: number;
+  xp: number;
+  xpMax: number;
+  coins: number;
+  energy: number;
+  energyMax: number;
+  crystals: number;
+  streak: number;
+  streakShields: number;
+  defeatedBosses: BossId[];
+  tutorialCompleted: boolean;
+  energySavingScore: number;
+  knowledgeScore: number;
+  city: CityState;
+  inventory: GuardianInventoryItem[];
+}
+
+export interface GamificationSettings {
+  cleanUtilityMode: boolean; // Pro clean mode: hides arcade, pet tree, and focus purely on electricity cost & saving
+  animationsEnabled: boolean; // UI animations & motion effects
+  rewardsEnabled: boolean; // Reward popups, mystery chest, coin particles
+  leaderboardVisible: boolean; // Public gamified leaderboard
+  homeEcoActivitiesVisible: boolean; // Show/hide quests and city card on Home screen
+}
+
+export const DEFAULT_GAMIFICATION_SETTINGS: GamificationSettings = {
+  cleanUtilityMode: false,
+  animationsEnabled: true,
+  rewardsEnabled: true,
+  leaderboardVisible: true,
+  homeEcoActivitiesVisible: true,
+};
+
 
 
 

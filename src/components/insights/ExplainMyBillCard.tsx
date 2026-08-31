@@ -13,7 +13,7 @@ import {
 import { InfoDetailMode } from '../../types';
 
 interface ExplainMyBillCardProps {
-  mode: InfoDetailMode;
+  mode?: InfoDetailMode;
   lang: 'th' | 'en';
   isDarkMode: boolean;
   kwhUsed?: number;

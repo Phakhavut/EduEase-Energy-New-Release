@@ -1,15 +1,27 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "motion/react";
-import { Lightbulb, Zap, Snowflake, Plug, Sun, BatteryCharging } from "lucide-react";
+import { Lightbulb, Zap, Snowflake, Plug, Sun, BatteryCharging, Wind } from "lucide-react";
+import { UserPersona, getPersonaConfig } from "../data/personaThemes";
+
+const iconMap = {
+  Snowflake,
+  Plug,
+  Sun,
+  BatteryCharging,
+  Wind,
+  Zap,
+  Lightbulb
+};
 
 export const EnergyTipWidget = ({
   activeHouse,
   isDarkMode,
-  lang = "en"
+  lang = "en",
+  persona = "student"
 }: {
   activeHouse?: any;
   isDarkMode?: boolean;
   lang?: string;
+  persona?: UserPersona;
 }) => {
   const [tip, setTip] = useState<{ title: string; content: string; icon: any }>({
     title: "Generating Tip...",
@@ -18,34 +30,24 @@ export const EnergyTipWidget = ({
   });
 
   useEffect(() => {
-    const houseName = activeHouse?.name || "Your property";
+    const config = getPersonaConfig(persona);
+    const houseName = activeHouse?.name || config.defaultLocationNameTh;
+    const tipsList = config.energyTips;
     
-    const possibleTips = [
-      {
-        title: lang === "th" ? "ปรับแต่งการใช้แอร์" : "Optimize HVAC Usage",
-        content: lang === "th" ? `เราสังเกตเห็นว่า ${houseName} มีการใช้ระบบทำความเย็นในช่วงที่มีความต้องการใช้ไฟฟ้าสูงสุด ลองเปลี่ยนไปใช้งานหนักในช่วงเวลาที่มีความต้องการใช้ไฟฟ้าต่ำเพื่อประหยัดการบริโภครายวันได้สูงสุดถึง 15%` : `We noticed ${houseName} has been running cooling systems during peak hours. Try shifting heavy cooling to off-peak hours to save up to 15% on daily consumption.`,
-        icon: Snowflake
-      },
-      {
-        title: lang === "th" ? "การแจ้งเตือนไฟรั่วไหล" : "Phantom Load Alert",
-        content: lang === "th" ? `อุปกรณ์หลายชิ้นที่ ${houseName} กำลังดึงพลังงานอย่างต่อเนื่อง ใช้คุณสมบัติ Eco-Standby ในการควบคุมด้วย AI เพื่อตัดไฟอัตโนมัติสำหรับอุปกรณ์ที่ไม่มีการใช้งาน` : `Several standby devices in ${houseName} are drawing power continuously. Utilize the Eco-Standby feature in the AI controls to automatically cut power to idle electronics.`,
-        icon: Plug
-      },
-      {
-        title: lang === "th" ? "แสงธรรมชาติ" : "Natural Lighting",
-        content: lang === "th" ? `สภาพอากาศปัจจุบันบ่งบอกว่า ${houseName} มีแสงแดดธรรมชาติที่ดีเยี่ยม พิจารณาเปิดม่านและปิดแสงสว่างจากหลอดไฟในห้องที่หันหน้าไปทางทิศใต้` : `Current weather suggests excellent natural sunlight for ${houseName}. Consider opening blinds and turning off artificial lighting in south-facing rooms.`,
-        icon: Sun
-      },
-      {
-        title: lang === "th" ? "ปรับแต่งตัวประกอบกำลัง" : "Power Factor Tuning",
-        content: lang === "th" ? `ตรวจพบการเหนี่ยวนำสูงใน ${houseName} เปิดใช้งานการปรับแต่งตัวประกอบกำลังด้วย AI เพื่อแก้ไขการสูญเสียประสิทธิภาพ` : `Heavy inductive loads detected in ${houseName}. Enable AI Power Factor Tuning to correct efficiency losses and avoid grid penalties.`,
-        icon: BatteryCharging
-      }
-    ];
+    // Choose tip dynamically or based on house
+    const tipIndex = Math.abs(houseName.length) % tipsList.length;
+    const selected = tipsList[tipIndex] || tipsList[0];
+    
+    const IconComponent = (iconMap as any)[selected.iconName] || Zap;
 
-    const tipIndex = houseName.length % possibleTips.length;
-    setTip(possibleTips[tipIndex]);
-  }, [activeHouse, lang]);
+    setTip({
+      title: lang === "th" ? selected.titleTh : selected.titleEn,
+      content: lang === "th" 
+        ? `${houseName}: ${selected.contentTh}`
+        : `${houseName}: ${selected.contentEn}`,
+      icon: IconComponent
+    });
+  }, [activeHouse, lang, persona]);
 
   const IconComponent = tip.icon;
 

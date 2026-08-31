@@ -33,10 +33,16 @@ import {
   Award, 
   Scale, 
   HelpCircle,
-  RotateCcw
+  RotateCcw,
+  Plug
 } from 'lucide-react';
 import { Appliance, InfoDetailMode, AppPage, ComparisonItem } from '../../types';
 import { ProgressiveCard } from '../common/ProgressiveCard';
+import { OfficialDatabaseAutoFiller } from '../appliances/OfficialDatabaseAutoFiller';
+import { OfficialApplianceSpec } from '../../data/officialApplianceDatabase';
+import { ShieldCheck, FileText, BarChart3 } from 'lucide-react';
+import { UserPersona } from '../../types';
+import { AppliancePriceComparison } from '../appliances/AppliancePriceComparison';
 
 interface ComparisonViewProps {
   lang: 'th' | 'en';
@@ -45,6 +51,7 @@ interface ComparisonViewProps {
   userAppliances: Appliance[];
   setCurrentPage: (page: AppPage) => void;
   onStartPageTour?: (stepIndex: number) => void;
+  persona?: UserPersona;
 }
 
 // Preset Comparison Sets
@@ -97,13 +104,16 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
   userAppliances,
   setCurrentPage,
   onStartPageTour,
+  persona = 'student',
 }) => {
+  const [compareMode, setCompareMode] = useState<'presets' | 'separate_appliances'>('presets');
   // Selected items for comparison (2 to 5 items)
   const [selectedItems, setSelectedItems] = useState<ComparisonItem[]>(PRESET_COMPARISONS[0].items as ComparisonItem[]);
   const [chartType, setChartType] = useState<'bar' | 'radar'>('bar');
 
   // Custom Item Modal or Editor state
   const [showAddCustom, setShowAddCustom] = useState(false);
+  const [addCompMode, setAddCompMode] = useState<'official' | 'manual'>('official');
   const [customName, setCustomName] = useState('');
   const [customWatt, setCustomWatt] = useState<number>(100);
   const [customHours, setCustomHours] = useState<number>(5);
@@ -114,6 +124,35 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
     if (preset) {
       setSelectedItems(preset.items as ComparisonItem[]);
     }
+  };
+
+  // Helper to map efficiency tags safely
+  const mapEfficiencyTag = (tag?: string): 'A+++ Eco' | 'Inverter' | 'Standard' | 'Heavy' => {
+    if (!tag) return 'Standard';
+    if (tag === 'A+++ Eco' || tag === 'Inverter' || tag === 'Standard' || tag === 'Heavy') return tag;
+    if (tag === 'Good') return 'A+++ Eco';
+    if (tag === 'Heavy Drinker') return 'Heavy';
+    return 'Standard';
+  };
+
+  // Add official appliance
+  const handleAddOfficialAppliance = (spec: OfficialApplianceSpec) => {
+    if (selectedItems.length >= 5) return;
+    const newItem: ComparisonItem = {
+      id: `official_${spec.id}_${Date.now()}`,
+      name: `${spec.brand} ${spec.modelSeries} ${spec.sizeCapacity}`,
+      nameEn: `${spec.brand} ${spec.modelSeries} ${spec.sizeCapacity}`,
+      category: spec.category,
+      watt: spec.ratedWatt,
+      hoursPerDay: spec.defaultHoursPerDay,
+      quantity: 1,
+      efficiencyScore: spec.labelNo5Stars === 3 ? 98 : spec.labelNo5Stars === 2 ? 90 : spec.labelNo5Stars === 1 ? 82 : 75,
+      powerFactor: spec.powerFactor,
+      efficiencyTag: mapEfficiencyTag(spec.efficiencyTag),
+      icon: spec.category === 'aircon' ? '❄️' : spec.category === 'refrigerator' ? '🧊' : spec.category === 'washing_machine' ? '🧺' : spec.category === 'tv' ? '📺' : '⚡',
+    };
+    setSelectedItems([...selectedItems, newItem]);
+    setShowAddCustom(false);
   };
 
   // Add user appliance from active list
@@ -129,7 +168,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
       quantity: 1,
       efficiencyScore: app.healthScore || 80,
       powerFactor: app.pf || 0.90,
-      efficiencyTag: app.efficiencyTag as any || 'Standard',
+      efficiencyTag: mapEfficiencyTag(app.efficiencyTag),
       icon: app.icon || '⚡',
     };
     setSelectedItems([...selectedItems, newItem]);
@@ -213,15 +252,62 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
   }));
 
   const radarData = [
-    { subject: 'ความคุ้มค่า (ROI)', ...Object.fromEntries(calculatedItems.map(i => [i.name, Math.max(10, 100 - (i.monthlyCost / 5))])) },
-    { subject: 'ประหยัดไฟ (kWh)', ...Object.fromEntries(calculatedItems.map(i => [i.name, Math.max(10, 100 - (i.monthlyKwh / 2))])) },
-    { subject: 'ประสิทธิภาพ (Eff)', ...Object.fromEntries(calculatedItems.map(i => [i.name, i.efficiencyScore])) },
+    { subject: lang === 'th' ? 'ความคุ้มค่า (ROI)' : 'Value (ROI)', ...Object.fromEntries(calculatedItems.map(i => [i.name, Math.max(10, 100 - (i.monthlyCost / 5))])) },
+    { subject: lang === 'th' ? 'ประหยัดไฟ (kWh)' : 'Savings (kWh)', ...Object.fromEntries(calculatedItems.map(i => [i.name, Math.max(10, 100 - (i.monthlyKwh / 2))])) },
+    { subject: lang === 'th' ? 'ประสิทธิภาพ (Eff)' : 'Efficiency', ...Object.fromEntries(calculatedItems.map(i => [i.name, i.efficiencyScore])) },
     { subject: 'Power Factor', ...Object.fromEntries(calculatedItems.map(i => [i.name, i.powerFactor * 100])) },
-    { subject: 'ระดับเสียง & ความเย็น', ...Object.fromEntries(calculatedItems.map(i => [i.name, 85])) },
+    { subject: lang === 'th' ? 'ระดับเสียง & ความเย็น' : 'Noise & Comfort', ...Object.fromEntries(calculatedItems.map(i => [i.name, 85])) },
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+    <div id="tour-step-compare" className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+      {/* Sub-Module Navigation Tabs */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto self-start border border-slate-300/50 dark:border-slate-700/50 flex-wrap">
+        <button
+          onClick={() => setCurrentPage('appliances')}
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        >
+          <Plug className="w-4 h-4 text-emerald-500" />
+          <span>{lang === 'th' ? 'รายการอุปกรณ์ & สวิตช์ Eco' : 'Appliances & Eco Switch'}</span>
+        </button>
+
+        <button
+          onClick={() => setCompareMode('presets')}
+          className={`flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            compareMode === 'presets'
+              ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400'
+          }`}
+        >
+          <Scale className="w-4 h-4 text-amber-500" />
+          <span>{lang === 'th' ? 'ห้องลองเปรียบเทียบ (Compare Lab)' : 'Compare Lab'}</span>
+        </button>
+
+        <button
+          onClick={() => setCompareMode('separate_appliances')}
+          className={`flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            compareMode === 'separate_appliances'
+              ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400'
+          }`}
+        >
+          <BarChart3 className="w-4 h-4 text-emerald-500" />
+          <span>{lang === 'th' ? '📊 เปรียบเทียบค่าไฟแยกอุปกรณ์' : 'Separate Appliance Price Comparison'}</span>
+        </button>
+      </div>
+
+      {compareMode === 'separate_appliances' ? (
+        /* SEPARATE APPLIANCE ELECTRICITY PRICE COMPARISON */
+        <AppliancePriceComparison
+          isDarkMode={isDarkMode}
+          lang={lang}
+          persona={persona}
+          infoDetailMode={infoDetailMode}
+          userAppliances={userAppliances}
+          onNavigatePage={setCurrentPage}
+        />
+      ) : (
+        <>
       {/* 1. HEADER BANNER */}
       <div className={`p-6 rounded-3xl border shadow-xl relative overflow-hidden transition-all ${
         isDarkMode 
@@ -238,7 +324,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
 
               {onStartPageTour && (
                 <button
-                  onClick={() => onStartPageTour(2)}
+                  onClick={() => onStartPageTour(5)}
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-xs border border-amber-500/30 hover:bg-amber-500/25 transition-all cursor-pointer"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-bounce" />
@@ -278,7 +364,7 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
       </div>
 
       {/* 2. AI VERDICT & CONCLUSION HIGHLIGHT CARDS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Most Expensive */}
         <ProgressiveCard
           mode={infoDetailMode}
@@ -588,89 +674,139 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
         </button>
       </div>
 
-      {/* Add Custom Appliance Modal */}
+      {/* Add Device to Compare Modal */}
       <AnimatePresence>
         {showAddCustom && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm overflow-y-auto">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className={`w-full max-w-md rounded-3xl p-6 border shadow-2xl ${
+              className={`w-full max-w-xl rounded-3xl p-6 border shadow-2xl space-y-4 my-8 ${
                 isDarkMode ? 'bg-slate-900 border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-800'
               }`}
             >
-              <h3 className="font-extrabold text-base font-display mb-4">
-                {lang === 'th' ? 'เพิ่มอุปกรณ์กำหนดเองเพื่อเปรียบเทียบ' : 'Add Custom Appliance'}
-              </h3>
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <h3 className="font-extrabold text-base font-display">
+                  {lang === 'th' ? 'เพิ่มอุปกรณ์เข้าตารางเปรียบเทียบ' : 'Add Device to Comparison'}
+                </h3>
 
-              <div className="space-y-3 mb-6">
-                <div>
-                  <label className="text-xs font-bold text-slate-400 block mb-1">
-                    {lang === 'th' ? 'ชื่ออุปกรณ์' : 'Appliance Name'}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="เช่น พัดลมไอเย็น 60W"
-                    value={customName}
-                    onChange={(e) => setCustomName(e.target.value)}
-                    className={`w-full p-3 rounded-xl border text-xs font-bold ${
-                      isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                {/* Switcher */}
+                <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setAddCompMode('official')}
+                    className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+                      addCompMode === 'official' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-500'
                     }`}
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>{lang === 'th' ? 'ฐานข้อมูล กฟผ.' : 'Official Specs'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAddCompMode('manual')}
+                    className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+                      addCompMode === 'manual' ? 'bg-emerald-500 text-white shadow-sm' : 'text-slate-500'
+                    }`}
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>{lang === 'th' ? 'กำหนดค่าเอง' : 'Manual'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {addCompMode === 'official' ? (
+                <div className="space-y-4">
+                  <OfficialDatabaseAutoFiller
+                    lang={lang}
+                    isDarkMode={isDarkMode}
+                    onSelectSpec={handleAddOfficialAppliance}
+                    onSwitchToManual={() => setAddCompMode('manual')}
                   />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-bold text-slate-400 block mb-1">
-                      {lang === 'th' ? 'กำลังไฟ (Watt)' : 'Power (Watt)'}
-                    </label>
-                    <input
-                      type="number"
-                      value={customWatt}
-                      onChange={(e) => setCustomWatt(Number(e.target.value))}
-                      className={`w-full p-3 rounded-xl border text-xs font-bold font-mono ${
-                        isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-                      }`}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-bold text-slate-400 block mb-1">
-                      {lang === 'th' ? 'เปิดใช้งาน (ชม./วัน)' : 'Usage (Hrs/Day)'}
-                    </label>
-                    <input
-                      type="number"
-                      step="0.5"
-                      value={customHours}
-                      onChange={(e) => setCustomHours(Number(e.target.value))}
-                      className={`w-full p-3 rounded-xl border text-xs font-bold font-mono ${
-                        isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
-                      }`}
-                    />
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddCustom(false)}
+                      className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                    >
+                      {lang === 'th' ? 'ยกเลิก' : 'Cancel'}
+                    </button>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-bold text-slate-400 block mb-1">
+                        {lang === 'th' ? 'ชื่ออุปกรณ์' : 'Appliance Name'}
+                      </label>
+                      <input
+                        type="text"
+                        placeholder={lang === 'th' ? "เช่น พัดลมไอเย็น 60W, ตู้เย็น 2 ประตู" : "e.g. Air Cooler 60W"}
+                        value={customName}
+                        onChange={(e) => setCustomName(e.target.value)}
+                        className={`w-full p-3 rounded-xl border text-xs font-bold ${
+                          isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                        }`}
+                      />
+                    </div>
 
-              <div className="flex items-center justify-end gap-2">
-                <button
-                  onClick={() => setShowAddCustom(false)}
-                  className="px-4 py-2.5 rounded-xl border text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
-                >
-                  {lang === 'th' ? 'ยกเลิก' : 'Cancel'}
-                </button>
-                <button
-                  onClick={handleAddCustomAppliance}
-                  disabled={!customName}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-xs transition-all disabled:opacity-50 cursor-pointer"
-                >
-                  {lang === 'th' ? 'เพิ่มเข้ารายการ' : 'Add to List'}
-                </button>
-              </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-bold text-slate-400 block mb-1">
+                          {lang === 'th' ? 'กำลังไฟ (Watt)' : 'Power (Watt)'}
+                        </label>
+                        <input
+                          type="number"
+                          value={customWatt}
+                          onChange={(e) => setCustomWatt(Number(e.target.value))}
+                          className={`w-full p-3 rounded-xl border text-xs font-bold font-mono ${
+                            isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-slate-400 block mb-1">
+                          {lang === 'th' ? 'เปิดใช้งาน (ชม./วัน)' : 'Usage (Hrs/Day)'}
+                        </label>
+                        <input
+                          type="number"
+                          step="0.5"
+                          value={customHours}
+                          onChange={(e) => setCustomHours(Number(e.target.value))}
+                          className={`w-full p-3 rounded-xl border text-xs font-bold font-mono ${
+                            isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-900'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2">
+                    <button
+                      onClick={() => setShowAddCustom(false)}
+                      className="px-4 py-2.5 rounded-xl border text-xs font-bold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                    >
+                      {lang === 'th' ? 'ยกเลิก' : 'Cancel'}
+                    </button>
+                    <button
+                      onClick={handleAddCustomAppliance}
+                      disabled={!customName}
+                      className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-extrabold text-xs transition-all disabled:opacity-50 cursor-pointer"
+                    >
+                      {lang === 'th' ? 'เพิ่มเข้ารายการ' : 'Add to List'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </motion.div>
           </div>
         )}
       </AnimatePresence>
+        </>
+      )}
     </div>
   );
 };

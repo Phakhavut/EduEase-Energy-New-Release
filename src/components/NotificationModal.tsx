@@ -63,7 +63,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
         <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
           {notifications.length === 0 ? (
             <div className="p-8 text-center text-slate-400 text-xs font-bold">
-              ไม่มีการแจ้งเตือนในขณะนี้
+              {lang === 'th' ? 'ไม่มีการแจ้งเตือนในขณะนี้' : 'No notifications at this time'}
             </div>
           ) : (
             notifications.map((notif) => (

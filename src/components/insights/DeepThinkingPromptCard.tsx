@@ -4,7 +4,7 @@ import { Brain, Sparkles, Send, Loader2, Zap, BookOpen, Lightbulb, ChevronRight 
 import { InfoDetailMode } from '../../types';
 
 interface DeepThinkingPromptCardProps {
-  mode: InfoDetailMode;
+  mode?: InfoDetailMode;
   lang: 'th' | 'en';
   isDarkMode: boolean;
   gridContext?: any;

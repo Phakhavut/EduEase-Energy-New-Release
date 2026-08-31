@@ -18,7 +18,7 @@ import { HouseholdBenchmark, InfoDetailMode } from '../../types';
 
 interface HouseholdBenchmarkCardProps {
   benchmarks: HouseholdBenchmark[];
-  mode: InfoDetailMode;
+  mode?: InfoDetailMode;
   lang: 'th' | 'en';
   isDarkMode: boolean;
 }
@@ -30,6 +30,7 @@ export const HouseholdBenchmarkCard: React.FC<HouseholdBenchmarkCardProps> = ({
   isDarkMode,
 }) => {
   const [selectedProfileIndex, setSelectedProfileIndex] = useState(0);
+  const [showPotentialSavings, setShowPotentialSavings] = useState(true);
   const activeProfile = benchmarks[selectedProfileIndex] || benchmarks[0];
 
   const getStatusBadge = (status: HouseholdBenchmark['status']) => {

@@ -16,7 +16,8 @@ import {
   Coins, 
   Brain, 
   ShieldCheck, 
-  SlidersHorizontal 
+  SlidersHorizontal,
+  User
 } from 'lucide-react';
 import { InfoDetailMode, AppPage, EnergySavingScoreBreakdown } from '../../types';
 import { ProgressiveCard } from '../common/ProgressiveCard';
@@ -158,7 +159,31 @@ export const ScoreView: React.FC<ScoreViewProps> = ({
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+    <div id="tour-step-score" className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+      {/* Profile & Score Hub Sub-Tabs */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto self-start border border-slate-300/50 dark:border-slate-700/50">
+        <button
+          onClick={() => setCurrentPage('profile')}
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        >
+          <User className="w-4 h-4 text-indigo-500" />
+          <span>{lang === 'th' ? 'โปรไฟล์ผู้ใช้ (Profile)' : 'Profile'}</span>
+        </button>
+        <button
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm"
+        >
+          <Trophy className="w-4 h-4 text-amber-500" />
+          <span>{lang === 'th' ? 'ดัชนีประหยัดไฟ (Saving Score)' : 'Saving Score'}</span>
+        </button>
+        <button
+          onClick={() => setCurrentPage('achievements')}
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        >
+          <Award className="w-4 h-4 text-emerald-500" />
+          <span>{lang === 'th' ? 'ตราความสำเร็จ (Badges)' : 'Badges & Skins'}</span>
+        </button>
+      </div>
+
       {/* 1. HERO OVERALL SCORE DISPLAY CARD */}
       <div className={`p-6 md:p-8 rounded-[2.5rem] border shadow-2xl relative overflow-hidden transition-all ${
         isDarkMode 
@@ -178,7 +203,7 @@ export const ScoreView: React.FC<ScoreViewProps> = ({
                     {overallScore}
                   </span>
                   <span className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest">
-                    / 100 คะแนน
+                    {lang === 'th' ? '/ 100 คะแนน' : '/ 100 PTS'}
                   </span>
                 </div>
               </div>
@@ -198,7 +223,7 @@ export const ScoreView: React.FC<ScoreViewProps> = ({
 
                 {onStartPageTour && (
                   <button
-                    onClick={() => onStartPageTour(3)}
+                    onClick={() => onStartPageTour(6)}
                     className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-xs border border-amber-500/30 hover:bg-amber-500/25 transition-all cursor-pointer"
                   >
                     <Sparkles className="w-3 h-3 text-amber-500 animate-bounce" />

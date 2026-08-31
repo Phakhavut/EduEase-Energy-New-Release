@@ -29,28 +29,44 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
   private handleQuickRetry = () => {
     this.setState({ hasError: false, error: null });
-    window.location.reload();
+    try {
+      if (typeof window !== 'undefined') {
+        window.location.reload();
+      }
+    } catch {
+      // Safe fallback
+    }
   };
 
   private handleResetAndRetry = () => {
     // Clear all localStorage keys starting with 'eudease_'
-    if (typeof window !== 'undefined') {
-      const keysToRemove: string[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.startsWith('eudease_') || key.includes('DarkMode') || key === 'lang')) {
-          keysToRemove.push(key);
+    try {
+      if (typeof window !== 'undefined') {
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.startsWith('eudease_') || key.includes('DarkMode') || key === 'lang')) {
+            keysToRemove.push(key);
+          }
         }
+        keysToRemove.forEach((key) => {
+          // Keep lang preferred if possible, but reset state
+          if (key !== 'lang') {
+            localStorage.removeItem(key);
+          }
+        });
       }
-      keysToRemove.forEach((key) => {
-        // Keep lang preferred if possible, but reset state
-        if (key !== 'lang') {
-          localStorage.removeItem(key);
-        }
-      });
+    } catch {
+      // Safe fallback
     }
     this.setState({ hasError: false, error: null });
-    window.location.reload();
+    try {
+      if (typeof window !== 'undefined') {
+        window.location.reload();
+      }
+    } catch {
+      // Safe fallback
+    }
   };
 
   private getActionableFeedback = (errorMessage: string) => {

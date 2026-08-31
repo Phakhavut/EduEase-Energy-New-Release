@@ -21,7 +21,7 @@ import { SmartAnomaly, InfoDetailMode, AppPage } from '../../types';
 
 interface AnomalyCardProps {
   anomaly: SmartAnomaly;
-  mode: InfoDetailMode;
+  mode?: InfoDetailMode;
   lang: 'th' | 'en';
   isDarkMode: boolean;
   onResolve?: (id: string) => void;
@@ -36,7 +36,8 @@ export const AnomalyCard: React.FC<AnomalyCardProps> = ({
   onResolve,
   onNavigatePage,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [showReason, setShowReason] = useState(false);
+  const [showTechnical, setShowTechnical] = useState(false);
 
   const getSeverityBadge = () => {
     switch (anomaly.severity) {
@@ -94,61 +95,118 @@ export const AnomalyCard: React.FC<AnomalyCardProps> = ({
         </div>
       </div>
 
-      {/* Description per Info Detail Mode */}
-      <div className="mb-4">
-        {mode === 'simple' && (
-          <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-            {lang === 'th' ? anomaly.simpleDescTh : anomaly.simpleDescEn}
-          </p>
-        )}
-
-        {mode === 'balanced' && (
-          <div className="space-y-2">
-            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-              {lang === 'th' ? anomaly.balancedDescTh : anomaly.balancedDescEn}
-            </p>
-            <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-700 dark:text-amber-300 font-medium flex items-start gap-2">
-              <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-              <span>
-                <strong>{lang === 'th' ? 'สาเหตุสันนิษฐาน:' : 'Likely Cause:'}</strong> {lang === 'th' ? anomaly.whyTh : anomaly.whyEn}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {mode === 'detailed' && (
-          <div className="space-y-3">
-            <p className="text-xs text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-              {lang === 'th' ? anomaly.detailedDescTh : anomaly.detailedDescEn}
-            </p>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono p-3 rounded-2xl bg-slate-100 dark:bg-slate-800/80">
-              <div>
-                <span className="text-[0.65rem] text-slate-400 block font-sans">Baseline</span>
-                <span className="font-bold text-slate-800 dark:text-slate-200">{anomaly.baselineKwh} kWh</span>
-              </div>
-              <div>
-                <span className="text-[0.65rem] text-slate-400 block font-sans">Current</span>
-                <span className="font-bold text-amber-500">{anomaly.currentKwh} kWh</span>
-              </div>
-              <div>
-                <span className="text-[0.65rem] text-slate-400 block font-sans">Deviation</span>
-                <span className="font-bold text-red-500">+{anomaly.deviationPct}%</span>
-              </div>
-              <div>
-                <span className="text-[0.65rem] text-slate-400 block font-sans">Data Source</span>
-                <span className="font-bold uppercase text-emerald-500">[{anomaly.source}]</span>
-              </div>
-            </div>
-
-            {anomaly.assumptionsTh && (
-              <div className="text-[0.7rem] text-slate-400 font-mono italic">
-                * Note: {anomaly.assumptionsTh}
-              </div>
-            )}
-          </div>
-        )}
+      {/* Main Description */}
+      <div className="mb-3">
+        <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
+          {lang === 'th' ? (anomaly.balancedDescTh || anomaly.simpleDescTh) : (anomaly.balancedDescEn || anomaly.simpleDescEn)}
+        </p>
       </div>
+
+      {/* Progressive Disclosure Action Bar */}
+      <div className="flex items-center gap-2 flex-wrap mb-3">
+        {(anomaly.whyTh || anomaly.whyEn) && (
+          <button
+            onClick={() => setShowReason(!showReason)}
+            className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer border ${
+              showReason
+                ? 'bg-amber-500 text-white border-amber-600 shadow-sm'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-amber-400'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>
+              {showReason
+                ? (lang === 'th' ? 'ซ่อนสาเหตุ' : 'Hide Cause')
+                : (lang === 'th' ? '💡 ดูสาเหตุสันนิษฐาน' : '💡 View Likely Cause')}
+            </span>
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showReason ? 'rotate-180' : ''}`} />
+          </button>
+        )}
+
+        <button
+          onClick={() => setShowTechnical(!showTechnical)}
+          className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer border ${
+            showTechnical
+              ? 'bg-teal-600 text-white border-teal-600 shadow-sm'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-teal-400'
+          }`}
+        >
+          <BarChart2 className="w-3.5 h-3.5" />
+          <span>
+            {showTechnical
+              ? (lang === 'th' ? 'ซ่อนตัวชี้วัด' : 'Hide Metrics')
+              : (lang === 'th' ? '⚙️ ดูตัวชี้วัด & ข้อมูลเชิงลึก' : '⚙️ View Metrics & Details')}
+          </span>
+          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showTechnical ? 'rotate-180' : ''}`} />
+        </button>
+      </div>
+
+      {/* Expanded Reason */}
+      <AnimatePresence>
+        {showReason && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden mb-3"
+          >
+            <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-900 dark:text-amber-200 font-medium flex items-start gap-2.5">
+              <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+              <div className="leading-relaxed">
+                <strong className="block mb-0.5 text-amber-800 dark:text-amber-300 font-bold">
+                  {lang === 'th' ? 'สาเหตุสันนิษฐานโดย AI:' : 'AI Likely Cause:'}
+                </strong>
+                {lang === 'th' ? anomaly.whyTh : anomaly.whyEn}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Expanded Technical Metrics */}
+      <AnimatePresence>
+        {showTechnical && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden mb-3"
+          >
+            <div className="space-y-2.5 p-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                  <span className="text-[0.65rem] text-slate-400 block font-sans font-bold">Baseline</span>
+                  <span className="font-bold text-slate-800 dark:text-slate-200">{anomaly.baselineKwh} kWh</span>
+                </div>
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                  <span className="text-[0.65rem] text-slate-400 block font-sans font-bold">Current</span>
+                  <span className="font-bold text-amber-500">{anomaly.currentKwh} kWh</span>
+                </div>
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                  <span className="text-[0.65rem] text-slate-400 block font-sans font-bold">Deviation</span>
+                  <span className="font-bold text-red-500">+{anomaly.deviationPct}%</span>
+                </div>
+                <div className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                  <span className="text-[0.65rem] text-slate-400 block font-sans font-bold">Data Source</span>
+                  <span className="font-bold uppercase text-emerald-500">[{anomaly.source}]</span>
+                </div>
+              </div>
+
+              {anomaly.detailedDescTh && (
+                <div className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-sans pt-1">
+                  {lang === 'th' ? anomaly.detailedDescTh : anomaly.detailedDescEn}
+                </div>
+              )}
+
+              {anomaly.assumptionsTh && (
+                <div className="text-[0.7rem] text-slate-400 font-mono italic">
+                  * Note: {anomaly.assumptionsTh}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Recommended Action Box */}
       <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">

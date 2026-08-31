@@ -13,9 +13,11 @@ import {
   ThumbsUp, 
   RefreshCw,
   Lightbulb,
-  ChevronRight
+  ChevronRight,
+  BrainCircuit,
+  BarChart3
 } from 'lucide-react';
-import { AICoachRecommendation, InfoDetailMode } from '../../types';
+import { AICoachRecommendation, InfoDetailMode, AppPage } from '../../types';
 import { ProgressiveCard } from '../common/ProgressiveCard';
 import { WhyButton } from '../trust/WhyButton';
 
@@ -29,6 +31,7 @@ interface AiCoachViewProps {
   isSendingChat: boolean;
   infoDetailMode: InfoDetailMode;
   onStartPageTour?: (stepIndex: number) => void;
+  onNavigatePage?: (page: AppPage) => void;
 }
 
 export const AiCoachView: React.FC<AiCoachViewProps> = ({
@@ -41,6 +44,7 @@ export const AiCoachView: React.FC<AiCoachViewProps> = ({
   isSendingChat,
   infoDetailMode,
   onStartPageTour,
+  onNavigatePage,
 }) => {
   const [input, setInput] = useState('');
   const [useThinkingMode, setUseThinkingMode] = useState(false);
@@ -61,6 +65,30 @@ export const AiCoachView: React.FC<AiCoachViewProps> = ({
 
   return (
     <div id="tour-step-aicoach" className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+      {/* AI & Analytics Hub Sub-Tabs */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto self-start border border-slate-300/50 dark:border-slate-700/50">
+        <button
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-700 text-purple-600 dark:text-purple-300 shadow-sm"
+        >
+          <Bot className="w-4 h-4 text-purple-500" />
+          <span>{lang === 'th' ? 'AI Coach (Voltie)' : 'AI Coach (Voltie)'}</span>
+        </button>
+        <button
+          onClick={() => onNavigatePage && onNavigatePage('insights')}
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        >
+          <BrainCircuit className="w-4 h-4 text-purple-500" />
+          <span>{lang === 'th' ? 'Smart Insights & Anomalies' : 'Smart Insights'}</span>
+        </button>
+        <button
+          onClick={() => onNavigatePage && onNavigatePage('analytics')}
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        >
+          <BarChart3 className="w-4 h-4 text-blue-500" />
+          <span>{lang === 'th' ? 'วิเคราะห์การใช้ไฟ (Analytics)' : 'Analytics'}</span>
+        </button>
+      </div>
+
       {/* 1. Header Banner */}
       <motion.div 
         initial={{ opacity: 0, y: 15 }}
@@ -111,7 +139,7 @@ export const AiCoachView: React.FC<AiCoachViewProps> = ({
           <span>{lang === 'th' ? 'คำแนะนำช่วยออมเงินวันนี้' : 'Smart Savings Recommendations'}</span>
         </h3>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {recommendations.map((rec) => (
             <div key={rec.id} className="relative group">
               <div className="absolute top-3 right-3 z-20">

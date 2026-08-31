@@ -13,7 +13,9 @@ import {
   BookOpen,
   Brain,
   Zap,
-  CheckCircle2
+  CheckCircle2,
+  Bot,
+  BarChart3
 } from 'lucide-react';
 
 import { 
@@ -41,7 +43,7 @@ import { DeepThinkingPromptCard } from './DeepThinkingPromptCard';
 interface SmartInsightsHubProps {
   lang: 'th' | 'en';
   isDarkMode: boolean;
-  infoDetailMode: InfoDetailMode;
+  infoDetailMode?: InfoDetailMode;
   anomalies: SmartAnomaly[];
   goals: SmartGoal[];
   benchmarks: HouseholdBenchmark[];
@@ -87,7 +89,31 @@ export const SmartInsightsHub: React.FC<SmartInsightsHubProps> = ({
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+    <div id="tour-step-insights" className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+      {/* AI & Analytics Hub Sub-Tabs */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto self-start border border-slate-300/50 dark:border-slate-700/50">
+        <button
+          onClick={() => onNavigatePage && onNavigatePage('ai-coach')}
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        >
+          <Bot className="w-4 h-4 text-purple-500" />
+          <span>{lang === 'th' ? 'AI Coach (Voltie)' : 'AI Coach (Voltie)'}</span>
+        </button>
+        <button
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-700 text-purple-600 dark:text-purple-300 shadow-sm"
+        >
+          <BrainCircuit className="w-4 h-4 text-purple-500" />
+          <span>{lang === 'th' ? 'Smart Insights & Anomalies' : 'Smart Insights'}</span>
+        </button>
+        <button
+          onClick={() => onNavigatePage && onNavigatePage('analytics')}
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+        >
+          <BarChart3 className="w-4 h-4 text-blue-500" />
+          <span>{lang === 'th' ? 'วิเคราะห์การใช้ไฟ (Analytics)' : 'Analytics'}</span>
+        </button>
+      </div>
+
       {/* 1. Hero Intelligence Banner */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}

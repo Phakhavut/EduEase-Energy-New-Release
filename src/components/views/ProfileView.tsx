@@ -19,9 +19,10 @@ import {
   ChevronRight,
   Shirt
 } from 'lucide-react';
-import { Badge, PassportStamp } from '../../types';
+import { Badge, PassportStamp, UserPersona } from '../../types';
 import { EnergyPassport } from '../gamification/EnergyPassport';
 import { INITIAL_PASSPORT_STAMPS } from '../../data/gamificationData';
+import { getPersonaConfig } from '../../data/personaThemes';
 
 interface ProfileViewProps {
   lang: 'th' | 'en';
@@ -35,6 +36,8 @@ interface ProfileViewProps {
   moneySavedMonth: number;
   badges: Badge[];
   onNavigatePage?: (page: any) => void;
+  persona?: UserPersona;
+  onPersonaChange?: (p: UserPersona) => void;
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({
@@ -48,21 +51,74 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
   currentAvatar,
   moneySavedMonth,
   badges,
-  onNavigatePage
+  onNavigatePage,
+  persona = 'student',
+  onPersonaChange,
 }) => {
   const [passportStamps, setPassportStamps] = useState<PassportStamp[]>(INITIAL_PASSPORT_STAMPS);
   const [avatarSkin, setAvatarSkin] = useState<string>('⚡ Eco Spark');
 
-  const totalKwhSaved = 450;
+  const config = getPersonaConfig(persona);
+
+  const totalKwhSaved = persona === 'facility' ? 4500 : persona === 'homeowner' ? 850 : 320;
   const treesEquivalent = Math.round(totalKwhSaved / 30);
-  const energySavingScore = 88; // 88/100
-  const currentRank = '#3 ศาลายา (Salaya Region)';
-  const favoriteAppliance = lang === 'th' ? 'ตู้เย็น Inverter 2 ประตู' : '2-Door Inverter Refrigerator';
+  const energySavingScore = persona === 'facility' ? 95 : 88;
+  const currentRank = persona === 'student' 
+    ? (lang === 'th' ? '#3 หอพักศาลายา (Salaya Student Dorm)' : '#3 Salaya Student Dorm')
+    : persona === 'homeowner' 
+      ? (lang === 'th' ? '#3 โซนบางนา (Bangna Residential)' : '#3 Bangna Residential')
+      : (lang === 'th' ? '#1 ศูนย์ควบคุมไฟฟ้านครปฐม (PEA Substation)' : '#1 PEA Central Substation');
+
+  const favoriteAppliance = persona === 'student'
+    ? (lang === 'th' ? 'พัดลมประหยัดไฟ & แอร์ห้อง 402' : 'Dorm Inverter AC & Desk Fan')
+    : persona === 'homeowner'
+      ? (lang === 'th' ? 'แอร์ Inverter 18,000 BTU & ปั๊มน้ำ' : '18,000 BTU Inverter AC')
+      : (lang === 'th' ? 'หม้อแปลงไฟฟ้าหลัก & ชิลเลอร์อุตสาหกรรม' : 'Main Power Transformer & Chiller');
+
+  const playerName = persona === 'student'
+    ? 'Namyen Student Saver'
+    : persona === 'homeowner'
+      ? 'Phakhavut Home Master'
+      : 'PEA Control Director';
+
+  const playerSub = persona === 'student'
+    ? (lang === 'th' ? 'นักศึกษา ม.มหิดล • หอพักนักศึกษาห้อง 402' : 'Mahidol Student • Dorm Unit 402')
+    : persona === 'homeowner'
+      ? (lang === 'th' ? 'เจ้าของบ้านพักอาศัย • เขตบางนา' : 'Residential Homeowner • Bangna')
+      : (lang === 'th' ? 'วิศวกรผู้ดูแลระบบ • การไฟฟ้าส่วนภูมิภาค' : 'System Engineer • PEA Grid Authority');
 
   const xpProgressPct = Math.min(100, Math.round((userXp / userXpMax) * 100));
 
   return (
-    <div className="space-y-6 animate-fade-in pb-20 lg:pb-8 max-w-4xl mx-auto">
+    <div id="tour-step-profile" className="space-y-6 animate-fade-in pb-20 lg:pb-8 max-w-4xl mx-auto">
+      {/* Profile & Score Hub Sub-Tabs */}
+      <div className="flex items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto self-start border border-slate-300/50 dark:border-slate-700/50">
+        <button
+          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm"
+        >
+          <User className="w-4 h-4 text-indigo-500" />
+          <span>{lang === 'th' ? 'โปรไฟล์ผู้ใช้ (Profile)' : 'Profile'}</span>
+        </button>
+        {onNavigatePage && (
+          <>
+            <button
+              onClick={() => onNavigatePage('score')}
+              className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+            >
+              <Trophy className="w-4 h-4 text-amber-500" />
+              <span>{lang === 'th' ? 'ดัชนีประหยัดไฟ (Saving Score)' : 'Saving Score'}</span>
+            </button>
+            <button
+              onClick={() => onNavigatePage('achievements')}
+              className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+            >
+              <Award className="w-4 h-4 text-emerald-500" />
+              <span>{lang === 'th' ? 'ตราความสำเร็จ (Badges)' : 'Badges & Skins'}</span>
+            </button>
+          </>
+        )}
+      </div>
+
       {/* 1. RPG PLAYER PROFILE CHARACTER CARD */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
@@ -86,13 +142,13 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
         {/* Player Name & Title */}
         <div className="space-y-1 mb-4">
           <h2 className="text-2xl font-extrabold font-display text-slate-900 dark:text-white flex items-center justify-center gap-2">
-            <span>Namyen EcoMaster</span>
+            <span>{playerName}</span>
             <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-xs font-bold">
-              RPG Guardian
+              {lang === 'th' ? config.roleBadgeTh : config.roleBadgeEn}
             </span>
           </h2>
           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-            {lang === 'th' ? 'นักศึกษา ม.มหิดล • เข้าร่วมเมื่อ ก.ค. 2026' : 'Mahidol Student • Joined July 2026'}
+            {playerSub}
           </p>
         </div>
 

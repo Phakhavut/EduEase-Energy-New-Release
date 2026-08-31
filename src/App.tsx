@@ -2,8 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import LoginForm from './components/LoginForm';
 import Dashboard from './components/Dashboard';
 import UserManual from './components/UserManual';
-import { HOUSES } from './constants';
+import { GameStateProvider } from './context/GameStateProvider';
+import { getHousesForPersona } from './constants';
 import { useOnboardingTour } from './hooks/useOnboardingTour';
+import { UserPersona } from './types';
 
 /**
  * Helper to retrieve stored theme preference with a fallback.
@@ -14,6 +16,7 @@ const getStoredTheme = (key: string, defaultValue: boolean): boolean => {
 };
 
 const App: React.FC = () => {
+  const [persona, setPersona] = useState<UserPersona>('student');
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -21,6 +24,9 @@ const App: React.FC = () => {
   const [isManualOpen, setIsManualOpen] = useState(false);
   const [lang, setLang] = useState<'th' | 'en'>('th');
   
+  const currentHouses = getHousesForPersona(persona);
+  const activeHouse = currentHouses[activeIndex] || currentHouses[0];
+
   const { tourCompleted, markCompleted, setStartImmediate } = useOnboardingTour();
   const showWelcomeTourPrompt = !tourCompleted;
 
@@ -46,12 +52,12 @@ const App: React.FC = () => {
       const response = await fetch('/api/auth/guest-login', { method: 'POST' });
       const data = await response.json();
       if (response.ok && data.success) {
-        handleLoginSuccess(data.user.username);
+        handleLoginSuccess(data.user.username, 'student');
       } else {
-        handleLoginSuccess('Guest User');
+        handleLoginSuccess('Guest User', 'student');
       }
     } catch (err) {
-      handleLoginSuccess('Guest User');
+      handleLoginSuccess('Guest User', 'student');
     }
   };
 
@@ -93,22 +99,23 @@ const App: React.FC = () => {
     }
   }, [isLoggedIn, isDarkMode]);
 
-  const activeHouse = HOUSES[activeIndex];
-
   const handleNext = useCallback(() => {
-    setActiveIndex((prev) => (prev + 1) % HOUSES.length);
-  }, []);
+    setActiveIndex((prev) => (prev + 1) % currentHouses.length);
+  }, [currentHouses.length]);
 
   const handlePrev = useCallback(() => {
-    setActiveIndex((prev) => (prev - 1 + HOUSES.length) % HOUSES.length);
-  }, []);
+    setActiveIndex((prev) => (prev - 1 + currentHouses.length) % currentHouses.length);
+  }, [currentHouses.length]);
 
   const toggleTheme = () => {
     setIsDarkMode((prev) => !prev);
   };
 
-  const handleLoginSuccess = (user: string) => {
+  const handleLoginSuccess = (user: string, role?: UserPersona) => {
     setUsername(user);
+    if (role) {
+      setPersona(role);
+    }
     setIsLoggedIn(true);
   };
 
@@ -135,14 +142,18 @@ const App: React.FC = () => {
 
   if (isLoggedIn) {
     return (
-      <Dashboard 
-        isDarkMode={isDarkMode} 
-        onToggleTheme={toggleTheme} 
-        onLogout={handleLogout} 
-        activeHouse={activeHouse}
-        lang={lang}
-        setLang={setLang}
-      />
+      <GameStateProvider>
+        <Dashboard 
+          isDarkMode={isDarkMode} 
+          onToggleTheme={toggleTheme} 
+          onLogout={handleLogout} 
+          activeHouse={activeHouse}
+          lang={lang}
+          setLang={setLang}
+          persona={persona}
+          onPersonaChange={setPersona}
+        />
+      </GameStateProvider>
     );
   }
 
@@ -153,7 +164,7 @@ const App: React.FC = () => {
     <div className={`relative min-h-screen w-full overflow-hidden transition-colors duration-700 ${isDarkMode ? 'bg-black' : 'bg-slate-50'}`}>
       {/* Background Slider */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        {HOUSES.map((house, idx) => (
+        {currentHouses.map((house, idx) => (
           <div
             key={house.id}
             className={`absolute inset-0 bg-transition duration-[1000ms] ${
@@ -228,74 +239,68 @@ const App: React.FC = () => {
         {/* Mobile Menu Dropdown */}
         
 
-        <main className="flex-grow flex flex-col lg:flex-row items-center justify-center px-2 sm:px-6 lg:px-24 gap-8 lg:gap-12 py-8 lg:py-0 relative z-30 max-w-7xl mx-auto w-full">
-          <div className="flex-1 text-center lg:text-left pt-4 lg:pt-0">
-            <h1 className={`text-5xl md:text-6xl lg:text-7xl font-black font-display tracking-tighter mb-6 animate-slide-up ${isDarkMode ? 'text-white' : 'text-slate-900'}`} style={{ animationDelay: '0.1s' }}>
-              Smart Energy Monitoring
+        <main className="flex-grow flex flex-col lg:flex-row items-center justify-center px-4 sm:px-8 lg:px-16 gap-6 lg:gap-10 py-4 lg:py-6 relative z-30 max-w-6xl mx-auto w-full">
+          <div className="flex-1 text-center lg:text-left pt-2 lg:pt-0 max-w-lg">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 mb-3">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>Next-Gen Smart Energy OS</span>
+            </div>
+            <h1 className={`text-3xl sm:text-4xl lg:text-5xl font-black font-display tracking-tight mb-3 leading-tight animate-slide-up ${isDarkMode ? 'text-white' : 'text-slate-900'}`} style={{ animationDelay: '0.1s' }}>
+              EduEase Energy
             </h1>
-            <p className={`text-lg md:text-xl font-medium tracking-wide mb-10 max-w-lg mx-auto lg:mx-0 animate-slide-up ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`} style={{ animationDelay: '0.2s' }}>
-              Monitor, Predict, and Reduce Energy Cost
+            <p className={`text-sm sm:text-base font-medium tracking-normal mb-6 max-w-md mx-auto lg:mx-0 leading-relaxed animate-slide-up ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`} style={{ animationDelay: '0.2s' }}>
+              {lang === 'th' 
+                ? 'แพลตฟอร์มติดตาม วิเคราะห์ และประหยัดค่าไฟอัจฉริยะ พร้อม AI Coach Voltie' 
+                : 'Monitor, predict, and reduce energy costs intelligently with AI Coach Voltie'}
             </p>
             <div className="relative inline-flex items-center justify-center animate-slide-up" style={{ animationDelay: '0.3s' }}>
-              {/* Subtle Circular Progress Rings */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                <svg className="w-40 h-40 absolute animate-[spin_12s_linear_infinite]" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="1.5" className={`${isDarkMode ? 'text-emerald-500/20' : 'text-emerald-600/20'}`} />
-                  <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="2.5" strokeDasharray="80 200" strokeLinecap="round" className={`${isDarkMode ? 'text-emerald-400/60' : 'text-emerald-500/60'}`} />
-                </svg>
-                <svg className="w-48 h-48 absolute animate-[spin_18s_linear_infinite_reverse]" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="1" className={`${isDarkMode ? 'text-sky-500/10' : 'text-sky-600/10'}`} />
-                  <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="60 240" strokeLinecap="round" className={`${isDarkMode ? 'text-sky-400/40' : 'text-sky-500/40'}`} />
-                </svg>
-                <svg className="w-56 h-56 absolute animate-[spin_24s_linear_infinite]" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="0.5" className={`${isDarkMode ? 'text-purple-500/10' : 'text-purple-600/10'}`} />
-                  <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="1" strokeDasharray="40 260" strokeLinecap="round" className={`${isDarkMode ? 'text-purple-400/30' : 'text-purple-500/30'}`} />
-                </svg>
-              </div>
-              
               <button 
                 onClick={handleGuestLogin}
-                className={`relative z-10 px-8 py-4 rounded-2xl font-bold text-lg shadow-lg hover:scale-105 transition-all duration-300 ${isDarkMode ? 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-emerald-500/20' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/30'}`}
+                className={`relative z-10 px-6 py-3 rounded-2xl font-black text-sm shadow-md hover:scale-102 transition-all duration-300 cursor-pointer ${isDarkMode ? 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-emerald-500/20' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'}`}
               >
-                {lang === 'th' ? 'เริ่มใช้งานทันที' : 'Start Now'}
+                {lang === 'th' ? '🚀 เริ่มใช้งานทันที (Guest Demo)' : '🚀 Start Instant Demo'}
               </button>
             </div>
-            <div className={`mt-10 flex flex-wrap gap-5 items-center justify-center lg:justify-start text-[0.7rem] font-bold tracking-widest uppercase animate-slide-up ${isDarkMode ? "text-slate-500" : "text-slate-500"}`} style={{ animationDelay: '0.4s' }}>
-              <span className="flex items-center gap-1.5"><i className="fas fa-microchip text-emerald-500"></i> {lang === 'th' ? 'ใช้ AI วิเคราะห์พฤติกรรม' : 'AI Behavior Analysis'}</span>
-              <span className="flex items-center gap-1.5"><i className="fas fa-satellite-dish text-sky-500"></i> {lang === 'th' ? 'รับข้อมูลสดจากเซนเซอร์' : 'Live Sensor Sync'}</span>
+            <div className={`mt-6 flex flex-wrap gap-4 items-center justify-center lg:justify-start text-[0.68rem] font-bold tracking-wider uppercase animate-slide-up ${isDarkMode ? "text-slate-500" : "text-slate-500"}`} style={{ animationDelay: '0.4s' }}>
+              <span className="flex items-center gap-1.5"><i className="fas fa-microchip text-emerald-500"></i> {lang === 'th' ? 'AI วิเคราะห์พฤติกรรม' : 'AI Analysis'}</span>
+              <span className="flex items-center gap-1.5"><i className="fas fa-satellite-dish text-sky-500"></i> {lang === 'th' ? 'ซิงค์มิเตอร์สด' : 'Live Smart Nodes'}</span>
             </div>
           </div>
           
-          <div className="flex-1 flex justify-center lg:justify-end w-full max-w-[400px]">
+          <div className="flex-1 flex justify-center lg:justify-end w-full max-w-[380px]">
             <LoginForm 
               selectedHouseName={activeHouse.name} 
               onLogin={handleLoginSuccess}
               isDarkMode={isDarkMode}
               lang={lang}
               setLang={setLang}
+              activeRole={persona}
+              onRoleChange={setPersona}
             />
           </div>
         </main>
 
-        <footer className="px-8 pb-12 md:px-16 flex justify-between items-end">
+        <footer className="px-6 pb-6 md:px-12 flex justify-between items-end">
           <div className="max-w-md">
             <div key={activeHouse.id} className="animate-fade-in">
-              <h3 className={`${isDarkMode ? 'text-emerald-500/40' : 'text-emerald-600'} text-[0.65rem] uppercase tracking-[0.4em] font-bold mb-1`}>SECTOR ID: {activeHouse.id}</h3>
-              <p className={`${textColor} font-display text-2xl font-light tracking-tight mb-1`}>{activeHouse.name}</p>
-              <p className={`${isDarkMode ? 'text-white/60' : 'text-slate-500'} text-[0.7rem] font-medium tracking-[0.2em] uppercase italic`}>{activeHouse.location}</p> {/* Fixed WCAG low-contrast */}
+              <h3 className={`${isDarkMode ? 'text-emerald-500/40' : 'text-emerald-600'} text-[0.62rem] uppercase tracking-[0.3em] font-bold mb-0.5`}>
+                {persona === 'student' ? 'ROOM / DORM ID' : persona === 'homeowner' ? 'RESIDENCE UNIT ID' : 'GRID SECTOR ID'}: {activeHouse.id}
+              </h3>
+              <p className={`${textColor} font-display text-lg sm:text-xl font-light tracking-tight`}>{activeHouse.name}</p>
+              <p className={`${isDarkMode ? 'text-white/60' : 'text-slate-500'} text-[0.65rem] font-medium tracking-wider uppercase italic`}>{activeHouse.location}</p>
             </div>
           </div>
           
           <div className="flex flex-col items-end">
-            <div className="flex gap-2 mb-4">
-              <button onClick={handlePrev} className={`p-2 rounded-full border ${isDarkMode ? 'border-white/10 hover:bg-emerald-500' : 'border-slate-200 hover:bg-emerald-600'} hover:text-white transition-all`}>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            <div className="flex gap-1.5 mb-2">
+              <button onClick={handlePrev} className={`p-1.5 rounded-full border cursor-pointer ${isDarkMode ? 'border-white/10 hover:bg-emerald-500' : 'border-slate-200 hover:bg-emerald-600'} hover:text-white transition-all`}>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
               </button>
-              <button onClick={handleNext} className={`p-2 rounded-full border ${isDarkMode ? 'border-white/10 hover:bg-emerald-500' : 'border-slate-200 hover:bg-emerald-600'} hover:text-white transition-all`}>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+              <button onClick={handleNext} className={`p-1.5 rounded-full border cursor-pointer ${isDarkMode ? 'border-white/10 hover:bg-emerald-500' : 'border-slate-200 hover:bg-emerald-600'} hover:text-white transition-all`}>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
-            <span className={`${isDarkMode ? 'text-white/10' : 'text-slate-200'} font-display text-5xl font-extralight tracking-tighter leading-none`}>
+            <span className={`${isDarkMode ? 'text-white/10' : 'text-slate-200'} font-display text-3xl font-extralight tracking-tighter leading-none`}>
               {String(activeIndex + 1).padStart(2, '0')}
             </span>
           </div>
@@ -311,50 +316,50 @@ const App: React.FC = () => {
 
       {/* Onboarding Welcome Prompt (Modal dialog visible on startup) */}
       {showWelcomeTourPrompt && (
-        <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[9999] flex items-center justify-center p-4 animate-fade-in overflow-y-auto">
-          <div className={`w-full max-w-lg p-6 md:p-8 rounded-[2.5rem] border shadow-2xl transition-all duration-300 transform scale-100 my-auto max-h-[95vh] overflow-y-auto ${
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-4 animate-fade-in overflow-y-auto">
+          <div className={`w-full max-w-md p-5 sm:p-6 rounded-3xl border shadow-2xl transition-all duration-300 transform scale-100 my-auto ${
             isDarkMode 
               ? 'bg-slate-900 border-emerald-500/30 text-white' 
               : 'bg-white border-emerald-200 text-slate-800'
           }`}>
-            <div className="flex items-center gap-4 mb-4">
-              <div className={`p-4 rounded-2xl ${isDarkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600'} animate-pulse`}>
-                <i className="fas fa-graduation-cap text-2xl"></i>
+            <div className="flex items-center gap-3 mb-3">
+              <div className={`p-3 rounded-2xl ${isDarkMode ? 'bg-emerald-500/10 text-emerald-400' : 'bg-emerald-50 text-emerald-600'} animate-pulse`}>
+                <i className="fas fa-graduation-cap text-xl"></i>
               </div>
               <div>
-                <h4 className="font-display font-black text-lg md:text-xl leading-tight">
-                  {lang === 'th' ? 'ระบบช่วยนำสอนรูปแบบ Spotlight!' : 'EduEase Spotlight Guided Tour'}
+                <h4 className="font-display font-black text-base md:text-lg leading-tight">
+                  {lang === 'th' ? 'ยินดีต้อนรับสู่ EduEase Energy' : 'Welcome to EduEase Energy'}
                 </h4>
-                <p className="text-[0.75rem] text-emerald-500 font-bold uppercase tracking-widest font-mono">Interactive Onboarding</p>
+                <p className="text-[0.68rem] text-emerald-500 font-bold uppercase tracking-wider font-mono">Interactive Spotlight Tour</p>
               </div>
             </div>
 
-            <p className={`text-xs leading-relaxed mb-6 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+            <p className={`text-xs leading-relaxed mb-4 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
               {lang === 'th'
-                ? 'ยินดีต้อนรับสู่ระบบพาชมประสิทธิภาพของเรา! ระบบจะกึ่งหรี่ไฟสีเทาครอบคลุมหน้าจอส่วนอื่นๆ และเว้นช่องแสง (Spotlight) ให้สว่างโร่ ณ บริเวณที่กำลังประยุกต์สอน พร้อมหน้ากากโมชันลื่นไหล เพื่อลดส่วนรบกวนสายตาและทำให้วิทยาทัศน์เด่นชัดที่สุด!'
-                : 'Welcome to our premium Spotlight tour! It dims non-critical elements into soft gray shadows to illuminate active control modules seamlessly, complete with fluid elastic slide motions that focus your view.'}
+                ? 'ระบบช่วยนำทางแบบ Spotlight จะไฮไลต์เฉพาะจุดสำคัญทีละส่วน พร้อมแนะนำวิธีการใช้งานและฟีเจอร์คำนวณค่าไฟอย่างรวดเร็ว'
+                : 'Our interactive Spotlight tour guides you through key energy monitoring, budget calculations, and AI insights step by step.'}
             </p>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2.5">
               <button
                 id="btn-skip-onboarding"
                 onClick={handleSkipOnboardingTour}
-                className={`w-full py-3.5 rounded-2xl text-xs font-black transition-all ${
+                className={`w-full py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
                   isDarkMode 
                     ? 'bg-slate-800 text-slate-300 hover:bg-slate-700' 
                     : 'bg-slate-100 text-slate-700 hover:bg-slate-200 shadow-sm'
                 }`}
               >
                 <i className="fas fa-forward me-1.5"></i>
-                {lang === 'th' ? 'ข้ามและเริ่มใช้งาน' : 'Skip & Start'}
+                {lang === 'th' ? 'ข้ามและเริ่มเลย' : 'Skip'}
               </button>
               <button
                 id="btn-start-onboarding"
                 onClick={handleStartOnboardingTour}
-                className="w-full py-3.5 bg-primary hover:bg-primary/90 text-white rounded-2xl text-xs font-black transition-all shadow-md shadow-primary/20 hover:scale-[1.02]"
+                className="w-full py-2.5 bg-emerald-500 hover:bg-emerald-400 text-white rounded-xl text-xs font-black transition-all shadow-md shadow-emerald-500/20 cursor-pointer"
               >
                 <i className="fas fa-play-circle me-1.5 animate-pulse"></i>
-                {lang === 'th' ? 'เริ่มต้นนำสอน' : 'Start Walkthrough'}
+                {lang === 'th' ? 'เริ่มแนะนำระบบ' : 'Start Tour'}
               </button>
             </div>
           </div>

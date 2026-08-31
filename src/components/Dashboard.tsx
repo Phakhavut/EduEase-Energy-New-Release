@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { AnimatePresence } from "motion/react";
+import { X } from "lucide-react";
 import { Sidebar } from "./navigation/Sidebar";
 import { MobileNavbar } from "./navigation/MobileNavbar";
 import { HeaderBar } from "./navigation/HeaderBar";
@@ -20,9 +22,16 @@ import { TrustCenterView } from "./trust/TrustCenterView";
 import { OnboardingModal } from "./OnboardingModal";
 import { NotificationModal } from "./NotificationModal";
 import { GlobalSearchModal } from "./common/GlobalSearchModal";
+import { SystemStatusModal } from "./common/SystemStatusModal";
+import { UserManual } from "./UserManual";
+import LoginForm from "./LoginForm";
 import { GuidedTour } from "./GuidedTour";
 import { useOnboardingTour } from "../hooks/useOnboardingTour";
-import { AppPage, LocationItem, InfoDetailMode, NotificationItem, SmartGoal, EnergyDiaryNote } from "../types";
+import { RetroEcoArcadeView } from "./game/RetroEcoArcadeView";
+import { useGameState } from '../context/GameStateProvider';
+import { DEFAULT_GUARDIAN_STATE } from "../data/energyGuardianData";
+import { EnergyBoss, BossId } from "../types";
+import { AppPage, LocationItem, InfoDetailMode, NotificationItem, SmartGoal, EnergyDiaryNote, Appliance, GamificationSettings, DEFAULT_GAMIFICATION_SETTINGS } from "../types";
 import { 
   INITIAL_APPLIANCES, 
   INITIAL_MISSIONS, 
@@ -45,6 +54,12 @@ import {
   initialDiaryNotes
 } from "../data/smartInsightsData";
 import { jsPDF } from "jspdf";
+import { MonthlyReportPdfModal } from "./export/MonthlyReportPdfModal";
+import { BudgetAlertToastContainer, BudgetToastNotification } from "./notifications/BudgetAlertToastContainer";
+import { NotificationPermissionBanner } from "./notifications/NotificationPermissionBanner";
+import { UserPersona } from "../types";
+import { NotificationService } from "../services/notificationService";
+import { useAutomatedAlertsWatcher } from "../hooks/useAutomatedAlertsWatcher";
 
 interface DashboardProps {
   isDarkMode: boolean;
@@ -53,6 +68,8 @@ interface DashboardProps {
   activeHouse: any;
   lang: 'th' | 'en';
   setLang: (lang: 'th' | 'en') => void;
+  persona?: UserPersona;
+  onPersonaChange?: (persona: UserPersona) => void;
 }
 
 export default function Dashboard({
@@ -62,9 +79,17 @@ export default function Dashboard({
   activeHouse,
   lang,
   setLang,
+  persona = 'student',
+  onPersonaChange,
 }: DashboardProps) {
   const [currentPage, setCurrentPage] = useState<AppPage>('home');
   const [infoDetailMode, setInfoDetailMode] = useState<InfoDetailMode>('balanced');
+  const [currentPersona, setCurrentPersona] = useState<UserPersona>(persona);
+
+  const handlePersonaChange = (newPersona: UserPersona) => {
+    setCurrentPersona(newPersona);
+    onPersonaChange?.(newPersona);
+  };
 
   // Tour Hook & State
   const { neverShowAgain, setNeverShowAgain, markCompleted } = useOnboardingTour();
@@ -99,6 +124,9 @@ export default function Dashboard({
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [showUserManual, setShowUserManual] = useState(false);
+  const [showSystemStatus, setShowSystemStatus] = useState(false);
+  const [showAccountModal, setShowAccountModal] = useState(false);
 
   // Global Keyboard Shortcuts (Cmd+K / Ctrl+K for search)
   useEffect(() => {
@@ -124,6 +152,8 @@ export default function Dashboard({
   const [glossaryTerms] = useState(INITIAL_GLOSSARY_TERMS);
 
   // User Stats & Gamification state
+  // User Stats & Gamification state (migrated some to context, but preserving user level, userXp here for backward compatibility or using context for them if possible. Wait, the prompt says "manage game-specific state like xp, coins, level, and inventory that persists across the Energy Adventure views while remaining distinct from the main website management state". So we can still keep userXp for main website, or just use context?)
+  // Let's keep `userLevel` etc for main website dashboard
   const [userLevel, setUserLevel] = useState(7);
   const [userXp, setUserXp] = useState(2450);
   const [userXpMax, setUserXpMax] = useState(3000);
@@ -131,9 +161,53 @@ export default function Dashboard({
   const [userStreak, setUserStreak] = useState(5);
   const [currentAvatar, setCurrentAvatar] = useState('⚡');
 
+  // Gamification & Accessibility Settings with localStorage persistence
+  const [gamificationSettings, setGamificationSettings] = useState<GamificationSettings>(() => {
+    try {
+      const saved = localStorage.getItem('eduease_gamification_settings');
+      if (saved) {
+        return { ...DEFAULT_GAMIFICATION_SETTINGS, ...JSON.parse(saved) };
+      }
+    } catch (e) {
+      console.warn('Failed to parse gamification settings from localStorage', e);
+    }
+    return DEFAULT_GAMIFICATION_SETTINGS;
+  });
+
+  const handleUpdateGamificationSettings = (newSettings: Partial<GamificationSettings>) => {
+    setGamificationSettings(prev => {
+      const updated = { ...prev, ...newSettings };
+      try {
+        localStorage.setItem('eduease_gamification_settings', JSON.stringify(updated));
+      } catch (e) {
+        console.warn('Failed to save gamification settings to localStorage', e);
+      }
+      return updated;
+    });
+  };
+
+  // Energy Guardian Game System State - now using Context
+  const {
+    guardianState,
+    setGuardianState,
+    activeBossBattle,
+    setActiveBossBattle,
+    showGameTutorialModal,
+    setShowGameTutorialModal,
+    showGameGuideModal,
+    setShowGameGuideModal,
+    showInventoryModal,
+    setShowInventoryModal,
+    handleBossVictory
+  } = useGameState();
+
   // Energy & Budget state
   const [monthlyBudget, setMonthlyBudget] = useState(2500);
-      const [moneySavedMonth, setMoneySavedMonth] = useState(320);
+  const [moneySavedMonth, setMoneySavedMonth] = useState(320);
+
+  // Monthly PDF Report & Budget Alert Toast States
+  const [showMonthlyReportModal, setShowMonthlyReportModal] = useState(false);
+  const [budgetToasts, setBudgetToasts] = useState<BudgetToastNotification[]>([]);
 
   // Collections state
   const [appliances, setAppliances] = useState(INITIAL_APPLIANCES);
@@ -260,6 +334,30 @@ export default function Dashboard({
     );
   };
 
+  const handleAddAppliance = (newApp: Omit<Appliance, 'id'>) => {
+    const createdApp: Appliance = {
+      ...newApp,
+      id: Date.now(),
+    };
+    setAppliances(prev => [createdApp, ...prev]);
+  };
+
+  const handleDeleteAppliance = (id: number) => {
+    setAppliances(prev => prev.filter(app => app.id !== id));
+  };
+
+  const handleAddMaintenanceLog = (id: number, log: { date: string; action: string; status: 'resolved' | 'pending' }) => {
+    setAppliances(prev => prev.map(app => {
+      if (app.id === id) {
+        return {
+          ...app,
+          logs: [log, ...(app.logs || [])]
+        };
+      }
+      return app;
+    }));
+  };
+
   const handleApplyRecommendation = (recId: string) => {
     setRecommendations((prev) =>
       prev.map((r) => {
@@ -321,16 +419,75 @@ export default function Dashboard({
     }
   };
 
+  // Budget Alert Notification Triggers & Dismissal
+  const handleTriggerBudgetToast = (type: 'danger' | 'warning', customMsgTh?: string, customMsgEn?: string) => {
+    const id = `toast-${Date.now()}`;
+    const budgetPercent = Math.round((monthlyEstimate / (monthlyBudget || 1)) * 100);
+    const isDanger = type === 'danger';
+    
+    const newToast: BudgetToastNotification = {
+      id,
+      type,
+      titleTh: isDanger ? '🚨 แจ้งเตือน: ค่าไฟเกินงบประมาณที่กำหนด!' : '⚠️ แจ้งเตือน: การใช้ไฟใกล้แตะเพดานงบ',
+      titleEn: isDanger ? '🚨 Budget Exceeded Alert!' : '⚠️ Approaching Budget Cap Alert',
+      messageTh: customMsgTh || (isDanger 
+        ? `ค่าไฟปัจจุบัน ฿${monthlyEstimate.toLocaleString()} เกินเพดานงบประมาณ ฿${monthlyBudget.toLocaleString()} ไปแล้ว ฿${(monthlyEstimate - monthlyBudget).toLocaleString()}` 
+        : `คุณใช้งานไปแล้ว ${budgetPercent}% ของงบประมาณรายเดือน ฿${monthlyBudget.toLocaleString()}`),
+      messageEn: customMsgEn || (isDanger 
+        ? `Current usage ฿${monthlyEstimate.toLocaleString()} exceeds your ฿${monthlyBudget.toLocaleString()} monthly budget by ฿${(monthlyEstimate - monthlyBudget).toLocaleString()}` 
+        : `You have reached ${budgetPercent}% of your ฿${monthlyBudget.toLocaleString()} monthly budget limit.`),
+      amountThb: monthlyEstimate,
+      thresholdPercent: budgetPercent,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      actionPage: 'budget',
+      actionLabelTh: isDanger ? 'ปรับลดไฟด่วน' : 'ตรวจสอบงบ',
+      actionLabelEn: isDanger ? 'Eco Cut Now' : 'Check Budget',
+    };
+
+    setBudgetToasts(prev => [newToast, ...prev.filter(t => t.id !== id).slice(0, 2)]);
+    
+    // Also push to persistent notifications modal list
+    setNotifications(prev => [
+      {
+        id: `notif-${Date.now()}`,
+        title: newToast.titleTh,
+        desc: newToast.messageTh,
+        priority: isDanger ? 'urgent' : 'warning',
+        timestamp: 'เมื่อสักครู่',
+        read: false,
+        actionPage: 'budget'
+      },
+      ...prev
+    ]);
+
+    // Dispatch Native Web Push to Browser / OS via Service Worker
+    NotificationService.sendNativePush({
+      title: lang === 'th' ? newToast.titleTh : newToast.titleEn,
+      body: lang === 'th' ? newToast.messageTh : newToast.messageEn,
+      type,
+      tag: `toast-push-${type}`,
+      amountThb: monthlyEstimate,
+      thresholdPercent: budgetPercent,
+    });
+  };
+
+  // Real-time automated watcher for budget thresholds & background spikes
+  useAutomatedAlertsWatcher({
+    monthlyEstimate,
+    monthlyBudget,
+    appliances,
+    onTriggerToast: (type, titleTh, msgTh) => {
+      handleTriggerBudgetToast(type, msgTh, msgTh);
+    },
+  });
+
+  const handleDismissBudgetToast = (id: string) => {
+    setBudgetToasts(prev => prev.filter(t => t.id !== id));
+  };
+
+  // Open rich printable PDF export modal
   const handleExportPDF = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text("EduEase Energy - Energy Performance Report", 14, 20);
-    doc.setFontSize(11);
-    doc.text(`Generated Date: ${new Date().toLocaleDateString()}`, 14, 30);
-    doc.text(`Monthly Spent Estimate: BHT ${monthlyEstimate}`, 14, 40);
-    doc.text(`Total Money Saved: BHT ${moneySavedMonth}`, 14, 50);
-    doc.text(`User Level: Level ${userLevel} Eco Master`, 14, 60);
-    doc.save("EduEase_Energy_Report.pdf");
+    setShowMonthlyReportModal(true);
   };
 
   return (
@@ -349,6 +506,7 @@ export default function Dashboard({
         userCoins={userCoins}
         infoDetailMode={infoDetailMode}
         onChangeDetailMode={setInfoDetailMode}
+        persona={currentPersona}
       />
 
       {/* Desktop Sticky Sidebar */}
@@ -366,10 +524,12 @@ export default function Dashboard({
         userCoins={userCoins}
         userStreak={userStreak}
         currentAvatar={currentAvatar}
+        gamificationSettings={gamificationSettings}
+        persona={currentPersona}
       />
 
       {/* Main View Area */}
-      <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
+      <main className="flex-1 p-3 sm:p-5 lg:p-6 max-w-7xl mx-auto w-full min-w-0 overflow-x-hidden">
         {/* Desktop HeaderBar */}
         <HeaderBar
           locations={locations}
@@ -381,12 +541,22 @@ export default function Dashboard({
           notifications={notifications}
           onOpenNotifications={() => setShowNotifications(true)}
           onOpenSearch={() => setShowSearchModal(true)}
+          onOpenManual={() => setShowUserManual(true)}
+          onOpenStatus={() => setShowSystemStatus(true)}
+          onOpenAccountModal={() => setShowAccountModal(true)}
           userLevel={userLevel}
           userStreak={userStreak}
           userCoins={userCoins}
           currentAvatar={currentAvatar}
           isDarkMode={isDarkMode}
           lang={lang}
+        />
+
+        {/* Notification Permission UI Helper Banner */}
+        <NotificationPermissionBanner
+          lang={lang}
+          isDarkMode={isDarkMode}
+          onOpenSettingsNotifications={() => setCurrentPage('settings')}
         />
 
         {currentPage === 'insights' && (
@@ -428,6 +598,10 @@ export default function Dashboard({
             userCoins={userCoins}
             infoDetailMode={infoDetailMode}
             onStartPageTour={handleStartTour}
+            onOpenMonthlyReport={handleExportPDF}
+            onTriggerBudgetToast={handleTriggerBudgetToast}
+            gamificationSettings={gamificationSettings}
+            persona={currentPersona}
           />
         )}
 
@@ -442,6 +616,7 @@ export default function Dashboard({
             isSendingChat={isSendingChat}
             infoDetailMode={infoDetailMode}
             onStartPageTour={handleStartTour}
+            onNavigatePage={setCurrentPage}
           />
         )}
 
@@ -465,8 +640,13 @@ export default function Dashboard({
             appliances={appliances}
             onToggleDeviceStatus={handleToggleDeviceStatus}
             onUpdateEcoMode={() => {}}
+            onAddAppliance={handleAddAppliance}
+            onDeleteAppliance={handleDeleteAppliance}
+            onAddMaintenanceLog={handleAddMaintenanceLog}
             infoDetailMode={infoDetailMode}
             onStartPageTour={handleStartTour}
+            onNavigatePage={setCurrentPage}
+            persona={currentPersona}
           />
         )}
 
@@ -480,20 +660,26 @@ export default function Dashboard({
             todayCost={todayCost}
             moneySavedMonth={moneySavedMonth}
             infoDetailMode={infoDetailMode}
+            persona={currentPersona}
             onStartPageTour={handleStartTour}
+            onNavigatePage={setCurrentPage}
+            onOpenMonthlyReport={handleExportPDF}
+            onTriggerBudgetToast={handleTriggerBudgetToast}
           />
         )}
 
-        {currentPage === 'analytics' && (
+        {(currentPage === 'analytics' || currentPage === 'insights') && (
           <AnalyticsView
             lang={lang}
             isDarkMode={isDarkMode}
             infoDetailMode={infoDetailMode}
             onExportPDF={handleExportPDF}
+            onNavigatePage={setCurrentPage}
+            persona={currentPersona}
           />
         )}
 
-        {currentPage === 'learning' && (
+        {(currentPage === 'learning' || currentPage === 'city') && (
           <LearningView
             learningPaths={learningPaths}
             glossaryTerms={glossaryTerms}
@@ -514,6 +700,7 @@ export default function Dashboard({
             userAppliances={appliances}
             setCurrentPage={setCurrentPage}
             onStartPageTour={handleStartTour}
+            persona={currentPersona}
           />
         )}
 
@@ -561,6 +748,7 @@ export default function Dashboard({
             setCurrentAvatar={setCurrentAvatar}
             leaderboard={LEADERBOARD_USERS}
             onStartPageTour={handleStartTour}
+            onNavigatePage={setCurrentPage}
           />
         )}
 
@@ -576,6 +764,9 @@ export default function Dashboard({
             currentAvatar={currentAvatar}
             moneySavedMonth={moneySavedMonth}
             badges={badges}
+            onNavigatePage={setCurrentPage}
+            persona={currentPersona}
+            onPersonaChange={handlePersonaChange}
           />
         )}
 
@@ -587,10 +778,27 @@ export default function Dashboard({
             onToggleTheme={onToggleTheme}
             monthlyBudget={monthlyBudget}
             setMonthlyBudget={setMonthlyBudget}
+            monthlyEstimate={monthlyEstimate}
             onStartTour={() => handleStartTour(0)}
             neverShowAgain={neverShowAgain}
             setNeverShowAgain={setNeverShowAgain}
             onNavigatePage={setCurrentPage}
+            onOpenManual={() => setShowUserManual(true)}
+            gamificationSettings={gamificationSettings}
+            onUpdateGamificationSettings={handleUpdateGamificationSettings}
+            persona={currentPersona}
+            onPersonaChange={handlePersonaChange}
+            onTriggerToast={handleTriggerBudgetToast}
+          />
+        )}
+
+        {/* Classic Retro Eco Arcade & Visual Memory Lab */}
+        {(currentPage === 'game' || currentPage === 'achievements') && (
+          <RetroEcoArcadeView
+            lang={lang}
+            isDarkMode={isDarkMode}
+            initialTab={currentPage === 'achievements' ? 'stamps' : 'memory'}
+            onNavigateToView={(view) => setCurrentPage(view as AppPage)}
           />
         )}
 
@@ -606,6 +814,10 @@ export default function Dashboard({
           onStartTour={() => handleStartTour(0)}
           onSkipForNow={handleSkipTourForNow}
           onNeverShowAgain={handleNeverShowTour}
+          onCompleteTour={() => {
+            setUserXp(x => x + 100);
+            setUserCoins(c => c + 30);
+          }}
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
         />
@@ -641,6 +853,71 @@ export default function Dashboard({
           isDarkMode={isDarkMode}
           lang={lang}
         />
+
+        <UserManual
+          isOpen={showUserManual}
+          onClose={() => setShowUserManual(false)}
+          isDarkMode={isDarkMode}
+          lang={lang}
+          onNavigatePage={(page) => {
+            setCurrentPage(page);
+            setShowUserManual(false);
+          }}
+        />
+
+        <SystemStatusModal
+          isOpen={showSystemStatus}
+          onClose={() => setShowSystemStatus(false)}
+          isDarkMode={isDarkMode}
+          lang={lang}
+        />
+
+        {/* Monthly Performance & AI Optimization PDF Report Modal */}
+        <MonthlyReportPdfModal
+          isOpen={showMonthlyReportModal}
+          onClose={() => setShowMonthlyReportModal(false)}
+          lang={lang}
+          isDarkMode={isDarkMode}
+          monthlyBudget={monthlyBudget}
+          monthlyEstimate={monthlyEstimate}
+          moneySavedMonth={moneySavedMonth}
+          appliances={appliances}
+          userLevel={userLevel}
+          currentLocationName={locations.find(l => l.id === currentLocationId)?.name || 'Home Base'}
+        />
+
+        {/* Floating Real-Time Budget Alert Toast Notification System */}
+        <BudgetAlertToastContainer
+          toasts={budgetToasts}
+          onDismiss={handleDismissBudgetToast}
+          onNavigatePage={setCurrentPage}
+          lang={lang}
+          isDarkMode={isDarkMode}
+        />
+
+        <AnimatePresence>
+          {showAccountModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+              <div className="relative w-full max-w-lg my-auto max-h-[90vh] overflow-y-auto scrollbar-none">
+                <button
+                  onClick={() => setShowAccountModal(false)}
+                  className="absolute top-4 right-4 p-2.5 text-white bg-slate-800/90 border border-slate-700 rounded-2xl hover:bg-slate-700 cursor-pointer z-50 shadow-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <LoginForm
+                  onLogin={() => {
+                    setShowAccountModal(false);
+                  }}
+                  selectedHouseName={locations.find(l => l.id === currentLocationId)?.name || 'Home Base'}
+                  isDarkMode={isDarkMode}
+                  lang={lang}
+                  setLang={setLang}
+                />
+              </div>
+            </div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );

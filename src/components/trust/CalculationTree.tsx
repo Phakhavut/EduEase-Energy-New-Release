@@ -112,13 +112,13 @@ export const CalculationTree: React.FC<CalculationTreeProps> = ({
                   <SourceBadge source={step.source} lang={lang} />
                 </div>
 
-                {mode !== 'simple' && step.formulaTh && (
-                  <p className="text-slate-500 dark:text-slate-400 font-mono text-[0.72rem]">
+                {step.formulaTh && (
+                  <p className="text-emerald-600 dark:text-emerald-400 font-mono text-[0.72rem] font-bold">
                     {step.formulaTh}
                   </p>
                 )}
 
-                {mode === 'detailed' && step.assumptionsTh && (
+                {step.assumptionsTh && (
                   <p className="text-slate-400 font-sans italic text-[0.68rem]">
                     * Note: {step.assumptionsTh}
                   </p>

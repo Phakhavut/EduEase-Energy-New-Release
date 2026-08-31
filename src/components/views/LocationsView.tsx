@@ -142,7 +142,7 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
               }`}
             >
               <BarChart2 className="w-4 h-4" />
-              <span>{orgMode ? 'โหมดองค์กร (Organization)' : 'เปิดโหมดองค์กร'}</span>
+              <span>{orgMode ? (lang === 'th' ? 'โหมดองค์กร (Organization)' : 'Org Portfolio Mode') : (lang === 'th' ? 'เปิดโหมดองค์กร' : 'Enable Org Mode')}</span>
             </button>
 
             <button
@@ -158,7 +158,7 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
 
       {/* Portfolio Overview Cards (Visible in Org Mode or if > 1 locations) */}
       {(orgMode || locations.length > 1) && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className={`p-5 rounded-3xl border transition-all ${
             isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-emerald-100 shadow-sm'
           }`}>
@@ -168,7 +168,9 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
             <div className="text-2xl font-black font-display mt-1 text-slate-800 dark:text-white">
               ฿{totalPortfolioBudget.toLocaleString()}
             </div>
-            <p className="text-xs text-slate-500 mt-1">จากทั้งหมด {locations.length} สถานที่</p>
+            <p className="text-xs text-slate-500 mt-1">
+              {lang === 'th' ? `จากทั้งหมด ${locations.length} สถานที่` : `Across ${locations.length} properties`}
+            </p>
           </div>
 
           <div className={`p-5 rounded-3xl border transition-all ${
@@ -181,7 +183,9 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
               ฿{totalPortfolioEst.toLocaleString()}
             </div>
             <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-1">
-              อยู่ในงบประมาณ (-฿{(totalPortfolioBudget - totalPortfolioEst).toLocaleString()})
+              {lang === 'th'
+                ? `อยู่ในงบประมาณ (-฿${(totalPortfolioBudget - totalPortfolioEst).toLocaleString()})`
+                : `Under budget (-฿${(totalPortfolioBudget - totalPortfolioEst).toLocaleString()})`}
             </p>
           </div>
 
@@ -197,7 +201,9 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
               </span>
               <span className="text-base font-bold text-slate-800 dark:text-white">
-                {locations.filter(l => l.isConnected).length} / {locations.length} สถานที่เชื่อมต่อกล่องสมาร์ทมีเตอร์
+                {lang === 'th'
+                  ? `${locations.filter(l => l.isConnected).length} / ${locations.length} สถานที่เชื่อมต่อกล่องสมาร์ทมีเตอร์`
+                  : `${locations.filter(l => l.isConnected).length} / ${locations.length} properties smart-meter synced`}
               </span>
             </div>
           </div>
@@ -357,7 +363,7 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="เช่น บ้านสวนเชียงใหม่, ร้านกาแฟ"
+                    placeholder={lang === 'th' ? "เช่น บ้านสวนเชียงใหม่, ร้านกาแฟ" : "e.g., Chiang Mai Garden House, Cafe"}
                     className={`w-full px-4 py-2.5 rounded-2xl border text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
                       isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
                     }`}
@@ -376,11 +382,11 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
                         isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
                       }`}
                     >
-                      <option value="home">บ้านพักอาศัย (Home)</option>
-                      <option value="dorm">หอพัก / คอนโด (Dorm/Condo)</option>
-                      <option value="provincial">บ้านต่างจังหวัด (Provincial)</option>
-                      <option value="shop">ร้านค้า / คาเฟ่ (Shop/Cafe)</option>
-                      <option value="office">อาคารสำนักงาน (Office)</option>
+                      <option value="home">{lang === 'th' ? 'บ้านพักอาศัย (Home)' : 'Residential Home'}</option>
+                      <option value="dorm">{lang === 'th' ? 'หอพัก / คอนโด (Dorm/Condo)' : 'Dorm / Apartment'}</option>
+                      <option value="provincial">{lang === 'th' ? 'บ้านต่างจังหวัด (Provincial)' : 'Provincial House'}</option>
+                      <option value="shop">{lang === 'th' ? 'ร้านค้า / คาเฟ่ (Shop/Cafe)' : 'Shop / Cafe'}</option>
+                      <option value="office">{lang === 'th' ? 'อาคารสำนักงาน (Office)' : 'Office Building'}</option>
                     </select>
                   </div>
 
