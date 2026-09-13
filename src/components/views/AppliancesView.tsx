@@ -30,13 +30,26 @@ import {
   FileText,
   Scale,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Grid,
+  List,
+  CheckSquare,
+  Square,
+  Edit3,
+  ArrowUpDown,
+  Filter,
+  Eye,
+  RefreshCcw,
+  Sparkle
 } from 'lucide-react';
 import { Appliance, InfoDetailMode, AppPage, UserPersona } from '../../types';
+import { EnergyDiagnosticQuickNav } from '../navigation/EnergyDiagnosticQuickNav';
 import { SourceBadge } from '../trust/SourceBadge';
 import { OfficialDatabaseAutoFiller } from '../appliances/OfficialDatabaseAutoFiller';
 import { OfficialApplianceSpec } from '../../data/officialApplianceDatabase';
 import { AppliancePriceComparison } from '../appliances/AppliancePriceComparison';
+import { GenZApplianceCard } from '../appliances/GenZApplianceCard';
+import { AddEditApplianceModal } from '../appliances/AddEditApplianceModal';
 import confetti from 'canvas-confetti';
 
 interface AppliancesViewProps {
@@ -46,6 +59,7 @@ interface AppliancesViewProps {
   onToggleDeviceStatus: (id: number) => void;
   onUpdateEcoMode: (id: number) => void;
   onAddAppliance?: (appliance: Omit<Appliance, 'id'>) => void;
+  onUpdateAppliance?: (appliance: Appliance) => void;
   onDeleteAppliance?: (id: number) => void;
   onAddMaintenanceLog?: (id: number, log: { date: string; action: string; status: 'resolved' | 'pending' }) => void;
   infoDetailMode: InfoDetailMode;
@@ -61,6 +75,7 @@ export const AppliancesView: React.FC<AppliancesViewProps> = ({
   onToggleDeviceStatus,
   onUpdateEcoMode,
   onAddAppliance,
+  onUpdateAppliance,
   onDeleteAppliance,
   onAddMaintenanceLog,
   infoDetailMode,
@@ -71,6 +86,14 @@ export const AppliancesView: React.FC<AppliancesViewProps> = ({
   const [subTab, setSubTab] = useState<'list' | 'price_compare'>('list');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+  const [selectedRoom, setSelectedRoom] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'cost_desc' | 'cost_asc' | 'hours_desc' | 'name_asc'>('cost_desc');
+  const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
+  const [selectedApplianceIds, setSelectedApplianceIds] = useState<number[]>([]);
+  const [isGenZAddModalOpen, setIsGenZAddModalOpen] = useState(false);
+  const [editingAppliance, setEditingAppliance] = useState<Appliance | null>(null);
+  const [isLoadingSkeleton, setIsLoadingSkeleton] = useState(false);
   
   // Modals state
   const [activeModalAppliance, setActiveModalAppliance] = useState<Appliance | null>(null);
@@ -144,12 +167,87 @@ export const AppliancesView: React.FC<AppliancesViewProps> = ({
 
   const categories = ['All', 'Cooling', 'Entertainment', 'Kitchen', 'Bathroom', 'Lighting', 'Misc'];
 
-  const filteredAppliances = appliances.filter((app) => {
-    const matchesSearch = app.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          (app.room && app.room.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = selectedCategory === 'All' || app.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const availableRooms = Array.from(
+    new Set(appliances.map((a) => a.room || (lang === 'th' ? 'ห้องทั่วไป' : 'General Room')))
+  ).filter(Boolean);
+
+  const totalHouseholdCost = appliances.reduce(
+    (sum, a) => sum + (a.status === 'off' ? 0 : a.monthlyCost),
+    0
+  );
+
+  const filteredAppliances = appliances
+    .filter((app) => {
+      const matchesSearch =
+        app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (app.room && app.room.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesCategory = selectedCategory === 'All' || app.category === selectedCategory;
+      const matchesRoom =
+        selectedRoom === 'all' ||
+        (app.room || (lang === 'th' ? 'ห้องทั่วไป' : 'General Room')) === selectedRoom;
+      return matchesSearch && matchesCategory && matchesRoom;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'cost_desc') return b.monthlyCost - a.monthlyCost;
+      if (sortBy === 'cost_asc') return a.monthlyCost - b.monthlyCost;
+      if (sortBy === 'hours_desc') return b.hours - a.hours;
+      if (sortBy === 'name_asc') return a.name.localeCompare(b.name, 'th');
+      return 0;
+    });
+
+  const toggleSelectAppliance = (id: number) => {
+    setSelectedApplianceIds((prev) =>
+      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedApplianceIds.length === filteredAppliances.length) {
+      setSelectedApplianceIds([]);
+    } else {
+      setSelectedApplianceIds(filteredAppliances.map((a) => a.id));
+    }
+  };
+
+  const handleBatchToggleStatus = (targetStatus: 'active' | 'off') => {
+    selectedApplianceIds.forEach((id) => {
+      const app = appliances.find((a) => a.id === id);
+      if (app && app.status !== targetStatus) {
+        onToggleDeviceStatus(id);
+      }
+    });
+    setSelectedApplianceIds([]);
+  };
+
+  const handleBatchDelete = () => {
+    if (
+      window.confirm(
+        lang === 'th'
+          ? `ต้องการลบ ${selectedApplianceIds.length} อุปกรณ์ที่เลือกใช่หรือไม่?`
+          : `Delete ${selectedApplianceIds.length} selected appliances?`
+      )
+    ) {
+      selectedApplianceIds.forEach((id) => {
+        onDeleteAppliance?.(id);
+      });
+      setSelectedApplianceIds([]);
+    }
+  };
+
+  const handleSaveAppliance = (appData: Omit<Appliance, 'id'> | Appliance) => {
+    if ('id' in appData && (appData as Appliance).id) {
+      onUpdateAppliance?.(appData as Appliance);
+    } else {
+      onAddAppliance?.(appData as Omit<Appliance, 'id'>);
+    }
+    setIsGenZAddModalOpen(false);
+    setEditingAppliance(null);
+  };
+
+  const handleOpenEdit = (app: Appliance) => {
+    setEditingAppliance(app);
+    setIsGenZAddModalOpen(true);
+  };
 
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -272,15 +370,30 @@ export const AppliancesView: React.FC<AppliancesViewProps> = ({
     setNewLogAction('');
   };
 
+  // Calculate active wattage from running appliances
+  const activeKw = +(appliances.filter(a => a.status).reduce((acc, curr) => acc + (curr.watt || 0), 0) / 1000).toFixed(2);
+
   return (
     <div id="tour-step-appliances" className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+      {/* Cross-Diagnostic Quick Navigation & Live Telemetry Strip */}
+      <EnergyDiagnosticQuickNav
+        currentPage="appliances"
+        onNavigate={onNavigatePage}
+        lang={lang}
+        isDarkMode={isDarkMode}
+        activeLoadKw={activeKw > 0 ? activeKw : 2.15}
+        powerFactor={0.95}
+        loadUnbalancePct={2.0}
+        voltageV={220}
+      />
+
       {/* 1. Header & Primary CTA */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <h2 className="text-2xl font-extrabold font-display tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
               <Plug className="w-6 h-6 text-emerald-500" />
-              <span>{lang === 'th' ? 'ศูนย์ควบคุมเครื่องใช้ไฟฟ้า' : 'Appliance Hub'}</span>
+              <span>{lang === 'th' ? 'เครื่องใช้ไฟฟ้าของฉัน' : 'My Appliances'}</span>
             </h2>
 
             {onStartPageTour && (
@@ -293,24 +406,40 @@ export const AppliancesView: React.FC<AppliancesViewProps> = ({
               </button>
             )}
           </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            {lang === 'th' ? 'จัดการเครื่องใช้ไฟฟ้า เพิ่มสเปก ตรวจเช็กค่าไฟลึก และปรับปรุงสุขภาพอุปกรณ์' : 'Manage appliances, add devices, inspect deep technical specs, and optimize efficiency.'}
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+            {lang === 'th' ? 'ดูว่าแต่ละเครื่องกำลังใช้ไฟและเงินเท่าไหร่ (ไฟของฉันถูกใช้ไปกับอะไร?)' : 'See how much power and money each appliance consumes • Where is my electricity going?'}
           </p>
         </div>
 
         {/* Top Controls: Add Button & Search */}
-        <div className="flex flex-col sm:flex-row items-center gap-3">
-          {/* ADD APPLIANCE BUTTON */}
+        <div className="flex flex-col sm:flex-row items-center gap-2.5 flex-wrap">
+          {/* SMART ADD APPLIANCE BUTTON (Gen Z Progressive Form) */}
           <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            onClick={() => {
+              setEditingAppliance(null);
+              setIsGenZAddModalOpen(true);
+            }}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4 stroke-[3]" />
-            <span>{lang === 'th' ? '+ เพิ่มเครื่องใช้ไฟฟ้าใหม่' : '+ Add New Appliance'}</span>
+            <span>{lang === 'th' ? '+ เพิ่มอุปกรณ์ (Smart Form)' : '+ Add Appliance'}</span>
+          </button>
+
+          {/* EGAT DATABASE LOOKUP */}
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+              isDarkMode
+                ? 'bg-slate-800/80 border-slate-700 text-slate-200 hover:border-emerald-500/40 hover:bg-slate-700/80'
+                : 'bg-white border-slate-200 text-slate-700 hover:border-emerald-500 hover:bg-slate-50'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4 text-emerald-500" />
+            <span>{lang === 'th' ? '✨ ฐานข้อมูล กฟผ.' : '✨ EGAT Database'}</span>
           </button>
 
           {/* Search */}
-          <div className="relative w-full sm:w-56">
+          <div className="relative w-full sm:w-48 md:w-56">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
@@ -456,8 +585,191 @@ export const AppliancesView: React.FC<AppliancesViewProps> = ({
         )}
       </div>
 
-      {/* 2. APPLIANCE CARDS GRID */}
-      {filteredAppliances.length === 0 ? (
+      {/* 2. STICKY FILTER & VIEW MODE BAR */}
+      <div className={`sticky top-0 z-20 p-3 rounded-2xl border backdrop-blur-md transition-all shadow-sm flex flex-wrap items-center justify-between gap-3 ${
+        isDarkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200/80'
+      }`}>
+        {/* Left: Filters & Batch toggle */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Room Filter Dropdown */}
+          <div className="flex items-center gap-1.5 text-xs">
+            <Home className="w-3.5 h-3.5 text-slate-400" />
+            <select
+              value={selectedRoom}
+              onChange={(e) => setSelectedRoom(e.target.value)}
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs border focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer ${
+                isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-700'
+              }`}
+            >
+              <option value="all">{lang === 'th' ? `ทุกห้อง (${appliances.length})` : `All Rooms (${appliances.length})`}</option>
+              {availableRooms.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Sort By Dropdown */}
+          <div className="flex items-center gap-1.5 text-xs">
+            <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className={`px-3 py-1.5 rounded-xl font-bold text-xs border focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer ${
+                isDarkMode ? 'bg-slate-800 border-slate-700 text-slate-200' : 'bg-slate-50 border-slate-200 text-slate-700'
+              }`}
+            >
+              <option value="cost_desc">{lang === 'th' ? 'ค่าไฟมากสุด ➔ น้อยสุด' : 'Cost: High to Low'}</option>
+              <option value="cost_asc">{lang === 'th' ? 'ค่าไฟน้อยสุด ➔ มากสุด' : 'Cost: Low to High'}</option>
+              <option value="hours_desc">{lang === 'th' ? 'ชั่วโมงใช้งานมากสุด' : 'Hours: High to Low'}</option>
+              <option value="name_asc">{lang === 'th' ? 'ชื่อ ก-ฮ (A-Z)' : 'Name (A-Z)'}</option>
+            </select>
+          </div>
+
+          {/* Multi-Select Toggle */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsMultiSelectMode(!isMultiSelectMode);
+              if (isMultiSelectMode) setSelectedApplianceIds([]);
+            }}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
+              isMultiSelectMode
+                ? 'bg-emerald-500 text-white border-emerald-400 shadow-sm'
+                : isDarkMode
+                  ? 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            {isMultiSelectMode ? <CheckSquare className="w-3.5 h-3.5" /> : <Square className="w-3.5 h-3.5 text-slate-400" />}
+            <span>{lang === 'th' ? 'เลือกจัดการหลายชิ้น' : 'Batch Select'}</span>
+          </button>
+        </div>
+
+        {/* Right: View Mode Toggle & Skeleton Refresh */}
+        <div className="flex items-center gap-2">
+          {/* Segmented Control: Cards vs Table */}
+          <div className={`p-1 rounded-xl border flex items-center gap-1 text-xs font-bold ${
+            isDarkMode ? 'bg-slate-800/80 border-slate-700' : 'bg-slate-100 border-slate-200'
+          }`}>
+            <button
+              type="button"
+              onClick={() => setViewMode('cards')}
+              className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === 'cards'
+                  ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              <Grid className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{lang === 'th' ? 'การ์ดอ่านง่าย (Gen Z)' : 'Cards'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === 'table'
+                  ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-xs'
+                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+              }`}
+            >
+              <List className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">{lang === 'th' ? 'ตารางครบทุกฟิลด์' : 'Full Table'}</span>
+            </button>
+          </div>
+
+          {/* Quick Refresh / Skeleton Trigger */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsLoadingSkeleton(true);
+              setTimeout(() => setIsLoadingSkeleton(false), 450);
+            }}
+            title={lang === 'th' ? 'รีเฟรช / คำนวณใหม่' : 'Refresh'}
+            className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-emerald-500 hover:rotate-180 transition-all cursor-pointer"
+          >
+            <RefreshCcw className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* BATCH ACTIONS FLOATING / INLINE BANNER */}
+      {isMultiSelectMode && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-between flex-wrap gap-3"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-black text-emerald-700 dark:text-emerald-300">
+              {lang === 'th'
+                ? `เลือกแล้ว ${selectedApplianceIds.length} จาก ${filteredAppliances.length} รายการ`
+                : `Selected ${selectedApplianceIds.length} of ${filteredAppliances.length}`}
+            </span>
+            <button
+              type="button"
+              onClick={handleSelectAll}
+              className="text-xs font-bold text-emerald-600 underline hover:text-emerald-700 cursor-pointer ml-1"
+            >
+              {selectedApplianceIds.length === filteredAppliances.length
+                ? (lang === 'th' ? 'ยกเลิกทั้งหมด' : 'Deselect All')
+                : (lang === 'th' ? 'เลือกทั้งหมด' : 'Select All')}
+            </button>
+          </div>
+
+          {selectedApplianceIds.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={() => handleBatchToggleStatus('active')}
+                className="px-3 py-1 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs flex items-center gap-1 shadow-xs cursor-pointer"
+              >
+                <Power className="w-3.5 h-3.5" />
+                <span>{lang === 'th' ? 'เปิดใช้งาน' : 'Turn On'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleBatchToggleStatus('off')}
+                className="px-3 py-1 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs flex items-center gap-1 cursor-pointer"
+              >
+                <Power className="w-3.5 h-3.5" />
+                <span>{lang === 'th' ? 'ปิดใช้งาน' : 'Turn Off'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleBatchDelete}
+                className="px-3 py-1 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-1 shadow-xs cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{lang === 'th' ? `ลบ (${selectedApplianceIds.length})` : `Delete (${selectedApplianceIds.length})`}</span>
+              </button>
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* 3. MAIN CONTENT: SKELETON / EMPTY / CARDS / TABLE */}
+      {isLoadingSkeleton ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((sk) => (
+            <div
+              key={sk}
+              className={`p-6 rounded-3xl border animate-pulse space-y-4 ${
+                isDarkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-100'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="w-12 h-12 rounded-2xl bg-slate-200 dark:bg-slate-800" />
+                <div className="w-20 h-6 rounded-full bg-slate-200 dark:bg-slate-800" />
+              </div>
+              <div className="space-y-2">
+                <div className="w-3/4 h-5 rounded-lg bg-slate-200 dark:bg-slate-800" />
+                <div className="w-1/2 h-4 rounded-lg bg-slate-200 dark:bg-slate-800" />
+              </div>
+              <div className="w-full h-12 rounded-2xl bg-slate-200 dark:bg-slate-800" />
+            </div>
+          ))}
+        </div>
+      ) : filteredAppliances.length === 0 ? (
         <div className={`p-10 rounded-[2rem] border text-center space-y-3 ${
           isDarkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-100'
         }`}>
@@ -468,185 +780,204 @@ export const AppliancesView: React.FC<AppliancesViewProps> = ({
             {lang === 'th' ? 'ไม่พบเครื่องใช้ไฟฟ้าตามเงื่อนไข' : 'No appliances found'}
           </h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            {lang === 'th' ? 'ลองเปลี่ยนคำค้นหา หรือกดปุ่มด้านบนเพื่อเพิ่มเครื่องใช้ไฟฟ้าเข้าสู่ระบบ' : 'Try another search term or click "+ Add New Appliance" above.'}
+            {lang === 'th' ? 'ลองเปลี่ยนคำค้นหา ปรับตัวกรองห้อง หรือกดปุ่มด้านบนเพื่อเพิ่มอุปกรณ์' : 'Try another search term or click "+ Add Appliance".'}
           </p>
           <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 text-white font-bold text-xs"
+            onClick={() => {
+              setEditingAppliance(null);
+              setIsGenZAddModalOpen(true);
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 text-white font-bold text-xs cursor-pointer hover:bg-emerald-400 shadow-md shadow-emerald-500/20"
           >
             <Plus className="w-4 h-4" />
             <span>{lang === 'th' ? 'เพิ่มเครื่องใช้ไฟฟ้าเลย' : 'Add Appliance Now'}</span>
           </button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 lg:gap-5">
+      ) : viewMode === 'cards' ? (
+        /* GEN Z CARD VIEW (Mobile-first, interactive, progressive disclosure) */
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-5">
           {filteredAppliances.map((app) => (
-            <motion.div
+            <GenZApplianceCard
               key={app.id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className={`p-5 rounded-[2rem] border transition-all relative group flex flex-col justify-between ${
-                isDarkMode 
-                  ? 'bg-slate-900/80 border-slate-800 hover:border-emerald-500/40' 
-                  : 'bg-white border-slate-100 hover:border-emerald-200 shadow-sm'
-              }`}
-            >
-              <div>
-                {/* Image / Icon Header */}
-                <div className="relative h-32 rounded-2xl overflow-hidden mb-4 bg-slate-100 dark:bg-slate-800">
-                  {app.imageUrl ? (
-                    <img
-                      src={app.imageUrl}
-                      alt={app.name}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-emerald-500 bg-gradient-to-br from-emerald-500/10 to-teal-500/5">
-                      <div className="p-4 rounded-2xl bg-emerald-500/15">
+              appliance={app}
+              totalHouseholdMonthlyCost={totalHouseholdCost}
+              rate={4.70}
+              isSelected={selectedApplianceIds.includes(app.id)}
+              isMultiSelectMode={isMultiSelectMode}
+              onToggleSelect={toggleSelectAppliance}
+              onEdit={handleOpenEdit}
+              onDelete={(id) => setConfirmDeleteId(id)}
+              onToggleStatus={(id) => onToggleDeviceStatus(id)}
+              onToggleStandbyCut={(id) => {
+                const cur = appliances.find((a) => a.id === id);
+                if (cur && onUpdateAppliance) {
+                  onUpdateAppliance({
+                    ...cur,
+                    standbyCutEnabled: !cur.standbyCutEnabled,
+                  });
+                }
+              }}
+              lang={lang}
+              isDarkMode={isDarkMode}
+            />
+          ))}
+        </div>
+      ) : (
+        /* FULL TABLE VIEW (Displaying all 11+ fields with full transparency) */
+        <div className={`overflow-x-auto rounded-3xl border ${
+          isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-slate-200'
+        }`}>
+          <table className="w-full text-left text-xs">
+            <thead className={`text-[11px] font-black uppercase tracking-wider border-b ${
+              isDarkMode ? 'bg-slate-800/50 text-slate-400 border-slate-800' : 'bg-slate-50 text-slate-500 border-slate-200'
+            }`}>
+              <tr>
+                {isMultiSelectMode && (
+                  <th className="p-3.5 w-10 text-center">
+                    <button type="button" onClick={handleSelectAll} className="cursor-pointer">
+                      {selectedApplianceIds.length === filteredAppliances.length && filteredAppliances.length > 0 ? (
+                        <CheckSquare className="w-4 h-4 text-emerald-500 mx-auto" />
+                      ) : (
+                        <Square className="w-4 h-4 text-slate-400 mx-auto" />
+                      )}
+                    </button>
+                  </th>
+                )}
+                <th className="p-3.5">{lang === 'th' ? 'อุปกรณ์' : 'Appliance'}</th>
+                <th className="p-3.5">{lang === 'th' ? 'ห้อง' : 'Room'}</th>
+                <th className="p-3.5">{lang === 'th' ? 'กำลังไฟ' : 'Power (W)'}</th>
+                <th className="p-3.5">{lang === 'th' ? 'ใช้งาน' : 'Usage'}</th>
+                <th className="p-3.5 text-center">{lang === 'th' ? 'จำนวน' : 'Qty'}</th>
+                <th className="p-3.5 text-center">{lang === 'th' ? 'เบอร์ 5' : 'Label 5'}</th>
+                <th className="p-3.5">{lang === 'th' ? 'Standby' : 'Standby'}</th>
+                <th className="p-3.5 text-right">{lang === 'th' ? 'ค่าไฟ/เดือน' : 'Cost/Mo'}</th>
+                <th className="p-3.5 text-center">{lang === 'th' ? 'สถานะ' : 'Status'}</th>
+                <th className="p-3.5 text-center">{lang === 'th' ? 'จัดการ' : 'Actions'}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+              {filteredAppliances.map((app) => (
+                <tr
+                  key={app.id}
+                  className={`transition-colors ${
+                    isDarkMode ? 'hover:bg-slate-800/40' : 'hover:bg-slate-50/80'
+                  } ${selectedApplianceIds.includes(app.id) ? (isDarkMode ? 'bg-emerald-950/20' : 'bg-emerald-50/50') : ''}`}
+                >
+                  {isMultiSelectMode && (
+                    <td className="p-3.5 text-center">
+                      <button type="button" onClick={() => toggleSelectAppliance(app.id)} className="cursor-pointer">
+                        {selectedApplianceIds.includes(app.id) ? (
+                          <CheckSquare className="w-4 h-4 text-emerald-500 mx-auto" />
+                        ) : (
+                          <Square className="w-4 h-4 text-slate-400 mx-auto" />
+                        )}
+                      </button>
+                    </td>
+                  )}
+                  <td className="p-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center shrink-0">
                         {getIcon(app.icon)}
                       </div>
+                      <div>
+                        <div className="font-extrabold text-slate-900 dark:text-slate-100">{app.name}</div>
+                        <div className="text-[10px] text-slate-400">{app.category}</div>
+                      </div>
                     </div>
-                  )}
-
-                  {/* Status Badge */}
-                  <div className="absolute top-2.5 left-2.5">
-                    <span className={`text-[0.65rem] font-bold px-2.5 py-1 rounded-full border backdrop-blur-md ${
-                      app.status === 'active'
-                        ? 'bg-emerald-500/80 text-white border-emerald-400'
-                        : app.status === 'standby'
-                          ? 'bg-amber-500/80 text-white border-amber-400'
-                          : 'bg-slate-700/80 text-slate-300 border-slate-600'
-                    }`}>
-                      {app.status === 'active' ? '⚡ Active' : app.status === 'standby' ? '🌙 Standby' : '⚪ Off'}
-                    </span>
-                  </div>
-
-                  {/* Efficiency Tag */}
-                  <div className="absolute top-2.5 right-2.5">
-                    <span className={`text-[0.65rem] font-bold px-2.5 py-1 rounded-full backdrop-blur-md ${
-                      app.efficiencyTag.includes('A+++')
-                        ? 'bg-emerald-600/90 text-white'
-                        : app.efficiencyTag === 'Heavy Drinker'
-                          ? 'bg-rose-600/90 text-white'
-                          : 'bg-blue-600/90 text-white'
-                    }`}>
-                      {app.efficiencyTag}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Title & Category */}
-                <div className="space-y-1 mb-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <h3 className="font-extrabold text-sm md:text-base text-slate-900 dark:text-white line-clamp-1">
-                      {app.name}
-                    </h3>
-                    {onDeleteAppliance && (
+                  </td>
+                  <td className="p-3.5 text-slate-600 dark:text-slate-300">
+                    {app.room || (lang === 'th' ? 'ห้องทั่วไป' : 'General')}
+                  </td>
+                  <td className="p-3.5">
+                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{app.watt} W</span>
+                    <span className="text-[10px] text-slate-400 block">PF: {app.powerFactor || 0.95}</span>
+                  </td>
+                  <td className="p-3.5">
+                    <span className="font-mono text-slate-700 dark:text-slate-300">{app.hours} ชม./วัน</span>
+                    <span className="text-[10px] text-slate-400 block">{app.daysPerWeek || 7} วัน/สัปดาห์</span>
+                  </td>
+                  <td className="p-3.5 text-center font-mono font-bold">
+                    {app.quantity || 1}
+                  </td>
+                  <td className="p-3.5 text-center">
+                    {app.labelNo5Stars !== undefined && app.labelNo5Stars > 0 ? (
+                      <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-[10px] font-black">
+                        ⭐ {app.labelNo5Stars} ดาว
+                      </span>
+                    ) : (
+                      <span className="text-[10px] text-slate-400">-</span>
+                    )}
+                  </td>
+                  <td className="p-3.5">
+                    {app.standbyWatt ? (
+                      <div>
+                        <span className="font-mono text-slate-600 dark:text-slate-300">{app.standbyWatt} W</span>
+                        {app.standbyCutEnabled && (
+                          <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/15 text-emerald-600 block w-max">
+                            {lang === 'th' ? 'ตัดไฟแล้ว' : 'Blocked'}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-slate-400 text-[10px]">-</span>
+                    )}
+                  </td>
+                  <td className="p-3.5 text-right">
+                    <div className="font-mono font-black text-emerald-600 dark:text-emerald-400">
+                      ฿{app.monthlyCost.toFixed(1)}
+                    </div>
+                    <div className="text-[10px] text-slate-400">
+                      ~{((app.monthlyCost / 4.70) * 0.48).toFixed(1)} kg CO₂
+                    </div>
+                  </td>
+                  <td className="p-3.5 text-center">
+                    <button
+                      type="button"
+                      onClick={() => onToggleDeviceStatus(app.id)}
+                      className={`px-2.5 py-1 rounded-full text-[10px] font-black cursor-pointer transition-all ${
+                        app.status === 'active'
+                          ? 'bg-emerald-500 text-white shadow-xs'
+                          : 'bg-slate-200 dark:bg-slate-700 text-slate-500'
+                      }`}
+                    >
+                      {app.status === 'active' ? '⚡ Active' : '⚪ Off'}
+                    </button>
+                  </td>
+                  <td className="p-3.5 text-center">
+                    <div className="flex items-center justify-center gap-1.5">
                       <button
+                        type="button"
+                        onClick={() => handleOpenEdit(app)}
+                        className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 text-slate-500 hover:text-emerald-600 transition-colors cursor-pointer"
+                        title={lang === 'th' ? 'แก้ไข' : 'Edit'}
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveModalAppliance(app);
+                          setActiveModalTab('specs');
+                        }}
+                        className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-blue-950/30 text-slate-500 hover:text-blue-600 transition-colors cursor-pointer"
+                        title={lang === 'th' ? 'ดูสเปกลึก' : 'Deep Specs'}
+                      >
+                        <Cpu className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setConfirmDeleteId(app.id)}
-                        className="opacity-0 group-hover:opacity-100 p-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-all cursor-pointer"
-                        title={lang === 'th' ? 'ลบเครื่องใช้ไฟฟ้านี้' : 'Delete Appliance'}
+                        className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-slate-500 hover:text-rose-600 transition-colors cursor-pointer"
+                        title={lang === 'th' ? 'ลบ' : 'Delete'}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-slate-500 flex-wrap">
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">{app.watt}W</span>
-                    <span>•</span>
-                    <span>{app.hours} ชม./วัน</span>
-                    {app.room && (
-                      <>
-                        <span>•</span>
-                        <span className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[0.65rem] font-medium">
-                          {app.room}
-                        </span>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Costs Breakdown */}
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 mb-3 space-y-2 border border-slate-100 dark:border-slate-800">
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <span className="text-[0.65rem] font-bold text-slate-400 uppercase">
-                        {lang === 'th' ? 'วันนี้' : 'Today'}
-                      </span>
-                      <div className="font-extrabold font-mono text-sm text-slate-900 dark:text-white">
-                        ฿{app.todayCost.toFixed(2)}
-                      </div>
                     </div>
-                    <div>
-                      <span className="text-[0.65rem] font-bold text-slate-400 uppercase">
-                        {lang === 'th' ? 'คาดการณ์เดือนนี้' : 'Est. Month'}
-                      </span>
-                      <div className="font-extrabold font-mono text-sm text-emerald-600 dark:text-emerald-400">
-                        ฿{app.monthlyCost.toFixed(2)}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-1 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between">
-                    <span className="text-[0.65rem] text-slate-400">{lang === 'th' ? 'ที่มาข้อมูล:' : 'Data Source:'}</span>
-                    <SourceBadge source={app.watt > 1500 ? 'measured' : 'estimated'} lang={lang} />
-                  </div>
-                </div>
-
-                {/* Health Score Bar */}
-                <div className="space-y-1 mb-3">
-                  <div className="flex justify-between text-[0.65rem] font-bold">
-                    <span className="text-slate-500">{lang === 'th' ? 'สุขภาพไฟฟ้า' : 'Electrical Health'}</span>
-                    <span className={app.healthScore > 90 ? 'text-emerald-500' : 'text-amber-500'}>
-                      {app.healthScore}/100
-                    </span>
-                  </div>
-                  <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-                    <div 
-                      className={`h-full rounded-full ${app.healthScore > 90 ? 'bg-emerald-500' : 'bg-amber-500'}`}
-                      style={{ width: `${app.healthScore}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* AI Tip Preview */}
-                <p className="text-[0.7rem] text-slate-500 dark:text-slate-400 italic line-clamp-2 mb-4">
-                  💡 "{lang === 'th' ? app.aiTip : app.aiTipEn}"
-                </p>
-              </div>
-
-              {/* Bottom Actions */}
-              <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-                <button
-                  onClick={() => onToggleDeviceStatus(app.id)}
-                  className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-                    app.status === 'active'
-                      ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                      : 'border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-400'
-                  }`}
-                  title={app.status === 'active' ? 'คลิกเพื่อปิด' : 'คลิกเพื่อเปิด'}
-                >
-                  <Power className="w-4 h-4" />
-                </button>
-
-                <button
-                  onClick={() => {
-                    setActiveModalAppliance(app);
-                    setActiveModalTab('specs');
-                  }}
-                  className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                    isDarkMode 
-                      ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20' 
-                      : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                  }`}
-                >
-                  <Cpu className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>{lang === 'th' ? 'สเปกเชิงลึก & วิเคราะห์' : 'Deep Specs & Diagnostics'}</span>
-                </button>
-              </div>
-            </motion.div>
-          ))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
         </>
@@ -1353,6 +1684,19 @@ export const AppliancesView: React.FC<AppliancesViewProps> = ({
           </div>
         )}
       </AnimatePresence>
+
+      {/* 6. GEN Z SMART ADD / EDIT APPLIANCE MODAL */}
+      <AddEditApplianceModal
+        isOpen={isGenZAddModalOpen}
+        onClose={() => {
+          setIsGenZAddModalOpen(false);
+          setEditingAppliance(null);
+        }}
+        onSave={handleSaveAppliance}
+        editAppliance={editingAppliance}
+        lang={lang}
+        isDarkMode={isDarkMode}
+      />
     </div>
   );
 };

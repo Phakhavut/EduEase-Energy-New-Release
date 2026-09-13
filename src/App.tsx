@@ -93,9 +93,9 @@ const App: React.FC = () => {
     
     // Apply specific background colors to prevent flickering or inconsistent gaps
     if (isLoggedIn) {
-      body.style.backgroundColor = isDarkMode ? '#0B1220' : '#f8fafc';
+      body.style.backgroundColor = isDarkMode ? '#0F141A' : '#F6F8F7';
     } else {
-      body.style.backgroundColor = isDarkMode ? '#0B1220' : '#ffffff';
+      body.style.backgroundColor = isDarkMode ? '#0F141A' : '#FFFFFF';
     }
   }, [isLoggedIn, isDarkMode]);
 

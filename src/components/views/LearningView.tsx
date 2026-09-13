@@ -56,6 +56,7 @@ import { CertificationProgressTracker } from '../learning/CertificationProgressT
 import { calculateCertificationProgress } from '../../data/certificationData';
 import { LevelUpCelebrationModal } from '../learning/LevelUpCelebrationModal';
 import { OfficialCertificateModal } from '../learning/OfficialCertificateModal';
+import { ElectricalEngineeringExamCenter } from '../learning/ElectricalEngineeringExamCenter';
 import { CertificationTier } from '../../types';
 
 export type MainCategoryTab = 'memory_games' | 'learning_modules' | 'simulators';
@@ -76,6 +77,7 @@ export type SubMenuId =
   | 'tree'
   | 'quests'
   | 'references'
+  | 'engineering_exam'
   // Simulators
   | 'watt_calc'
   | 'ac_sim';
@@ -432,6 +434,16 @@ export const LearningView: React.FC<LearningViewProps> = ({
         tagEn: 'Standards',
         descriptionTh: 'สารบัญแหล่งข้อมูล กฟผ., กกพ., สนพ., EPREL, Energy Star, ผู้ผลิต และค้าปลีกชั้นนำ',
         descriptionEn: 'Directory of verified energy standards, international registries, and manufacturer catalogs'
+      },
+      {
+        id: 'engineering_exam',
+        icon: Calculator,
+        labelTh: '7. ศูนย์สอบหลักการวิศวกรรมไฟฟ้า (Engineering Exam)',
+        labelEn: '7. Electrical Engineering Principles Exam',
+        tagTh: 'ข้อสอบคำนวณ',
+        tagEn: 'EIT & IEEE Exam',
+        descriptionTh: 'ข้อสอบคำนวณ PF, ระบบ 3 เฟส, แรงดันตก วสท., พิกัดเบรกเกอร์ MCB, สายดิน และ DGA หม้อแปลง',
+        descriptionEn: 'Rigorous engineering assessments for PF, 3-phase unbalance, voltage drop, MCB curves, and transformer DGA'
       }
     ],
     simulators: [
@@ -1038,6 +1050,33 @@ export const LearningView: React.FC<LearningViewProps> = ({
                 </div>
               </div>
 
+              {/* Electrical Engineering Principles Examination Banner */}
+              <div className="mt-4 p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-teal-500/15 to-emerald-500/15 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xl shrink-0 shadow-md">
+                    ⚡
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white flex items-center gap-1.5">
+                      <span>{lang === 'th' ? 'ศูนย์สอบวัดระดับหลักการวิศวกรรมไฟฟ้า (EIT & IEEE Principles Exam)' : 'Electrical Engineering Principles Examination'}</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] bg-amber-500 text-slate-950 font-black">NEW</span>
+                    </h3>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
+                      {lang === 'th'
+                        ? 'ทดสอบการคำนวณ PF, โหลด 3 เฟส, แรงดันตก วสท. 022013-59, พิกัดเบรกเกอร์ MCB, ระบบสายดิน และ DGA หม้อแปลง'
+                        : 'Practice engineering calculations for PF correction, 3-phase unbalance, EIT voltage drop, MCB trip curves, and transformer DGA.'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setActiveSubMenu('engineering_exam')}
+                  className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-amber-400 text-white dark:text-slate-950 font-black text-xs hover:scale-105 active:scale-95 transition-all shadow-md cursor-pointer shrink-0 flex items-center gap-1.5 self-start sm:self-auto"
+                >
+                  <Calculator className="w-3.5 h-3.5" />
+                  <span>{lang === 'th' ? 'เริ่มทำข้อสอบวิศวกรรม ➔' : 'Launch Exam ➔'}</span>
+                </button>
+              </div>
+
               {/* Difficulty Level Filter Chips */}
               <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center gap-2">
                 <span className="text-xs font-black text-slate-400 uppercase tracking-wider flex items-center gap-1 mr-1">
@@ -1340,6 +1379,21 @@ export const LearningView: React.FC<LearningViewProps> = ({
         <OfficialReferencesDirectory
           lang={lang}
           isDarkMode={isDarkMode}
+        />
+      )}
+
+      {/* 6. ELECTRICAL ENGINEERING PRINCIPLES EXAM */}
+      {activeSubMenu === 'engineering_exam' && (
+        <ElectricalEngineeringExamCenter
+          lang={lang}
+          isDarkMode={isDarkMode}
+          onRewardCoins={onRewardCoins}
+          onCompleteExam={(result) => {
+            if (result.passed) {
+              setBonusQuizCp(prev => prev + 60);
+            }
+          }}
+          onClose={() => setActiveSubMenu('courses')}
         />
       )}
 

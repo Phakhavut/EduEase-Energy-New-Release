@@ -161,7 +161,7 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
                     {lang === 'th' ? 'Quick Start Tour (แนะนำแอป 60 วินาที)' : 'Quick Start Tour'}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {lang === 'th' ? 'เปิดระบบนำสอน Spotlight แนะนำ 7 ฟีเจอร์หลัก' : 'Spotlight walkthrough covering 7 key features'}
+                    {lang === 'th' ? 'เปิดระบบนำสอน Spotlight 9 ฟีเจอร์หลัก (ตามแนวคิด COST → CAUSE → ACTION)' : 'Spotlight walkthrough covering all 9 key energy management steps'}
                   </p>
                 </div>
               </div>

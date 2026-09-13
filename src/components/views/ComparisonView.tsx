@@ -37,6 +37,7 @@ import {
   Plug
 } from 'lucide-react';
 import { Appliance, InfoDetailMode, AppPage, ComparisonItem } from '../../types';
+import { EnergyDiagnosticQuickNav } from '../navigation/EnergyDiagnosticQuickNav';
 import { ProgressiveCard } from '../common/ProgressiveCard';
 import { OfficialDatabaseAutoFiller } from '../appliances/OfficialDatabaseAutoFiller';
 import { OfficialApplianceSpec } from '../../data/officialApplianceDatabase';
@@ -261,6 +262,18 @@ export const ComparisonView: React.FC<ComparisonViewProps> = ({
 
   return (
     <div id="tour-step-compare" className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+      {/* Cross-Diagnostic Quick Navigation & Live Telemetry Strip */}
+      <EnergyDiagnosticQuickNav
+        currentPage="compare"
+        onNavigate={setCurrentPage}
+        lang={lang}
+        isDarkMode={isDarkMode}
+        activeLoadKw={2.3}
+        powerFactor={0.96}
+        loadUnbalancePct={1.9}
+        voltageV={220}
+      />
+
       {/* Sub-Module Navigation Tabs */}
       <div className="flex items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto self-start border border-slate-300/50 dark:border-slate-700/50 flex-wrap">
         <button

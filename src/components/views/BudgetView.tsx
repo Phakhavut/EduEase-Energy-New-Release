@@ -19,6 +19,7 @@ import {
 
 import { InfoDetailMode, AppPage, UserPersona } from '../../types';
 import { ProgressiveCard } from '../common/ProgressiveCard';
+import { EnergyDiagnosticQuickNav } from '../navigation/EnergyDiagnosticQuickNav';
 import { CalculationTree } from '../trust/CalculationTree';
 import { AssumptionCard } from '../trust/AssumptionCard';
 import { BudgetThresholdAlertBanner } from '../notifications/BudgetThresholdAlertBanner';
@@ -81,6 +82,18 @@ export const BudgetView: React.FC<BudgetViewProps> = ({
 
   return (
     <div id="tour-step-budget" className="space-y-6 animate-fade-in pb-20 lg:pb-8">
+      {/* Cross-Diagnostic Quick Navigation & Live Telemetry Strip */}
+      <EnergyDiagnosticQuickNav
+        currentPage="budget"
+        onNavigate={onNavigatePage}
+        lang={lang}
+        isDarkMode={isDarkMode}
+        activeLoadKw={todayCost ? +(todayCost / 4.2 / 8).toFixed(2) : 2.1}
+        powerFactor={0.96}
+        loadUnbalancePct={2.1}
+        voltageV={220}
+      />
+
       {/* 0. Budget Threshold Visual Alert Banner */}
       <BudgetThresholdAlertBanner
         lang={lang}

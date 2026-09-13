@@ -23,6 +23,7 @@ import { EnergyPassport } from '../gamification/EnergyPassport';
 import { EnergyTreeEcosystem } from '../gamification/EnergyTreeEcosystem';
 import { EduVerseHub } from '../gamification/EduVerseHub';
 import { INITIAL_PASSPORT_STAMPS } from '../../data/gamificationData';
+import { BadgeSystem } from '../gamification/BadgeSystem';
 
 interface AchievementsViewProps {
   lang: 'th' | 'en';
@@ -297,37 +298,12 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
 
       {/* 5. BADGES COLLECTION VIEW */}
       {activeTab === 'badges' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {badges.map((badge) => (
-            <motion.div
-              key={badge.id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className={`p-5 rounded-[2rem] border transition-all flex items-center gap-4 ${
-                badge.unlocked
-                  ? isDarkMode ? 'bg-slate-900/80 border-emerald-500/30' : 'bg-white border-emerald-200 shadow-sm'
-                  : isDarkMode ? 'bg-slate-900/40 border-slate-800 opacity-60' : 'bg-slate-50 border-slate-200 opacity-60'
-              }`}
-            >
-              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-md shrink-0 ${
-                badge.unlocked ? 'bg-emerald-500/15 text-emerald-500' : 'bg-slate-200 dark:bg-slate-800 text-slate-400'
-              }`}>
-                {badge.unlocked ? <Award className="w-6 h-6" /> : <Lock className="w-6 h-6" />}
-              </div>
-              <div className="space-y-0.5">
-                <span className="text-[0.65rem] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
-                  {badge.rarity}
-                </span>
-                <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                  {lang === 'th' ? badge.name : badge.nameEn}
-                </h4>
-                <p className="text-[0.7rem] text-slate-500">
-                  {lang === 'th' ? badge.description : badge.descriptionEn}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        <BadgeSystem
+          lang={lang}
+          isDarkMode={isDarkMode}
+          onNavigatePage={onNavigatePage}
+          customBadges={badges}
+        />
       )}
 
       {/* 6. CHARACTER SKINS SHOP VIEW */}

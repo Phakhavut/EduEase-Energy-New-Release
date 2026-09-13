@@ -8,6 +8,31 @@ export interface House {
 
 export type UserPersona = 'student' | 'homeowner' | 'facility';
 
+export interface PersonaPresentationPipeline {
+  granularity: 'student_dorm_simple' | 'homeowner_balanced' | 'facility_engineering_deep';
+  granularityBadgeTh: string;
+  granularityBadgeEn: string;
+  focusMetrics: {
+    primaryLabelTh: string;
+    primaryLabelEn: string;
+    primaryUnitTh: string;
+    primaryUnitEn: string;
+    secondaryLabelTh: string;
+    secondaryLabelEn: string;
+    secondaryUnitTh: string;
+    secondaryUnitEn: string;
+    costResolution: 'daily_simple' | 'monthly_tiered' | 'tou_demand_telemetry';
+  };
+  features: {
+    show3PhaseBalance: boolean;
+    showPowerFactorDiagnostics: boolean;
+    showHarmonicsTHD: boolean;
+    showRoomBudgetSplit: boolean;
+    showDormRoommateSplit: boolean;
+    showPeakDemandCharge: boolean;
+  };
+}
+
 export type AppPage = 
   | 'home' 
   | 'insights'
@@ -24,7 +49,9 @@ export type AppPage =
   | 'score'
   | 'trust-center'
   | 'game'
-  | 'city';
+  | 'city'
+  | 'crypto'
+  | 'ux-assessment';
 
 export type InfoDetailMode = 'simple' | 'balanced' | 'detailed';
 
@@ -175,9 +202,16 @@ export interface Appliance {
   id: number;
   name: string;
   watt: number;
-  hours: number;
+  hours: number; // hours used per day
+  daysPerWeek?: number; // days per week (default 7)
+  quantity?: number; // number of units (default 1)
   category: string;
   room?: string;
+  purchaseYear?: number; // e.g. 2023
+  labelNo5Stars?: number; // 0=None, 1, 2, 3, 4, 5 stars
+  standbyWatt?: number; // Standby power in watts (e.g. 1.5W)
+  standbyCutEnabled?: boolean; // Standby eco cut mode active
+  customRate?: number; // Optional custom THB/kWh rate
   status: 'active' | 'standby' | 'off';
   healthScore: number;
   efficiencyTag: 'A+++ Eco' | 'Good' | 'Average' | 'Heavy Drinker';
@@ -188,6 +222,7 @@ export interface Appliance {
   aiTip: string;
   aiTipEn: string;
   pf: number;
+  powerFactor?: number;
   logs: { date: string; action: string; status: 'resolved' | 'pending' }[];
   dataSource?: DataSourceType;
   isEsp32Connected?: boolean;
@@ -264,6 +299,52 @@ export interface LearningPath {
   badgeLabelTh?: string;
   badgeLabelEn?: string;
   lessons: Lesson[];
+}
+
+export type EngineeringCategory = 
+  | 'ac_power' 
+  | 'three_phase' 
+  | 'voltage_drop' 
+  | 'breaker_protection' 
+  | 'grounding' 
+  | 'harmonics' 
+  | 'transformer_pm';
+
+export interface EngineeringExamQuestion {
+  id: string;
+  tier: 1 | 2 | 3; // 1: Fundamentals, 2: Circuits & Standards, 3: Pro Diagnostics
+  tierBadgeTh: string;
+  tierBadgeEn: string;
+  category: EngineeringCategory;
+  categoryNameTh: string;
+  categoryNameEn: string;
+  titleTh: string;
+  titleEn: string;
+  standardRef: string; // e.g., "วสท. 022013-59", "มอก. 11-2553", "IEEE 519"
+  formulaUsed: string; // e.g., "P = √3 × V_LL × I_L × cosθ"
+  scenarioTh: string;
+  scenarioEn: string;
+  givenData: { labelTh: string; labelEn: string; value: string }[];
+  questionTh: string;
+  questionEn: string;
+  optionsTh: string[];
+  optionsEn: string[];
+  correctIndex: number;
+  detailedSolutionTh: string[];
+  detailedSolutionEn: string[];
+  engineeringPrincipleTh: string;
+  engineeringPrincipleEn: string;
+}
+
+export interface ElectricalExamResult {
+  score: number;
+  totalQuestions: number;
+  percentage: number;
+  passed: boolean;
+  tier: number;
+  earnedXp: number;
+  earnedCoins: number;
+  timestamp: string;
 }
 
 export type CertificationTierId = 'tier1_apprentice' | 'tier2_auditor' | 'tier3_specialist' | 'tier4_manager' | 'tier5_grandmaster';

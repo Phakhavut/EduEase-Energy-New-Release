@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Building2, 
@@ -18,9 +18,99 @@ import {
   ArrowRight,
   ShieldCheck,
   ChevronRight,
-  X
+  X,
+  Search,
+  Filter,
+  Copy,
+  Radio,
+  RefreshCw,
+  SlidersHorizontal,
+  CheckCircle2,
+  Cpu
 } from 'lucide-react';
 import { LocationItem, InfoDetailMode } from '../../types';
+
+interface PropertyPreset {
+  id: string;
+  nameTh: string;
+  nameEn: string;
+  type: LocationItem['type'];
+  budget: number;
+  residents: number;
+  billingCycleDay: number;
+  province: string;
+  tariffLabelTh: string;
+  descriptionTh: string;
+  badge: string;
+}
+
+const PROPERTY_PRESETS: PropertyPreset[] = [
+  {
+    id: 'dorm',
+    nameTh: 'หอพักนักศึกษา / คอนโดสตูดิโอ',
+    nameEn: 'Student Dorm / Studio',
+    type: 'dorm',
+    budget: 1200,
+    residents: 1,
+    billingCycleDay: 25,
+    province: 'กรุงเทพมหานคร',
+    tariffLabelTh: 'มิเตอร์ย่อยหอพัก (฿7/หน่วย)',
+    descriptionTh: 'เหมาะสำหรับนักศึกษา ควบคุมแอร์และค่าไฟรายวัน',
+    badge: '🎓 ยอดนิยมสำหรับนักศึกษา'
+  },
+  {
+    id: 'condo',
+    nameTh: 'คอนโดมิเนียม 1-2 ห้องนอน',
+    nameEn: 'Modern Condo Unit',
+    type: 'home',
+    budget: 2400,
+    residents: 2,
+    billingCycleDay: 15,
+    province: 'นนทบุรี',
+    tariffLabelTh: 'MEA 1.1.2 อัตราก้าวหน้า',
+    descriptionTh: 'แอร์ Inverter + ตู้เย็น + เครื่องทำน้ำอุ่น',
+    badge: '🏢 คนทำงาน'
+  },
+  {
+    id: 'house',
+    nameTh: 'บ้านเดี่ยว / ทาวน์โฮมครอบครัว',
+    nameEn: 'Family Home / Townhouse',
+    type: 'home',
+    budget: 4800,
+    residents: 4,
+    billingCycleDay: 1,
+    province: 'ปทุมธานี',
+    tariffLabelTh: 'PEA 1.1.2 + รองรับโซลาร์รูฟ',
+    descriptionTh: 'โหลดแอร์หลายห้อง + ปั๊มน้ำ + รถยนต์ไฟฟ้า EV',
+    badge: '🏡 ครอบครัว'
+  },
+  {
+    id: 'shop',
+    nameTh: 'คาเฟ่ / โฮมออฟฟิศ SME',
+    nameEn: 'Cafe / SME Commercial',
+    type: 'shop',
+    budget: 8500,
+    residents: 3,
+    billingCycleDay: 10,
+    province: 'เชียงใหม่',
+    tariffLabelTh: 'อัตรา TOU 2.1.2 กิจการขนาดเล็ก',
+    descriptionTh: 'โหลดเปิดกลางวัน Peak 09:00-22:00 น.',
+    badge: '☕ ธุรกิจ SME'
+  },
+  {
+    id: 'facility',
+    nameTh: 'อาคารสำนักงาน / โรงงานขนาดย่อม',
+    nameEn: 'Commercial Facility / Office',
+    type: 'office',
+    budget: 35000,
+    residents: 15,
+    billingCycleDay: 20,
+    province: 'สมุทรปราการ',
+    tariffLabelTh: 'TOU + พีคดีมานด์ชาร์จ 15 นาที',
+    descriptionTh: 'ระบบไฟ 3 เฟส บาลานซ์โหลด และปรับปรุง cos φ',
+    badge: '🏭 อุตสาหกรรม'
+  }
+];
 
 interface LocationsViewProps {
   locations: LocationItem[];
@@ -45,6 +135,11 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
 }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [orgMode, setOrgMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<'name' | 'budget-desc' | 'est-desc' | 'utilization'>('utilization');
+  const [pingSuccessMessage, setPingSuccessMessage] = useState<string | null>(null);
+  const [isPinging, setIsPinging] = useState(false);
 
   // Form state
   const [name, setName] = useState('');
@@ -53,6 +148,17 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
   const [residents, setResidents] = useState(2);
   const [budget, setBudget] = useState(2500);
   const [billingCycleDay, setBillingCycleDay] = useState(25);
+  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
+
+  const applyPreset = (preset: PropertyPreset) => {
+    setSelectedPresetId(preset.id);
+    setName(lang === 'th' ? preset.nameTh : preset.nameEn);
+    setType(preset.type);
+    setProvince(preset.province);
+    setResidents(preset.residents);
+    setBudget(preset.budget);
+    setBillingCycleDay(preset.billingCycleDay);
+  };
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,12 +171,37 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
       residents,
       billingCycleDay,
       budget,
-      isConnected: false,
+      isConnected: true,
       memberCount: residents,
       icon: type === 'home' ? 'Home' : type === 'shop' ? 'Store' : type === 'provincial' ? 'Trees' : 'Building2',
     });
     setName('');
+    setSelectedPresetId(null);
     setShowAddModal(false);
+  };
+
+  const handleDuplicate = (loc: LocationItem) => {
+    onAddLocation({
+      name: `${loc.name} (สำเนา)`,
+      nameEn: `${loc.nameEn || loc.name} (Copy)`,
+      type: loc.type,
+      province: loc.province,
+      residents: loc.residents,
+      billingCycleDay: loc.billingCycleDay,
+      budget: loc.budget,
+      isConnected: loc.isConnected,
+      memberCount: loc.memberCount || loc.residents,
+      icon: loc.icon,
+    });
+  };
+
+  const handleSimulatePing = () => {
+    setIsPinging(true);
+    setTimeout(() => {
+      setIsPinging(false);
+      setPingSuccessMessage(lang === 'th' ? '⚡ ซิงค์ข้อมูลกับ Modbus/ESP32 สำเร็จ (Latency: 14ms)' : '⚡ Hardware telemetry synced (Latency: 14ms)');
+      setTimeout(() => setPingSuccessMessage(null), 4000);
+    }, 600);
   };
 
   const currentLoc = locations.find(l => l.id === currentLocationId) || locations[0];
@@ -87,6 +218,27 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
       default: return Home;
     }
   };
+
+  // Filtered and Sorted Locations
+  const filteredLocations = useMemo(() => {
+    let list = locations.filter(loc => {
+      const matchSearch = loc.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          loc.province.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchType = filterType === 'all' || loc.type === filterType;
+      return matchSearch && matchType;
+    });
+
+    return list.sort((a, b) => {
+      if (sortBy === 'budget-desc') return b.budget - a.budget;
+      if (sortBy === 'est-desc') return b.estimatedBill - a.estimatedBill;
+      if (sortBy === 'utilization') {
+        const utilA = a.estimatedBill / a.budget;
+        const utilB = b.estimatedBill / b.budget;
+        return utilB - utilA;
+      }
+      return a.name.localeCompare(b.name);
+    });
+  }, [locations, searchQuery, filterType, sortBy]);
 
   return (
     <div id="tour-step-locations" className="space-y-6 pb-20">
@@ -210,9 +362,156 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
         </div>
       )}
 
+      {/* Search, Filter & Quick Property Toolbar */}
+      <div className={`p-4 rounded-2xl border transition-all ${
+        isDarkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-emerald-100 shadow-sm'
+      }`}>
+        <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={lang === 'th' ? "ค้นหาชื่อสถานที่ หรือ จังหวัด..." : "Search property name or province..."}
+              className={`w-full pl-9 pr-4 py-2 rounded-xl border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all ${
+                isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
+              }`}
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Filter Chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
+            {[
+              { id: 'all', labelTh: 'ทั้งหมด', labelEn: 'All' },
+              { id: 'home', labelTh: 'บ้านพัก', labelEn: 'Home' },
+              { id: 'dorm', labelTh: 'หอพัก/คอนโด', labelEn: 'Dorm/Condo' },
+              { id: 'shop', labelTh: 'ธุรกิจ/ร้านค้า', labelEn: 'SME/Shop' },
+              { id: 'office', labelTh: 'อาคาร/โรงงาน', labelEn: 'Facility' },
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setFilterType(tab.id)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                  filterType === tab.id
+                    ? 'bg-emerald-500 text-white shadow-sm'
+                    : isDarkMode
+                      ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {lang === 'th' ? tab.labelTh : tab.labelEn}
+              </button>
+            ))}
+          </div>
+
+          {/* Sort Dropdown */}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs text-slate-400 font-bold hidden lg:inline">
+              {lang === 'th' ? 'เรียงตาม:' : 'Sort:'}
+            </span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              className={`px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none ${
+                isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
+              }`}
+            >
+              <option value="utilization">{lang === 'th' ? 'การใช้งบสูงสุด' : 'Budget Utilization'}</option>
+              <option value="est-desc">{lang === 'th' ? 'ค่าไฟประมาณการสูงสุด' : 'Highest Estimated Bill'}</option>
+              <option value="budget-desc">{lang === 'th' ? 'งบประมาณสูงสุด' : 'Highest Budget'}</option>
+              <option value="name">{lang === 'th' ? 'ตามชื่อ A-Z' : 'Name A-Z'}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Active Space Hero & IoT Sync Indicator */}
+      {currentLoc && (
+        <div className={`p-5 rounded-3xl border shadow-sm transition-all ${
+          isDarkMode 
+            ? 'bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-900 border-emerald-500/30' 
+            : 'bg-gradient-to-br from-emerald-50/70 via-white to-emerald-100/20 border-emerald-200/80'
+        }`}>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
+                <Radio className="w-6 h-6 animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    {lang === 'th' ? 'พื้นที่ที่กำลังเปิดดู' : 'Currently Active Space'}
+                  </span>
+                  <span className="text-xs text-slate-400">• {currentLoc.province}</span>
+                </div>
+                <h2 className="text-xl font-extrabold text-slate-800 dark:text-white mt-0.5">
+                  {currentLoc.name}
+                </h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  {lang === 'th' 
+                    ? `งบประมาณ ฿${currentLoc.budget.toLocaleString()} • ผู้อยู่อาศัย ${currentLoc.residents} คน • ตัดรอบวันที่ ${currentLoc.billingCycleDay}` 
+                    : `Budget ฿${currentLoc.budget.toLocaleString()} • ${currentLoc.residents} Residents • Cycle day ${currentLoc.billingCycleDay}`}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <button
+                onClick={handleSimulatePing}
+                disabled={isPinging}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-bold transition-all shadow-sm ${
+                  isPinging 
+                    ? 'opacity-60 cursor-not-allowed' 
+                    : isDarkMode 
+                      ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700' 
+                      : 'bg-white border-emerald-200 text-slate-700 hover:bg-emerald-50'
+                }`}
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-emerald-500 ${isPinging ? 'animate-spin' : ''}`} />
+                <span>{lang === 'th' ? 'ทดสอบเชื่อมต่อมิเตอร์' : 'Test IoT Ping'}</span>
+              </button>
+
+              <button
+                onClick={() => handleDuplicate(currentLoc)}
+                title={lang === 'th' ? 'ทำสำเนาเพื่อสร้างห้องหรือสาขาใหม่' : 'Duplicate configuration'}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-bold transition-all shadow-sm ${
+                  isDarkMode 
+                    ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700' 
+                    : 'bg-white border-emerald-200 text-slate-700 hover:bg-emerald-50'
+                }`}
+              >
+                <Copy className="w-3.5 h-3.5 text-blue-500" />
+                <span>{lang === 'th' ? 'ทำสำเนาสาขา' : 'Duplicate'}</span>
+              </button>
+            </div>
+          </div>
+
+          {pingSuccessMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-3 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex items-center gap-2"
+            >
+              <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+              <span>{pingSuccessMessage}</span>
+            </motion.div>
+          )}
+        </div>
+      )}
+
       {/* Locations List Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {locations.map((loc) => {
+        {filteredLocations.map((loc) => {
           const IconComp = getIcon(loc.type);
           const isSelected = loc.id === currentLocationId;
           const usagePercent = Math.min(100, Math.round((loc.estimatedBill / loc.budget) * 100));
@@ -253,7 +552,7 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
                   <h3 className="font-extrabold text-lg text-slate-800 dark:text-white truncate">
                     {loc.name}
                   </h3>
-                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
+                  <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 mt-0.5 flex-wrap">
                     <span>{loc.province}</span>
                     <span>•</span>
                     <span className="flex items-center gap-1">
@@ -309,25 +608,47 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
                   )}
                 </div>
 
-                {!isSelected ? (
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={() => onSwitchLocation(loc.id)}
-                    className="flex items-center gap-1 px-4 py-1.5 rounded-xl bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20 hover:bg-emerald-600 transition-all"
+                    onClick={() => handleDuplicate(loc)}
+                    title={lang === 'th' ? 'ทำสำเนาสถานที่นี้' : 'Duplicate location'}
+                    className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all"
                   >
-                    <span>{lang === 'th' ? 'สลับมาใช้อันนี้' : 'Switch Here'}</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <Copy className="w-3.5 h-3.5" />
                   </button>
-                ) : (
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
-                    <ShieldCheck className="w-4 h-4" />
-                    {lang === 'th' ? 'กำลังแสดงผลบนแดชบอร์ด' : 'Currently Viewing'}
-                  </span>
-                )}
+
+                  {!isSelected ? (
+                    <button
+                      onClick={() => onSwitchLocation(loc.id)}
+                      className="flex items-center gap-1 px-4 py-1.5 rounded-xl bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-500/20 hover:bg-emerald-600 transition-all cursor-pointer"
+                    >
+                      <span>{lang === 'th' ? 'สลับมาใช้อันนี้' : 'Switch Here'}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  ) : (
+                    <span className="text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                      <ShieldCheck className="w-4 h-4" />
+                      {lang === 'th' ? 'เปิดใช้งานอยู่' : 'Active'}
+                    </span>
+                  )}
+                </div>
               </div>
             </motion.div>
           );
         })}
       </div>
+
+      {filteredLocations.length === 0 && (
+        <div className="text-center py-12 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800">
+          <Building2 className="w-12 h-12 text-slate-400 mx-auto mb-3 opacity-50" />
+          <h3 className="font-bold text-base text-slate-700 dark:text-slate-300">
+            {lang === 'th' ? 'ไม่พบสถานที่ที่ค้นหา' : 'No properties found'}
+          </h3>
+          <p className="text-xs text-slate-500 mt-1">
+            {lang === 'th' ? 'ลองเปลี่ยนคำค้นหา หรือกดล้างตัวกรอง' : 'Try adjusting your search or clearing filters'}
+          </p>
+        </div>
+      )}
 
       {/* Add Location Modal */}
       <AnimatePresence>
@@ -351,6 +672,36 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
                 >
                   <X className="w-5 h-5 text-slate-400" />
                 </button>
+              </div>
+
+              <div className="mb-4">
+                <span className="block text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-2">
+                  {lang === 'th' ? '⚡ เลือกต้นแบบด่วน (1-Click Presets):' : '⚡ 1-Click Property Presets:'}
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {PROPERTY_PRESETS.map(preset => {
+                    const isSelected = selectedPresetId === preset.id;
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => applyPreset(preset)}
+                        className={`p-2 rounded-xl border text-left transition-all text-xs cursor-pointer ${
+                          isSelected
+                            ? 'bg-emerald-500/15 border-emerald-500 text-emerald-700 dark:text-emerald-300 ring-2 ring-emerald-500/30'
+                            : isDarkMode
+                              ? 'bg-slate-800 border-slate-700 text-slate-300 hover:border-slate-600'
+                              : 'bg-slate-50 border-slate-200 text-slate-700 hover:border-emerald-300'
+                        }`}
+                      >
+                        <div className="font-extrabold truncate">{preset.nameTh.split('/')[0]}</div>
+                        <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">
+                          ฿{preset.budget.toLocaleString()} • {preset.residents} {lang === 'th' ? 'คน' : 'p'}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <form onSubmit={handleCreate} className="space-y-4">

@@ -43,6 +43,7 @@ import {
 } from 'lucide-react';
 import { AppPage } from '../types';
 import { DEMO_USERS } from './LoginForm';
+import { KnowledgeCheckQuiz, getStoredQuizScores, KnowledgeCheckScoreRecord } from './manual/KnowledgeCheckQuiz';
 
 interface UserManualProps {
   isOpen: boolean;
@@ -67,6 +68,17 @@ export const UserManual: React.FC<UserManualProps> = ({
 
   // Step Completion Tracker State (persist in component state)
   const [completedSteps, setCompletedSteps] = useState<Record<string, boolean>>({});
+
+  // Knowledge Check Quiz Scores State (persisted in localStorage)
+  const [quizScores, setQuizScores] = useState<Record<string, KnowledgeCheckScoreRecord>>(() => getStoredQuizScores());
+
+  const handleQuizScoreUpdate = (lessonId: string, score: number, total: number) => {
+    setQuizScores(getStoredQuizScores());
+  };
+
+  const totalMastered = Object.values(quizScores).filter(s => s.mastered).length;
+  const totalScoreEarned = Object.values(quizScores).reduce((sum, s) => sum + (s.bestScore || 0), 0);
+  const totalXPEarned = Object.values(quizScores).reduce((sum, s) => sum + (s.bestScore * 10 + (s.mastered ? 20 : 0)), 0);
 
   const tabsScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -212,6 +224,24 @@ export const UserManual: React.FC<UserManualProps> = ({
             )}
           </div>
 
+          {/* Gamified Knowledge Check Overview Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/15 border border-emerald-500/25 text-xs">
+            <div className="flex items-center gap-2 font-bold text-emerald-800 dark:text-emerald-300">
+              <Sparkles className="w-4 h-4 text-emerald-500 animate-pulse shrink-0" />
+              <span>{lang === 'th' ? 'แบบทดสอบความรู้ Knowledge Check:' : 'Knowledge Check Quizzes:'}</span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-white font-black text-[0.68rem] shadow-sm">
+                {totalMastered}/9 {lang === 'th' ? 'บทเรียน Mastered ⭐' : 'Mastered ⭐'}
+              </span>
+              <span className="text-slate-500 dark:text-slate-400 font-mono text-[0.72rem]">
+                ({totalScoreEarned}/27 {lang === 'th' ? 'แต้ม' : 'pts'})
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[0.72rem] text-emerald-700 dark:text-emerald-400 font-extrabold">
+              <Zap className="w-3.5 h-3.5 fill-emerald-500 text-emerald-500" />
+              <span>+{totalXPEarned} XP Earned</span>
+            </div>
+          </div>
+
           {/* Navigation Chapter Badges with Left/Right Scroll Controls */}
           <div className="relative flex items-center group/scroll">
             {/* Left Scroll Button */}
@@ -232,6 +262,8 @@ export const UserManual: React.FC<UserManualProps> = ({
               {manualTabs.map((tab) => {
                 const TabIcon = tab.icon;
                 const isActive = activeTab === tab.id;
+                const scoreRecord = quizScores[tab.id];
+
                 return (
                   <button
                     key={tab.id}
@@ -246,6 +278,15 @@ export const UserManual: React.FC<UserManualProps> = ({
                   >
                     <TabIcon className="w-3.5 h-3.5" />
                     <span>{lang === 'th' ? tab.labelTh : tab.labelEn}</span>
+                    {scoreRecord?.mastered ? (
+                      <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-amber-400/30 text-amber-300 text-[0.62rem] font-black border border-amber-300/40">
+                        ⭐ 3/3
+                      </span>
+                    ) : scoreRecord?.attempts ? (
+                      <span className="ml-0.5 px-1.5 py-0.5 rounded-full bg-black/20 text-white/90 text-[0.62rem] font-mono font-bold">
+                        {scoreRecord.bestScore}/3
+                      </span>
+                    ) : null}
                   </button>
                 );
               })}
@@ -411,6 +452,15 @@ export const UserManual: React.FC<UserManualProps> = ({
                   ข้อมูลการใช้งานถูกเข้ารหัสแบบ TLS 1.3 พร้อมระบบ PBKDF2 Password Hashing โดยไม่มีการเปิดเผยรหัสผ่านในฝั่ง Client และรองรับการยืนยันตัวตนด้วย Passkey Biometrics
                 </p>
               </div>
+
+              {/* Knowledge Check Quiz */}
+              <KnowledgeCheckQuiz
+                lessonId="auth"
+                lessonTitle={lang === 'th' ? 'บทที่ 1: ระบบเข้าสู่ระบบ & สิทธิ์การใช้งาน' : 'Chapter 1: Authentication & Roles'}
+                lang={lang}
+                isDarkMode={isDarkMode}
+                onCompleteQuiz={handleQuizScoreUpdate}
+              />
             </div>
           )}
 
@@ -511,6 +561,15 @@ export const UserManual: React.FC<UserManualProps> = ({
                   </p>
                 </div>
               </div>
+
+              {/* Knowledge Check Quiz */}
+              <KnowledgeCheckQuiz
+                lessonId="home"
+                lessonTitle={lang === 'th' ? 'บทที่ 2: หน้าหลัก & ตอบ 5 วินาที' : 'Chapter 2: Home Dashboard & 5-Sec Answers'}
+                lang={lang}
+                isDarkMode={isDarkMode}
+                onCompleteQuiz={handleQuizScoreUpdate}
+              />
             </div>
           )}
 
@@ -608,6 +667,15 @@ export const UserManual: React.FC<UserManualProps> = ({
                   </p>
                 </div>
               </div>
+
+              {/* Knowledge Check Quiz */}
+              <KnowledgeCheckQuiz
+                lessonId="appliances"
+                lessonTitle={lang === 'th' ? 'บทที่ 3: จัดการเครื่องใช้ไฟฟ้า & Eco Cut 0W' : 'Chapter 3: Appliances & Eco Cut'}
+                lang={lang}
+                isDarkMode={isDarkMode}
+                onCompleteQuiz={handleQuizScoreUpdate}
+              />
             </div>
           )}
 
@@ -705,6 +773,15 @@ export const UserManual: React.FC<UserManualProps> = ({
                   </p>
                 </div>
               </div>
+
+              {/* Knowledge Check Quiz */}
+              <KnowledgeCheckQuiz
+                lessonId="budget"
+                lessonTitle={lang === 'th' ? 'บทที่ 4: คำนวณค่าไฟ กฎอัตราก้าวหน้า & มิเตอร์ TOU' : 'Chapter 4: Budget & TOU Tariff'}
+                lang={lang}
+                isDarkMode={isDarkMode}
+                onCompleteQuiz={handleQuizScoreUpdate}
+              />
             </div>
           )}
 
@@ -802,6 +879,15 @@ export const UserManual: React.FC<UserManualProps> = ({
                   </p>
                 </div>
               </div>
+
+              {/* Knowledge Check Quiz */}
+              <KnowledgeCheckQuiz
+                lessonId="ai"
+                lessonTitle={lang === 'th' ? 'บทที่ 5: AI Coach Voltie & Smart Insights Hub' : 'Chapter 5: AI Coach & Smart Insights'}
+                lang={lang}
+                isDarkMode={isDarkMode}
+                onCompleteQuiz={handleQuizScoreUpdate}
+              />
             </div>
           )}
 
@@ -899,6 +985,15 @@ export const UserManual: React.FC<UserManualProps> = ({
                   </p>
                 </div>
               </div>
+
+              {/* Knowledge Check Quiz */}
+              <KnowledgeCheckQuiz
+                lessonId="quests"
+                lessonTitle={lang === 'th' ? 'บทที่ 6: ภารกิจประหยัดไฟ & คลังบทเรียน' : 'Chapter 6: Eco Quests & Lessons'}
+                lang={lang}
+                isDarkMode={isDarkMode}
+                onCompleteQuiz={handleQuizScoreUpdate}
+              />
             </div>
           )}
 
@@ -975,6 +1070,15 @@ export const UserManual: React.FC<UserManualProps> = ({
                   </p>
                 </div>
               </div>
+
+              {/* Knowledge Check Quiz */}
+              <KnowledgeCheckQuiz
+                lessonId="locations"
+                lessonTitle={lang === 'th' ? 'บทที่ 7: สถานที่ของฉัน & โหนดสมาร์ทมิเตอร์' : 'Chapter 7: My Locations & Smart Meters'}
+                lang={lang}
+                isDarkMode={isDarkMode}
+                onCompleteQuiz={handleQuizScoreUpdate}
+              />
             </div>
           )}
 
@@ -1055,6 +1159,15 @@ export const UserManual: React.FC<UserManualProps> = ({
                   </p>
                 </div>
               </div>
+
+              {/* Knowledge Check Quiz */}
+              <KnowledgeCheckQuiz
+                lessonId="score"
+                lessonTitle={lang === 'th' ? 'บทที่ 8: ดัชนีคะแนนประหยัดพลังงาน 5 มิติ' : 'Chapter 8: Energy Saving Score 76/100'}
+                lang={lang}
+                isDarkMode={isDarkMode}
+                onCompleteQuiz={handleQuizScoreUpdate}
+              />
             </div>
           )}
 
@@ -1152,6 +1265,15 @@ export const UserManual: React.FC<UserManualProps> = ({
                   </p>
                 </div>
               </div>
+
+              {/* Knowledge Check Quiz */}
+              <KnowledgeCheckQuiz
+                lessonId="trust"
+                lessonTitle={lang === 'th' ? 'บทที่ 9: ศูนย์ความโปร่งใส ค้นหาครอบจักรวาล & ส่งออก PDF' : 'Chapter 9: Trust Center & Export'}
+                lang={lang}
+                isDarkMode={isDarkMode}
+                onCompleteQuiz={handleQuizScoreUpdate}
+              />
             </div>
           )}
 

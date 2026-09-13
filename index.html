@@ -12,13 +12,57 @@
     <script>
       tailwind.config = {
         darkMode: ['class', '[data-theme="dark"]'],
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                DEFAULT: '#16A34A',
+                dark: '#15803D',
+                soft: '#DCFCE7',
+              },
+              neutral: {
+                bgLight: '#F6F8F7',
+                surfaceLight: '#FFFFFF',
+                borderLight: '#E2E8E4',
+                textPrimary: '#15201A',
+                textSecondary: '#53635A',
+                textTertiary: '#78857D',
+              },
+              darkTheme: {
+                bgDark: '#0F141A',
+                surfaceDark: '#151C23',
+                elevatedDark: '#1B242D',
+                textPrimary: '#F5F7F8',
+                textSecondary: '#AAB4BE',
+                borderDark: 'rgba(255,255,255,0.08)',
+              },
+              semantic: {
+                info: '#2563EB',
+                warning: '#D97706',
+                danger: '#DC2626',
+                success: '#16A34A',
+              }
+            },
+            borderRadius: {
+              'btn': '10px',
+              'card': '16px',
+              'hero': '20px',
+            },
+            fontFamily: {
+              sans: ['Prompt', 'Inter', 'sans-serif'],
+              display: ['Prompt', 'sans-serif'],
+              number: ['Inter', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'monospace'],
+            }
+          }
+        }
       }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@200;300;400;600;700&family=Kanit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Prompt:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         .skip-link {
             position: absolute;
@@ -40,7 +84,7 @@
             inset: 0;
             pointer-events: none;
             z-index: 9985;
-            background-color: rgba(2, 6, 23, 0.65);
+            background-color: rgba(15, 20, 26, 0.7);
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
             transition: clip-path 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
@@ -51,8 +95,8 @@
             position: fixed;
             z-index: 9990;
             pointer-events: none;
-            border-radius: 1.5rem;
-            border-width: 4px;
+            border-radius: 16px;
+            border-width: 3px;
             transition: top 0.45s cubic-bezier(0.16, 1, 0.3, 1),
                         left 0.45s cubic-bezier(0.16, 1, 0.3, 1),
                         width 0.45s cubic-bezier(0.16, 1, 0.3, 1),
@@ -62,42 +106,74 @@
             will-change: top, left, width, height, box-shadow;
         }
         :root {
-            --primary: #22C55E; 
-            --primary-hover: #16A34A;
-            --bg-body: #f8fafc;
-            --sidebar-bg: #ffffff;
-            --card-bg: #ffffff; 
-            --card-hover: #f1f5f9;
-            --text-main: #0B1220;
-            --text-gray: #64748b;
-            --border: rgba(15, 23, 42, 0.08);
-            --input-bg: #f1f5f9;
-            --accent: #22C55E;
+            /* EduEase Energy Design System (CI Lock) */
+            --brand-primary: #16A34A;
+            --brand-dark: #15803D;
+            --brand-soft: #DCFCE7;
+
+            --bg-body: #F6F8F7;
+            --surface: #FFFFFF;
+            --border: #E2E8E4;
+            --text-primary: #15201A;
+            --text-secondary: #53635A;
+            --text-tertiary: #78857D;
+
+            --primary: #16A34A; 
+            --primary-hover: #15803D;
+            --sidebar-bg: #FFFFFF;
+            --card-bg: #FFFFFF; 
+            --card-hover: #F6F8F7;
+            --text-main: #15201A;
+            --text-gray: #53635A;
+            --input-bg: #F6F8F7;
+            --accent: #16A34A;
             
-            --blue-accent: #3B82F6;
-            --orange-accent: #F59E0B;
-            --danger: #EF4444;
-            --success: #22C55E;
-            --warning: #F59E0B;
-            --info: #38BDF8;
+            --semantic-info: #2563EB;
+            --semantic-warning: #D97706;
+            --semantic-danger: #DC2626;
+            --semantic-success: #16A34A;
+
+            --info: #2563EB;
+            --warning: #D97706;
+            --danger: #DC2626;
+            --success: #16A34A;
+
+            --radius-btn: 10px;
+            --radius-card: 16px;
+            --radius-hero: 20px;
         }
         [data-theme="dark"] {
-            --bg-body: #0B1220; 
-            --sidebar-bg: #111827; 
-            --card-bg: #182235;
-            --card-hover: #22304A;
-            --text-main: #f3f4f6; 
-            --text-gray: #9ca3af;
+            --brand-primary: #16A34A;
+            --brand-dark: #15803D;
+            --brand-soft: rgba(22, 163, 74, 0.16);
+
+            --bg-body: #0F141A; 
+            --surface: #151C23;
+            --surface-elevated: #1B242D;
             --border: rgba(255, 255, 255, 0.08);
-            --input-bg: #1F2937;
-            --accent: #22C55E;
+            --text-primary: #F5F7F8;
+            --text-secondary: #AAB4BE;
+            --text-tertiary: #78857D;
+
+            --primary: #16A34A; 
+            --primary-hover: #15803D;
+            --sidebar-bg: #151C23; 
+            --card-bg: #151C23;
+            --card-hover: #1B242D;
+            --text-main: #F5F7F8; 
+            --text-gray: #AAB4BE;
+            --input-bg: #1B242D;
+            --accent: #16A34A;
             
-            --blue-accent: #3B82F6;
-            --orange-accent: #F59E0B;
-            --danger: #EF4444;
-            --success: #22C55E;
-            --warning: #F59E0B;
-            --info: #38BDF8;
+            --semantic-info: #2563EB;
+            --semantic-warning: #D97706;
+            --semantic-danger: #DC2626;
+            --semantic-success: #16A34A;
+
+            --info: #2563EB;
+            --warning: #D97706;
+            --danger: #DC2626;
+            --success: #16A34A;
         }
 
         html, body {
@@ -106,19 +182,27 @@
             font-size: clamp(14px, 1.2vw + 10px, 16px);
         }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Prompt', 'Inter', sans-serif;
             margin: 0;
             padding: 0;
             background-color: var(--bg-body);
-            
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         h1, h2, h3, h4, h5, h6, .font-display {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Prompt', sans-serif;
             color: var(--text-main);
+            letter-spacing: -0.01em;
         }
 
-        .mono-font {
+        .font-number, .tabular-nums {
+            font-family: 'Inter', sans-serif;
+            font-feature-settings: 'tnum' 1, 'cv05' 1;
+        }
+
+        .mono-font, .font-tech, code, kbd {
             font-family: 'JetBrains Mono', monospace;
         }
         
@@ -148,14 +232,33 @@
         [data-theme="dark"] .text-slate-850,
         [data-theme="dark"] .text-slate-800,
         [data-theme="dark"] .text-slate-700,
-        [data-theme="dark"] .text-slate-600,
-        [data-theme="dark"] .text-slate-500,
         [data-theme="dark"] .text-gray-900,
         [data-theme="dark"] .text-gray-800,
-        [data-theme="dark"] .text-gray-700,
+        [data-theme="dark"] .text-gray-700 {
+            color: #F5F7F8 !important; /* Text Primary in dark mode */
+        }
+        [data-theme="dark"] .text-slate-600,
+        [data-theme="dark"] .text-slate-500,
+        [data-theme="dark"] .text-slate-400,
         [data-theme="dark"] .text-gray-600,
-        [data-theme="dark"] .text-gray-500 {
-            color: #f8fafc !important; /* Force beautiful light gray text, eliminating invisible dark texts on dark background */
+        [data-theme="dark"] .text-gray-500,
+        [data-theme="dark"] .text-gray-400 {
+            color: #AAB4BE !important; /* Text Secondary in dark mode */
+        }
+        
+        /* CI Lock: Standard Radii & Shadow Reductions */
+        .card-standard {
+            border-radius: 16px !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: none !important;
+        }
+        .card-hero {
+            border-radius: 20px !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: none !important;
+        }
+        .btn-standard {
+            border-radius: 10px !important;
         }
         
         

@@ -19,7 +19,10 @@ import { ComparisonView } from "./views/ComparisonView";
 import { ScoreView } from "./views/ScoreView";
 import { SmartInsightsHub } from "./insights/SmartInsightsHub";
 import { TrustCenterView } from "./trust/TrustCenterView";
+import { Web3GreenCryptoHub } from "./crypto/Web3GreenCryptoHub";
+import { UxAssessmentView } from "./trust/UxAssessmentView";
 import { OnboardingModal } from "./OnboardingModal";
+import { GenZGuidedOnboardingModal } from "./onboarding/GenZGuidedOnboardingModal";
 import { NotificationModal } from "./NotificationModal";
 import { GlobalSearchModal } from "./common/GlobalSearchModal";
 import { SystemStatusModal } from "./common/SystemStatusModal";
@@ -122,6 +125,7 @@ export default function Dashboard({
 
   // Modals state
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showGenZOnboarding, setShowGenZOnboarding] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [showUserManual, setShowUserManual] = useState(false);
@@ -342,6 +346,10 @@ export default function Dashboard({
     setAppliances(prev => [createdApp, ...prev]);
   };
 
+  const handleUpdateAppliance = (updatedApp: Appliance) => {
+    setAppliances(prev => prev.map(a => a.id === updatedApp.id ? updatedApp : a));
+  };
+
   const handleDeleteAppliance = (id: number) => {
     setAppliances(prev => prev.filter(app => app.id !== id));
   };
@@ -502,6 +510,14 @@ export default function Dashboard({
         setLang={setLang}
         isDarkMode={isDarkMode}
         onToggleTheme={onToggleTheme}
+        locations={locations}
+        currentLocationId={currentLocationId}
+        onSwitchLocation={handleSwitchLocation}
+        notifications={notifications}
+        onOpenNotifications={() => setShowNotifications(true)}
+        onOpenAccountModal={() => setShowAccountModal(true)}
+        currentAvatar={currentAvatar}
+        userLevel={userLevel}
         userStreak={userStreak}
         userCoins={userCoins}
         infoDetailMode={infoDetailMode}
@@ -529,7 +545,7 @@ export default function Dashboard({
       />
 
       {/* Main View Area */}
-      <main className="flex-1 p-3 sm:p-5 lg:p-6 max-w-7xl mx-auto w-full min-w-0 overflow-x-hidden">
+      <main className="flex-1 px-4 md:px-5 lg:px-6 xl:px-8 py-4 sm:py-6 max-w-[1280px] mx-auto w-full min-w-0 overflow-x-hidden">
         {/* Desktop HeaderBar */}
         <HeaderBar
           locations={locations}
@@ -549,7 +565,9 @@ export default function Dashboard({
           userCoins={userCoins}
           currentAvatar={currentAvatar}
           isDarkMode={isDarkMode}
+          onToggleTheme={onToggleTheme}
           lang={lang}
+          onToggleLang={() => setLang(lang === 'th' ? 'en' : 'th')}
         />
 
         {/* Notification Permission UI Helper Banner */}
@@ -602,6 +620,8 @@ export default function Dashboard({
             onTriggerBudgetToast={handleTriggerBudgetToast}
             gamificationSettings={gamificationSettings}
             persona={currentPersona}
+            badges={badges}
+            learningPaths={learningPaths}
           />
         )}
 
@@ -641,6 +661,7 @@ export default function Dashboard({
             onToggleDeviceStatus={handleToggleDeviceStatus}
             onUpdateEcoMode={() => {}}
             onAddAppliance={handleAddAppliance}
+            onUpdateAppliance={handleUpdateAppliance}
             onDeleteAppliance={handleDeleteAppliance}
             onAddMaintenanceLog={handleAddMaintenanceLog}
             infoDetailMode={infoDetailMode}
@@ -676,6 +697,7 @@ export default function Dashboard({
             onExportPDF={handleExportPDF}
             onNavigatePage={setCurrentPage}
             persona={currentPersona}
+            appliances={appliances}
           />
         )}
 
@@ -727,6 +749,27 @@ export default function Dashboard({
             isDarkMode={isDarkMode}
             infoDetailMode={infoDetailMode}
             onNavigatePage={setCurrentPage}
+          />
+        )}
+
+        {currentPage === 'crypto' && (
+          <Web3GreenCryptoHub
+            lang={lang}
+            isDarkMode={isDarkMode}
+            infoDetailMode={infoDetailMode}
+            onNavigatePage={setCurrentPage}
+            persona={currentPersona}
+            userCoins={userCoins}
+          />
+        )}
+
+        {currentPage === 'ux-assessment' && (
+          <UxAssessmentView
+            lang={lang}
+            isDarkMode={isDarkMode}
+            infoDetailMode={infoDetailMode}
+            onNavigatePage={setCurrentPage}
+            persona={currentPersona}
           />
         )}
 
@@ -823,6 +866,28 @@ export default function Dashboard({
         />
 
         {/* Interactive Modals */}
+        <GenZGuidedOnboardingModal
+          isOpen={showGenZOnboarding}
+          onClose={() => setShowGenZOnboarding(false)}
+          onComplete={({ selectedAppliances, recentBill }) => {
+            if (selectedAppliances && selectedAppliances.length > 0) {
+              const newItems = selectedAppliances.map((app, idx) => ({
+                ...app,
+                id: Date.now() + idx,
+              }));
+              setAppliances(prev => [...newItems, ...prev]);
+            }
+            if (recentBill && recentBill > 0) {
+              setMonthlyBudget(Math.round(recentBill * 1.1));
+            }
+            setUserXp(x => x + 150);
+            setUserCoins(c => c + 50);
+            setShowGenZOnboarding(false);
+          }}
+          isDarkMode={isDarkMode}
+          lang={lang}
+        />
+
         <OnboardingModal
           isOpen={showOnboarding}
           onClose={() => setShowOnboarding(false)}

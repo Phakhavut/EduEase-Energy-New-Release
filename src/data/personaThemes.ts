@@ -1,4 +1,4 @@
-import { House } from '../types';
+import { House, PersonaPresentationPipeline } from '../types';
 
 export type UserPersona = 'student' | 'homeowner' | 'facility';
 
@@ -12,6 +12,7 @@ export interface PersonaConfig {
   spaceTypeLabelEn: string;
   defaultLocationNameTh: string;
   defaultLocationNameEn: string;
+  presentationPipeline: PersonaPresentationPipeline;
   houses: House[];
   energyTips: {
     titleTh: string;
@@ -45,6 +46,30 @@ export const PERSONA_CONFIGS: Record<UserPersona, PersonaConfig> = {
     spaceTypeLabelEn: 'Dorm / Student Unit',
     defaultLocationNameTh: 'ห้อง 402 หอพักนักศึกษา A',
     defaultLocationNameEn: 'Room 402, Student Dorm A',
+    presentationPipeline: {
+      granularity: 'student_dorm_simple',
+      granularityBadgeTh: '🌱 รายวัน & ค่าไฟหอพัก (Dorm Simple)',
+      granularityBadgeEn: '🌱 Daily & Student Budget (Simple)',
+      focusMetrics: {
+        primaryLabelTh: 'ค่าไฟเฉลี่ยรายวัน',
+        primaryLabelEn: 'Daily Average Cost',
+        primaryUnitTh: '฿/วัน',
+        primaryUnitEn: 'THB/day',
+        secondaryLabelTh: 'เทียบเท่างบขนม/วัน',
+        secondaryLabelEn: 'Snack Budget Equiv.',
+        secondaryUnitTh: 'แก้วชานมไข่มุก',
+        secondaryUnitEn: 'Boba cups',
+        costResolution: 'daily_simple'
+      },
+      features: {
+        show3PhaseBalance: false,
+        showPowerFactorDiagnostics: false,
+        showHarmonicsTHD: false,
+        showRoomBudgetSplit: false,
+        showDormRoommateSplit: true,
+        showPeakDemandCharge: false
+      }
+    },
     houses: [
       {
         id: 'dorm-402',
@@ -135,6 +160,30 @@ export const PERSONA_CONFIGS: Record<UserPersona, PersonaConfig> = {
     spaceTypeLabelEn: 'Residential House / Townhome',
     defaultLocationNameTh: 'บ้านพักหลัก (กรุงเทพฯ)',
     defaultLocationNameEn: 'Main Family Home (Bangkok)',
+    presentationPipeline: {
+      granularity: 'homeowner_balanced',
+      granularityBadgeTh: '🏠 สมดุลครัวเรือน & ขั้นบันได (Homeowner Balanced)',
+      granularityBadgeEn: '🏠 Household Economics & Tariffs (Balanced)',
+      focusMetrics: {
+        primaryLabelTh: 'คาดการณ์บิลสิ้นเดือน',
+        primaryLabelEn: 'Month-End Forecast',
+        primaryUnitTh: '฿/เดือน',
+        primaryUnitEn: 'THB/mo',
+        secondaryLabelTh: 'อัตราก้าวหน้าขั้นบันได',
+        secondaryLabelEn: 'Progressive Tier Rate',
+        secondaryUnitTh: 'ขั้นที่ 3 (>150 หน่วย)',
+        secondaryUnitEn: 'Tier 3 (>150 units)',
+        costResolution: 'monthly_tiered'
+      },
+      features: {
+        show3PhaseBalance: false,
+        showPowerFactorDiagnostics: false,
+        showHarmonicsTHD: false,
+        showRoomBudgetSplit: true,
+        showDormRoommateSplit: false,
+        showPeakDemandCharge: false
+      }
+    },
     houses: [
       {
         id: 'home-bkk-eco',
@@ -218,6 +267,30 @@ export const PERSONA_CONFIGS: Record<UserPersona, PersonaConfig> = {
     spaceTypeLabelEn: 'Facility / Grid Substation',
     defaultLocationNameTh: 'อาคารเรียนรวม & Smart Campus Hub',
     defaultLocationNameEn: 'Campus Academic Complex Hub',
+    presentationPipeline: {
+      granularity: 'facility_engineering_deep',
+      granularityBadgeTh: '⚡ เทเลเมตรี & วิศวกรรมกริด (Facility Engineering Deep)',
+      granularityBadgeEn: '⚡ Telemetry & Grid Engineering (Deep Pro)',
+      focusMetrics: {
+        primaryLabelTh: 'ความต้องการพลังไฟฟ้าสูงสุด (Peak Demand)',
+        primaryLabelEn: 'Peak Active Demand',
+        primaryUnitTh: 'kW (กิโลวัตต์)',
+        primaryUnitEn: 'kW Demand',
+        secondaryLabelTh: 'ตัวประกอบกำลังเฉลี่ย (Power Factor)',
+        secondaryLabelEn: 'Average Power Factor',
+        secondaryUnitTh: 'PF (เป้าหมาย >0.85)',
+        secondaryUnitEn: 'PF (Target >0.85)',
+        costResolution: 'tou_demand_telemetry'
+      },
+      features: {
+        show3PhaseBalance: true,
+        showPowerFactorDiagnostics: true,
+        showHarmonicsTHD: true,
+        showRoomBudgetSplit: true,
+        showDormRoommateSplit: false,
+        showPeakDemandCharge: true
+      }
+    },
     houses: [
       {
         id: 'facility-campus-hub',

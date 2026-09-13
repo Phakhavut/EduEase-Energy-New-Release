@@ -17,12 +17,23 @@ import {
   Trophy,
   Award,
   Coins,
-  Zap
+  Zap,
+  Home,
+  Building2,
+  Plug,
+  Calculator,
+  Bot,
+  Scale,
+  Activity,
+  GraduationCap,
+  Keyboard
 } from 'lucide-react';
 
 export interface TourStep {
   stepNumber: number;
   pageKey: string;
+  categoryTh: string;
+  categoryEn: string;
   titleTh: string;
   titleEn: string;
   descTh: string;
@@ -37,98 +48,128 @@ export const QUICK_START_STEPS: TourStep[] = [
   {
     stepNumber: 1,
     pageKey: 'home',
-    titleTh: "1. หน้าหลัก (Home Dashboard)",
-    titleEn: "1. Home Dashboard",
-    descTh: "ศูนย์รวมข้อมูลสถานการณ์ค่าไฟวันนี้ โหลดพลังงานสด สรุปงบประมาณประจำเดือน และภารกิจรักษ์โลกประจำวัน",
-    descEn: "Your starting point for today's electricity cost, cumulative power draw, bill estimates, and daily eco missions.",
+    categoryTh: '1. สถานการณ์ค่าไฟ (Cost)',
+    categoryEn: '1. Cost Overview',
+    titleTh: "1. ภาพรวม & ประมาณการค่าไฟ (Home Dashboard)",
+    titleEn: "1. Home & Monthly Cost Overview",
+    descTh: "ศูนย์บัญชาการสถานการณ์ค่าไฟ: ดูยอดค่าไฟคาดการณ์สิ้นเดือน (฿1,284), สถานะงบประมาณ (🟢 อยู่ในงบ), 3 เครื่องใช้ไฟฟ้าตัวการหลัก และกดลองจำลอง What-If เพื่อเห็นผลลัพธ์การประหยัดก่อนลงมือจริง",
+    descEn: "Your energy command center: see your projected monthly bill (฿1,284), budget health (🟢 On Track), top 3 consuming appliances, and test What-If simulations to forecast savings.",
     targetPage: "home",
     targetId: "tour-step-home",
-    tipTh: "💡 คำถามที่ตอบ: 'ตอนนี้สถานการณ์ไฟของฉันเป็นยังไง?'",
-    tipEn: "💡 Key Question Answered: 'What is my energy situation right now?'"
+    tipTh: "💡 คำถามหลัก: 'ตอนนี้สถานการณ์ค่าไฟของฉันเป็นอย่างไร และมีแนวโน้มเกินงบหรือไม่?'",
+    tipEn: "💡 Key Question: 'What is my current power cost status and am I within budget?'"
   },
   {
     stepNumber: 2,
-    pageKey: 'appliances',
-    titleTh: "2. เครื่องใช้ไฟฟ้า & เปรียบเทียบ (Appliances & Compare)",
-    titleEn: "2. Appliances & Compare Lab",
-    descTh: "เจาะดูทันทีว่า 'อะไรทำให้เสียไฟ' ดูค่าวัตต์จริง สแกนฉลากเบอร์ 5 ด้วย AI และสลับไปห้องลองเปรียบเทียบ (Compare Lab) ได้ในคลิกเดียว",
-    descEn: "Find out what drives up power usage, monitor device wattage, scan Energy Label No. 5, and compare devices side-by-side.",
-    targetPage: "appliances",
-    targetId: "tour-step-appliances",
-    tipTh: "💡 คำถามที่ตอบ: 'แล้วอะไรทำให้ค่าไฟฉันแพง และอุปกรณ์ตัวไหนคุ้มกว่า?'",
-    tipEn: "💡 Key Question Answered: 'Which device uses most power and which model is more efficient?'"
+    pageKey: 'locations',
+    categoryTh: '2. จัดการสถานที่ (Locations)',
+    categoryEn: '2. Spaces & Properties',
+    titleTh: "2. สถานที่ & พื้นที่ของฉัน (My Locations & Spaces)",
+    titleEn: "2. My Locations & Spaces",
+    descTh: "จัดการสถานที่ต่าง ๆ เช่น หอพัก คอนโด บ้าน หรือออฟฟิศ เพื่อแยกติดตามมิเตอร์ งบประมาณ และเครื่องใช้ไฟฟ้าของแต่ละแห่งอย่างอิสระ สลับดูค่าไฟได้ทันที",
+    descEn: "Manage distinct spaces (Dorm, Condo, House, Office) to monitor separate meters, independent budgets, and device inventories with seamless one-click switching.",
+    targetPage: "locations",
+    targetId: "tour-step-locations",
+    tipTh: "💡 คำถามหลัก: 'ฉันจะสลับดูหรือเพิ่มสถานที่เพื่อแยกคุมค่าไฟอย่างไร?'",
+    tipEn: "💡 Key Question: 'How do I switch or manage energy consumption across multiple properties?'"
   },
   {
     stepNumber: 3,
-    pageKey: 'budget',
-    titleTh: "3. ค่าไฟ & งบประมาณ (Budget & Bills)",
-    titleEn: "3. Budget & Bill Calculator",
-    descTh: "เปลี่ยนจากหน่วยไฟเป็น 'คิดเป็นเงินกี่บาท' ตั้งงบรายเดือน อัตรา TOU และเลือกระดับความละเอียดข้อมูลได้ 3 ระดับ (ง่าย / สมดุล / ละเอียด)",
-    descEn: "Convert kWh into actual bill amounts, set monthly budget limits, manage TOU tariffs, and switch between 3 information depth levels.",
-    targetPage: "budget",
-    targetId: "tour-step-budget",
-    tipTh: "💡 คำถามที่ตอบ: 'แล้วสุดท้ายฉันต้องจ่ายเท่าไหร่?'",
-    tipEn: "💡 Key Question Answered: 'How much money will I actually pay?'"
+    pageKey: 'appliances',
+    categoryTh: '3. เครื่องใช้ไฟฟ้า (Appliances)',
+    categoryEn: '3. My Appliances',
+    titleTh: "3. เครื่องใช้ไฟฟ้า & ฮีทแมป (My Appliances & Heatmap)",
+    titleEn: "3. My Appliances & 24h Heatmap",
+    descTh: "ค้นหาว่า 'ไฟของฉันถูกใช้ไปกับอะไร?': ตรวจสอบวัตต์, วิเคราะห์ชั่วโมงเปิดใช้งานจริง, ดูฮีทแมปช่วงเวลาพีค (18:00–23:00) และสแกนฉลากเบอร์ 5 ด้วย AI",
+    descEn: "Discover exactly where your power goes: monitor real wattage, track running hours, view 24h consumption heatmaps (peak 18:00–23:00), and scan Energy Label No. 5 with AI.",
+    targetPage: "appliances",
+    targetId: "tour-step-appliances",
+    tipTh: "💡 คำถามหลัก: 'อะไรคือตัวการกินไฟหลัก และอุปกรณ์ตัวไหนเปิดนานเกินไป?'",
+    tipEn: "💡 Key Question: 'Which device uses the most power and runs during expensive peak hours?'"
   },
   {
     stepNumber: 4,
-    pageKey: 'insights',
-    titleTh: "4. AI & วิเคราะห์การใช้ไฟ (AI & Analytics Engine)",
-    titleEn: "4. AI & Analytics Engine",
-    descTh: "ศูนย์รวมปัญญาประดิษฐ์: ปรึกษา Voltie AI Coach, ตรวจจับจุดไฟรั่วซึม (Anomalies), จำลองฉากทัศน์ What-If และดูกราฟย้อนหลัง",
-    descEn: "Your AI intelligence center: Consult Voltie Coach, detect power leak anomalies, model What-If scenarios, and analyze usage trends.",
-    targetPage: "insights",
-    targetId: "tour-step-insights",
-    tipTh: "💡 คำถามที่ตอบ: 'ทำไมค่าไฟถึงสูง และควรแก้ตรงไหน?'",
-    tipEn: "💡 Key Question Answered: 'Why did the bill spike and where should I optimize?'"
+    pageKey: 'budget',
+    categoryTh: '4. งบประมาณ (Budget)',
+    categoryEn: '4. Budget & Tariffs',
+    titleTh: "4. วางแผนงบ & ระบบตัดไฟจำลอง (Budget & Eco-Cut)",
+    titleEn: "4. Budget Planning & Eco-Cut System",
+    descTh: "แปลงหน่วยไฟฟ้า (kWh) เป็นเงินบาทจริง ตั้งงบประมาณรายเดือน เลือกประเภทอัตราค่าไฟ (ก้าวหน้า / TOU) และเปิดระบบตัดไฟจำลองเมื่อใกล้เกินงบ",
+    descEn: "Translate kWh into real currency, set monthly spending limits, choose between progressive or TOU off-peak tariffs, and activate simulated automated cut-off alerts.",
+    targetPage: "budget",
+    targetId: "tour-step-budget",
+    tipTh: "💡 คำถามหลัก: 'จะคุมบิลไม่ให้เกินงบ และวางแผนค่าไฟล่วงหน้าได้อย่างไร?'",
+    tipEn: "💡 Key Question: 'How do I cap my monthly spending and avoid surprise utility bills?'"
   },
   {
     stepNumber: 5,
-    pageKey: 'learning',
-    titleTh: "5. Energy Adventure & เรียนรู้ (Adventure & Arcade)",
-    titleEn: "5. Energy Adventure & Arcade",
-    descTh: "เติมความรู้เรื่องไฟฟ้า 6 กฎทอง, ทดลองหมุนมิเตอร์จานจริง, เล่นมินิเกมภาพจำ ประลองควิซ และเอาชนะบอสเพื่อสร้างเมืองรักษ์โลก",
-    descEn: "Master electricity rules, experiment with meter disc simulation, play arcade matching games, defeat energy bosses, and build your eco city.",
-    targetPage: "learning",
-    targetId: "tour-step-learning",
-    tipTh: "💡 คำถามที่ตอบ: 'อยากเรียนรู้เทคนิคประหยัดไฟและเล่นเกมสะสม XP ทำอย่างไร?'",
-    tipEn: "💡 Key Question Answered: 'How can I learn power hacks and earn XP through fun games?'"
+    pageKey: 'ai-coach',
+    categoryTh: '5. AI ผู้ช่วย (AI Coach)',
+    categoryEn: '5. Voltie AI Coach',
+    titleTh: "5. ผู้ช่วยอัจฉริยะ Voltie (AI Energy Coach)",
+    titleEn: "5. Voltie AI Energy Coach",
+    descTh: "ปรึกษา Voltie AI สำหรับคำแนะนำเฉพาะตัว: วิเคราะห์จุดไฟรั่วซึม (Anomalies), ประเมินพฤติกรรมการใช้ไฟ และเสนอแนวทางลดค่าไฟแบบไม่ต้องทนร้อน",
+    descEn: "Consult Voltie AI for personalized recommendations: detect power leakage anomalies, assess usage habits, and get actionable savings without sacrificing living comfort.",
+    targetPage: "ai-coach",
+    targetId: "tour-step-aicoach",
+    tipTh: "💡 คำถามหลัก: 'ทำไมค่าไฟถึงสูงขึ้น และเริ่มปรับตรงไหนได้ผลที่สุด?'",
+    tipEn: "💡 Key Question: 'Why did my electricity cost increase and what are the highest-impact actions?'"
   },
   {
     stepNumber: 6,
-    pageKey: 'locations',
-    titleTh: "6. สถานที่ของฉัน (My Locations)",
-    titleEn: "6. My Locations & Properties",
-    descTh: "จัดการสถานที่ต่าง ๆ เช่น บ้าน คอนโด หอพัก หรือออฟฟิศ เพื่อแยกติดตามบิลค่าไฟและงบประมาณแต่ละแห่งอย่างอิสระ",
-    descEn: "Manage multiple properties (Home, Condo, Dorm, Office) to track independent meters and budget goals.",
-    targetPage: "locations",
-    targetId: "tour-step-locations",
-    tipTh: "💡 คำถามที่ตอบ: 'สลับดูค่าไฟบ้าน คอนโด หรือหอพักอย่างไร?'",
-    tipEn: "💡 Key Question Answered: 'How do I switch or manage energy for my different properties?'"
+    pageKey: 'compare',
+    categoryTh: '6. เปรียบเทียบ (Compare)',
+    categoryEn: '6. Compare Lab',
+    titleTh: "6. ห้องทดลองเปรียบเทียบ (Appliance Compare Lab)",
+    titleEn: "6. Appliance Compare Lab",
+    descTh: "วางเทียบเครื่องใช้ไฟฟ้าสองเครื่องเคียงข้างกัน คำนวณจุดคุ้มทุน (ROI) ระหว่างรุ่นประหยัดไฟเบอร์ 5 กับรุ่นธรรมดา เพื่อการตัดสินใจซื้อที่คุ้มค่าที่สุด",
+    descEn: "Compare two appliances side-by-side, analyze payback ROI between standard vs. Energy Label No. 5 Inverter models, and make cost-effective purchase decisions.",
+    targetPage: "compare",
+    targetId: "tour-step-compare",
+    tipTh: "💡 คำถามหลัก: 'ซื้อรุ่นประหยัดไฟเบอร์ 5 จะคุ้มค่าส่วนต่างราคาในกี่เดือน?'",
+    tipEn: "💡 Key Question: 'Is upgrading to an inverter or Energy Label No. 5 model worth the price difference?'"
   },
   {
     stepNumber: 7,
-    pageKey: 'profile',
-    titleTh: "7. โปรไฟล์ & คะแนนประหยัดไฟ (Profile & Saving Score)",
-    titleEn: "7. Profile & 5D Saving Score",
-    descTh: "ติดตาม Level, XP, Eco Coins, ประเมินดัชนีการประหยัดไฟ 5 มิติ (Saving Score) และแลกสกินกรอบรูปตัวละคร",
-    descEn: "Track player level XP, Eco Coins, evaluate your 5D Energy Saving Score, and unlock character avatar skins.",
-    targetPage: "profile",
-    targetId: "tour-step-profile",
-    tipTh: "💡 คำถามที่ตอบ: 'ฉันทำได้ดีแค่ไหนในการประหยัดไฟ และรับรางวัลได้อย่างไร?'",
-    tipEn: "💡 Key Question Answered: 'How well am I saving energy and how do I claim rewards?'"
+    pageKey: 'score',
+    categoryTh: '7. ดัชนีประหยัดไฟ (Score)',
+    categoryEn: '7. Saving Score',
+    titleTh: "7. ดัชนีประหยัดไฟ 5 มิติ (5D Saving Score)",
+    titleEn: "7. 5D Energy Saving Score",
+    descTh: "ประเมินพฤติกรรมการใช้พลังงานผ่านเรดาร์ 5 มิติ: ประสิทธิภาพ (Efficiency), การคุมงบ (Budget), ช่วงเวลา (Timing), ความสม่ำเสมอ (Consistency) และความรู้ (Eco IQ)",
+    descEn: "Evaluate your energy habits across 5 key dimensions: Efficiency, Budget Control, Peak Timing, Habit Consistency, and Eco Knowledge.",
+    targetPage: "score",
+    targetId: "tour-step-score",
+    tipTh: "💡 คำถามหลัก: 'พฤติกรรมการใช้ไฟของฉันจัดอยู่ในเกณฑ์ไหนเมื่อเทียบกับค่ามาตรฐาน?'",
+    tipEn: "💡 Key Question: 'How do my habits rank across efficiency, timing, and conservation benchmarks?'"
   },
   {
     stepNumber: 8,
-    pageKey: 'settings',
-    titleTh: "8. ตั้งค่า & ความน่าเชื่อถือ (Settings & Trust)",
-    titleEn: "8. Settings & Trust Center",
-    descTh: "ปรับเปลี่ยนภาษา (ไทย/English), ธีม (Light/Dark), เปิด Quick Tour ใหม่ และตรวจสอบสูตรคำนวณบิลและความโปร่งใสของ AI",
-    descEn: "Configure app language, light/dark themes, restart this tour, and verify bill calculation formulas with zero black box.",
-    targetPage: "settings",
-    targetId: "tour-step-settings",
-    tipTh: "💡 คำถามที่ตอบ: 'ตั้งค่าระบบ หรือตรวจสอบสูตรคำนวณได้ที่ไหน?'",
-    tipEn: "💡 Key Question Answered: 'Where do I configure preferences or verify bill calculation formulas?'"
+    pageKey: 'learning',
+    categoryTh: '8. เรียนรู้ (Learning)',
+    categoryEn: '8. Energy Learning',
+    titleTh: "8. ห้องเรียนพลังงาน & กฎทอง (Energy Learning)",
+    titleEn: "8. Energy Learning & Gold Rules",
+    descTh: "เรียนรู้ 6 กฎทองประหยัดไฟ, ทดลองหมุนมิเตอร์จานจริง (Meter Disc Simulation), ศึกษาเทคนิคการตั้งแอร์ 26°C + พัดลม และอ่านคำอธิบายแบบไม่มี Black Box",
+    descEn: "Master 6 golden electricity rules, simulate rotating induction disc meters, test the 26°C + fan formula, and explore transparent energy education.",
+    targetPage: "learning",
+    targetId: "tour-step-learning",
+    tipTh: "💡 คำถามหลัก: 'มีเทคนิคประหยัดไฟอะไรบ้างที่ทำตามได้ทันทีและเห็นผลจริง?'",
+    tipEn: "💡 Key Question: 'What proven power-saving techniques can I apply right away?'"
+  },
+  {
+    stepNumber: 9,
+    pageKey: 'achievements',
+    categoryTh: '9. ภารกิจ & รางวัล (Rewards)',
+    categoryEn: '9. Quests & Badges',
+    titleTh: "9. ภารกิจ & รางวัลรักษ์โลก (Quests & Rewards)",
+    titleEn: "9. Eco Missions & Achievements",
+    descTh: "พิชิตภารกิจประหยัดไฟประจำวัน สะสมดวงตราแสตมป์ รับเหรียญ Eco Coins แลกรับรางวัล และเพิ่มระดับเลเวลผู้พิทักษ์พลังงานของคุณ",
+    descEn: "Complete daily eco quests, collect milestone stamps, earn Eco Coins, unlock achievement badges, and level up your Energy Guardian rank.",
+    targetPage: "achievements",
+    targetId: "tour-step-missions",
+    tipTh: "💡 คำถามหลัก: 'การประหยัดไฟช่วยให้ฉันได้รับ XP, เหรียญ และรางวัลอะไรบ้าง?'",
+    tipEn: "💡 Key Question: 'How do my conservation efforts turn into XP, badges, and tangible rewards?'"
   }
 ];
 
@@ -176,6 +217,29 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
 
   const currentStep = QUICK_START_STEPS[stepIndex] || QUICK_START_STEPS[0];
 
+  // Sound effect on celebration
+  const playCelebrationChime = useCallback(() => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      notes.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.1);
+        gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + idx * 0.1 + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + idx * 0.1 + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ctx.currentTime + idx * 0.1);
+        osc.stop(ctx.currentTime + idx * 0.1 + 0.45);
+      });
+    } catch {}
+  }, []);
+
   // Compute smooth polygon cutout clip-path for spotlight overlay
   const x1 = spotlightRect ? Math.max(0, spotlightRect.left - 10) : 0;
   const y1 = spotlightRect ? Math.max(0, spotlightRect.top - 10) : 0;
@@ -215,9 +279,8 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
     const element = document.getElementById(currentStep.targetId);
     if (element) {
       if (typeof window !== 'undefined' && window.innerWidth < 768) {
-        // On mobile, the bottom sheet covers the bottom 50% of the screen.
         const y = element.getBoundingClientRect().top + window.scrollY - (window.innerHeight * 0.25);
-        window.scrollTo({ top: y, behavior: 'smooth' });
+        window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
       } else {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
@@ -270,23 +333,53 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
     };
   }, [stepIndex, showPrompt, currentPage, updateSpotlightPosition, isActive]);
 
-  if (!isActive) return null;
-
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setIsPaused(false);
     if (stepIndex < QUICK_START_STEPS.length - 1) {
       setStepIndex(prev => prev + 1);
     } else {
       setShowCompletedBadge(true);
+      playCelebrationChime();
     }
-  };
+  }, [stepIndex, setStepIndex, playCelebrationChime]);
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     setIsPaused(false);
     if (stepIndex > 0) {
       setStepIndex(prev => prev - 1);
     }
-  };
+  }, [stepIndex, setStepIndex]);
+
+  // Keyboard navigation support
+  useEffect(() => {
+    if (!isActive || showPrompt || showCompletedBadge) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
+
+      if (e.key === 'ArrowRight' || e.key === 'Enter') {
+        e.preventDefault();
+        handleNext();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        handlePrev();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      } else if (e.key === ' ' || e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        setIsPaused(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isActive, showPrompt, showCompletedBadge, handleNext, handlePrev, onClose]);
+
+  if (!isActive) return null;
 
   return (
     <>
@@ -317,61 +410,74 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                   <h3 className="font-extrabold text-xl md:text-2xl font-display leading-tight">
                     {lang === 'th' ? '⚡ Quick Start Tour (แนะนำแอป)' : '⚡ Quick Start Tour'}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                    {lang === 'th' ? 'ทำความรู้จักกับ 9 ฟีเจอร์หลักที่จะช่วยคุณประหยัดค่าไฟ' : 'Discover the 9 key features to slash your energy bill.'}
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                    {lang === 'th' 
+                      ? 'ทำความรู้จักกับ 9 ฟีเจอร์หลักที่จะพาคุณตอบโจทย์: ค่าไฟเท่าไหร่ → เพราะอะไร → ลดตรงไหน' 
+                      : 'Discover the 9 key features answering: How much → Why → Where to save.'}
                   </p>
                 </div>
               </div>
 
-              {/* Tour Steps Summary List */}
-              <div className={`p-4 rounded-2xl border mb-6 space-y-2 text-xs font-semibold ${
+              {/* 9 Tour Steps Summary List */}
+              <div className={`p-4 rounded-2xl border mb-5 space-y-2 text-xs font-semibold ${
                 isDarkMode ? 'bg-slate-950/60 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
               }`}>
                 <div className="flex items-center justify-between text-[0.7rem] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
-                  <span>{lang === 'th' ? 'สิ่งที่คุณจะได้เรียนรู้' : 'What you will explore'}</span>
-                  <span>9 {lang === 'th' ? 'ขั้นตอน' : 'Steps'}</span>
+                  <span>{lang === 'th' ? 'สิ่งที่คุณจะได้สำรวจ (9 ขั้นตอน)' : 'What you will explore (9 Steps)'}</span>
+                  <span className="flex items-center gap-1 text-amber-500 font-black">
+                    <Zap className="w-3 h-3 fill-amber-500" /> +100 XP
+                  </span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[0.75rem]">
-                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> 1. หน้าหลัก (Home)</span>
-                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> 2. สถานที่ของฉัน (Locations)</span>
-                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> 3. เครื่องใช้ไฟฟ้า (Appliances)</span>
-                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> 4. ค่าไฟ & งบประมาณ (Budget)</span>
-                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> 5. AI Coach (Voltie)</span>
-                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> 6. เปรียบเทียบอุปกรณ์ (Compare Lab)</span>
-                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> 7. ดัชนีประหยัดไฟ (Saving Score)</span>
-                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> 8. เรียนรู้ & คู่มือ (Learning)</span>
-                  <span className="flex items-center gap-1.5 sm:col-span-2"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> 9. ภารกิจ & รางวัล (Missions)</span>
+                  {QUICK_START_STEPS.map((s) => (
+                    <span key={s.stepNumber} className="flex items-center gap-1.5 truncate">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span className="truncate">{lang === 'th' ? s.titleTh : s.titleEn}</span>
+                    </span>
+                  ))}
                 </div>
               </div>
 
-              {/* 3 Explicit Choices Required by Prompt */}
+              {/* Rewards Preview Banner */}
+              <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 mb-5 text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                <span className="flex items-center gap-1.5">
+                  <Award className="w-4 h-4 text-emerald-500" />
+                  {lang === 'th' ? 'จบแล้วรับรางวัลทันที:' : 'Complete to earn:'}
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="text-amber-500 font-extrabold flex items-center gap-1"><Zap className="w-3 h-3 fill-amber-500" /> +100 XP</span>
+                  <span className="text-emerald-500 font-extrabold flex items-center gap-1"><Coins className="w-3 h-3 text-emerald-500" /> +30 Coins</span>
+                </span>
+              </div>
+
+              {/* 3 Explicit Choices */}
               <div className="space-y-2.5">
                 {/* Choice 1: ดูทัวร์ */}
                 <button
                   onClick={onStartTour}
-                  className="w-full py-3.5 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white rounded-2xl font-extrabold text-sm shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                  className="w-full py-3.5 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white rounded-2xl font-extrabold text-sm shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Play className="w-4 h-4 fill-white animate-pulse" />
-                  <span>{lang === 'th' ? 'ดูทัวร์ (แนะนำแบบรวดเร็ว)' : 'Watch Tour (~60s)'}</span>
+                  <span>{lang === 'th' ? 'เริ่มดูทัวร์แนะนำ (~60 วินาที)' : 'Start Quick Tour (~60s)'}</span>
                 </button>
 
                 <div className="grid grid-cols-2 gap-2.5">
                   {/* Choice 2: ข้ามไปเลย */}
                   <button
                     onClick={onSkipForNow}
-                    className={`py-3 px-3 rounded-2xl text-xs font-bold transition-all ${
+                    className={`py-3 px-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
                       isDarkMode 
                         ? 'bg-slate-800 hover:bg-slate-700 text-slate-300' 
                         : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
                     }`}
                   >
-                    {lang === 'th' ? 'ข้ามไปเลย' : 'Skip for now'}
+                    {lang === 'th' ? 'ข้ามไปก่อน' : 'Skip for now'}
                   </button>
 
                   {/* Choice 3: ไม่ต้องแสดงอีก */}
                   <button
                     onClick={onNeverShowAgain}
-                    className={`py-3 px-3 rounded-2xl text-xs font-bold transition-all border ${
+                    className={`py-3 px-3 rounded-2xl text-xs font-bold transition-all border cursor-pointer ${
                       isDarkMode 
                         ? 'border-slate-700/80 hover:bg-slate-800 text-slate-400 hover:text-slate-200' 
                         : 'border-slate-200 hover:bg-slate-100 text-slate-500 hover:text-slate-800'
@@ -433,10 +539,10 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
             >
               <button
                 onClick={() => setIsMinimized(false)}
-                className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white p-3 px-4 rounded-full shadow-2xl font-extrabold text-xs transition-all border border-emerald-400"
+                className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white p-3 px-4 rounded-full shadow-2xl font-extrabold text-xs transition-all border border-emerald-400 cursor-pointer"
               >
                 <Eye className="w-4 h-4 animate-bounce" />
-                <span>{lang === 'th' ? `แสดง Quick Start Tour (${stepIndex + 1}/9)` : `Show Tour (${stepIndex + 1}/9)`}</span>
+                <span>{lang === 'th' ? `เปิด Quick Start Tour (${stepIndex + 1}/9)` : `Show Tour (${stepIndex + 1}/9)`}</span>
               </button>
             </motion.div>
           ) : (
@@ -446,20 +552,20 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
               exit={isMobile ? { opacity: 0, y: "100%" } : { opacity: 0, scale: 0.9, y: 15 }}
               transition={{ type: "spring", stiffness: 100, damping: 15 }}
               className={isMobile 
-                ? "fixed z-[9995] bottom-0 left-0 right-0 w-full pointer-events-auto shadow-[0_-10px_40px_rgba(0,0,0,0.15)] rounded-t-[24px]" 
-                : "fixed z-[9995] w-full max-w-md px-4 sm:px-0 pointer-events-auto"
+                ? "fixed z-[9995] bottom-0 left-0 right-0 w-full pointer-events-auto shadow-[0_-10px_40px_rgba(0,0,0,0.15)] rounded-t-[28px]" 
+                : "fixed z-[9995] w-full max-w-lg px-4 sm:px-0 pointer-events-auto"
               }
               style={isMobile ? undefined : {
                 top: spotlightRect 
-                  ? (typeof window !== 'undefined' && spotlightRect.top + spotlightRect.height + 20 > window.innerHeight - 280
-                      ? Math.max(16, spotlightRect.top - 250)
+                  ? (typeof window !== 'undefined' && spotlightRect.top + spotlightRect.height + 20 > window.innerHeight - 300
+                      ? Math.max(16, spotlightRect.top - 280)
                       : spotlightRect.top + spotlightRect.height + 16)
-                  : '30%',
+                  : '25%',
                 left: spotlightRect
                   ? (typeof window !== 'undefined'
-                      ? window.innerWidth < 500
-                        ? '0px'
-                        : Math.min(window.innerWidth - 460, Math.max(16, spotlightRect.left + (spotlightRect.width / 2) - 224))
+                      ? window.innerWidth < 520
+                        ? '16px'
+                        : Math.min(window.innerWidth - 480, Math.max(16, spotlightRect.left + (spotlightRect.width / 2) - 240))
                       : '50%')
                   : '50%',
                 transform: spotlightRect 
@@ -468,10 +574,10 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
               }}
             >
               <div className={isMobile
-                ? `flex flex-col w-full rounded-t-[24px] overflow-hidden transition-all ${
+                ? `flex flex-col w-full rounded-t-[28px] overflow-hidden transition-all ${
                     isDarkMode ? 'bg-slate-900 border-t-2 border-emerald-500/40 text-white' : 'bg-white border-t-2 border-emerald-400 text-slate-800'
                   }`
-                : `p-5 md:p-6 rounded-[2rem] border-2 shadow-2xl backdrop-blur-xl relative transition-all ${
+                : `p-5 md:p-6 rounded-[2.2rem] border-2 shadow-2xl backdrop-blur-xl relative transition-all ${
                     isDarkMode 
                       ? 'bg-slate-950/95 border-emerald-500/40 text-white shadow-emerald-950/60' 
                       : 'bg-white/95 border-emerald-400 text-slate-800 shadow-slate-300'
@@ -479,15 +585,18 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
               }>
                 
                 {/* Scrollable Body */}
-                <div className={isMobile ? "p-5 md:p-6 pb-2 overflow-y-auto max-h-[50vh] sm:max-h-[60vh] flex flex-col" : "flex flex-col"}>
+                <div className={isMobile ? "p-5 md:p-6 pb-2 overflow-y-auto max-h-[55vh] sm:max-h-[60vh] flex flex-col" : "flex flex-col"}>
                   {/* Header Row */}
-                  <div className="flex items-center justify-between mb-2 shrink-0">
+                  <div className="flex items-center justify-between mb-2.5 shrink-0">
                     <div className="flex items-center gap-2">
-                      <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs font-mono whitespace-nowrap">
-                        {lang === 'th' ? `ขั้นที่ ${stepIndex + 1} จาก 9` : `Step ${stepIndex + 1} of 9`}
+                      <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-black text-xs font-mono whitespace-nowrap">
+                        {lang === 'th' ? `ขั้นตอนที่ ${stepIndex + 1}/9` : `Step ${stepIndex + 1}/9`}
+                      </span>
+                      <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 truncate max-w-[140px] sm:max-w-[200px]">
+                        {lang === 'th' ? currentStep.categoryTh : currentStep.categoryEn}
                       </span>
                       {isPaused && (
-                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500 font-extrabold text-[0.65rem] uppercase shrink-0">
+                        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-500 font-extrabold text-[0.65rem] uppercase shrink-0 animate-pulse">
                           {lang === 'th' ? 'ทดลองอิสระ' : 'Paused'}
                         </span>
                       )}
@@ -496,19 +605,46 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => setIsMinimized(true)}
-                        className="p-1 text-slate-400 hover:text-emerald-500 transition-colors"
+                        className="p-1.5 text-slate-400 hover:text-emerald-500 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                         title={lang === 'th' ? 'ย่อหน้าต่าง' : 'Minimize'}
                       >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
                         onClick={onClose}
-                        className="p-1 text-slate-400 hover:text-rose-500 transition-colors"
+                        className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                         title={lang === 'th' ? 'ข้ามและปิด' : 'Close'}
                       >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
+                  </div>
+
+                  {/* Interactive Quick-Jump Step Pills */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto py-1.5 mb-3 no-scrollbar shrink-0">
+                    {QUICK_START_STEPS.map((s, idx) => {
+                      const isCurrent = idx === stepIndex;
+                      const isDone = idx < stepIndex;
+                      return (
+                        <button
+                          key={s.stepNumber}
+                          onClick={() => {
+                            setIsPaused(false);
+                            setStepIndex(idx);
+                          }}
+                          className={`flex items-center justify-center w-7 h-7 rounded-lg text-xs font-black transition-all shrink-0 cursor-pointer ${
+                            isCurrent
+                              ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/30 scale-105'
+                              : isDone
+                                ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/30'
+                                : 'bg-slate-200/70 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-slate-700'
+                          }`}
+                          title={lang === 'th' ? s.titleTh : s.titleEn}
+                        >
+                          {isDone ? '✓' : s.stepNumber}
+                        </button>
+                      );
+                    })}
                   </div>
 
                   {/* Progress Bar */}
@@ -522,13 +658,13 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                   </div>
 
                   {/* Step Content */}
-                  <div className="space-y-3 mb-5 shrink-0">
-                    <h4 className="font-extrabold text-base md:text-lg font-display text-emerald-600 dark:text-emerald-400 flex items-start gap-2">
+                  <div className="space-y-3 mb-4 shrink-0">
+                    <h4 className="font-black text-base sm:text-lg font-display text-emerald-600 dark:text-emerald-400 flex items-start gap-2">
                       <Sparkles className="w-4 h-4 text-emerald-500 shrink-0 mt-1" />
                       <span className="break-words">{lang === 'th' ? currentStep.titleTh : currentStep.titleEn}</span>
                     </h4>
 
-                    <p className="text-xs md:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium break-words">
+                    <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-medium break-words">
                       {lang === 'th' ? currentStep.descTh : currentStep.descEn}
                     </p>
 
@@ -541,23 +677,31 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                       </div>
                     )}
                   </div>
+
+                  {/* Keyboard Shortcuts Helper Hint */}
+                  {!isMobile && (
+                    <div className="flex items-center gap-2 text-[10px] text-slate-400 mb-2">
+                      <Keyboard className="w-3 h-3 text-slate-400" />
+                      <span>{lang === 'th' ? 'ปุ่มลัด: ← ย้อนกลับ / → ถัดไป / Space พักไฮไลต์ / Esc ปิด' : 'Keys: ← Back / → Next / Space Pause / Esc Exit'}</span>
+                    </div>
+                  )}
                 </div>
 
-                {/* Bottom Control Bar (Pinned on mobile) */}
+                {/* Bottom Control Bar */}
                 <div 
                   className={`flex items-center justify-between border-t border-slate-200 dark:border-slate-800 shrink-0 ${
-                    isMobile ? 'p-5 md:p-6 bg-slate-50 dark:bg-slate-800/50' : 'pt-3'
+                    isMobile ? 'p-4 sm:p-5 bg-slate-50 dark:bg-slate-800/50' : 'pt-3'
                   }`}
-                  style={isMobile ? { paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.5rem)' } : undefined}
+                  style={isMobile ? { paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)' } : undefined}
                 >
                   <button
                     onClick={() => setIsPaused(!isPaused)}
-                    className={`px-3 py-2 sm:py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    className={`px-3 py-2 sm:py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
                       isPaused 
                         ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30' 
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                     }`}
-                    style={isMobile ? { minHeight: '56px' } : undefined}
+                    style={isMobile ? { minHeight: '48px' } : undefined}
                   >
                     {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
                     <span>{isPaused ? (lang === 'th' ? 'เล่นต่อ' : 'Resume') : (lang === 'th' ? 'ทดลองอิสระ' : 'Pause')}</span>
@@ -567,12 +711,12 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                     <button
                       onClick={handlePrev}
                       disabled={stepIndex === 0}
-                      className={`px-3 py-2 sm:py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 ${
+                      className={`px-3 py-2 sm:py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
                         stepIndex === 0
                           ? 'opacity-30 cursor-not-allowed text-slate-400'
                           : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200'
                       }`}
-                      style={isMobile ? { minHeight: '56px' } : undefined}
+                      style={isMobile ? { minHeight: '48px' } : undefined}
                     >
                       <ChevronLeft className="w-4 h-4" />
                       <span>{lang === 'th' ? 'ย้อน' : 'Back'}</span>
@@ -580,10 +724,10 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
 
                     <button
                       onClick={handleNext}
-                      className="px-4 py-2 sm:py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-extrabold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1 hover:scale-105 active:scale-95"
-                      style={isMobile ? { minHeight: '56px' } : undefined}
+                      className="px-4 py-2 sm:py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-extrabold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1 hover:scale-105 active:scale-95 cursor-pointer"
+                      style={isMobile ? { minHeight: '48px' } : undefined}
                     >
-                      <span>{stepIndex === QUICK_START_STEPS.length - 1 ? (lang === 'th' ? 'เสร็จสิ้น' : 'Finish') : (lang === 'th' ? 'ถัดไป' : 'Next')}</span>
+                      <span>{stepIndex === QUICK_START_STEPS.length - 1 ? (lang === 'th' ? 'เสร็จสิ้น 🎉' : 'Finish 🎉') : (lang === 'th' ? 'ถัดไป' : 'Next')}</span>
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -600,11 +744,11 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
           <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-4 overflow-hidden animate-fade-in">
             {/* Confetti Particles */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-              {Array.from({ length: 28 }).map((_, i) => {
-                const colors = ['#10B981', '#F59E0B', '#3B82F6', '#EC4899', '#8B5CF6', '#14B8A6'];
+              {Array.from({ length: 32 }).map((_, i) => {
+                const colors = ['#10B981', '#F59E0B', '#3B82F6', '#EC4899', '#8B5CF6', '#14B8A6', '#F43F5E'];
                 const color = colors[i % colors.length];
-                const left = `${(i * 3.6 + 2) % 100}%`;
-                const delay = (i % 7) * 0.12;
+                const left = `${(i * 3.2 + 2) % 100}%`;
+                const delay = (i % 8) * 0.1;
                 const size = 8 + (i % 4) * 4;
                 return (
                   <motion.div
@@ -656,7 +800,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
 
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-extrabold text-xs uppercase tracking-wider border border-emerald-500/30 mb-3">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
-                <span>{lang === 'th' ? 'ทัวร์สมบูรณ์แล้ว!' : 'Tour Completed!'}</span>
+                <span>{lang === 'th' ? 'ทัวร์ครบสมบูรณ์แล้ว!' : 'Tour Completed!'}</span>
               </div>
 
               <h2 className="text-xl md:text-2xl font-black mb-2">
@@ -665,8 +809,8 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
 
               <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 font-medium mb-5 leading-relaxed">
                 {lang === 'th' 
-                  ? 'คุณพร้อมใช้งาน EduEase Energy อย่างเต็มประสิทธิภาพแล้ว รับรางวัลเหรียญ XP และยศ Explorer เพื่อเริ่มต้นประหยัดค่าไฟได้ทันที!' 
-                  : 'You are now fully equipped to optimize your power bill! Claim your XP & Explorer badge to get started.'}
+                  ? 'คุณเข้าใจโครงสร้างการคุมค่าไฟ: สถานการณ์ → หาสาเหตุ → ลดตรงไหน เรียบร้อยแล้ว! รับรางวัลเหรียญและ XP เพื่อเริ่มต้นประหยัดค่าไฟได้ทันที' 
+                  : 'You now understand how to track costs, pinpoint causes, and apply actionable savings! Claim your rewards and start saving.'}
               </p>
 
               {/* Rewards chips */}
@@ -700,7 +844,7 @@ export const GuidedTour: React.FC<GuidedTourProps> = ({
                 className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-extrabold text-sm shadow-xl shadow-emerald-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
               >
                 <Sparkles className="w-4 h-4 animate-spin" />
-                <span>{lang === 'th' ? 'รับรางวัล & เริ่มใช้งานเลย' : 'Claim Reward & Get Started'}</span>
+                <span>{lang === 'th' ? 'รับรางวัล & เริ่มต้นใช้งานเลย' : 'Claim Reward & Get Started'}</span>
               </button>
             </motion.div>
           </div>
