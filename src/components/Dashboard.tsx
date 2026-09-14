@@ -21,6 +21,7 @@ import { SmartInsightsHub } from "./insights/SmartInsightsHub";
 import { TrustCenterView } from "./trust/TrustCenterView";
 import { Web3GreenCryptoHub } from "./crypto/Web3GreenCryptoHub";
 import { UxAssessmentView } from "./trust/UxAssessmentView";
+import { BrandIdentityModal } from "./brand/BrandIdentityModal";
 import { OnboardingModal } from "./OnboardingModal";
 import { GenZGuidedOnboardingModal } from "./onboarding/GenZGuidedOnboardingModal";
 import { NotificationModal } from "./NotificationModal";
@@ -131,6 +132,7 @@ export default function Dashboard({
   const [showUserManual, setShowUserManual] = useState(false);
   const [showSystemStatus, setShowSystemStatus] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
+  const [showBrandIdentityModal, setShowBrandIdentityModal] = useState(false);
 
   // Global Keyboard Shortcuts (Cmd+K / Ctrl+K for search)
   useEffect(() => {
@@ -544,6 +546,7 @@ export default function Dashboard({
         persona={currentPersona}
         locations={locations}
         currentLocationId={currentLocationId}
+        onOpenBrandGuide={() => setShowBrandIdentityModal(true)}
       />
 
       {/* Main View Area */}
@@ -943,6 +946,14 @@ export default function Dashboard({
           toasts={budgetToasts}
           onDismiss={handleDismissBudgetToast}
           onNavigatePage={setCurrentPage}
+          lang={lang}
+          isDarkMode={isDarkMode}
+        />
+
+        {/* Brand Identity & Logo Suite Modal */}
+        <BrandIdentityModal
+          isOpen={showBrandIdentityModal}
+          onClose={() => setShowBrandIdentityModal(false)}
           lang={lang}
           isDarkMode={isDarkMode}
         />

@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import logoImg from '../../assets/images/eduease_energy_logo_1789318705939.jpg';
+import { EduEaseLogo } from '../brand/EduEaseLogo';
 import { 
   Home, 
   Bot, 
@@ -47,6 +47,7 @@ interface SidebarProps {
   persona?: UserPersona;
   locations?: LocationItem[];
   currentLocationId?: string;
+  onOpenBrandGuide?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -67,6 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   persona = 'student',
   locations,
   currentLocationId,
+  onOpenBrandGuide,
 }) => {
   const isCleanMode = gamificationSettings.cleanUtilityMode;
   const personaConfig = getPersonaConfig(persona);
@@ -170,25 +172,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }`}>
         {/* Top: Branding */}
         <div>
-          <div className="flex items-center gap-2.5 mb-5 px-1 pt-1">
-            <div className="w-9 h-9 rounded-[10px] overflow-hidden border border-emerald-500/30 shadow-sm shrink-0 bg-[#0B1220]">
-              <img
-                src={logoImg}
-                alt="EduEase Energy Logo"
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            <div>
-              <h1 className="font-bold text-base tracking-tight text-[#15201A] dark:text-[#F5F7F8] font-display">
-                EduEase Energy
-              </h1>
-              <p className="text-[11px] font-medium text-[#16A34A] flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A]"></span>
-                Smart Energy Assistant
-              </p>
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={() => onOpenBrandGuide ? onOpenBrandGuide() : setCurrentPage('home')}
+            className="flex items-center gap-2.5 mb-5 px-1 pt-1 text-left w-full hover:opacity-90 transition-opacity cursor-pointer group"
+            title={lang === 'th' ? 'คลิกเพื่อดูคู่มืออัตลักษณ์แบรนด์ & โลโก้' : 'Click to view Brand Identity & Logo Suite'}
+          >
+            <EduEaseLogo
+              variant="horizontal"
+              size="md"
+              isDarkMode={isDarkMode}
+            />
+          </button>
 
           {/* User Status Card */}
           {isCleanMode ? (
