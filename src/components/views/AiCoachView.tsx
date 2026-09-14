@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Bot, 
@@ -11,15 +11,28 @@ import {
   Zap, 
   PiggyBank, 
   ThumbsUp, 
-  RefreshCw,
-  Lightbulb,
-  ChevronRight,
-  BrainCircuit,
-  BarChart3
+  RefreshCw, 
+  Lightbulb, 
+  ChevronRight, 
+  BrainCircuit, 
+  BarChart3 
 } from 'lucide-react';
-import { AICoachRecommendation, InfoDetailMode, AppPage } from '../../types';
+import { 
+  AICoachRecommendation, 
+  InfoDetailMode, 
+  AppPage,
+  SmartAnomaly, 
+  SmartGoal, 
+  HouseholdBenchmark, 
+  SeasonalInsight, 
+  ActionTimelineItem, 
+  WhatIfScenario, 
+  EnergyDiaryNote 
+} from '../../types';
 import { ProgressiveCard } from '../common/ProgressiveCard';
 import { WhyButton } from '../trust/WhyButton';
+import { SmartInsightsHub } from '../insights/SmartInsightsHub';
+import { PageHeader, SegmentedTabs, UnifiedButton, UnifiedCard } from '../../design-system';
 
 interface AiCoachViewProps {
   lang: 'th' | 'en';
@@ -32,6 +45,18 @@ interface AiCoachViewProps {
   infoDetailMode: InfoDetailMode;
   onStartPageTour?: (stepIndex: number) => void;
   onNavigatePage?: (page: AppPage) => void;
+  initialTab?: 'coach' | 'insights';
+  anomalies?: SmartAnomaly[];
+  goals?: SmartGoal[];
+  benchmarks?: HouseholdBenchmark[];
+  seasonalInsights?: SeasonalInsight[];
+  actionTimeline?: ActionTimelineItem[];
+  scenarios?: WhatIfScenario[];
+  diaryNotes?: EnergyDiaryNote[];
+  onResolveAnomaly?: (id: string) => void;
+  onAddGoal?: (goal: SmartGoal) => void;
+  onToggleGoalComplete?: (id: string) => void;
+  onAddDiaryNote?: (note: EnergyDiaryNote) => void;
 }
 
 export const AiCoachView: React.FC<AiCoachViewProps> = ({
@@ -45,9 +70,28 @@ export const AiCoachView: React.FC<AiCoachViewProps> = ({
   infoDetailMode,
   onStartPageTour,
   onNavigatePage,
+  initialTab = 'coach',
+  anomalies = [],
+  goals = [],
+  benchmarks = [],
+  seasonalInsights = [],
+  actionTimeline = [],
+  scenarios = [],
+  diaryNotes = [],
+  onResolveAnomaly = () => {},
+  onAddGoal = () => {},
+  onToggleGoalComplete = () => {},
+  onAddDiaryNote = () => {},
 }) => {
+  const [activeTab, setActiveTab] = useState<'coach' | 'insights'>(initialTab);
   const [input, setInput] = useState('');
   const [useThinkingMode, setUseThinkingMode] = useState(false);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   const quickPrompts = [
     { th: 'ทำอย่างไรให้ประหยัดค่าไฟ ฿500 เดือนนี้?', en: 'How to save ฿500 this month?' },
@@ -65,73 +109,78 @@ export const AiCoachView: React.FC<AiCoachViewProps> = ({
 
   return (
     <div id="tour-step-aicoach" className="space-y-6 animate-fade-in pb-20 lg:pb-8">
-      {/* AI & Analytics Hub Sub-Tabs */}
-      <div className="flex items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto self-start border border-slate-300/50 dark:border-slate-700/50">
-        <button
-          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-700 text-purple-600 dark:text-purple-300 shadow-sm"
-        >
-          <Bot className="w-4 h-4 text-purple-500" />
-          <span>{lang === 'th' ? 'AI Coach (Voltie)' : 'AI Coach (Voltie)'}</span>
-        </button>
-        <button
-          onClick={() => onNavigatePage && onNavigatePage('insights')}
-          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-        >
-          <BrainCircuit className="w-4 h-4 text-purple-500" />
-          <span>{lang === 'th' ? 'Smart Insights & Anomalies' : 'Smart Insights'}</span>
-        </button>
-        <button
-          onClick={() => onNavigatePage && onNavigatePage('analytics')}
-          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-        >
-          <BarChart3 className="w-4 h-4 text-blue-500" />
-          <span>{lang === 'th' ? 'วิเคราะห์การใช้ไฟ (Analytics)' : 'Analytics'}</span>
-        </button>
-      </div>
+      {/* 1. Standardized Page Header */}
+      <PageHeader
+        title={lang === 'th' ? 'ผู้ช่วย AI วิเคราะห์พลังงาน (Voltie)' : 'AI Energy Coach (Voltie)'}
+        subtitle={lang === 'th' 
+          ? 'สอบถามข้อสงสัย วางแผนประหยัดค่าไฟ หรือให้ Voltie ช่วยอธิบายสถิติไฟเป็นภาษาเข้าใจง่าย'
+          : 'Ask questions, create saving plans, or get plain English explanations of your power trends.'}
+        icon={Bot}
+        badgeText="Voltie v3.0"
+        badgeVariant="brand"
+        lang={lang}
+        isDarkMode={isDarkMode}
+        onStartTour={onStartPageTour ? () => onStartPageTour(4) : undefined}
+        tourStepLabel={lang === 'th' ? '💡 แนะนำหน้านี้' : '💡 Page Tour'}
+      />
 
-      {/* 1. Header Banner */}
-      <motion.div 
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={`p-6 md:p-8 rounded-[2.5rem] border relative overflow-hidden transition-all shadow-lg ${
-          isDarkMode
-            ? 'bg-gradient-to-r from-slate-900 via-purple-950/40 to-slate-900 border-purple-500/20 text-white'
-            : 'bg-gradient-to-r from-purple-50 via-teal-50/60 to-purple-50 border-purple-100 text-slate-800'
-        }`}
-      >
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 rounded-3xl bg-gradient-to-tr from-purple-500 via-teal-400 to-emerald-400 flex items-center justify-center text-white text-2xl shadow-xl ring-4 ring-purple-400/20 shrink-0">
-            <Bot className="w-8 h-8 animate-pulse" />
-          </div>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 flex-wrap">
-              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs font-bold bg-purple-500/15 text-purple-600 dark:text-purple-300 border border-purple-500/20">
-                <Sparkles className="w-3.5 h-3.5 text-purple-500" />
-                <span>Voltie • AI Energy Coach v3.0</span>
-              </div>
+      {/* 2. Sub-Tabs: AI Coach vs Smart Insights */}
+      <SegmentedTabs
+        tabs={[
+          {
+            id: 'coach',
+            labelTh: 'AI Coach (ห้องแชท & คำแนะนำ)',
+            labelEn: 'AI Coach (Chat & Recommendations)',
+            icon: Bot,
+          },
+          {
+            id: 'insights',
+            labelTh: 'Smart Insights & ตรวจจับไฟพุ่ง',
+            labelEn: 'Smart Insights & Anomalies',
+            icon: BrainCircuit,
+            badge: anomalies.filter(a => !a.resolved).length > 0 ? anomalies.filter(a => !a.resolved).length : undefined,
+          },
+          ...(onNavigatePage ? [{
+            id: 'analytics',
+            labelTh: 'วิเคราะห์การใช้ไฟ (Analytics)',
+            labelEn: 'Analytics',
+            icon: BarChart3,
+          }] : []),
+        ]}
+        activeTab={activeTab}
+        onChange={(tabId) => {
+          if (tabId === 'analytics' && onNavigatePage) {
+            onNavigatePage('analytics');
+          } else {
+            setActiveTab(tabId as 'coach' | 'insights');
+          }
+        }}
+        lang={lang}
+        isDarkMode={isDarkMode}
+        size="md"
+      />
 
-              {onStartPageTour && (
-                <button
-                  onClick={() => onStartPageTour(4)}
-                  className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-xs border border-amber-500/30 hover:bg-amber-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-bounce" />
-                  <span>{lang === 'th' ? '💡 แนะนำหน้านี้' : '💡 Page Tour'}</span>
-                </button>
-              )}
-            </div>
-            <h2 className="text-xl md:text-2xl font-extrabold font-display">
-              {lang === 'th' ? 'ผู้ช่วยวิเคราะห์และให้คำแนะนำพลังงานส่วนตัว' : 'Personal AI Energy Assistant'}
-            </h2>
-            <p className="text-xs md:text-sm text-slate-600 dark:text-slate-300">
-              {lang === 'th' 
-                ? 'สอบถามข้อสงสัย วางแผนประหยัดค่าไฟ หรือให้ Voltie ช่วยอธิบายสถิติไฟเป็นภาษาเข้าใจง่าย'
-                : 'Ask questions, create saving plans, or get plain English explanations of your power trends.'}
-            </p>
-          </div>
-        </div>
-      </motion.div>
-
+      {/* When Smart Insights is active */}
+      {activeTab === 'insights' ? (
+        <SmartInsightsHub
+          lang={lang}
+          isDarkMode={isDarkMode}
+          infoDetailMode={infoDetailMode}
+          anomalies={anomalies}
+          goals={goals}
+          benchmarks={benchmarks}
+          seasonalInsights={seasonalInsights}
+          actionTimeline={actionTimeline}
+          scenarios={scenarios}
+          diaryNotes={diaryNotes}
+          onResolveAnomaly={onResolveAnomaly}
+          onAddGoal={onAddGoal}
+          onToggleGoalComplete={onToggleGoalComplete}
+          onAddDiaryNote={onAddDiaryNote}
+          onNavigatePage={onNavigatePage || (() => {})}
+        />
+      ) : (
+        <>
       {/* 2. AI RECOMMENDATION CARDS (Hero Action Widgets) */}
       <div className="space-y-3">
         <h3 className="font-extrabold text-base font-display flex items-center gap-2 px-1">
@@ -326,6 +375,8 @@ export const AiCoachView: React.FC<AiCoachViewProps> = ({
           </form>
         </div>
       </div>
+      </>
+      )}
     </div>
   );
 };

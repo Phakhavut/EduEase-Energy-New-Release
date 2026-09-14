@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import logoImg from '../assets/images/eduease_energy_logo_1789318705939.jpg';
 import { 
   ShieldCheck, 
   User, 
@@ -132,18 +133,27 @@ const LoginForm: React.FC<LoginFormProps> = ({
         <div className="relative z-10 space-y-4">
           
           {/* Header */}
-          <div className="space-y-1">
+          <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[0.65rem] font-extrabold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                <Zap className="w-3 h-3 text-emerald-500" />
-                <span>EduEase Auth</span>
-              </span>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl overflow-hidden border border-emerald-500/30 shadow-sm shrink-0 bg-[#0B1220]">
+                  <img
+                    src={logoImg}
+                    alt="EduEase Energy Logo"
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+                <span className="font-bold text-sm tracking-tight font-display text-slate-900 dark:text-white">
+                  EduEase Energy
+                </span>
+              </div>
               <span className="text-[0.65rem] text-slate-400 font-mono">
-                {selectedRole === 'student' ? (lang === 'th' ? 'ห้องพัก: ' : 'Unit: ') : selectedRole === 'homeowner' ? (lang === 'th' ? 'บ้าน: ' : 'Home: ') : (lang === 'th' ? 'อาคาร/โหนด: ' : 'Node: ')}<strong className="text-emerald-500 font-bold truncate max-w-[110px] inline-block align-bottom">{selectedHouseName}</strong>
+                {selectedRole === 'student' ? (lang === 'th' ? 'ห้องพัก: ' : 'Unit: ') : selectedRole === 'homeowner' ? (lang === 'th' ? 'บ้าน: ' : 'Home: ') : (lang === 'th' ? 'อาคาร: ' : 'Node: ')}<strong className="text-emerald-500 font-bold truncate max-w-[90px] inline-block align-bottom">{selectedHouseName}</strong>
               </span>
             </div>
 
-            <h2 className={`text-xl font-black ${headingColor} tracking-tight font-display`}>
+            <h2 className={`text-lg font-black ${headingColor} tracking-tight font-display`}>
               {lang === 'th' ? 'เข้าสู่ระบบจัดการพลังงาน' : 'Energy Access Portal'}
             </h2>
             <p className="text-[0.72rem] text-slate-500 dark:text-slate-400 leading-snug">

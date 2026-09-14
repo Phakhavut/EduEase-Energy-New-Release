@@ -542,6 +542,8 @@ export default function Dashboard({
         currentAvatar={currentAvatar}
         gamificationSettings={gamificationSettings}
         persona={currentPersona}
+        locations={locations}
+        currentLocationId={currentLocationId}
       />
 
       {/* Main View Area */}
@@ -577,26 +579,6 @@ export default function Dashboard({
           onOpenSettingsNotifications={() => setCurrentPage('settings')}
         />
 
-        {currentPage === 'insights' && (
-          <SmartInsightsHub
-            lang={lang}
-            isDarkMode={isDarkMode}
-            infoDetailMode={infoDetailMode}
-            anomalies={anomalies}
-            goals={goals}
-            benchmarks={benchmarks}
-            seasonalInsights={seasonalInsightsList}
-            actionTimeline={actionTimeline}
-            scenarios={scenarios}
-            diaryNotes={diaryNotes}
-            onResolveAnomaly={handleResolveAnomaly}
-            onAddGoal={handleAddGoal}
-            onToggleGoalComplete={handleToggleGoalComplete}
-            onAddDiaryNote={handleAddDiaryNote}
-            onNavigatePage={setCurrentPage}
-          />
-        )}
-
         {currentPage === 'home' && (
           <HomeView
             lang={lang}
@@ -625,7 +607,7 @@ export default function Dashboard({
           />
         )}
 
-        {currentPage === 'ai-coach' && (
+        {(currentPage === 'ai-coach' || currentPage === 'insights') && (
           <AiCoachView
             lang={lang}
             isDarkMode={isDarkMode}
@@ -637,6 +619,18 @@ export default function Dashboard({
             infoDetailMode={infoDetailMode}
             onStartPageTour={handleStartTour}
             onNavigatePage={setCurrentPage}
+            initialTab={currentPage === 'insights' ? 'insights' : 'coach'}
+            anomalies={anomalies}
+            goals={goals}
+            benchmarks={benchmarks}
+            seasonalInsights={seasonalInsightsList}
+            actionTimeline={actionTimeline}
+            scenarios={scenarios}
+            diaryNotes={diaryNotes}
+            onResolveAnomaly={handleResolveAnomaly}
+            onAddGoal={handleAddGoal}
+            onToggleGoalComplete={handleToggleGoalComplete}
+            onAddDiaryNote={handleAddDiaryNote}
           />
         )}
 
@@ -650,6 +644,7 @@ export default function Dashboard({
             lang={lang}
             infoDetailMode={infoDetailMode}
             onStartPageTour={handleStartTour}
+            onNavigatePage={setCurrentPage}
           />
         )}
 
@@ -701,7 +696,7 @@ export default function Dashboard({
           />
         )}
 
-        {(currentPage === 'learning' || currentPage === 'city') && (
+        {(currentPage === 'learning' || currentPage === 'game') && (
           <LearningView
             learningPaths={learningPaths}
             glossaryTerms={glossaryTerms}
@@ -711,6 +706,7 @@ export default function Dashboard({
             lang={lang}
             infoDetailMode={infoDetailMode}
             onStartPageTour={handleStartTour}
+            initialCategory={currentPage === 'game' ? 'memory_games' : 'learning_modules'}
           />
         )}
 
@@ -773,7 +769,7 @@ export default function Dashboard({
           />
         )}
 
-        {currentPage === 'achievements' && (
+        {(currentPage === 'city' || currentPage === 'achievements') && (
           <AchievementsView
             lang={lang}
             isDarkMode={isDarkMode}
@@ -792,6 +788,7 @@ export default function Dashboard({
             leaderboard={LEADERBOARD_USERS}
             onStartPageTour={handleStartTour}
             onNavigatePage={setCurrentPage}
+            initialTab={currentPage === 'achievements' ? 'missions' : 'eduverse'}
           />
         )}
 
@@ -832,16 +829,6 @@ export default function Dashboard({
             persona={currentPersona}
             onPersonaChange={handlePersonaChange}
             onTriggerToast={handleTriggerBudgetToast}
-          />
-        )}
-
-        {/* Classic Retro Eco Arcade & Visual Memory Lab */}
-        {(currentPage === 'game' || currentPage === 'achievements') && (
-          <RetroEcoArcadeView
-            lang={lang}
-            isDarkMode={isDarkMode}
-            initialTab={currentPage === 'achievements' ? 'stamps' : 'memory'}
-            onNavigateToView={(view) => setCurrentPage(view as AppPage)}
           />
         )}
 

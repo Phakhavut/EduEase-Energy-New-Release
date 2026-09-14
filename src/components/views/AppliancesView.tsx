@@ -51,6 +51,7 @@ import { AppliancePriceComparison } from '../appliances/AppliancePriceComparison
 import { GenZApplianceCard } from '../appliances/GenZApplianceCard';
 import { AddEditApplianceModal } from '../appliances/AddEditApplianceModal';
 import confetti from 'canvas-confetti';
+import { PageHeader, UnifiedButton, SegmentedTabs, UnifiedCard } from '../../design-system';
 
 interface AppliancesViewProps {
   lang: 'th' | 'en';
@@ -387,107 +388,94 @@ export const AppliancesView: React.FC<AppliancesViewProps> = ({
         voltageV={220}
       />
 
-      {/* 1. Header & Primary CTA */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
-            <h2 className="text-2xl font-extrabold font-display tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-              <Plug className="w-6 h-6 text-emerald-500" />
-              <span>{lang === 'th' ? 'เครื่องใช้ไฟฟ้าของฉัน' : 'My Appliances'}</span>
-            </h2>
+      {/* 1. Standardized Header & Primary CTA */}
+      <PageHeader
+        title={lang === 'th' ? 'เครื่องใช้ไฟฟ้าของฉัน' : 'My Appliances'}
+        subtitle={lang === 'th' ? 'ดูว่าแต่ละเครื่องกำลังใช้ไฟและเงินเท่าไหร่ (ไฟของฉันถูกใช้ไปกับอะไร?)' : 'See how much power and money each appliance consumes • Where is my electricity going?'}
+        icon={Plug}
+        badgeText={lang === 'th' ? `${appliances.length} อุปกรณ์` : `${appliances.length} Devices`}
+        badgeVariant="brand"
+        lang={lang}
+        isDarkMode={isDarkMode}
+        onStartTour={onStartPageTour ? () => onStartPageTour(2) : undefined}
+        tourStepLabel={lang === 'th' ? '💡 แนะนำหน้านี้' : '💡 Page Tour'}
+        actions={
+          <>
+            <UnifiedButton
+              variant="primary"
+              size="md"
+              icon={Plus}
+              isDarkMode={isDarkMode}
+              onClick={() => {
+                setEditingAppliance(null);
+                setIsGenZAddModalOpen(true);
+              }}
+            >
+              {lang === 'th' ? '+ เพิ่มอุปกรณ์ (Smart Form)' : '+ Add Appliance'}
+            </UnifiedButton>
 
-            {onStartPageTour && (
-              <button
-                onClick={() => onStartPageTour(2)}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-xs border border-amber-500/30 hover:bg-amber-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-bounce" />
-                <span>{lang === 'th' ? '💡 แนะนำหน้านี้' : '💡 Page Tour'}</span>
-              </button>
-            )}
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-            {lang === 'th' ? 'ดูว่าแต่ละเครื่องกำลังใช้ไฟและเงินเท่าไหร่ (ไฟของฉันถูกใช้ไปกับอะไร?)' : 'See how much power and money each appliance consumes • Where is my electricity going?'}
-          </p>
-        </div>
+            <UnifiedButton
+              variant="outline"
+              size="md"
+              icon={ShieldCheck}
+              isDarkMode={isDarkMode}
+              onClick={() => setIsAddModalOpen(true)}
+            >
+              {lang === 'th' ? '✨ ฐานข้อมูล กฟผ.' : '✨ EGAT Database'}
+            </UnifiedButton>
 
-        {/* Top Controls: Add Button & Search */}
-        <div className="flex flex-col sm:flex-row items-center gap-2.5 flex-wrap">
-          {/* SMART ADD APPLIANCE BUTTON (Gen Z Progressive Form) */}
-          <button
-            onClick={() => {
-              setEditingAppliance(null);
-              setIsGenZAddModalOpen(true);
-            }}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all cursor-pointer"
-          >
-            <Plus className="w-4 h-4 stroke-[3]" />
-            <span>{lang === 'th' ? '+ เพิ่มอุปกรณ์ (Smart Form)' : '+ Add Appliance'}</span>
-          </button>
-
-          {/* EGAT DATABASE LOOKUP */}
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className={`w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-              isDarkMode
-                ? 'bg-slate-800/80 border-slate-700 text-slate-200 hover:border-emerald-500/40 hover:bg-slate-700/80'
-                : 'bg-white border-slate-200 text-slate-700 hover:border-emerald-500 hover:bg-slate-50'
-            }`}
-          >
-            <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            <span>{lang === 'th' ? '✨ ฐานข้อมูล กฟผ.' : '✨ EGAT Database'}</span>
-          </button>
-
-          {/* Search */}
-          <div className="relative w-full sm:w-48 md:w-56">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={lang === 'th' ? 'ค้นหาชื่อ หรือห้อง...' : 'Search name or room...'}
-              className={`w-full pl-9 pr-4 py-2 rounded-xl text-xs font-medium border focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all ${
-                isDarkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-800'
-              }`}
-            />
-          </div>
-        </div>
-      </div>
+            {/* Search Input */}
+            <div className="relative w-full sm:w-48 md:w-56">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#78857D] dark:text-[#AAB4BE]" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder={lang === 'th' ? 'ค้นหาชื่อ หรือห้อง...' : 'Search name or room...'}
+                className={`w-full pl-9 pr-3 py-2 rounded-[10px] text-xs font-medium border focus:outline-none focus:ring-2 focus:ring-[#16A34A] transition-all ${
+                  isDarkMode ? 'bg-[#151C23] border-white/10 text-white' : 'bg-[#F6F8F7] border-[#E2E8E4] text-[#15201A]'
+                }`}
+              />
+            </div>
+          </>
+        }
+      />
 
       {/* Sub-Module Navigation Tabs */}
-      <div className="flex items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto self-start border border-slate-300/50 dark:border-slate-700/50 flex-wrap">
-        <button
-          onClick={() => setSubTab('list')}
-          className={`flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-            subTab === 'list'
-              ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400'
-          }`}
-        >
-          <Plug className="w-4 h-4" />
-          <span>{lang === 'th' ? 'รายการอุปกรณ์ & สวิตช์ Eco' : 'Appliances & Eco Switch'}</span>
-        </button>
-        <button
-          onClick={() => setSubTab('price_compare')}
-          className={`flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-            subTab === 'price_compare'
-              ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400'
-          }`}
-        >
-          <BarChart3 className="w-4 h-4 text-emerald-500" />
-          <span>{lang === 'th' ? '📊 เปรียบเทียบค่าไฟแยกอุปกรณ์' : 'Separate Appliance Price Comparison'}</span>
-        </button>
-        {onNavigatePage && (
-          <button
-            onClick={() => onNavigatePage('compare')}
-            className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-          >
-            <Scale className="w-4 h-4 text-amber-500" />
-            <span>{lang === 'th' ? 'ห้องลองเปรียบเทียบ (Compare Lab)' : 'Compare Lab'}</span>
-          </button>
-        )}
-      </div>
+      <SegmentedTabs
+        tabs={[
+          {
+            id: 'list',
+            labelTh: 'รายการอุปกรณ์ & สวิตช์ Eco',
+            labelEn: 'Appliances & Eco Switch',
+            icon: Plug,
+            badge: appliances.length,
+          },
+          {
+            id: 'price_compare',
+            labelTh: '📊 เปรียบเทียบค่าไฟแยกอุปกรณ์',
+            labelEn: 'Appliance Price Comparison',
+            icon: BarChart3,
+          },
+          ...(onNavigatePage ? [{
+            id: 'compare',
+            labelTh: 'ห้องลองเปรียบเทียบ (Compare Lab)',
+            labelEn: 'Compare Lab',
+            icon: Scale,
+          }] : []),
+        ]}
+        activeTab={subTab}
+        onChange={(id) => {
+          if (id === 'compare' && onNavigatePage) {
+            onNavigatePage('compare');
+          } else {
+            setSubTab(id as 'list' | 'price_compare');
+          }
+        }}
+        lang={lang}
+        isDarkMode={isDarkMode}
+        size="md"
+      />
 
       {subTab === 'price_compare' ? (
         /* SEPARATE APPLIANCE ELECTRICITY PRICE COMPARISON */

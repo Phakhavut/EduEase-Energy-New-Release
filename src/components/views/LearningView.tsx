@@ -48,6 +48,7 @@ import { AnalogMeterSimulator } from '../game/retro/AnalogMeterSimulator';
 import { RetroTriviaQuiz } from '../game/retro/RetroTriviaQuiz';
 import { HabitStampCard } from '../game/retro/HabitStampCard';
 import { VisualMnemonicCard } from '../game/retro/VisualMnemonicCard';
+import { PageHeader, UnifiedButton, UnifiedCard, SegmentedTabs } from '../../design-system';
 import { RetroBadgeShowcase } from '../game/retro/RetroBadgeShowcase';
 import { MnemonicCarousel } from '../game/retro/MnemonicCarousel';
 import { VISUAL_MNEMONICS } from '../../data/retroGamificationData';
@@ -92,6 +93,7 @@ interface LearningViewProps {
   infoDetailMode: InfoDetailMode;
   onStartPageTour?: (stepIndex: number) => void;
   onRewardCoins?: (coins: number, xp: number) => void;
+  initialCategory?: MainCategoryTab;
   initialMenuTab?: SubMenuId;
 }
 
@@ -105,12 +107,32 @@ export const LearningView: React.FC<LearningViewProps> = ({
   infoDetailMode,
   onStartPageTour,
   onRewardCoins,
-  initialMenuTab = 'matching'
+  initialCategory,
+  initialMenuTab = 'courses'
 }) => {
   // Main Category state
-  const [activeCategory, setActiveCategory] = useState<MainCategoryTab>('memory_games');
+  const [activeCategory, setActiveCategory] = useState<MainCategoryTab>(initialCategory || 'learning_modules');
   // Active Submenu state
-  const [activeSubMenu, setActiveSubMenu] = useState<SubMenuId>(initialMenuTab);
+  const [activeSubMenu, setActiveSubMenu] = useState<SubMenuId>(
+    initialMenuTab || (initialCategory === 'memory_games' ? 'matching' : 'courses')
+  );
+
+  useEffect(() => {
+    if (initialCategory) {
+      setActiveCategory(initialCategory);
+      if (initialCategory === 'memory_games') {
+        setActiveSubMenu('matching');
+      } else if (initialCategory === 'learning_modules') {
+        setActiveSubMenu('courses');
+      }
+    }
+  }, [initialCategory]);
+
+  useEffect(() => {
+    if (initialMenuTab) {
+      setActiveSubMenu(initialMenuTab);
+    }
+  }, [initialMenuTab]);
   // Submenu Selection Prompt Modal
   const [showSubMenuPrompt, setShowSubMenuPrompt] = useState<boolean>(false);
 
@@ -482,50 +504,31 @@ export const LearningView: React.FC<LearningViewProps> = ({
 
   return (
     <div id="tour-step-learning" className="space-y-6 pb-20">
-      {/* Header Banner */}
-      <div className={`p-6 md:p-8 rounded-[2.5rem] border shadow-xl relative overflow-hidden transition-all ${
-        isDarkMode 
-          ? 'bg-slate-900/90 border-slate-800 text-white' 
-          : 'bg-gradient-to-br from-teal-50 via-emerald-50/50 to-teal-100/30 border-teal-100 text-slate-800'
-      }`}>
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-          <div>
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="px-3 py-1 rounded-full bg-teal-500/20 text-teal-600 dark:text-teal-400 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
-                <GraduationCap className="w-3.5 h-3.5" />
-                {lang === 'th' ? 'ศูนย์การเรียนรู้ & อาร์เคดพลังงาน' : 'Unified Learning & Energy Arcade'}
-              </span>
-
-              {onStartPageTour && (
-                <button
-                  onClick={() => onStartPageTour(7)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-xs border border-amber-500/30 hover:bg-amber-500/25 transition-all cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-bounce" />
-                  <span>{lang === 'th' ? '💡 แนะนำหน้านี้' : '💡 Page Tour'}</span>
-                </button>
-              )}
-            </div>
-            <h1 className="text-2xl md:text-3xl font-black font-display tracking-tight">
-              {lang === 'th' ? 'โมดูลการเรียนรู้ & เกมภาพจำประหยัดไฟ' : 'Learning Modules & Memory Games'}
-            </h1>
-            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-2xl font-medium">
-              {lang === 'th' 
-                ? 'เลือกหมวดหมู่หลัก แล้วเลือกกิจกรรมย่อยเพื่อเริ่มเรียนรู้หรือเล่นเกมประหยัดไฟได้ทันที พร้อมแถบเลื่อนซ้าย-ขวาที่ใช้งานได้ทั้งคอมและมือถือ' 
-                : 'Select a main category, then pick a submenu activity to play or study with smooth desktop and mobile scrolling.'}
-            </p>
-          </div>
-
-          {/* Quick Submenu Prompt Launcher Button */}
-          <button
+      {/* Standardized Page Header */}
+      <PageHeader
+        title={lang === 'th' ? 'โมดูลการเรียนรู้ & เกมภาพจำประหยัดไฟ' : 'Learning Modules & Memory Games'}
+        subtitle={lang === 'th' 
+          ? 'เลือกหมวดหมู่หลัก แล้วเลือกกิจกรรมย่อยเพื่อเริ่มเรียนรู้หรือเล่นเกมประหยัดไฟได้ทันที พร้อมแถบเลื่อนที่ใช้งานง่ายทั้งคอมและมือถือ' 
+          : 'Select a main category, then pick a submenu activity to play or study with smooth desktop and mobile scrolling.'}
+        icon={GraduationCap}
+        badgeText={lang === 'th' ? 'ศูนย์การเรียนรู้ & อาร์เคด' : 'Learning Hub & Arcade'}
+        badgeVariant="brand"
+        lang={lang}
+        isDarkMode={isDarkMode}
+        onStartTour={onStartPageTour ? () => onStartPageTour(7) : undefined}
+        tourStepLabel={lang === 'th' ? '💡 แนะนำหน้านี้' : '💡 Page Tour'}
+        actions={
+          <UnifiedButton
+            variant="primary"
+            size="md"
+            icon={FolderOpen}
+            isDarkMode={isDarkMode}
             onClick={() => setShowSubMenuPrompt(true)}
-            className="px-4 py-3 rounded-2xl bg-gradient-to-r from-teal-500 to-emerald-600 text-white font-extrabold text-xs shadow-lg hover:scale-105 transition-all flex items-center gap-2 cursor-pointer shrink-0 border border-teal-400/40"
           >
-            <FolderOpen className="w-4 h-4" />
-            <span>{lang === 'th' ? '📂 เลือกเมนูกิจกรรมทั้งหมด' : '📂 Browse All Activities'}</span>
-          </button>
-        </div>
-      </div>
+            {lang === 'th' ? '📂 เลือกเมนูกิจกรรมทั้งหมด' : '📂 Browse All Activities'}
+          </UnifiedButton>
+        }
+      />
 
       {/* ========================================================================= */}
       {/* 1. PRIMARY MAIN CATEGORY MENU TABS (Memory Games vs Learning Modules vs Simulators) */}

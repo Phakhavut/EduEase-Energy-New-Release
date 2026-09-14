@@ -26,9 +26,14 @@ import {
   RefreshCw,
   SlidersHorizontal,
   CheckCircle2,
-  Cpu
+  Cpu,
+  MapPin,
+  Wallet,
+  Zap,
+  Activity
 } from 'lucide-react';
-import { LocationItem, InfoDetailMode } from '../../types';
+import { LocationItem, InfoDetailMode, AppPage } from '../../types';
+import { PageHeader, StatCard, UnifiedCard, UnifiedButton, StatusBadge } from '../../design-system';
 
 interface PropertyPreset {
   id: string;
@@ -121,6 +126,7 @@ interface LocationsViewProps {
   lang: 'th' | 'en';
   infoDetailMode: InfoDetailMode;
   onStartPageTour?: (stepIndex: number) => void;
+  onNavigatePage?: (page: AppPage) => void;
 }
 
 export const LocationsView: React.FC<LocationsViewProps> = ({
@@ -132,6 +138,7 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
   lang,
   infoDetailMode,
   onStartPageTour,
+  onNavigatePage,
 }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [orgMode, setOrgMode] = useState(false);
@@ -242,147 +249,102 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
 
   return (
     <div id="tour-step-locations" className="space-y-6 pb-20">
-      {/* Header Banner */}
-      <div className={`p-6 rounded-3xl border shadow-xl relative overflow-hidden transition-all ${
-        isDarkMode 
-          ? 'bg-slate-900/90 border-slate-800 text-white' 
-          : 'bg-gradient-to-br from-emerald-50 via-teal-50/50 to-emerald-100/30 border-emerald-100 text-slate-800'
-      }`}>
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
-          <div>
-            <div className="flex items-center gap-2 mb-2 flex-wrap">
-              <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" />
-                {lang === 'th' ? 'ระบบจัดการหลายสถานที่' : 'Multi-Location System'}
-              </span>
-
-              {onStartPageTour && (
-                <button
-                  onClick={() => onStartPageTour(1)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-xs border border-amber-500/30 hover:bg-amber-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-bounce" />
-                  <span>{lang === 'th' ? '💡 แนะนำหน้านี้' : '💡 Page Tour'}</span>
-                </button>
-              )}
-              {orgMode && (
-                <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-600 dark:text-purple-400 font-bold text-xs uppercase tracking-wider">
-                  Organization Mode Active
-                </span>
-              )}
-            </div>
-            <h1 className="text-2xl md:text-3xl font-black font-display tracking-tight">
-              {lang === 'th' ? 'สถานที่ของฉัน (My Locations)' : 'My Locations'}
-            </h1>
-            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xl font-medium">
-              {lang === 'th' 
-                ? 'สลับดูค่าไฟและควบคุมเครื่องใช้ไฟฟ้าของบ้าน หอพัก ร้านค้า หรือบ้านต่างจังหวัดได้ในที่เดียว' 
-                : 'Manage energy budgets, connected devices, and billing status across all your properties.'}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Mode Switcher Button */}
-            <button
+      {/* 1. Standardized Page Header */}
+      <PageHeader
+        title={lang === 'th' ? 'สถานที่ของฉัน' : 'My Locations'}
+        subtitle={lang === 'th' 
+          ? 'สลับดูค่าไฟและควบคุมเครื่องใช้ไฟฟ้าของบ้าน หอพัก ร้านค้า หรือบ้านต่างจังหวัดได้ในที่เดียว' 
+          : 'Manage energy budgets, connected devices, and billing status across all your properties.'}
+        icon={MapPin}
+        badgeText={orgMode ? (lang === 'th' ? 'โหมดองค์กร' : 'Org Mode') : (lang === 'th' ? `${locations.length} สถานที่` : `${locations.length} Places`)}
+        badgeVariant={orgMode ? 'info' : 'brand'}
+        lang={lang}
+        isDarkMode={isDarkMode}
+        onStartTour={onStartPageTour ? () => onStartPageTour(1) : undefined}
+        tourStepLabel={lang === 'th' ? '💡 แนะนำหน้านี้' : '💡 Page Tour'}
+        actions={
+          <>
+            <UnifiedButton
+              variant={orgMode ? 'primary' : 'outline'}
+              size="md"
+              icon={BarChart2}
+              isDarkMode={isDarkMode}
               onClick={() => setOrgMode(!orgMode)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-bold transition-all shadow-sm ${
-                orgMode
-                  ? 'bg-purple-600 text-white border-purple-500 shadow-purple-500/25'
-                  : isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
-                    : 'bg-white border-emerald-200 text-slate-700 hover:bg-emerald-50'
-              }`}
             >
-              <BarChart2 className="w-4 h-4" />
-              <span>{orgMode ? (lang === 'th' ? 'โหมดองค์กร (Organization)' : 'Org Portfolio Mode') : (lang === 'th' ? 'เปิดโหมดองค์กร' : 'Enable Org Mode')}</span>
-            </button>
+              {orgMode 
+                ? (lang === 'th' ? 'โหมดองค์กร (Active)' : 'Org Mode (Active)') 
+                : (lang === 'th' ? 'เปิดโหมดองค์กร' : 'Enable Org Mode')}
+            </UnifiedButton>
 
-            <button
+            <UnifiedButton
+              variant="primary"
+              size="md"
+              icon={Plus}
+              isDarkMode={isDarkMode}
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105 transition-all"
             >
-              <Plus className="w-4 h-4" />
-              <span>{lang === 'th' ? 'เพิ่มสถานที่ใหม่' : 'Add Location'}</span>
-            </button>
-          </div>
-        </div>
-      </div>
+              {lang === 'th' ? 'เพิ่มสถานที่ใหม่' : 'Add Location'}
+            </UnifiedButton>
+          </>
+        }
+      />
 
-      {/* Portfolio Overview Cards (Visible in Org Mode or if > 1 locations) */}
+      {/* 2. Portfolio KPI Stats Strip (Visible in Org Mode or if > 1 locations) */}
       {(orgMode || locations.length > 1) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className={`p-5 rounded-3xl border transition-all ${
-            isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-emerald-100 shadow-sm'
-          }`}>
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              {lang === 'th' ? 'งบประมาณรวมทั้งพอร์ต' : 'Total Portfolio Budget'}
-            </span>
-            <div className="text-2xl font-black font-display mt-1 text-slate-800 dark:text-white">
-              ฿{totalPortfolioBudget.toLocaleString()}
-            </div>
-            <p className="text-xs text-slate-500 mt-1">
-              {lang === 'th' ? `จากทั้งหมด ${locations.length} สถานที่` : `Across ${locations.length} properties`}
-            </p>
-          </div>
+          <StatCard
+            label={lang === 'th' ? 'งบประมาณรวมทั้งพอร์ต' : 'Total Portfolio Budget'}
+            value={`฿${totalPortfolioBudget.toLocaleString()}`}
+            subValue={lang === 'th' ? `ครอบคลุม ${locations.length} สถานที่` : `Across ${locations.length} properties`}
+            icon={Wallet}
+            isDarkMode={isDarkMode}
+          />
 
-          <div className={`p-5 rounded-3xl border transition-all ${
-            isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-emerald-100 shadow-sm'
-          }`}>
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              {lang === 'th' ? 'ประมาณการค่าไฟรวมเดือนนี้' : 'Total Forecasted Bill'}
-            </span>
-            <div className="text-2xl font-black font-display mt-1 text-emerald-600 dark:text-emerald-400">
-              ฿{totalPortfolioEst.toLocaleString()}
-            </div>
-            <p className="text-xs text-emerald-600 dark:text-emerald-400 font-bold mt-1">
-              {lang === 'th'
-                ? `อยู่ในงบประมาณ (-฿${(totalPortfolioBudget - totalPortfolioEst).toLocaleString()})`
-                : `Under budget (-฿${(totalPortfolioBudget - totalPortfolioEst).toLocaleString()})`}
-            </p>
-          </div>
+          <StatCard
+            label={lang === 'th' ? 'ประมาณการค่าไฟรวมเดือนนี้' : 'Total Forecasted Bill'}
+            value={`฿${totalPortfolioEst.toLocaleString()}`}
+            subValue={lang === 'th'
+              ? `อยู่ในงบประมาณ (-฿${(totalPortfolioBudget - totalPortfolioEst).toLocaleString()})`
+              : `Under budget (-฿${(totalPortfolioBudget - totalPortfolioEst).toLocaleString()})`}
+            icon={Zap}
+            trend={{
+              value: totalPortfolioBudget > totalPortfolioEst ? 'Under' : 'Over',
+              direction: totalPortfolioBudget >= totalPortfolioEst ? 'down' : 'up',
+              isPositive: totalPortfolioBudget >= totalPortfolioEst,
+            }}
+            isDarkMode={isDarkMode}
+          />
 
-          <div className={`p-5 rounded-3xl border transition-all ${
-            isDarkMode ? 'bg-slate-900/80 border-slate-800' : 'bg-white border-emerald-100 shadow-sm'
-          }`}>
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-              {lang === 'th' ? 'สถานะการเชื่อมต่อ ESP32' : 'Connected Hardware'}
-            </span>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="flex h-3 w-3 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
-              </span>
-              <span className="text-base font-bold text-slate-800 dark:text-white">
-                {lang === 'th'
-                  ? `${locations.filter(l => l.isConnected).length} / ${locations.length} สถานที่เชื่อมต่อกล่องสมาร์ทมีเตอร์`
-                  : `${locations.filter(l => l.isConnected).length} / ${locations.length} properties smart-meter synced`}
-              </span>
-            </div>
-          </div>
+          <StatCard
+            label={lang === 'th' ? 'สถานะกล่องวัดไฟ ESP32' : 'Connected Hardware'}
+            value={`${locations.filter(l => l.isConnected).length} / ${locations.length}`}
+            unit={lang === 'th' ? 'เชื่อมต่อแล้ว' : 'Online'}
+            subValue={lang === 'th' ? 'อัปเดตข้อมูลอัตโนมัติ 5s' : 'Auto-synced every 5s'}
+            icon={Radio}
+            isDarkMode={isDarkMode}
+          />
         </div>
       )}
 
-      {/* Search, Filter & Quick Property Toolbar */}
-      <div className={`p-4 rounded-2xl border transition-all ${
-        isDarkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-emerald-100 shadow-sm'
-      }`}>
+      {/* 3. Search, Filter & Quick Toolbar */}
+      <UnifiedCard isDarkMode={isDarkMode} className="p-3.5">
         <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
           {/* Search Input */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#78857D] dark:text-[#AAB4BE] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={lang === 'th' ? "ค้นหาชื่อสถานที่ หรือ จังหวัด..." : "Search property name or province..."}
-              className={`w-full pl-9 pr-4 py-2 rounded-xl border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all ${
-                isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
+              className={`w-full pl-9 pr-8 py-2 rounded-[10px] border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#16A34A] transition-all ${
+                isDarkMode ? 'bg-[#151C23] border-white/10 text-white placeholder:text-slate-500' : 'bg-[#F6F8F7] border-[#E2E8E4] text-[#15201A] placeholder:text-slate-400'
               }`}
             />
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -401,12 +363,12 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
               <button
                 key={tab.id}
                 onClick={() => setFilterType(tab.id)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1.5 rounded-[8px] text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                   filterType === tab.id
-                    ? 'bg-emerald-500 text-white shadow-sm'
+                    ? 'bg-[#16A34A] text-white shadow-sm'
                     : isDarkMode
-                      ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-[#1B242D] text-[#AAB4BE] hover:bg-[#1E2832] border border-white/5'
+                      : 'bg-[#F6F8F7] text-[#53635A] hover:bg-slate-200 border border-[#E2E8E4]'
                 }`}
               >
                 {lang === 'th' ? tab.labelTh : tab.labelEn}
@@ -416,14 +378,14 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
 
           {/* Sort Dropdown */}
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-xs text-slate-400 font-bold hidden lg:inline">
+            <span className="text-xs text-[#78857D] dark:text-[#AAB4BE] font-bold hidden lg:inline">
               {lang === 'th' ? 'เรียงตาม:' : 'Sort:'}
             </span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className={`px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none ${
-                isDarkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-slate-50 border-slate-200 text-slate-800'
+              className={`px-3 py-2 rounded-[10px] border text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#16A34A] ${
+                isDarkMode ? 'bg-[#151C23] border-white/10 text-white' : 'bg-[#F6F8F7] border-[#E2E8E4] text-[#15201A]'
               }`}
             >
               <option value="utilization">{lang === 'th' ? 'การใช้งบสูงสุด' : 'Budget Utilization'}</option>
@@ -433,7 +395,7 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
             </select>
           </div>
         </div>
-      </div>
+      </UnifiedCard>
 
       {/* Active Space Hero & IoT Sync Indicator */}
       {currentLoc && (
@@ -495,6 +457,39 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
               </button>
             </div>
           </div>
+
+          {/* Quick Module Navigation for Active Location */}
+          {onNavigatePage && (
+            <div className="mt-4 pt-3.5 border-t border-emerald-500/20 flex items-center gap-2 flex-wrap text-xs">
+              <span className="font-semibold text-slate-500 dark:text-slate-400 mr-1">
+                {lang === 'th' ? 'เข้าสู่โมดูลของสถานที่นี้:' : 'Open for this location:'}
+              </span>
+              <button
+                onClick={() => onNavigatePage('home')}
+                className="px-3 py-1.5 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all flex items-center gap-1 shadow-sm cursor-pointer"
+              >
+                <span>{lang === 'th' ? '🏠 หน้าหลัก (Home)' : '🏠 Home'}</span>
+              </button>
+              <button
+                onClick={() => onNavigatePage('appliances')}
+                className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center gap-1 border border-slate-200 dark:border-slate-700 cursor-pointer"
+              >
+                <span>{lang === 'th' ? '🔌 เครื่องใช้ไฟฟ้า' : '🔌 Appliances'}</span>
+              </button>
+              <button
+                onClick={() => onNavigatePage('budget')}
+                className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center gap-1 border border-slate-200 dark:border-slate-700 cursor-pointer"
+              >
+                <span>{lang === 'th' ? '💰 งบประมาณ' : '💰 Budget'}</span>
+              </button>
+              <button
+                onClick={() => onNavigatePage('analytics')}
+                className="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center gap-1 border border-slate-200 dark:border-slate-700 cursor-pointer"
+              >
+                <span>{lang === 'th' ? '📊 วิเคราะห์การใช้ไฟ' : '📊 Analytics'}</span>
+              </button>
+            </div>
+          )}
 
           {pingSuccessMessage && (
             <motion.div

@@ -168,24 +168,15 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
         </AnimatePresence>
 
         {/* System Status: Connected / Real-time */}
-        <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-[10px] border text-xs font-medium ${
-          isDarkMode ? 'bg-[#16A34A]/10 border-[#16A34A]/30 text-[#4ADE80]' : 'bg-[#DCFCE7] border-[#16A34A]/20 text-[#15803D]'
-        }`}>
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#16A34A] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#16A34A]"></span>
-          </span>
-          <span className="font-semibold text-[11px]">{lang === 'th' ? 'เชื่อมต่อเรียลไทม์' : 'Live Connected'}</span>
-        </div>
       </div>
 
-      {/* Center: Billing Period (Strict Requirement Section 41) */}
+      {/* Center: Billing Period */}
       <div className="flex items-center gap-2 text-xs">
         <span className="text-[#78857D] font-normal">{lang === 'th' ? 'รอบบิลปัจจุบัน:' : 'Billing Period:'}</span>
-        <span className="font-semibold text-[#15201A] dark:text-[#F5F7F8] tabular-nums font-mono">1–31 ส.ค. 2569</span>
+        <span className="font-semibold text-[#15201A] dark:text-[#F5F7F8] tabular-nums font-mono">1–30 ก.ย. 2569</span>
       </div>
 
-      {/* Right: Connection, Notifications, Profile (Strict Requirement Section 41) */}
+      {/* Right: Connection, Notifications, Profile */}
       <div className="flex items-center gap-3 shrink-0">
         {/* Connection Status */}
         <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-[10px] border text-xs font-medium ${
@@ -195,7 +186,7 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#16A34A] opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-[#16A34A]"></span>
           </span>
-          <span className="font-semibold text-[11px]">{lang === 'th' ? 'เชื่อมต่อสด' : 'Live Connected'}</span>
+          <span className="font-semibold text-[11px]">{lang === 'th' ? 'เชื่อมต่อเรียลไทม์' : 'Live Connected'}</span>
         </div>
 
         {/* Notifications */}

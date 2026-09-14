@@ -23,6 +23,7 @@ import { InfoDetailMode, AppPage, EnergySavingScoreBreakdown } from '../../types
 import { ProgressiveCard } from '../common/ProgressiveCard';
 import { DataQualityCard } from '../trust/DataQualityCard';
 import { WhyButton } from '../trust/WhyButton';
+import { PageHeader, SegmentedTabs, UnifiedCard, StatCard, UnifiedButton } from '../../design-system';
 
 interface ScoreViewProps {
   lang: 'th' | 'en';
@@ -160,55 +161,78 @@ export const ScoreView: React.FC<ScoreViewProps> = ({
 
   return (
     <div id="tour-step-score" className="space-y-6 animate-fade-in pb-20 lg:pb-8">
-      {/* Profile & Score Hub Sub-Tabs */}
-      <div className="flex items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl w-full sm:w-auto self-start border border-slate-300/50 dark:border-slate-700/50">
-        <button
-          onClick={() => setCurrentPage('profile')}
-          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-        >
-          <User className="w-4 h-4 text-indigo-500" />
-          <span>{lang === 'th' ? 'โปรไฟล์ผู้ใช้ (Profile)' : 'Profile'}</span>
-        </button>
-        <button
-          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-300 shadow-sm"
-        >
-          <Trophy className="w-4 h-4 text-amber-500" />
-          <span>{lang === 'th' ? 'ดัชนีประหยัดไฟ (Saving Score)' : 'Saving Score'}</span>
-        </button>
-        <button
-          onClick={() => setCurrentPage('achievements')}
-          className="flex-1 sm:flex-initial py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-        >
-          <Award className="w-4 h-4 text-emerald-500" />
-          <span>{lang === 'th' ? 'ตราความสำเร็จ (Badges)' : 'Badges & Skins'}</span>
-        </button>
-      </div>
+      {/* 1. Page Header */}
+      <PageHeader
+        title={lang === 'th' ? 'ดัชนีการประหยัดพลังงาน' : 'Energy Saving Score'}
+        subtitle={lang === 'th' 
+          ? 'คะแนนประเมินทักษะ พฤติกรรม และประสิทธิภาพการใช้ไฟของคุณในภาพรวม' 
+          : 'Holistic score evaluating your habits, budget discipline, and eco actions.'}
+        icon={Trophy}
+        badgeText={badgeInfo.nameTh}
+        badgeVariant="brand"
+        lang={lang}
+        isDarkMode={isDarkMode}
+        onStartTour={onStartPageTour ? () => onStartPageTour(6) : undefined}
+        tourStepLabel={lang === 'th' ? '💡 แนะนำหน้านี้' : '💡 Tour'}
+      />
 
-      {/* 1. HERO OVERALL SCORE DISPLAY CARD */}
-      <div className={`p-6 md:p-8 rounded-[2.5rem] border shadow-2xl relative overflow-hidden transition-all ${
-        isDarkMode 
-          ? 'bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/60 border-slate-800 text-white shadow-emerald-950/20' 
-          : 'bg-gradient-to-br from-emerald-500/10 via-white to-teal-500/10 border-emerald-100 text-slate-900 shadow-emerald-500/5'
-      }`}>
+      {/* 2. Profile & Score Hub Sub-Tabs */}
+      <SegmentedTabs
+        tabs={[
+          {
+            id: 'profile',
+            labelTh: 'โปรไฟล์ผู้ใช้ (Profile)',
+            labelEn: 'Profile',
+            icon: User,
+          },
+          {
+            id: 'score',
+            labelTh: 'ดัชนีประหยัดไฟ (Saving Score)',
+            labelEn: 'Saving Score',
+            icon: Trophy,
+          },
+          {
+            id: 'achievements',
+            labelTh: 'ตราความสำเร็จ (Badges)',
+            labelEn: 'Badges & Skins',
+            icon: Award,
+          },
+        ]}
+        activeTab="score"
+        onChange={(tabId) => {
+          if (tabId === 'profile') setCurrentPage('profile');
+          if (tabId === 'achievements') setCurrentPage('achievements');
+        }}
+        lang={lang}
+        isDarkMode={isDarkMode}
+        size="md"
+      />
+
+      {/* 3. HERO OVERALL SCORE DISPLAY CARD */}
+      <UnifiedCard
+        isDarkMode={isDarkMode}
+        variant="elevated"
+        className="p-6 md:p-8"
+      >
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
           {/* Score & Level Badge Column */}
           <div className="flex items-center gap-6">
             <div className="relative flex items-center justify-center">
               {/* Outer Score Ring */}
-              <div className="w-32 h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 p-2 flex items-center justify-center shadow-xl shadow-emerald-500/20">
+              <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-[#16A34A] p-2 flex items-center justify-center shadow-lg shadow-[#16A34A]/20">
                 <div className={`w-full h-full rounded-full flex flex-col items-center justify-center ${
-                  isDarkMode ? 'bg-slate-900' : 'bg-white'
+                  isDarkMode ? 'bg-[#151C23]' : 'bg-[#FFFFFF]'
                 }`}>
-                  <span className="text-4xl md:text-5xl font-black font-mono text-emerald-500 tracking-tight">
+                  <span className="text-3xl md:text-4xl font-bold font-mono text-[#16A34A] dark:text-[#4ADE80] tracking-tight">
                     {overallScore}
                   </span>
-                  <span className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest">
+                  <span className="text-[10px] font-bold text-[#78857D] dark:text-[#AAB4BE] uppercase tracking-widest">
                     {lang === 'th' ? '/ 100 คะแนน' : '/ 100 PTS'}
                   </span>
                 </div>
               </div>
 
-              <div className="absolute -bottom-2 px-3 py-0.5 rounded-full bg-emerald-500 text-white font-extrabold text-[0.7rem] flex items-center gap-1 shadow-md">
+              <div className="absolute -bottom-2 px-2.5 py-0.5 rounded-full bg-[#16A34A] text-white font-bold text-[10px] flex items-center gap-1 shadow-sm">
                 <TrendingUp className="w-3 h-3" />
                 <span>+5 {lang === 'th' ? 'จากสัปดาห์ก่อน' : 'vs last week'}</span>
               </div>
@@ -216,47 +240,37 @@ export const ScoreView: React.FC<ScoreViewProps> = ({
 
             <div>
               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <span className={`px-3 py-1 rounded-full font-black text-xs text-white bg-gradient-to-r ${badgeInfo.color} flex items-center gap-1.5 shadow-md`}>
+                <span className={`px-2.5 py-0.5 rounded-[8px] font-bold text-xs text-white bg-gradient-to-r ${badgeInfo.color} flex items-center gap-1.5 shadow-sm`}>
                   <span>{badgeInfo.icon}</span>
                   <span>{lang === 'th' ? badgeInfo.nameTh : badgeInfo.nameEn}</span>
                 </span>
-
-                {onStartPageTour && (
-                  <button
-                    onClick={() => onStartPageTour(6)}
-                    className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-extrabold text-xs border border-amber-500/30 hover:bg-amber-500/25 transition-all cursor-pointer"
-                  >
-                    <Sparkles className="w-3 h-3 text-amber-500 animate-bounce" />
-                    <span>{lang === 'th' ? '💡 แนะนำหน้านี้' : '💡 Tour'}</span>
-                  </button>
-                )}
               </div>
 
-              <h1 className="text-2xl md:text-3xl font-black font-display tracking-tight">
-                {lang === 'th' ? 'ดัชนีการประหยัดพลังงาน' : 'Energy Saving Score'}
-              </h1>
-              <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-md">
+              <h2 className="text-xl md:text-2xl font-bold font-display tracking-tight text-[#15201A] dark:text-[#F5F7F8]">
+                {lang === 'th' ? 'ระดับประสิทธิภาพพลังงาน' : 'Energy Efficiency Tier'}
+              </h2>
+              <p className="text-xs md:text-sm text-[#53635A] dark:text-[#AAB4BE] mt-0.5 max-w-md">
                 {lang === 'th' 
-                  ? 'คะแนนประเมินทักษะ พฤติกรรม และประสิทธิภาพการใช้ไฟของคุณในภาพรวม' 
-                  : 'Holistic score evaluating your habits, budget discipline, and eco actions.'}
+                  ? 'คุณกำลังทำได้ดีกว่า 78% ของผู้ใช้งานประเภทเดียวกันในพื้นที่' 
+                  : 'You are performing better than 78% of similar users in your area.'}
               </p>
             </div>
           </div>
 
           {/* Quick Money Impact Banner */}
-          <div className={`p-4 md:p-5 rounded-3xl border flex flex-col justify-between max-w-xs ${
-            isDarkMode ? 'bg-slate-800/80 border-slate-700' : 'bg-white/80 border-emerald-100 shadow-sm'
+          <div className={`p-4 md:p-5 rounded-[12px] border flex flex-col justify-between max-w-xs ${
+            isDarkMode ? 'bg-[#1B242D] border-white/10' : 'bg-[#F6F8F7] border-[#E2E8E4]'
           }`}>
             <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#78857D] dark:text-[#AAB4BE] uppercase tracking-wider">
                 {lang === 'th' ? 'เงินเซฟสะสมคาดการณ์' : 'Est. Monthly Impact'}
               </span>
-              <div className="p-1.5 rounded-xl bg-emerald-500/10 text-emerald-500">
+              <div className="p-1.5 rounded-[8px] bg-[#DCFCE7] dark:bg-[#16A34A]/20 text-[#15803D] dark:text-[#4ADE80]">
                 <Coins className="w-4 h-4" />
               </div>
             </div>
 
-            <div className="text-2xl font-black font-mono text-emerald-600 dark:text-emerald-400">
+            <div className="text-2xl font-bold font-mono text-[#15803D] dark:text-[#4ADE80]">
               ~ ฿320 / {lang === 'th' ? 'เดือน' : 'mo'}
             </div>
             <p className="text-[0.7rem] text-slate-500 dark:text-slate-400 font-medium mt-1">
@@ -266,7 +280,7 @@ export const ScoreView: React.FC<ScoreViewProps> = ({
             </p>
           </div>
         </div>
-      </div>
+      </UnifiedCard>
 
       {/* 2. PROGRESSIVE SUMMARY CARDS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

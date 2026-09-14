@@ -25,6 +25,7 @@ import { WebPushManagerCard } from '../notifications/WebPushManagerCard';
 import { NotificationHubModal } from '../notifications/NotificationHubModal';
 import { NotificationsSettingsTab } from '../settings/NotificationsSettingsTab';
 import { NotificationService } from '../../services/notificationService';
+import { PageHeader, SegmentedTabs, UnifiedCard, UnifiedButton } from '../../design-system';
 
 interface SettingsViewProps {
   lang: 'th' | 'en';
@@ -75,64 +76,56 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
 
   return (
     <div id="tour-step-settings" className="space-y-6 animate-fade-in pb-20 lg:pb-8 max-w-3xl mx-auto">
-      {/* Settings & Notifications Sub-Tabs Navigation */}
-      <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800/80 rounded-2xl w-full border border-slate-300/50 dark:border-slate-700/50">
-        <button
-          onClick={() => setActiveTab('general')}
-          className={`flex-1 sm:flex-initial py-2.5 px-4 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-            activeTab === 'general'
-              ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400'
-          }`}
-        >
-          <Settings className="w-4 h-4 text-emerald-500" />
-          <span>{lang === 'th' ? 'การตั้งค่าทั่วไป (General)' : 'General Settings'}</span>
-        </button>
+      {/* 1. Page Header */}
+      <PageHeader
+        title={activeTab === 'notifications'
+          ? (lang === 'th' ? 'การแจ้งเตือน & การเตือนค่าไฟ' : 'Notification Hub & Alert Thresholds')
+          : (lang === 'th' ? 'การตั้งค่าแอปพลิเคชัน' : 'Application Settings')}
+        subtitle={activeTab === 'notifications'
+          ? (lang === 'th' ? 'เปิด/ปิด Web Push แจ้งเตือนผ่านเบราว์เซอร์ และปรับเกณฑ์เปอร์เซ็นต์เตือนค่าไฟ (50% - 95%)' : 'Toggle push notifications, customize energy thresholds, and manage alert channels.')
+          : (lang === 'th' ? 'ปรับแต่งภาษา บทบาทผู้ใช้ โทนเสียง AI Coach และ Quick Start Tour' : 'Personalize language, persona context, AI Coach, and Quick Start Tour.')}
+        icon={activeTab === 'notifications' ? BellRing : Settings}
+        badgeText={lang === 'th' ? 'ระบบ & การตั้งค่า' : 'System & Config'}
+        badgeVariant="brand"
+        lang={lang}
+        isDarkMode={isDarkMode}
+      />
 
-        <button
-          onClick={() => setActiveTab('notifications')}
-          className={`flex-1 sm:flex-initial py-2.5 px-4 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-2 cursor-pointer relative ${
-            activeTab === 'notifications'
-              ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm'
-              : 'text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400'
-          }`}
-        >
-          <BellRing className="w-4 h-4 text-amber-500" />
-          <span>{lang === 'th' ? 'การแจ้งเตือน & เกณฑ์ค่าไฟ (Notifications)' : 'Notifications & Alerts'}</span>
-          {isWebPushActive && (
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          )}
-        </button>
-
-        {onNavigatePage && (
-          <button
-            onClick={() => onNavigatePage('trust-center')}
-            className="flex-1 sm:flex-initial py-2.5 px-4 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-2 text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
-          >
-            <ShieldCheck className="w-4 h-4 text-teal-500" />
-            <span>{lang === 'th' ? 'ศูนย์ความโปร่งใส (Trust Center)' : 'Trust Center'}</span>
-          </button>
-        )}
-      </div>
-
-      {/* Header Banner */}
-      <div className="flex items-center gap-3">
-        <div className={`p-3 rounded-2xl ${activeTab === 'notifications' ? 'bg-amber-500/15 text-amber-500' : 'bg-emerald-500/15 text-emerald-500'}`}>
-          {activeTab === 'notifications' ? <BellRing className="w-6 h-6" /> : <Settings className="w-6 h-6" />}
-        </div>
-        <div>
-          <h2 className="text-2xl font-extrabold font-display text-slate-900 dark:text-white">
-            {activeTab === 'notifications'
-              ? (lang === 'th' ? 'การแจ้งเตือน & การเตือนค่าไฟ' : 'Notification Hub & Alert Thresholds')
-              : (lang === 'th' ? 'การตั้งค่าแอปพลิเคชัน' : 'Application Settings')}
-          </h2>
-          <p className="text-xs text-slate-500">
-            {activeTab === 'notifications'
-              ? (lang === 'th' ? 'เปิด/ปิด Web Push แจ้งเตือนผ่านเบราว์เซอร์ และปรับเกณฑ์เปอร์เซ็นต์เตือนค่าไฟ (50% - 95%)' : 'Toggle push notifications, customize energy thresholds, and manage alert channels.')
-              : (lang === 'th' ? 'ปรับแต่งภาษา บทบาทผู้ใช้ โทนเสียง AI Coach และ Quick Start Tour' : 'Personalize language, persona context, AI Coach, and Quick Start Tour.')}
-          </p>
-        </div>
-      </div>
+      {/* 2. Settings & Notifications Sub-Tabs Navigation */}
+      <SegmentedTabs
+        tabs={[
+          {
+            id: 'general',
+            labelTh: 'การตั้งค่าทั่วไป (General)',
+            labelEn: 'General Settings',
+            icon: Settings,
+          },
+          {
+            id: 'notifications',
+            labelTh: 'การแจ้งเตือน & เกณฑ์ค่าไฟ (Notifications)',
+            labelEn: 'Notifications & Alerts',
+            icon: BellRing,
+            badge: isWebPushActive ? 1 : undefined,
+          },
+          ...(onNavigatePage ? [{
+            id: 'trust-center',
+            labelTh: 'ศูนย์ความโปร่งใส (Trust Center)',
+            labelEn: 'Trust Center',
+            icon: ShieldCheck,
+          }] : []),
+        ]}
+        activeTab={activeTab}
+        onChange={(tabId) => {
+          if (tabId === 'trust-center' && onNavigatePage) {
+            onNavigatePage('trust-center');
+          } else {
+            setActiveTab(tabId as 'general' | 'notifications');
+          }
+        }}
+        lang={lang}
+        isDarkMode={isDarkMode}
+        size="md"
+      />
 
       {/* TAB CONTENT: NOTIFICATIONS */}
       {activeTab === 'notifications' ? (

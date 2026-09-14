@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Sliders, 
@@ -78,19 +79,20 @@ export const WhatIfSimulationModal: React.FC<WhatIfSimulationModalProps> = ({
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className={`relative w-full max-w-xl rounded-3xl p-6 sm:p-8 shadow-2xl border transition-all my-8 ${
-            isDarkMode 
-              ? 'bg-slate-900 border-slate-800 text-white' 
-              : 'bg-white border-slate-200 text-slate-900'
-          }`}
-        >
+      <div className="fixed inset-0 z-[9999] overflow-y-auto bg-black/75 backdrop-blur-sm">
+        <div className="min-h-full flex items-center justify-center p-4 py-8 sm:py-12">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className={`relative w-full max-w-xl rounded-3xl p-6 sm:p-8 shadow-2xl border transition-all ${
+              isDarkMode 
+                ? 'bg-slate-900 border-slate-800 text-white' 
+                : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
           {/* Header */}
           <div className="flex items-start justify-between gap-4 mb-6">
             <div>
@@ -312,7 +314,9 @@ export const WhatIfSimulationModal: React.FC<WhatIfSimulationModalProps> = ({
             </button>
           </div>
         </motion.div>
+        </div>
       </div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

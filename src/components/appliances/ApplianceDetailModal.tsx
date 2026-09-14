@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   X, 
@@ -64,19 +65,20 @@ export const ApplianceDetailModal: React.FC<ApplianceDetailModalProps> = ({
         { id: 3, name: 'Water Heater (เครื่องทำน้ำอุ่น)', monthlyCost: 180, percent: 14, icon: '🚿' },
       ];
 
-  return (
+  return createPortal(
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className={`relative w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border transition-all my-8 ${
-            isDarkMode 
-              ? 'bg-slate-900 border-slate-800 text-white' 
-              : 'bg-white border-slate-200 text-slate-900'
-          }`}
-        >
+      <div className="fixed inset-0 z-[9999] overflow-y-auto bg-black/75 backdrop-blur-sm">
+        <div className="min-h-full flex items-center justify-center p-4 py-8 sm:py-12">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className={`relative w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl border transition-all ${
+              isDarkMode 
+                ? 'bg-slate-900 border-slate-800 text-white' 
+                : 'bg-white border-slate-200 text-slate-900'
+            }`}
+          >
           {/* Top Bar: Appliance Name & Monthly Cost */}
           <div className="flex items-start justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800 mb-6">
             <div className="flex items-center gap-3">
@@ -305,7 +307,9 @@ export const ApplianceDetailModal: React.FC<ApplianceDetailModalProps> = ({
             </div>
           </div>
         </motion.div>
+        </div>
       </div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

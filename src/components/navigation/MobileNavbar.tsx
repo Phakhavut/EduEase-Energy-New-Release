@@ -18,7 +18,8 @@ import {
   X,
   Sun,
   Moon,
-  Globe
+  Globe,
+  Building2
 } from 'lucide-react';
 import { AppPage, LocationItem, NotificationItem, UserPersona } from '../../types';
 import { getPersonaConfig } from '../../data/personaThemes';
@@ -69,21 +70,39 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
   const currentLoc = locations.find(l => l.id === currentLocationId) || locations[0];
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  // STRICT CI LOCK: Maximum 5 items in bottom navigation
+  // STRICT CI LOCK: Maximum 5 items in bottom navigation (4 primary + 1 More menu button)
   const bottomNavItems = [
-    { id: 'home' as AppPage, labelTh: 'หน้าหลัก', labelEn: 'Home', icon: Home },
-    { id: 'appliances' as AppPage, labelTh: 'อุปกรณ์', labelEn: 'Devices', icon: Plug },
-    { id: 'ai-coach' as AppPage, labelTh: 'AI Coach', labelEn: 'AI Coach', icon: Bot },
-    { id: 'analytics' as AppPage, labelTh: 'วิเคราะห์', labelEn: 'Analytics', icon: BarChart3 },
+    { id: 'home' as AppPage, subIds: ['home'], labelTh: 'หน้าหลัก', labelEn: 'Home', icon: Home },
+    { id: 'ai-coach' as AppPage, subIds: ['ai-coach', 'insights'], labelTh: 'AI Coach', labelEn: 'AI Coach', icon: Bot },
+    { id: 'appliances' as AppPage, subIds: ['appliances', 'compare'], labelTh: 'อุปกรณ์', labelEn: 'Appliances', icon: Plug },
+    { id: 'city' as AppPage, subIds: ['city', 'achievements', 'score'], labelTh: 'เมืองยั่งยืน', labelEn: 'City', icon: Building2 },
   ];
 
-  const moreMenuItems = [
-    { id: 'budget' as AppPage, labelTh: 'งบประมาณ & ตัดไฟ', labelEn: 'Budget & Alert', icon: Wallet },
-    { id: 'locations' as AppPage, labelTh: 'สถานที่ของฉัน', labelEn: 'Locations', icon: MapPin },
-    { id: 'learning' as AppPage, labelTh: 'ห้องเรียนพลังงาน', labelEn: 'Learning Lab', icon: GraduationCap },
-    { id: 'achievements' as AppPage, labelTh: 'ภารกิจ & รางวัล', labelEn: 'Quests & Arcade', icon: Trophy },
-    { id: 'profile' as AppPage, labelTh: 'ข้อมูลผู้ใช้', labelEn: 'Profile', icon: User },
-    { id: 'settings' as AppPage, labelTh: 'ตั้งค่าระบบ', labelEn: 'Settings', icon: Settings },
+  const moreSections = [
+    {
+      titleTh: 'ENERGY (พลังงาน)',
+      titleEn: 'ENERGY',
+      items: [
+        { id: 'locations' as AppPage, subIds: ['locations'], labelTh: 'สถานที่ของฉัน', labelEn: 'My Locations', icon: MapPin, badge: currentLoc?.name },
+        { id: 'budget' as AppPage, subIds: ['budget'], labelTh: 'งบประมาณ & แจ้งเตือน', labelEn: 'Budget', icon: Wallet },
+        { id: 'analytics' as AppPage, subIds: ['analytics'], labelTh: 'วิเคราะห์การใช้ไฟ', labelEn: 'Analytics', icon: BarChart3 },
+      ],
+    },
+    {
+      titleTh: 'LEARN & PLAY (เรียนรู้ & เล่น)',
+      titleEn: 'LEARN & PLAY',
+      items: [
+        { id: 'learning' as AppPage, subIds: ['learning', 'game'], labelTh: 'การเรียนรู้ & อาร์เคด', labelEn: 'Learning & Arcade', icon: GraduationCap },
+      ],
+    },
+    {
+      titleTh: 'SYSTEM (ระบบ)',
+      titleEn: 'SYSTEM',
+      items: [
+        { id: 'settings' as AppPage, subIds: ['settings', 'trust-center', 'ux-assessment', 'crypto'], labelTh: 'ตั้งค่าระบบ', labelEn: 'Settings', icon: Settings },
+        { id: 'profile' as AppPage, subIds: ['profile'], labelTh: 'โปรไฟล์ผู้ใช้', labelEn: 'Profile', icon: User },
+      ],
+    },
   ];
 
   return (
@@ -212,31 +231,40 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
                 </button>
               </div>
 
-              {/* Secondary Navigation Grid */}
-              <div className="grid grid-cols-2 gap-2.5 mb-4">
-                {moreMenuItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = currentPage === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setCurrentPage(item.id);
-                        setShowMoreMenu(false);
-                      }}
-                      className={`flex items-center gap-2.5 p-3 rounded-[10px] border text-xs font-semibold transition-colors text-left ${
-                        isActive
-                          ? 'bg-[#DCFCE7] border-[#16A34A] text-[#15803D] dark:bg-[#16A34A]/20 dark:border-[#16A34A]/40 dark:text-[#4ADE80]'
-                          : isDarkMode
-                            ? 'bg-[#1B242D] border-white/10 text-[#AAB4BE] hover:text-[#F5F7F8]'
-                            : 'bg-[#F6F8F7] border-[#E2E8E4] text-[#53635A] hover:text-[#15201A]'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4 text-[#16A34A] shrink-0" />
-                      <span className="truncate">{lang === 'th' ? item.labelTh : item.labelEn}</span>
-                    </button>
-                  );
-                })}
+              {/* Secondary Navigation Grouped by Mental Models */}
+              <div className="space-y-3 mb-4 max-h-[60vh] overflow-y-auto pr-1">
+                {moreSections.map((section, sIdx) => (
+                  <div key={sIdx} className="space-y-1.5">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] px-1">
+                      {lang === 'th' ? section.titleTh : section.titleEn}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {section.items.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = item.subIds ? item.subIds.includes(currentPage) : currentPage === item.id;
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => {
+                              setCurrentPage(item.id);
+                              setShowMoreMenu(false);
+                            }}
+                            className={`flex items-center gap-2.5 p-2.5 rounded-[10px] border text-xs font-semibold transition-colors text-left cursor-pointer ${
+                              isActive
+                                ? 'bg-[#DCFCE7] border-[#16A34A] text-[#15803D] dark:bg-[#16A34A]/20 dark:border-[#16A34A]/40 dark:text-[#4ADE80]'
+                                : isDarkMode
+                                  ? 'bg-[#1B242D] border-white/10 text-[#AAB4BE] hover:text-[#F5F7F8]'
+                                  : 'bg-[#F6F8F7] border-[#E2E8E4] text-[#53635A] hover:text-[#15201A]'
+                            }`}
+                          >
+                            <Icon className="w-4 h-4 text-[#16A34A] shrink-0" />
+                            <span className="truncate">{lang === 'th' ? item.labelTh : item.labelEn}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
               </div>
 
               {/* Quick Preferences: Language and Theme belong in Settings/More menu */}
@@ -273,7 +301,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
         <div className="h-[72px] max-w-md mx-auto px-2 flex items-center justify-around pb-[env(safe-area-inset-bottom)]">
           {bottomNavItems.map((item) => {
             const Icon = item.icon;
-            const isActive = currentPage === item.id;
+            const isActive = item.subIds ? item.subIds.includes(currentPage) : currentPage === item.id;
             return (
               <button
                 key={item.id}
@@ -281,7 +309,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
                   setShowMoreMenu(false);
                   setCurrentPage(item.id);
                 }}
-                className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] px-2 py-1 rounded-[10px] transition-colors ${
+                className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] px-2 py-1 rounded-[10px] transition-colors cursor-pointer ${
                   isActive
                     ? 'text-[#15803D] dark:text-[#4ADE80] font-semibold'
                     : 'text-[#53635A] dark:text-[#AAB4BE] hover:text-[#15201A] dark:hover:text-[#F5F7F8]'
@@ -303,8 +331,8 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
           {/* 5th Item: More Menu Trigger */}
           <button
             onClick={() => setShowMoreMenu(!showMoreMenu)}
-            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] px-2 py-1 rounded-[10px] transition-colors ${
-              showMoreMenu || ['budget', 'locations', 'learning', 'achievements', 'profile', 'settings'].includes(currentPage)
+            className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] px-2 py-1 rounded-[10px] transition-colors cursor-pointer ${
+              showMoreMenu || ['locations', 'budget', 'analytics', 'learning', 'game', 'profile', 'settings', 'trust-center', 'ux-assessment', 'crypto'].includes(currentPage)
                 ? 'text-[#15803D] dark:text-[#4ADE80] font-semibold'
                 : 'text-[#53635A] dark:text-[#AAB4BE] hover:text-[#15201A] dark:hover:text-[#F5F7F8]'
             }`}

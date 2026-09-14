@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Trophy, 
@@ -14,7 +14,8 @@ import {
   Zap, 
   Award,
   ChevronRight,
-  User
+  User,
+  Building2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Mission, Badge, CharacterSkin, AppPage } from '../../types';
@@ -43,6 +44,7 @@ interface AchievementsViewProps {
   leaderboard: any[];
   onStartPageTour?: (stepIndex: number) => void;
   onNavigatePage?: (page: AppPage) => void;
+  initialTab?: 'eduverse' | 'missions' | 'passport' | 'tree' | 'badges' | 'skins' | 'leaderboard';
 }
 
 export const AchievementsView: React.FC<AchievementsViewProps> = ({
@@ -63,10 +65,17 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
   leaderboard,
   onStartPageTour,
   onNavigatePage,
+  initialTab = 'eduverse',
 }) => {
-  const [activeTab, setActiveTab] = useState<'eduverse' | 'missions' | 'passport' | 'tree' | 'badges' | 'skins' | 'leaderboard'>('eduverse');
+  const [activeTab, setActiveTab] = useState<'eduverse' | 'missions' | 'passport' | 'tree' | 'badges' | 'skins' | 'leaderboard'>(initialTab);
   const [isLootBoxOpen, setIsLootBoxOpen] = useState(false);
   const [lootBoxReward, setLootBoxReward] = useState<{ xp: number; coins: number; item: string } | null>(null);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   const triggerConfetti = () => {
     confetti({
@@ -147,7 +156,7 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
                 )}
               </div>
               <h2 className="text-xl md:text-2xl font-extrabold font-display">
-                {lang === 'th' ? 'ศูนย์ภารกิจ & รางวัลรักษ์โลก' : 'Green Missions & Rewards'}
+                {lang === 'th' ? 'เมืองความยั่งยืน & เควสต์พลังงาน (Sustainable City)' : 'Sustainable City & Energy Quests'}
               </h2>
             </div>
           </div>
@@ -185,12 +194,12 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
       {/* 2. TAB NAVIGATION */}
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
         {[
-          { id: 'eduverse', th: '🌐 EduVerse โลกเสมือนชีวิต', en: '🌐 EduVerse World' },
-          { id: 'missions', th: '🎯 ศูนย์ภารกิจ 2.0 (Missions)', en: '🎯 Missions' },
-          { id: 'passport', th: '📘 พาสปอร์ตพลังงาน (Passport)', en: '📘 Passport' },
+          { id: 'eduverse', th: '🌐 เมืองเสมือน EduVerse (City)', en: '🌐 EduVerse City' },
+          { id: 'missions', th: '🎯 เควสต์ & ภารกิจ (Quests)', en: '🎯 Quests & Missions' },
           { id: 'tree', th: '🌳 ต้นไม้พลังงาน (Energy Tree)', en: '🌳 Energy Tree' },
-          { id: 'badges', th: '🏅 เข็มกลัดเกียรติยศ (Badges)', en: '🏅 Badges' },
+          { id: 'badges', th: '🏅 รางวัล & ตราเกียรติยศ (Rewards)', en: '🏅 Rewards & Badges' },
           { id: 'skins', th: '🎨 สกิน & อวตาร (Skins)', en: '🎨 Skins' },
+          { id: 'passport', th: '📘 พาสปอร์ตพลังงาน (Passport)', en: '📘 Passport' },
           { id: 'leaderboard', th: '🏆 ตารางผู้นำ (Leaderboard)', en: '🏆 Leaderboard' },
         ].map((tab) => (
           <button
@@ -406,3 +415,5 @@ export const AchievementsView: React.FC<AchievementsViewProps> = ({
     </div>
   );
 };
+
+export const SustainableCityView = AchievementsView;

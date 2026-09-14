@@ -67,9 +67,28 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
   appliances = [],
 }) => {
   const [activeTab, setActiveTab] = useState<'monthly' | 'heatmap' | 'weekly' | 'daily' | 'room' | 'appliance'>('monthly');
+  const [comparisonMode, setComparisonMode] = useState<'month_cycle' | 'daily' | 'history3m'>('month_cycle');
 
   const monthlyData = getMonthlyComparison(persona);
   const isSavings = monthlyData.costDiff < 0;
+
+  // Monthly 4-week billing cycle data (This Month vs Previous Month)
+  const monthlyCycleData = useMemo(() => {
+    return (monthlyData.weeklyComparison || []).map((item) => ({
+      key: item.weekKey,
+      labelTh: item.weekLabelTh,
+      labelEn: item.weekLabelEn,
+      shortLabelTh: item.weekKey === 'w1' ? 'สัปดาห์ 1 (1-7)' : item.weekKey === 'w2' ? 'สัปดาห์ 2 (8-14)' : item.weekKey === 'w3' ? 'สัปดาห์ 3 (15-21)' : 'สัปดาห์ 4 (22-31)',
+      shortLabelEn: item.weekKey === 'w1' ? 'W1 (1-7)' : item.weekKey === 'w2' ? 'W2 (8-14)' : item.weekKey === 'w3' ? 'W3 (15-21)' : 'W4 (22-31)',
+      periodTh: item.thisMonthPeriodTh,
+      periodEn: item.thisMonthPeriodEn,
+      thisMonthCost: item.thisMonthCost,
+      prevMonthCost: item.prevMonthCost,
+      thisMonthKwh: item.thisMonthKwh,
+      prevMonthKwh: item.prevMonthKwh,
+      diffCost: item.thisMonthCost - item.prevMonthCost,
+    }));
+  }, [monthlyData]);
 
   const weeklyData = [
     { day: 'Mon', cost: 38, prevCost: 45, labelTh: 'จ.', labelEn: 'Mon', kwh: 9.0, provenance: 'Measured' },
@@ -80,6 +99,18 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
     { day: 'Sat', cost: 62, prevCost: 70, labelTh: 'ส.', labelEn: 'Sat', kwh: 14.7, provenance: 'Measured' },
     { day: 'Sun', cost: 58, prevCost: 65, labelTh: 'อา.', labelEn: 'Sun', kwh: 13.8, provenance: 'Predicted' },
   ];
+
+  const historical3MonthsData = useMemo(() => {
+    return (monthlyData.historical3Months || []).map((m) => ({
+      monthId: m.monthId,
+      nameTh: m.nameTh,
+      nameEn: m.nameEn,
+      cost: m.totalCost,
+      kwh: m.totalKwh,
+      avgDaily: m.avgDailyCost,
+      isCurrent: m.monthId === monthlyData.currentMonth.monthId,
+    }));
+  }, [monthlyData]);
 
   const hourly24Data = [
     { hour: '00:00', cost: 1.2, kwh: 0.3, label: '00:00' },
@@ -315,39 +346,193 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
       <div className={`p-5 sm:p-6 rounded-[16px] border transition-colors ${
         isDarkMode ? 'bg-[#151C23] border-white/10' : 'bg-[#FFFFFF] border-[#E2E8E4]'
       }`}>
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
-            <h4 className="font-bold text-sm text-[#15201A] dark:text-[#F5F7F8] font-display">
-              {lang === 'th' ? 'กราฟเปรียบเทียบค่าไฟเดือนนี้ vs เดือนก่อน' : 'Monthly Trend Comparison'}
+            <h4 className="font-bold text-sm sm:text-base text-[#15201A] dark:text-[#F5F7F8] font-display">
+              {comparisonMode === 'month_cycle'
+                ? (lang === 'th' ? `กราฟเปรียบเทียบค่าไฟเดือนนี้ vs เดือนก่อน (รอบบิล ${monthlyData.currentMonth.nameTh.split(' ')[0]} vs ${monthlyData.previousMonth.nameTh.split(' ')[0]})` : `Billing Cycle: This Month vs Last Month (${monthlyData.currentMonth.nameEn.split(' ')[0]} vs ${monthlyData.previousMonth.nameEn.split(' ')[0]})`)
+                : comparisonMode === 'daily'
+                ? (lang === 'th' ? 'กราฟเปรียบเทียบค่าไฟรายวัน (สัปดาห์นี้ vs สัปดาห์ก่อน)' : 'Daily Comparison (This Week vs Prior Week)')
+                : (lang === 'th' ? 'กราฟเปรียบเทียบค่าไฟย้อนหลัง 3 เดือน' : '3-Month Historical Comparison')}
             </h4>
-            <p className="text-xs text-[#78857D]">
-              {lang === 'th' ? 'แสดงการใช้ไฟฟ้ารายสัปดาห์ในรอบบิลปัจจุบัน' : 'Weekly energy usage across current billing cycle'}
+            <p className="text-xs text-[#78857D] dark:text-[#AAB4BE] mt-0.5">
+              {comparisonMode === 'month_cycle'
+                ? (lang === 'th' 
+                    ? `เปรียบเทียบค่าไฟ 4 สัปดาห์ในรอบบิล: ${monthlyData.currentMonth.nameTh} (฿${monthlyData.currentMonth.totalCost.toLocaleString()}) เทียบกับ ${monthlyData.previousMonth.nameTh} (฿${monthlyData.previousMonth.totalCost.toLocaleString()})`
+                    : `Comparing 4-week billing cycle: ${monthlyData.currentMonth.nameEn} (฿${monthlyData.currentMonth.totalCost.toLocaleString()}) vs ${monthlyData.previousMonth.nameEn} (฿${monthlyData.previousMonth.totalCost.toLocaleString()})`)
+                : comparisonMode === 'daily'
+                ? (lang === 'th' ? 'เปรียบเทียบการใช้ไฟฟ้า 7 วัน (วันจันทร์-วันอาทิตย์) ในสัปดาห์ปัจจุบันเทียบกับสัปดาห์ที่แล้ว' : 'Comparing daily electricity cost (Mon-Sun) of current week vs prior week')
+                : (lang === 'th' ? 'ประวัติค่าไฟและหน่วยการใช้ไฟฟ้ารายเดือน (มิ.ย. - ส.ค.)' : 'Historical monthly billing overview and energy volume')}
             </p>
           </div>
+
+          {/* Mode Switcher */}
+          <div className="inline-flex items-center gap-1 p-1 rounded-[10px] bg-[#F6F8F7] dark:bg-[#1B242D] border border-[#E2E8E4] dark:border-white/10 shrink-0 self-start sm:self-auto overflow-x-auto">
+            <button
+              type="button"
+              onClick={() => setComparisonMode('month_cycle')}
+              className={`px-2.5 py-1 rounded-[7px] text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                comparisonMode === 'month_cycle'
+                  ? 'bg-[#16A34A] text-white shadow-xs'
+                  : 'text-[#53635A] dark:text-[#AAB4BE] hover:text-[#15201A] dark:hover:text-[#F5F7F8]'
+              }`}
+            >
+              {lang === 'th' ? 'เดือนนี้ vs เดือนก่อน' : 'This Month vs Last Month'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setComparisonMode('daily')}
+              className={`px-2.5 py-1 rounded-[7px] text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                comparisonMode === 'daily'
+                  ? 'bg-[#16A34A] text-white shadow-xs'
+                  : 'text-[#53635A] dark:text-[#AAB4BE] hover:text-[#15201A] dark:hover:text-[#F5F7F8]'
+              }`}
+            >
+              {lang === 'th' ? 'สัปดาห์นี้ vs สัปดาห์ก่อน' : 'This Week vs Prior Week'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setComparisonMode('history3m')}
+              className={`px-2.5 py-1 rounded-[7px] text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                comparisonMode === 'history3m'
+                  ? 'bg-[#16A34A] text-white shadow-xs'
+                  : 'text-[#53635A] dark:text-[#AAB4BE] hover:text-[#15201A] dark:hover:text-[#F5F7F8]'
+              }`}
+            >
+              {lang === 'th' ? 'ย้อนหลัง 3 เดือน' : '3 Months'}
+            </button>
+          </div>
+        </div>
+
+        {/* Legend Indicator */}
+        <div className="flex items-center gap-4 mb-3 text-xs flex-wrap">
+          {comparisonMode === 'month_cycle' && (
+            <>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-[3px] bg-slate-400 dark:bg-slate-600 inline-block" />
+                <span className="text-[#53635A] dark:text-[#AAB4BE] font-medium">
+                  {lang === 'th' ? `เดือนก่อน (${monthlyData.previousMonth.nameTh.split(' ')[0]})` : `Last Month (${monthlyData.previousMonth.nameEn.split(' ')[0]})`}: 
+                  <strong className="ml-1 text-[#15201A] dark:text-[#F5F7F8] font-mono">฿{monthlyData.previousMonth.totalCost.toLocaleString()}</strong>
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-[3px] bg-[#16A34A] inline-block" />
+                <span className="text-[#53635A] dark:text-[#AAB4BE] font-medium">
+                  {lang === 'th' ? `เดือนนี้ (${monthlyData.currentMonth.nameTh.split(' ')[0]})` : `This Month (${monthlyData.currentMonth.nameEn.split(' ')[0]})`}: 
+                  <strong className="ml-1 text-[#16A34A] font-mono">฿{monthlyData.currentMonth.totalCost.toLocaleString()}</strong>
+                </span>
+              </div>
+            </>
+          )}
+
+          {comparisonMode === 'daily' && (
+            <>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-[3px] bg-slate-400 dark:bg-slate-600 inline-block" />
+                <span className="text-[#53635A] dark:text-[#AAB4BE] font-medium">
+                  {lang === 'th' ? 'สัปดาห์ก่อน (Prior Week)' : 'Prior Week'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-[3px] bg-[#16A34A] inline-block" />
+                <span className="text-[#53635A] dark:text-[#AAB4BE] font-medium">
+                  {lang === 'th' ? 'สัปดาห์นี้ (This Week)' : 'This Week'}
+                </span>
+              </div>
+            </>
+          )}
+
+          {comparisonMode === 'history3m' && (
+            <div className="flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-[3px] bg-[#16A34A] inline-block" />
+              <span className="text-[#53635A] dark:text-[#AAB4BE] font-medium">
+                {lang === 'th' ? 'ค่าไฟฟ้ารายเดือน (บาท)' : 'Monthly Electricity Cost (THB)'}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Supporting Bar Chart */}
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" opacity={isDarkMode ? 0.08 : 0.4} />
-              <XAxis dataKey={lang === 'th' ? 'labelTh' : 'labelEn'} stroke="#78857D" fontSize={11} tickLine={false} />
-              <YAxis stroke="#78857D" fontSize={11} unit="฿" tickLine={false} />
-              <Tooltip
-                formatter={(value: any, name: any) => [
-                  `฿${value}`, 
-                  name === 'cost' ? (lang === 'th' ? 'สัปดาห์นี้' : 'This Week') : (lang === 'th' ? 'สัปดาห์ก่อน' : 'Prior Week')
-                ]}
-                contentStyle={{ 
-                  borderRadius: '10px', 
-                  background: isDarkMode ? '#1B242D' : '#FFFFFF', 
-                  border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8E4',
-                  fontSize: '12px'
-                }}
-              />
-              <Bar dataKey="prevCost" fill={isDarkMode ? '#334155' : '#E2E8E4'} radius={[6, 6, 0, 0]} name="prevCost" />
-              <Bar dataKey="cost" fill="#16A34A" radius={[6, 6, 0, 0]} name="cost" />
-            </BarChart>
+            {comparisonMode === 'month_cycle' ? (
+              <BarChart data={monthlyCycleData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={isDarkMode ? 0.08 : 0.4} />
+                <XAxis dataKey={lang === 'th' ? 'shortLabelTh' : 'shortLabelEn'} stroke="#78857D" fontSize={11} tickLine={false} />
+                <YAxis stroke="#78857D" fontSize={11} unit="฿" tickLine={false} />
+                <Tooltip
+                  formatter={(value: any, name: any, item: any) => {
+                    const isCurrent = name === 'thisMonthCost';
+                    const label = isCurrent 
+                      ? (lang === 'th' ? `เดือนนี้ (${monthlyData.currentMonth.nameTh.split(' ')[0]})` : 'This Month')
+                      : (lang === 'th' ? `เดือนก่อน (${monthlyData.previousMonth.nameTh.split(' ')[0]})` : 'Last Month');
+                    const kwh = isCurrent ? item.payload.thisMonthKwh : item.payload.prevMonthKwh;
+                    return [`฿${value} (${kwh} kWh)`, label];
+                  }}
+                  labelFormatter={(label, payload) => {
+                    if (payload && payload[0]) {
+                      return `${payload[0].payload[lang === 'th' ? 'labelTh' : 'labelEn']} - ${payload[0].payload[lang === 'th' ? 'periodTh' : 'periodEn']}`;
+                    }
+                    return label;
+                  }}
+                  contentStyle={{ 
+                    borderRadius: '10px', 
+                    background: isDarkMode ? '#1B242D' : '#FFFFFF', 
+                    border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8E4',
+                    fontSize: '12px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+                  }}
+                />
+                <Bar dataKey="prevMonthCost" fill={isDarkMode ? '#475569' : '#94A3B8'} radius={[6, 6, 0, 0]} name="prevMonthCost" />
+                <Bar dataKey="thisMonthCost" fill="#16A34A" radius={[6, 6, 0, 0]} name="thisMonthCost" />
+              </BarChart>
+            ) : comparisonMode === 'daily' ? (
+              <BarChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={isDarkMode ? 0.08 : 0.4} />
+                <XAxis dataKey={lang === 'th' ? 'labelTh' : 'labelEn'} stroke="#78857D" fontSize={11} tickLine={false} />
+                <YAxis stroke="#78857D" fontSize={11} unit="฿" tickLine={false} />
+                <Tooltip
+                  formatter={(value: any, name: any, item: any) => [
+                    `฿${value}${name === 'cost' ? ` (${item.payload.kwh} kWh)` : ''}`, 
+                    name === 'cost' ? (lang === 'th' ? 'สัปดาห์นี้' : 'This Week') : (lang === 'th' ? 'สัปดาห์ก่อน' : 'Prior Week')
+                  ]}
+                  contentStyle={{ 
+                    borderRadius: '10px', 
+                    background: isDarkMode ? '#1B242D' : '#FFFFFF', 
+                    border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8E4',
+                    fontSize: '12px'
+                  }}
+                />
+                <Bar dataKey="prevCost" fill={isDarkMode ? '#475569' : '#94A3B8'} radius={[6, 6, 0, 0]} name="prevCost" />
+                <Bar dataKey="cost" fill="#16A34A" radius={[6, 6, 0, 0]} name="cost" />
+              </BarChart>
+            ) : (
+              <BarChart data={historical3MonthsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={isDarkMode ? 0.08 : 0.4} />
+                <XAxis dataKey={lang === 'th' ? 'nameTh' : 'nameEn'} stroke="#78857D" fontSize={11} tickLine={false} />
+                <YAxis stroke="#78857D" fontSize={11} unit="฿" tickLine={false} />
+                <Tooltip
+                  formatter={(value: any, _, item: any) => [
+                    `฿${Number(value).toLocaleString()} (${item.payload.kwh} kWh - เฉลี่ย ฿${item.payload.avgDaily}/วัน)`,
+                    lang === 'th' ? 'ค่าไฟฟ้ารวม' : 'Total Bill'
+                  ]}
+                  contentStyle={{ 
+                    borderRadius: '10px', 
+                    background: isDarkMode ? '#1B242D' : '#FFFFFF', 
+                    border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8E4',
+                    fontSize: '12px'
+                  }}
+                />
+                <Bar dataKey="cost" radius={[6, 6, 0, 0]}>
+                  {historical3MonthsData.map((entry, index) => (
+                    <Cell 
+                      key={`hist-${index}`} 
+                      fill={entry.isCurrent ? '#16A34A' : isDarkMode ? '#475569' : '#94A3B8'} 
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            )}
           </ResponsiveContainer>
         </div>
       </div>

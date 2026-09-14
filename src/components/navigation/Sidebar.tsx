@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
+import logoImg from '../../assets/images/eduease_energy_logo_1789318705939.jpg';
 import { 
   Home, 
   Bot, 
@@ -25,7 +26,7 @@ import {
   Gamepad2,
   Building2
 } from 'lucide-react';
-import { AppPage, GamificationSettings, DEFAULT_GAMIFICATION_SETTINGS, UserPersona } from '../../types';
+import { AppPage, GamificationSettings, DEFAULT_GAMIFICATION_SETTINGS, UserPersona, LocationItem } from '../../types';
 import { getPersonaConfig } from '../../data/personaThemes';
 
 interface SidebarProps {
@@ -44,6 +45,8 @@ interface SidebarProps {
   currentAvatar: string;
   gamificationSettings?: GamificationSettings;
   persona?: UserPersona;
+  locations?: LocationItem[];
+  currentLocationId?: string;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -62,27 +65,100 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentAvatar,
   gamificationSettings = DEFAULT_GAMIFICATION_SETTINGS,
   persona = 'student',
+  locations,
+  currentLocationId,
 }) => {
   const isCleanMode = gamificationSettings.cleanUtilityMode;
   const personaConfig = getPersonaConfig(persona);
-  const menu = personaConfig.menuCopy;
+  const currentLoc = locations?.find(l => l.id === currentLocationId) || locations?.[0];
+  const selectedLocationName = currentLoc?.name || (lang === 'th' ? personaConfig.defaultLocationNameTh : personaConfig.defaultLocationNameEn);
 
-  const primaryNavItems = [
-    { id: 'home' as AppPage, subIds: ['home'], labelTh: 'หน้าหลัก', labelEn: 'Home', icon: Home, badge: undefined },
-    { id: 'ai-coach' as AppPage, subIds: ['ai-coach'], labelTh: 'ผู้ช่วย AI Coach', labelEn: 'AI Coach', icon: Bot, badge: 'Smart' },
-    { id: 'appliances' as AppPage, subIds: ['appliances', 'compare'], labelTh: 'อุปกรณ์ & โหลดไฟฟ้า', labelEn: 'Appliances', icon: Plug, badge: undefined },
-    { id: 'analytics' as AppPage, subIds: ['analytics', 'insights'], labelTh: 'วิเคราะห์การใช้ไฟ', labelEn: 'Analytics', icon: BarChart3, badge: undefined },
+  // 1. MAIN
+  const mainNavItems = [
+    { 
+      id: 'home' as AppPage, 
+      subIds: ['home'], 
+      labelTh: 'หน้าหลัก', 
+      labelEn: 'Home', 
+      icon: Home, 
+      badge: undefined 
+    },
+    { 
+      id: 'ai-coach' as AppPage, 
+      subIds: ['ai-coach', 'insights'], 
+      labelTh: 'AI Coach & ข้อมูลเชิงลึก', 
+      labelEn: 'AI Coach', 
+      icon: Bot, 
+      badge: 'AI' 
+    },
   ];
 
-  const secondaryNavItems = [
-    { id: 'budget' as AppPage, subIds: ['budget'], labelTh: 'งบประมาณ & ตัดไฟ', labelEn: 'Budget & Alert', icon: Wallet, badge: undefined },
-    { id: 'learning' as AppPage, subIds: ['learning', 'city'], labelTh: 'ห้องเรียนพลังงาน', labelEn: 'Energy Academy', icon: GraduationCap, badge: undefined },
-    { id: 'achievements' as AppPage, subIds: ['achievements', 'game'], labelTh: 'เควสต์ & รางวัล', labelEn: 'Quests & Rewards', icon: Trophy, badge: undefined },
+  // 2. ENERGY
+  const energyNavItems = [
+    { 
+      id: 'locations' as AppPage, 
+      subIds: ['locations'], 
+      labelTh: 'สถานที่ของฉัน', 
+      labelEn: 'My Locations', 
+      icon: MapPin, 
+      badge: currentLoc ? currentLoc.name.slice(0, 10) : undefined 
+    },
+    { 
+      id: 'appliances' as AppPage, 
+      subIds: ['appliances', 'compare'], 
+      labelTh: 'เครื่องใช้ไฟฟ้า', 
+      labelEn: 'Appliances', 
+      icon: Plug, 
+      badge: undefined 
+    },
+    { 
+      id: 'budget' as AppPage, 
+      subIds: ['budget'], 
+      labelTh: 'งบประมาณ & แจ้งเตือน', 
+      labelEn: 'Budget', 
+      icon: Wallet, 
+      badge: undefined 
+    },
+    { 
+      id: 'analytics' as AppPage, 
+      subIds: ['analytics'], 
+      labelTh: 'วิเคราะห์การใช้ไฟ', 
+      labelEn: 'Analytics', 
+      icon: BarChart3, 
+      badge: undefined 
+    },
   ];
 
-  const utilityNavItems = [
-    { id: 'locations' as AppPage, subIds: ['locations'], labelTh: 'สถานที่ของฉัน', labelEn: 'My Locations', icon: MapPin, badge: undefined },
-    { id: 'settings' as AppPage, subIds: ['settings', 'trust-center', 'ux-assessment', 'crypto'], labelTh: 'ตั้งค่าระบบ', labelEn: 'Settings', icon: Settings, badge: undefined },
+  // 3. LEARN & PLAY
+  const learnPlayNavItems = [
+    { 
+      id: 'learning' as AppPage, 
+      subIds: ['learning', 'game'], 
+      labelTh: 'การเรียนรู้ & อาร์เคด', 
+      labelEn: 'Learning & Arcade', 
+      icon: GraduationCap, 
+      badge: undefined 
+    },
+    { 
+      id: 'city' as AppPage, 
+      subIds: ['city', 'achievements', 'score'], 
+      labelTh: 'เมืองความยั่งยืน', 
+      labelEn: 'Sustainable City', 
+      icon: Building2, 
+      badge: undefined 
+    },
+  ];
+
+  // 4. SYSTEM
+  const systemNavItems = [
+    { 
+      id: 'settings' as AppPage, 
+      subIds: ['settings', 'trust-center', 'ux-assessment', 'crypto', 'profile'], 
+      labelTh: 'ตั้งค่าระบบ', 
+      labelEn: 'Settings', 
+      icon: Settings, 
+      badge: undefined 
+    },
   ];
 
   return (
@@ -95,8 +171,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Top: Branding */}
         <div>
           <div className="flex items-center gap-2.5 mb-5 px-1 pt-1">
-            <div className="w-9 h-9 rounded-[10px] bg-gradient-to-tr from-[#16A34A] to-emerald-400 flex items-center justify-center text-white shadow-sm shrink-0">
-              <Sparkles className="w-4 h-4" />
+            <div className="w-9 h-9 rounded-[10px] overflow-hidden border border-emerald-500/30 shadow-sm shrink-0 bg-[#0B1220]">
+              <img
+                src={logoImg}
+                alt="EduEase Energy Logo"
+                className="w-full h-full object-cover"
+                referrerPolicy="no-referrer"
+              />
             </div>
             <div>
               <h1 className="font-bold text-base tracking-tight text-[#15201A] dark:text-[#F5F7F8] font-display">
@@ -122,8 +203,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-xs truncate">
-                      {lang === 'th' ? personaConfig.defaultLocationNameTh : personaConfig.defaultLocationNameEn}
+                    <span className="font-semibold text-xs truncate" title={selectedLocationName}>
+                      {selectedLocationName}
                     </span>
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-[6px] bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80]">
                       PRO
@@ -147,8 +228,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-xs truncate">
-                      {lang === 'th' ? personaConfig.defaultLocationNameTh : personaConfig.defaultLocationNameEn}
+                    <span className="font-semibold text-xs truncate" title={selectedLocationName}>
+                      {selectedLocationName}
                     </span>
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-[6px] bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80]">
                       Lv. {userLevel}
@@ -194,21 +275,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
           )}
 
-          {/* Navigation Items */}
+          {/* Navigation Items (4 Mental Model Categories) */}
           <nav className="space-y-3">
-            {/* Primary Actions */}
+            {/* 1. MAIN */}
             <div className="space-y-1">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-[#78857D] px-2.5">
-                {lang === 'th' ? 'เมนูหลัก' : 'Main'}
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] px-2.5">
+                {lang === 'th' ? 'MAIN (เมนูหลัก)' : 'MAIN'}
               </div>
-              {primaryNavItems.map((item) => {
+              {mainNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = item.subIds ? item.subIds.includes(currentPage) : currentPage === item.id;
                 return (
                   <button
                     key={item.id}
                     onClick={() => setCurrentPage(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-xs transition-colors group ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-xs transition-colors group cursor-pointer ${
                       isActive
                         ? 'bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80] font-semibold border border-[#16A34A]/30'
                         : isDarkMode
@@ -231,19 +312,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
               })}
             </div>
 
-            {/* Secondary Actions */}
+            {/* 2. ENERGY */}
             <div className="space-y-1 pt-2 border-t border-[#E2E8E4] dark:border-white/10">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-[#78857D] px-2.5">
-                {lang === 'th' ? 'การจัดการ & เควสต์' : 'Manage & Learn'}
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] px-2.5">
+                {lang === 'th' ? 'ENERGY (พลังงาน)' : 'ENERGY'}
               </div>
-              {secondaryNavItems.map((item) => {
+              {energyNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = item.subIds ? item.subIds.includes(currentPage) : currentPage === item.id;
                 return (
                   <button
                     key={item.id}
                     onClick={() => setCurrentPage(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-xs transition-colors group ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-xs transition-colors group cursor-pointer ${
                       isActive
                         ? 'bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80] font-semibold border border-[#16A34A]/30'
                         : isDarkMode
@@ -255,24 +336,65 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <Icon className={`w-4 h-4 ${isActive ? 'text-[#16A34A] dark:text-[#4ADE80]' : 'text-[#78857D]'}`} />
                       <span>{lang === 'th' ? item.labelTh : item.labelEn}</span>
                     </div>
+
+                    {item.badge && (
+                      <span className="text-[9px] font-medium max-w-[70px] truncate px-1.5 py-0.5 rounded-[5px] bg-[#16A34A]/10 text-[#16A34A] dark:text-[#4ADE80]">
+                        {item.badge}
+                      </span>
+                    )}
                   </button>
                 );
               })}
             </div>
 
-            {/* Utility Actions */}
+            {/* 3. LEARN & PLAY */}
             <div className="space-y-1 pt-2 border-t border-[#E2E8E4] dark:border-white/10">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-[#78857D] px-2.5">
-                {lang === 'th' ? 'เครื่องมือ & ตั้งค่า' : 'Tools'}
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] px-2.5">
+                {lang === 'th' ? 'LEARN & PLAY (เรียนรู้ & เล่น)' : 'LEARN & PLAY'}
               </div>
-              {utilityNavItems.map((item) => {
+              {learnPlayNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = item.subIds ? item.subIds.includes(currentPage) : currentPage === item.id;
                 return (
                   <button
                     key={item.id}
                     onClick={() => setCurrentPage(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-xs transition-colors group ${
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-xs transition-colors group cursor-pointer ${
+                      isActive
+                        ? 'bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80] font-semibold border border-[#16A34A]/30'
+                        : isDarkMode
+                          ? 'text-[#AAB4BE] hover:text-[#F5F7F8] hover:bg-[#1B242D]'
+                          : 'text-[#53635A] hover:text-[#15201A] hover:bg-[#F6F8F7]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#16A34A] dark:text-[#4ADE80]' : 'text-[#78857D]'}`} />
+                      <span>{lang === 'th' ? item.labelTh : item.labelEn}</span>
+                    </div>
+
+                    {item.badge && (
+                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-[6px] bg-[#16A34A]/15 text-[#16A34A] dark:text-[#4ADE80]">
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 4. SYSTEM */}
+            <div className="space-y-1 pt-2 border-t border-[#E2E8E4] dark:border-white/10">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] px-2.5">
+                {lang === 'th' ? 'SYSTEM (ระบบ)' : 'SYSTEM'}
+              </div>
+              {systemNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = item.subIds ? item.subIds.includes(currentPage) : currentPage === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setCurrentPage(item.id)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-xs transition-colors group cursor-pointer ${
                       isActive
                         ? 'bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80] font-semibold border border-[#16A34A]/30'
                         : isDarkMode
