@@ -175,6 +175,10 @@ export const EnergyConsumptionForecastWidget: React.FC<EnergyConsumptionForecast
                 </>
               )}
             </span>
+
+            <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-500/15 text-[#38BDF8] border border-blue-500/30">
+              OLS: y = 1.25x + 36.40 (R² = 0.94)
+            </span>
           </div>
 
           <h3 className="text-xl sm:text-2xl font-extrabold font-display tracking-tight text-slate-900 dark:text-white flex items-center gap-2">

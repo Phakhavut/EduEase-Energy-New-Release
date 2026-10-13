@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { 
   Sparkles, 
@@ -10,12 +10,16 @@ import {
   Clock,
   GraduationCap,
   Zap,
-  Leaf
+  Leaf,
+  Calculator
 } from 'lucide-react';
 import { Mission, Appliance, AppPage, InfoDetailMode, GamificationSettings, DEFAULT_GAMIFICATION_SETTINGS, UserPersona, Badge, LearningPath } from '../../types';
 import { WhatIfSimulationModal } from '../simulation/WhatIfSimulationModal';
 import { ApplianceDetailModal } from '../appliances/ApplianceDetailModal';
 import { getMonthlyComparison } from '../../data/monthlyComparisonData';
+import { LinearRegressionForecastCard } from '../forecasting/LinearRegressionForecastCard';
+import { buildLinearRegressionForecast } from '../../utils/linearRegressionForecasting';
+import { MonthlySavingsProgressBar } from '../gamification/MonthlySavingsProgressBar';
 
 interface HomeViewProps {
   lang: 'th' | 'en';
@@ -79,9 +83,19 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   const monthlyData = getMonthlyComparison(persona);
   const budgetPercent = Math.min(100, Math.round((monthlyEstimate / monthlyBudget) * 100));
+
+  // Compute Simple Linear Regression Monthly Energy Forecast
+  const lrForecast = useMemo(() => {
+    return buildLinearRegressionForecast({
+      totalDays: 30,
+      monthlyBudget,
+      currentDay: 14,
+      elecRate: 4.7,
+    });
+  }, [monthlyBudget]);
   
   // Budget status logic (Green / Yellow / Red)
-  const isOverBudget = monthlyEstimate > monthlyBudget;
+  const isOverBudget = lrForecast.projectedMonthlyTotal > monthlyBudget;
   const isWarningBudget = budgetPercent >= 85 && !isOverBudget;
   const budgetStatusText = isOverBudget
     ? (lang === 'th' ? 'เกินงบ' : 'Over Budget')
@@ -136,15 +150,15 @@ export const HomeView: React.FC<HomeViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-bold font-display tracking-tight text-[#15201A] dark:text-[#F5F7F8]">
+            <h1 className="text-xl sm:text-2xl font-bold font-display tracking-tight text-slate-900 dark:text-white">
               {lang === 'th' ? 'สวัสดี Namyen 👋' : 'Hello Namyen 👋'}
             </h1>
-            <span className="px-2.5 py-0.5 rounded-[8px] text-xs font-semibold bg-[#E8F8F6] text-[#138A81] dark:bg-[#1AA298]/20 dark:text-[#38C7BA]">
+            <span className="px-2.5 py-0.5 rounded-[8px] text-xs font-semibold bg-blue-50 text-[#1D4ED8] dark:bg-blue-500/20 dark:text-[#38BDF8] border border-blue-400/30">
               {lang === 'th' ? 'หอพัก My Dorm' : 'My Dorm'}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-[#78857D] mt-0.5">
-            <Clock className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            <Clock className="w-3.5 h-3.5 text-[#38BDF8]" />
             <span>{lang === 'th' ? 'รอบบิลปัจจุบัน: 1–31 ส.ค. 2026' : 'Billing cycle: 1–31 Aug 2026'}</span>
           </div>
         </div>
@@ -154,13 +168,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {onOpenMonthlyReport && (
             <button
               onClick={onOpenMonthlyReport}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] border text-xs font-semibold transition-colors ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] border text-xs font-semibold transition-colors cursor-pointer ${
                 isDarkMode 
-                  ? 'bg-[#161E27] border-white/10 hover:bg-[#1F2935] text-[#F3F6F9]' 
-                  : 'bg-[#FFFFFF] border-[#E2E8F0] hover:bg-[#F1F5F9] text-[#1E293B]'
+                  ? 'bg-[#101B3B] border-[#1E2E5D] hover:bg-[#142352] text-white shadow-sm' 
+                  : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700 shadow-sm'
               }`}
             >
-              <FileText className="w-3.5 h-3.5 text-[#1AA298]" />
+              <FileText className="w-3.5 h-3.5 text-[#38BDF8]" />
               <span>{lang === 'th' ? 'รายงาน PDF' : 'PDF Report'}</span>
             </button>
           )}
@@ -168,7 +182,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {onStartPageTour && (
             <button
               onClick={() => onStartPageTour(0)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-[#E8F8F6] text-[#138A81] dark:bg-[#1AA298]/20 dark:text-[#38C7BA] text-xs font-semibold transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-blue-50 text-[#1D4ED8] dark:bg-blue-500/20 dark:text-[#38BDF8] border border-blue-400/30 text-xs font-semibold transition-colors cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>{lang === 'th' ? 'แนะนำวิธีดู' : 'Quick Tour'}</span>
@@ -259,29 +273,75 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
         </div>
 
-        {/* KPI 3: คาดการณ์สิ้นเดือน (4 cols) */}
-        <div className={`col-span-2 md:col-span-8 lg:col-span-4 min-h-[132px] p-5 rounded-[18px] border flex flex-col justify-between transition-all duration-200 ${
-          isDarkMode ? 'bg-[#0B132B] border-[#1E2E5D]/80 shadow-md shadow-blue-950/40' : 'bg-[#FFFFFF] border-[#CBD5E1]'
-        }`}>
+        {/* KPI 3: คาดการณ์สิ้นเดือนด้วยแบบจำลองถดถอยเชิงเส้น (4 cols) */}
+        <div 
+          onClick={() => {
+            const el = document.getElementById('section-forecasting');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className={`col-span-2 md:col-span-8 lg:col-span-4 min-h-[132px] p-5 rounded-[18px] border flex flex-col justify-between transition-all duration-200 cursor-pointer group hover:border-blue-500/50 ${
+            isDarkMode ? 'bg-[#0B132B] border-[#1E2E5D]/80 shadow-md shadow-blue-950/40' : 'bg-[#FFFFFF] border-[#CBD5E1]'
+          }`}
+        >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-[#53635A] dark:text-[#94A3B8]">
-              {lang === 'th' ? 'คาดการณ์สิ้นเดือน' : 'Month-End Forecast'}
+            <span className="text-xs font-semibold text-[#53635A] dark:text-[#94A3B8] flex items-center gap-1.5">
+              <span>{lang === 'th' ? 'คาดการณ์สิ้นเดือน (OLS)' : 'Month-End Forecast (OLS)'}</span>
+              <Calculator className="w-3.5 h-3.5 text-[#38BDF8] opacity-75" />
             </span>
-            <span className="text-xs font-semibold text-[#78857D] dark:text-[#64748B]">
-              {lang === 'th' ? 'ประมาณการ' : 'Projected'}
+            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-[6px] bg-blue-500/15 text-[#2563EB] dark:text-[#38BDF8] border border-blue-500/30">
+              m = {lrForecast.regression.slope >= 0 ? '+' : ''}{lrForecast.regression.slope.toFixed(2)} ฿/d
             </span>
           </div>
 
           <div className="my-1">
             <div className="text-3xl lg:text-[38px] font-bold font-mono tracking-tight text-[#2563EB] dark:text-[#38BDF8] tabular-nums leading-none">
-              ฿{Math.round(monthlyEstimate * 1.04).toLocaleString()}
+              ฿{lrForecast.projectedMonthlyTotal.toLocaleString()}
             </div>
           </div>
 
           <div className="text-[13px] text-[#78857D] dark:text-[#94A3B8] flex items-center justify-between">
-            <span>{lang === 'th' ? 'เฉลี่ยต่อวัน' : 'Daily avg'}</span>
-            <span className="font-mono">฿{(monthlyEstimate / 30).toFixed(0)}/d</span>
+            <span className="flex items-center gap-1">
+              <span>R² = {lrForecast.regression.rSquared.toFixed(2)}</span>
+              <span className="text-[10px] text-slate-400">({lang === 'th' ? 'ความแม่นยำสูง' : 'High fit'})</span>
+            </span>
+            <span className="font-mono text-xs text-[#2563EB] dark:text-[#38BDF8] group-hover:underline flex items-center gap-0.5">
+              <span>{lang === 'th' ? 'ดูการพยากรณ์' : 'View Forecast'}</span>
+              <ChevronRight className="w-3 h-3" />
+            </span>
           </div>
+        </div>
+
+        {/* ====================================================
+            MONTHLY SAVINGS GOAL PROGRESS & LEVEL UP MILESTONES (12 cols)
+            Visualizes progress toward monthly savings target with
+            animated milestone markers and Level Up celebrations
+            ==================================================== */}
+        <div id="section-savings-progress" className="col-span-4 md:col-span-8 lg:col-span-12">
+          <MonthlySavingsProgressBar
+            lang={lang}
+            isDarkMode={isDarkMode}
+            initialSaved={moneySavedMonth || 320}
+            targetGoal={500}
+            userLevel={userLevel}
+            userXp={userXp}
+            userXpMax={userXpMax}
+            userCoins={userCoins}
+          />
+        </div>
+
+        {/* ====================================================
+            FORECASTING FEATURE: LINEAR REGRESSION PREDICTOR (12 cols)
+            Calculates projected monthly energy costs based on current
+            usage trends using Simple Linear Regression (y = mx + b)
+            ==================================================== */}
+        <div id="section-forecasting" className="col-span-4 md:col-span-8 lg:col-span-12">
+          <LinearRegressionForecastCard
+            lang={lang}
+            isDarkMode={isDarkMode}
+            monthlyBudget={monthlyBudget}
+            monthlyEstimate={monthlyEstimate}
+            onNavigateToBudget={() => setCurrentPage('budget')}
+          />
         </div>
 
         {/* ====================================================

@@ -549,53 +549,96 @@ async function startServer() {
     }
   });
 
-  // REST API Endpoint: AI Guided Energy Chatbot
+  // REST API Endpoint: AI Guided Energy Chatbot with Multi-Turn Conversation & Roles
   app.post("/api/ai/chat", async (req, res) => {
     try {
       const key = process.env.GEMINI_API_KEY;
-      const { messages, message, devices, analytics, useThinkingMode } = req.body;
+      const { 
+        messages, 
+        message, 
+        devices, 
+        analytics, 
+        useThinkingMode, 
+        modelChoice = "general", 
+        role = "coach",
+        customSystemInstruction 
+      } = req.body;
       
-      // Support both {messages: [...]} format and {message: "text"} format
-      const messagesList = messages || (message ? [{ role: 'user', content: message }] : []);
+      // Support both {messages: [...]} format and legacy {message: "text"} format
+      const rawList = messages || (message ? [{ role: 'user', content: message }] : []);
+      const messagesList = rawList.map((m: any) => ({
+        role: m.role === 'assistant' || m.role === 'model' ? 'model' : 'user',
+        content: m.content || m.text || ''
+      }));
 
       if (!messagesList || messagesList.length === 0) {
         return res.status(400).json({ error: "Messages list is required." });
       }
+
+      // Determine model based on prompt guidelines
+      // complex: gemini-3.1-pro-preview | fast: gemini-3.1-flash-lite | general (default): gemini-3.5-flash
+      let selectedModel = "gemini-3.5-flash";
+      if (modelChoice === "complex" || useThinkingMode) {
+        selectedModel = "gemini-3.1-pro-preview";
+      } else if (modelChoice === "fast" || modelChoice === "lite") {
+        selectedModel = "gemini-3.1-flash-lite";
+      }
+
+      // Role-specific system instructions
+      let roleInstruction = "You are Voltie, an enthusiastic, friendly AI Energy Coach for EduEase Energy OS. You help dorm residents and homeowners save money and reduce electricity consumption with practical, warm, encouraging advice in Thai and English. Always format recommendations with neat markdown bullet points, estimates of THB savings, and clear action steps.";
+      if (role === "engineer") {
+        roleInstruction = "You are a Senior PEA Grid Engineer and Power Quality Auditor. You provide technical, engineering-grade advice on electrical load balancing, Power Factor (PF), Time-of-Use (TOU) tariffs, compressor heat transfer, standby leakage currents, and wiring safety. You give precise, data-driven explanations.";
+      } else if (role === "financial" || role === "budget") {
+        roleInstruction = "You are a Financial Energy Strategist. You specialize in payback periods, ROI calculation for appliance upgrades, month-end billing forecasts, budget limit enforcement, and cost-benefit analysis of energy habits.";
+      }
+
+      if (customSystemInstruction) {
+        roleInstruction = `${roleInstruction}\n${customSystemInstruction}`;
+      }
+
+      const activeDevices = devices || [];
+      const costStr = analytics?.totalCost ? `฿${analytics.totalCost.toFixed(2)}` : "unknown";
+      const unitsStr = analytics?.totalUnits ? `${analytics.totalUnits.toFixed(2)} kWh` : "unknown";
+      const budgetStr = analytics?.budget ? `฿${analytics.budget}` : "unknown";
+
+      const systemInstruction = `${roleInstruction}
+Current Live User Room State:
+- Devices in Room: ${JSON.stringify(activeDevices.map((d: any) => ({ name: d.name, category: d.category, watt: d.watt, hours: d.hours, status: d.status })))}
+- Estimated Monthly Bill: ${costStr}
+- Monthly Budget Target: ${budgetStr}
+- Estimated Monthly Consumption: ${unitsStr}
+
+Guidelines:
+- Default to Thai language unless the user asks in English.
+- Be concise, actionable, and encouraging.
+- When suggesting savings, state approximate Thai Baht (฿) saved per month.`;
 
       let aiResponseText: string | null = null;
 
       if (key && !isGeminiCooldownActive()) {
         try {
           const ai = getAiClient();
-          const activeDevices = devices || [];
-          const costStr = analytics?.totalCost ? `฿${analytics.totalCost.toFixed(2)}` : "unknown";
-          const unitsStr = analytics?.totalUnits ? `${analytics.totalUnits.toFixed(2)} kWh` : "unknown";
 
-          const prompt = `You are "EnergyAI Assistant" (ผู้ช่วยอัจฉริยะด้านวิศวกรรมพลังงาน), an expert AI Energy Advisor for our Smart Home Grid. Here is the current live grid state:
-          Devices/Nodes in Grid: ${JSON.stringify(activeDevices.map((d: any) => ({ name: d.name, category: d.category, watt: d.watt, hours: d.hours, status: d.status, pf: d.pf })))}
-          Estimated Monthly Bill: ${costStr}
-          Estimated Monthly Consumption: ${unitsStr}
-
-          Respond to the last user message, giving professional, actionable, and pro-active energy-saving tips, device diagnostics, or utility advice tailored to their exact metrics.
-          - Be friendly, encouraging, and highly professional.
-          - Adopt a high-contrast bilingual tone: default to Thai unless the user asks in English.
-          - Give clear step-by-step markdown bullets.
-          - Point out exactly how much they can save by toggling local controls (e.g., Smart AC, Eco Standby, TOU Shift, and Power Factor corrections, which combine to save up to 22%).
-
-          Here is the conversation history:
-          ${messagesList.map((m: any) => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join("\n")}
-          `;
+          // Prepare multi-turn contents format for GoogleGenAI SDK
+          const contents = messagesList.map((m: any) => ({
+            role: m.role,
+            parts: [{ text: m.content }]
+          }));
 
           const response = await ai.models.generateContent({
-            model: useThinkingMode ? "gemini-3.1-pro-preview" : "gemini-3.1-flash",
-            contents: prompt,
+            model: selectedModel,
+            contents: contents,
             config: {
-              ...(useThinkingMode ? {
+              systemInstruction: systemInstruction,
+              ...(selectedModel === "gemini-3.1-pro-preview" ? {
                 thinkingConfig: {
                   thinkingLevel: ThinkingLevel.HIGH,
                 }
-              } : {}),
-              systemInstruction: "You are the EnergyAI Assistant, a friendly and highly knowledgeable energy-saving expert. Always use actual grid parameters provided in the prompt to construct highly accurate, context-aware suggestions."
+              } : selectedModel === "gemini-3.1-flash-lite" ? {
+                thinkingConfig: {
+                  thinkingLevel: ThinkingLevel.MINIMAL,
+                }
+              } : {})
             }
           });
 
@@ -606,14 +649,13 @@ async function startServer() {
             triggerGeminiCooldown();
           }
           cleanGeminiErrorLog("chat", apiError);
-          // Allow execution to flow into the heuristic fallback block below
           aiResponseText = null; 
         }
       }
 
-      // High-Intelligence Expert Heuristic Real-time Scanner Fallback
+      // Return response
       if (aiResponseText) {
-        return res.json({ reply: aiResponseText, source: "gemini" });
+        return res.json({ reply: aiResponseText, source: "gemini", model: selectedModel, role });
       } else {
         const lastMsg = messagesList[messagesList.length - 1].content.toLowerCase();
         let reply = "";
