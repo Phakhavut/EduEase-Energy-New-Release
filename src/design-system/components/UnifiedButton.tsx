@@ -39,28 +39,28 @@ export const UnifiedButton: React.FC<UnifiedButtonProps> = ({
     switch (variant) {
       case 'secondary':
         return isDarkMode
-          ? 'bg-[#1B242D] hover:bg-[#1E2832] text-[#F5F7F8] border border-white/10'
-          : 'bg-[#F6F8F7] hover:bg-[#EDF2EE] text-[#15201A] border border-[#E2E8E4]';
+          ? 'bg-[#0E1A3D] hover:bg-[#142352] text-[#F8FAFC] border border-[#1E2E5D]'
+          : 'bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0A1128] border border-[#CBD5E1]';
       case 'outline':
         return isDarkMode
-          ? 'bg-transparent hover:bg-white/5 text-[#F5F7F8] border border-white/20'
-          : 'bg-transparent hover:bg-slate-50 text-[#15201A] border border-[#E2E8E4]';
+          ? 'bg-transparent hover:bg-blue-500/10 text-[#38BDF8] border border-blue-500/30'
+          : 'bg-transparent hover:bg-slate-50 text-[#0A1128] border border-[#CBD5E1]';
       case 'ghost':
         return isDarkMode
-          ? 'bg-transparent hover:bg-white/5 text-[#AAB4BE] hover:text-[#F5F7F8]'
-          : 'bg-transparent hover:bg-slate-100 text-[#53635A] hover:text-[#15201A]';
+          ? 'bg-transparent hover:bg-white/5 text-[#94A3B8] hover:text-[#FFFFFF]'
+          : 'bg-transparent hover:bg-slate-100 text-[#475569] hover:text-[#0A1128]';
       case 'danger':
         return isDarkMode
           ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-sm'
           : 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm';
       case 'success':
-        return 'bg-[#16A34A] hover:bg-[#15803D] text-white shadow-sm shadow-[#16A34A]/20';
+        return 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20';
       case 'soft':
         return isDarkMode
-          ? 'bg-[#16A34A]/15 hover:bg-[#16A34A]/25 text-[#4ADE80] border border-[#16A34A]/30'
-          : 'bg-[#DCFCE7] hover:bg-[#BBF7D0] text-[#15803D] border border-[#16A34A]/30';
+          ? 'bg-[#2563EB]/15 hover:bg-[#2563EB]/25 text-[#60A5FA] border border-[#2563EB]/30'
+          : 'bg-blue-50 hover:bg-blue-100 text-[#1D4ED8] border border-blue-200';
       default: // primary
-        return 'bg-[#16A34A] hover:bg-[#15803D] text-white font-bold shadow-sm shadow-[#16A34A]/20 active:scale-[0.98]';
+        return 'bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold shadow-md shadow-blue-600/30 active:scale-[0.98] border border-blue-400/20';
     }
   };
 

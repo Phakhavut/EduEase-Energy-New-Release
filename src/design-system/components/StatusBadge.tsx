@@ -23,10 +23,14 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 }) => {
   const getStyle = () => {
     switch (variant) {
+      case 'brand':
+        return isDarkMode
+          ? 'bg-[#2563EB]/18 text-[#60A5FA] border-[#2563EB]/40'
+          : 'bg-[#EFF6FF] text-[#1D4ED8] border-blue-200';
       case 'success':
         return isDarkMode
-          ? 'bg-[#16A34A]/20 text-[#4ADE80] border-[#16A34A]/30'
-          : 'bg-[#DCFCE7] text-[#15803D] border-[#16A34A]/20';
+          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+          : 'bg-emerald-50 text-emerald-800 border-emerald-200';
       case 'warning':
         return isDarkMode
           ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
@@ -37,32 +41,33 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
           : 'bg-rose-50 text-rose-800 border-rose-200';
       case 'info':
         return isDarkMode
-          ? 'bg-blue-500/20 text-blue-300 border-blue-500/30'
-          : 'bg-blue-50 text-blue-800 border-blue-200';
+          ? 'bg-sky-500/20 text-sky-300 border-sky-500/30'
+          : 'bg-sky-50 text-sky-800 border-sky-200';
       case 'purple':
         return isDarkMode
-          ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
-          : 'bg-purple-50 text-purple-800 border-purple-200';
+          ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+          : 'bg-indigo-50 text-indigo-800 border-indigo-200';
       case 'neutral':
         return isDarkMode
-          ? 'bg-slate-800 text-slate-300 border-slate-700'
+          ? 'bg-[#0E1A3D] text-slate-300 border-[#1E2E5D]'
           : 'bg-slate-100 text-slate-700 border-slate-200';
       default:
         return isDarkMode
-          ? 'bg-[#16A34A]/20 text-[#4ADE80] border-[#16A34A]/30'
-          : 'bg-[#DCFCE7] text-[#15803D] border-[#16A34A]/20';
+          ? 'bg-[#2563EB]/18 text-[#60A5FA] border-[#2563EB]/40'
+          : 'bg-[#EFF6FF] text-[#1D4ED8] border-blue-200';
     }
   };
 
   const getDotColor = () => {
     switch (variant) {
-      case 'success': return 'bg-[#16A34A]';
+      case 'brand': return 'bg-[#38BDF8]';
+      case 'success': return 'bg-emerald-500';
       case 'warning': return 'bg-amber-500';
       case 'danger': return 'bg-rose-500';
-      case 'info': return 'bg-blue-500';
-      case 'purple': return 'bg-purple-500';
+      case 'info': return 'bg-sky-500';
+      case 'purple': return 'bg-indigo-500';
       case 'neutral': return 'bg-slate-400';
-      default: return 'bg-[#16A34A]';
+      default: return 'bg-[#38BDF8]';
     }
   };
 

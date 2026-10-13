@@ -27,6 +27,7 @@ import { GenZGuidedOnboardingModal } from "./onboarding/GenZGuidedOnboardingModa
 import { NotificationModal } from "./NotificationModal";
 import { GlobalSearchModal } from "./common/GlobalSearchModal";
 import { SystemStatusModal } from "./common/SystemStatusModal";
+import { ProjectCreditsFooter } from "./common/ProjectCreditsFooter";
 import { UserManual } from "./UserManual";
 import LoginForm from "./LoginForm";
 import { GuidedTour } from "./GuidedTour";
@@ -834,6 +835,9 @@ export default function Dashboard({
             onTriggerToast={handleTriggerBudgetToast}
           />
         )}
+
+        {/* Global Project Credits Footer displayed across all pages */}
+        <ProjectCreditsFooter lang={lang} isDarkMode={isDarkMode} />
 
         {/* Guided Quick Start Tour Component */}
         <GuidedTour

@@ -6,65 +6,78 @@
 export const DS_TOKENS = {
   colors: {
     brand: {
-      primary: '#16A34A',      // Primary CTA, active states, key highlights
-      primaryDark: '#15803D',  // Hover states, high-contrast dark green
-      primaryLight: '#4ADE80', // Dark mode highlights, glowing accents
-      softBg: '#DCFCE7',       // Light badge background
-      softDarkBg: 'rgba(22, 163, 74, 0.15)',
+      primary: '#2563EB',      // Royal Electric Blue (matching EZUP centerpiece)
+      primaryDark: '#1D4ED8',  // Deep Royal Blue
+      primaryLight: '#3B82F6', // Bright Electric Blue
+      sky: '#38BDF8',          // Cyber Sky Blue (EZUP Cyan)
+      softBg: '#EFF6FF',       // Light badge background
+      softDarkBg: 'rgba(37, 99, 235, 0.18)',
     },
     semantic: {
       success: {
-        main: '#16A34A',
-        light: '#DCFCE7',
-        dark: '#4ADE80',
-        border: 'rgba(22, 163, 74, 0.25)',
+        main: '#10B981',       // Neon Mint (ระบบสังกัด gauge)
+        light: '#ECFDF5',
+        dark: '#34D399',
+        border: 'rgba(16, 185, 129, 0.3)',
       },
       warning: {
-        main: '#D97706',
-        light: '#FEF3C7',
+        main: '#F59E0B',       // Streamer Amber & Solar
+        light: '#FFFBEB',
         dark: '#FBBF24',
-        border: 'rgba(217, 119, 6, 0.25)',
+        border: 'rgba(245, 158, 11, 0.3)',
       },
       danger: {
-        main: '#DC2626',
-        light: '#FEE2E2',
-        dark: '#F87171',
-        border: 'rgba(220, 38, 38, 0.25)',
+        main: '#F43F5E',       // Alert Red
+        light: '#FFF1F2',
+        dark: '#FB7185',
+        border: 'rgba(244, 63, 94, 0.3)',
       },
       info: {
-        main: '#2563EB',
-        light: '#DBEAFE',
-        dark: '#60A5FA',
-        border: 'rgba(37, 99, 235, 0.25)',
+        main: '#38BDF8',       // Cyber Sky Blue (QR & IoT)
+        light: '#F0F9FF',
+        dark: '#7DD3FC',
+        border: 'rgba(56, 189, 248, 0.3)',
+      },
+      eco: {
+        main: '#10B981',
+        light: '#ECFDF5',
+        dark: '#34D399',
+        border: 'rgba(16, 185, 129, 0.3)',
+      },
+      solar: {
+        main: '#F59E0B',
+        light: '#FFFBEB',
+        dark: '#FBBF24',
+        border: 'rgba(245, 158, 11, 0.3)',
       },
       purple: {
-        main: '#9333EA',
-        light: '#F3E8FF',
-        dark: '#C084FC',
-        border: 'rgba(147, 51, 234, 0.25)',
+        main: '#6366F1',       // 67 Challenge & 2FA Purple
+        light: '#EEF2FF',
+        dark: '#818CF8',
+        border: 'rgba(99, 102, 241, 0.3)',
       },
     },
     neutral: {
       light: {
-        bg: '#F6F8F7',
+        bg: '#F1F5F9',
         surface: '#FFFFFF',
         surfaceElevated: '#F8FAFC',
-        surfaceMuted: '#F1F5F3',
-        border: '#E2E8E4',
-        borderSubtle: '#EDF2EE',
-        textPrimary: '#15201A',
-        textSecondary: '#53635A',
-        textTertiary: '#78857D',
+        surfaceMuted: '#E2E8F0',
+        border: '#CBD5E1',
+        borderSubtle: '#F1F5F9',
+        textPrimary: '#0A1128',
+        textSecondary: '#475569',
+        textTertiary: '#94A3B8',
       },
       dark: {
-        bg: '#0F141A',
-        surface: '#151C23',
-        surfaceElevated: '#1B242D',
-        surfaceMuted: '#1E2832',
-        border: 'rgba(255, 255, 255, 0.08)',
-        borderSubtle: 'rgba(255, 255, 255, 0.04)',
-        textPrimary: '#F5F7F8',
-        textSecondary: '#AAB4BE',
+        bg: '#060A18',         // Midnight abyss space
+        surface: '#0B132B',    // Deep bento card navy
+        surfaceElevated: '#101B3B',
+        surfaceMuted: '#0E1838',
+        border: 'rgba(59, 130, 246, 0.2)', // Electric blue rim
+        borderSubtle: 'rgba(59, 130, 246, 0.1)',
+        textPrimary: '#FFFFFF',
+        textSecondary: '#94A3B8',
         textTertiary: '#64748B',
       },
     },
@@ -78,7 +91,7 @@ export const DS_TOKENS = {
   },
   shadows: {
     cardLight: '0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04)',
-    cardHover: '0 8px 16px -4px rgba(22, 163, 74, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)',
+    cardHover: '0 8px 16px -4px rgba(26, 162, 152, 0.12), 0 4px 6px -2px rgba(0, 0, 0, 0.04)',
     cardDark: '0 1px 3px 0 rgba(0, 0, 0, 0.2)',
   },
   typography: {

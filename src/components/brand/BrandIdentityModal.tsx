@@ -45,7 +45,7 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'lockups' | 'icons' | 'scalability' | 'colors' | 'typography' | 'illustrations'>('overview');
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
-  const [bgPreview, setBgPreview] = useState<'light' | 'dark' | 'green' | 'black'>('light');
+  const [bgPreview, setBgPreview] = useState<'light' | 'dark' | 'cyan' | 'black'>('light');
   const [selectedIllustrationCategory, setSelectedIllustrationCategory] = useState<string>('all');
   const [illustrationSearch, setIllustrationSearch] = useState<string>('');
   const [previewSize, setPreviewSize] = useState<number>(64);
@@ -58,70 +58,90 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
     setTimeout(() => setCopiedCode(null), 2500);
   };
 
-  // Official 5 Color Tokens strictly from the brand sheet
+  // EZUP Cyber Blue & Midnight Navy Palette - Inspired by Bento Showcase Design
   const colorPalette = [
     {
-      name: 'Primary Green',
-      role: 'Core Brand & Sustainability Accent',
-      hex: '#22C55E',
-      rgb: 'rgb(34, 197, 94)',
-      hsl: 'hsl(142, 71%, 45%)',
-      contrast: 'WCAG AAA (10.2:1)',
-      bgClass: 'bg-[#22C55E]',
-      descTh: 'สีเขียวสดใส สื่อถึงพลังงานสะอาด ความสดชื่น และความยั่งยืน',
+      name: 'Cyber Electric Blue',
+      role: 'Core Brand & Primary Showcase Highlight',
+      hex: '#2563EB',
+      rgb: 'rgb(37, 99, 235)',
+      hsl: 'hsl(221, 83%, 53%)',
+      contrast: 'WCAG AAA on Dark Navy',
+      bgClass: 'bg-[#2563EB]',
+      descTh: 'สีน้ำเงินอิเล็กทริก สื่อถึงพลังงานไฟฟ้าความเร็วสูง นวัตกรรมดิจิทัล และความแม่นยำระดับมืออาชีพ',
     },
     {
-      name: 'Secondary Yellow',
-      role: 'Solar Energy & Electric Spark Core',
-      hex: '#FBBF24',
-      rgb: 'rgb(251, 191, 36)',
-      hsl: 'hsl(43, 96%, 56%)',
-      contrast: 'WCAG AA Accent',
-      bgClass: 'bg-[#FBBF24]',
-      descTh: 'สีเหลืองทองพลังงาน สื่อถึงสายฟ้า ความสว่าง และโซลาร์เซลล์',
+      name: 'Cyber Sky / Cyan',
+      role: 'Hero Logo Accent, QR & Telemetry Pill',
+      hex: '#38BDF8',
+      rgb: 'rgb(56, 189, 248)',
+      hsl: 'hsl(199, 95%, 60%)',
+      contrast: 'High Glow Visibility',
+      bgClass: 'bg-[#38BDF8]',
+      descTh: 'สีฟ้าไซเบอร์สกาย สื่อถึง AI Voltie, ข้อมูลมิเตอร์ IoT และการเชื่อมต่อแบบเรียลไทม์',
     },
     {
-      name: 'Supporting Blue',
-      role: 'Smart Tech & Precise Intelligence',
-      hex: '#60A5FA',
-      rgb: 'rgb(96, 165, 250)',
-      hsl: 'hsl(213, 94%, 68%)',
-      contrast: 'WCAG AA',
-      bgClass: 'bg-[#60A5FA]',
-      descTh: 'สีฟ้าเทคโนโลยี สื่อถึงความแม่นยำ สถิติ และการวิเคราะห์',
+      name: 'Midnight Navy Abyss',
+      role: 'Global Dark Canvas & Ambient Vignette',
+      hex: '#060A18',
+      rgb: 'rgb(6, 10, 24)',
+      hsl: 'hsl(227, 60%, 6%)',
+      contrast: 'Ultra Deep Contrast',
+      bgClass: 'bg-[#060A18]',
+      descTh: 'สีพื้นหลังห้วงอวกาศมิดไนท์เนวี ลึกล้ำ มีมิติ แสงสะท้อนสีน้ำเงินในมุมมองกว้าง',
     },
     {
-      name: 'Charcoal',
-      role: 'Primary Neutral & Heavy Typography',
-      hex: '#1F2937',
-      rgb: 'rgb(31, 41, 55)',
-      hsl: 'hsl(215, 28%, 17%)',
-      contrast: 'WCAG AAA (16.8:1)',
-      bgClass: 'bg-[#1F2937]',
-      descTh: 'สีเทาเข้มชาร์โคล หนักแน่น อ่านง่าย ชัดเจนทุกพื้นผิว',
+      name: 'Deep Bento Navy',
+      role: 'Bento Glassmorphic Card Surface & Rim',
+      hex: '#0B132B',
+      rgb: 'rgb(11, 19, 43)',
+      hsl: 'hsl(225, 59%, 11%)',
+      contrast: 'WCAG AAA Surface',
+      bgClass: 'bg-[#0B132B]',
+      descTh: 'สีการ์ด Bento ดำริ้วน้ำเงินเข้ม พร้อมขอบบางประกายฟ้า (Electric Rim #1E2E5D)',
     },
     {
-      name: 'Off White',
-      role: 'Canvas Background & Clean Surface',
-      hex: '#F8FAFC',
-      rgb: 'rgb(248, 250, 252)',
-      hsl: 'hsl(210, 40%, 98%)',
-      contrast: 'Eye-Safe Warm Light',
-      bgClass: 'bg-[#F8FAFC]',
-      descTh: 'สีขาวนวล สบายตา ช่วยให้ใช้งานได้ต่อเนื่องโดยไม่ล้าแสง',
+      name: 'Neon Mint Gauge',
+      role: 'Energy Savings, Eco Nodes & Efficiency Status',
+      hex: '#10B981',
+      rgb: 'rgb(16, 185, 129)',
+      hsl: 'hsl(160, 84%, 39%)',
+      contrast: 'Vibrant Status Ring',
+      bgClass: 'bg-[#10B981]',
+      descTh: 'สีเขียวมิ้นต์นีออน สำหรับเกจสังกัดมิเตอร์ โหมดประหยัดพลังงาน และเควสต์',
+    },
+    {
+      name: 'Streamer Bronze / Amber',
+      role: 'Peak TOU Windows & Tournament Badges',
+      hex: '#F59E0B',
+      rgb: 'rgb(245, 158, 11)',
+      hsl: 'hsl(38, 92%, 50%)',
+      contrast: 'Warning & Warm Accent',
+      bgClass: 'bg-[#F59E0B]',
+      descTh: 'สีทองอำพัน สำหรับแจ้งเตือนชั่วโมงค่าไฟพีค และเหรียญรางวัลสะสม',
+    },
+    {
+      name: 'Challenge Purple / Indigo',
+      role: 'Security 2FA, Passkeys & Micro Quests',
+      hex: '#6366F1',
+      rgb: 'rgb(99, 102, 241)',
+      hsl: 'hsl(239, 84%, 67%)',
+      contrast: 'Special Feature Accent',
+      bgClass: 'bg-[#6366F1]',
+      descTh: 'สีม่วงอินดิโก สื่อถึงระบบความปลอดภัย 2FA และชาเลนจ์ภารกิจพิเศษ',
     },
   ];
 
   const getBackgroundStyle = () => {
     switch (bgPreview) {
       case 'dark':
-        return 'bg-[#1F2937] text-white border-slate-700';
-      case 'green':
-        return 'bg-[#22C55E] text-white border-[#16A34A]';
+        return 'bg-[#0B132B] text-white border-[#1E2E5D]';
+      case 'cyan':
+        return 'bg-[#2563EB] text-white border-blue-400';
       case 'black':
-        return 'bg-[#000000] text-white border-white/20';
+        return 'bg-[#060A18] text-white border-blue-900/40';
       default:
-        return 'bg-[#F8FAFC] text-[#1F2937] border-slate-200';
+        return 'bg-[#F1F5F9] text-[#0A1128] border-slate-300';
     }
   };
 
@@ -129,14 +149,14 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
   const officialSvgString = `<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="leftWing" x1="30%" y1="10%" x2="50%" y2="90%">
-      <stop offset="0%" stop-color="#4ADE80" />
-      <stop offset="55%" stop-color="#22C55E" />
-      <stop offset="100%" stop-color="#0D9488" />
+      <stop offset="0%" stop-color="#4DE5EE" />
+      <stop offset="55%" stop-color="#1EC1CB" />
+      <stop offset="100%" stop-color="#169EA7" />
     </linearGradient>
     <linearGradient id="rightWing" x1="85%" y1="20%" x2="35%" y2="85%">
-      <stop offset="0%" stop-color="#22C55E" />
-      <stop offset="60%" stop-color="#16A34A" />
-      <stop offset="100%" stop-color="#0F766E" />
+      <stop offset="0%" stop-color="#1EC1CB" />
+      <stop offset="60%" stop-color="#169EA7" />
+      <stop offset="100%" stop-color="#156D74" />
     </linearGradient>
     <linearGradient id="spark" x1="20%" y1="0%" x2="80%" y2="100%">
       <stop offset="0%" stop-color="#FDE047" />
@@ -242,15 +262,15 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                         </button>
                         <button 
                           onClick={() => setBgPreview('dark')} 
-                          className={`px-2 py-1 rounded-[6px] font-bold text-[11px] cursor-pointer ${bgPreview === 'dark' ? 'bg-[#1F2937] text-white shadow' : 'text-slate-500'}`}
+                          className={`px-2 py-1 rounded-[6px] font-bold text-[11px] cursor-pointer ${bgPreview === 'dark' ? 'bg-[#1C1C28] text-white shadow' : 'text-slate-500'}`}
                         >
-                          Charcoal
+                          Deep Navy
                         </button>
                         <button 
-                          onClick={() => setBgPreview('green')} 
-                          className={`px-2 py-1 rounded-[6px] font-bold text-[11px] cursor-pointer ${bgPreview === 'green' ? 'bg-[#22C55E] text-white shadow' : 'text-slate-500'}`}
+                          onClick={() => setBgPreview('cyan')} 
+                          className={`px-2 py-1 rounded-[6px] font-bold text-[11px] cursor-pointer ${bgPreview === 'cyan' ? 'bg-[#1EC1CB] text-slate-900 shadow' : 'text-slate-500'}`}
                         >
-                          Green
+                          Cyan
                         </button>
                         <button 
                           onClick={() => setBgPreview('black')} 
@@ -264,20 +284,20 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                     {/* Visual Rationale & Composition */}
                     <div className="flex-1 space-y-4">
                       <div>
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#22C55E]">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#1EC1CB]">
                           Official Brand Symbol Structure
                         </span>
-                        <h3 className="text-2xl font-black font-display text-[#1F2937] dark:text-[#F8FAFC] mt-0.5">
+                        <h3 className="text-2xl font-black font-display text-[#1C1C28] dark:text-[#F5F7FB] mt-0.5">
                           The Open Book, Energy Spark & Eco Leaf
                         </h3>
-                        <p className="text-sm font-semibold text-[#22C55E] mt-0.5">
+                        <p className="text-sm font-semibold text-[#1EC1CB] mt-0.5">
                           {lang === 'th' ? 'ผสานความรู้ด้านพลังงาน (Edu) + ความง่ายสบาย (Ease) + สายฟ้าพลังงานสะอาด (Energy)' : 'Synthesizing Education, Frictionless Ease, and Clean Energy.'}
                         </p>
                       </div>
 
                       <div className="space-y-2.5 text-xs md:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                         <div className="flex items-start gap-2">
-                          <span className="w-2 h-2 rounded-full bg-[#22C55E] mt-1.5 shrink-0" />
+                          <span className="w-2 h-2 rounded-full bg-[#1EC1CB] mt-1.5 shrink-0" />
                           <span><strong>ปีกซ้าย (Left Wing):</strong> รูปทรงหน้าหนังสือเปิดและใบไม้อ่อน สื่อถึงองค์ความรู้พื้นฐานและการเริ่มต้นเรียนรู้</span>
                         </div>
                         <div className="flex items-start gap-2">
@@ -285,7 +305,7 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                           <span><strong>ประกายสายฟ้า (Center Spark):</strong> สัญลักษณ์สายฟ้าสีทอง สื่อถึงพลังงานไฟฟ้า แสงอาทิตย์ และความเข้าใจที่กระจ่างชัด</span>
                         </div>
                         <div className="flex items-start gap-2">
-                          <span className="w-2 h-2 rounded-full bg-[#0D9488] mt-1.5 shrink-0" />
+                          <span className="w-2 h-2 rounded-full bg-[#169EA7] mt-1.5 shrink-0" />
                           <span><strong>ปีกขวาเจาะช่อง (Right Leaf with Aperture):</strong> ใบไม้พร้อมช่องเปิด สื่อถึงความโปร่งใส ความยั่งยืน และความสบายตา</span>
                         </div>
                       </div>
@@ -323,10 +343,10 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
 
                 {/* Primary Logo (Horizontal) Showcase */}
                 <UnifiedCard isDarkMode={isDarkMode} className="p-6">
-                  <span className="text-xs font-bold text-[#22C55E] uppercase tracking-wider block mb-3">
+                  <span className="text-xs font-bold text-[#1EC1CB] uppercase tracking-wider block mb-3">
                     Primary Logo (Horizontal)
                   </span>
-                  <div className="p-8 rounded-[16px] bg-[#F8FAFC] dark:bg-[#1B242D] border border-slate-200 dark:border-white/10 flex items-center justify-center min-h-[140px]">
+                  <div className="p-8 rounded-[16px] bg-[#F5F7FA] dark:bg-[#242435] border border-slate-200 dark:border-white/10 flex items-center justify-center min-h-[140px]">
                     <EduEaseLogo variant="primary" size={56} isDarkMode={isDarkMode} />
                   </div>
                 </UnifiedCard>
@@ -341,10 +361,10 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                   <UnifiedCard isDarkMode={isDarkMode} className="p-5 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-bold text-[#22C55E] uppercase tracking-wider">1. Primary Logo (Horizontal)</span>
+                        <span className="text-xs font-bold text-[#1EC1CB] uppercase tracking-wider">1. Primary Logo (Horizontal)</span>
                         <span className="text-[10px] text-slate-400 font-mono">Standard Lockup</span>
                       </div>
-                      <div className="p-6 rounded-[14px] bg-[#F8FAFC] dark:bg-[#1B242D] border border-slate-200 dark:border-white/10 flex items-center justify-center min-h-[130px]">
+                      <div className="p-6 rounded-[14px] bg-[#F5F7FA] dark:bg-[#242435] border border-slate-200 dark:border-white/10 flex items-center justify-center min-h-[130px]">
                         <EduEaseLogo variant="primary" size="lg" isDarkMode={isDarkMode} />
                       </div>
                     </div>
@@ -357,10 +377,10 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                   <UnifiedCard isDarkMode={isDarkMode} className="p-5 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-bold text-[#22C55E] uppercase tracking-wider">2. Stacked Logo</span>
+                        <span className="text-xs font-bold text-[#1EC1CB] uppercase tracking-wider">2. Stacked Logo</span>
                         <span className="text-[10px] text-slate-400 font-mono">Hero / Poster</span>
                       </div>
-                      <div className="p-6 rounded-[14px] bg-[#F8FAFC] dark:bg-[#1B242D] border border-slate-200 dark:border-white/10 flex items-center justify-center min-h-[130px]">
+                      <div className="p-6 rounded-[14px] bg-[#F5F7FA] dark:bg-[#242435] border border-slate-200 dark:border-white/10 flex items-center justify-center min-h-[130px]">
                         <EduEaseLogo variant="stacked" size="md" isDarkMode={isDarkMode} />
                       </div>
                     </div>
@@ -373,10 +393,10 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                   <UnifiedCard isDarkMode={isDarkMode} className="p-5 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-bold text-[#22C55E] uppercase tracking-wider">3. Symbol Only</span>
+                        <span className="text-xs font-bold text-[#1EC1CB] uppercase tracking-wider">3. Symbol Only</span>
                         <span className="text-[10px] text-slate-400 font-mono">Standalone Icon</span>
                       </div>
-                      <div className="p-6 rounded-[14px] bg-[#F8FAFC] dark:bg-[#1B242D] border border-slate-200 dark:border-white/10 flex items-center justify-center min-h-[130px]">
+                      <div className="p-6 rounded-[14px] bg-[#F5F7FA] dark:bg-[#242435] border border-slate-200 dark:border-white/10 flex items-center justify-center min-h-[130px]">
                         <EduEaseLogo variant="symbol" size={54} isDarkMode={isDarkMode} />
                       </div>
                     </div>
@@ -389,10 +409,10 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                   <UnifiedCard isDarkMode={isDarkMode} className="p-5 flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-bold text-[#22C55E] uppercase tracking-wider">4. Horizontal Navbar</span>
+                        <span className="text-xs font-bold text-[#1EC1CB] uppercase tracking-wider">4. Horizontal Navbar</span>
                         <span className="text-[10px] text-slate-400 font-mono">Compact 36px</span>
                       </div>
-                      <div className="p-6 rounded-[14px] bg-[#F8FAFC] dark:bg-[#1B242D] border border-slate-200 dark:border-white/10 flex items-center justify-center min-h-[130px]">
+                      <div className="p-6 rounded-[14px] bg-[#F5F7FA] dark:bg-[#242435] border border-slate-200 dark:border-white/10 flex items-center justify-center min-h-[130px]">
                         <EduEaseLogo variant="horizontal" size="md" isDarkMode={isDarkMode} />
                       </div>
                     </div>
@@ -405,7 +425,7 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                 {/* Monochrome Variations */}
                 <UnifiedCard isDarkMode={isDarkMode} className="p-6 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#22C55E] uppercase tracking-wider">
+                    <span className="text-xs font-bold text-[#1EC1CB] uppercase tracking-wider">
                       Monochrome Lockups (100% Solid Ink)
                     </span>
                     <span className="text-[10px] text-slate-400 font-mono">Print & High Contrast</span>
@@ -419,7 +439,7 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                     </div>
 
                     {/* Monochrome White */}
-                    <div className="p-6 rounded-[14px] bg-[#1F2937] border border-slate-700 flex flex-col items-center justify-center gap-2">
+                    <div className="p-6 rounded-[14px] bg-[#1C1C28] border border-slate-700 flex flex-col items-center justify-center gap-2">
                       <EduEaseLogo variant="monochrome-white" size="lg" />
                       <span className="text-[11px] font-bold text-white mt-2">Monochrome (White)</span>
                     </div>
@@ -435,7 +455,7 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                   {/* App Icon */}
                   <UnifiedCard isDarkMode={isDarkMode} className="p-6 flex flex-col items-center text-center justify-between">
                     <div>
-                      <span className="text-xs font-bold text-[#22C55E] uppercase tracking-wider block mb-4">
+                      <span className="text-xs font-bold text-[#1EC1CB] uppercase tracking-wider block mb-4">
                         App Icon (iOS / Android / PWA)
                       </span>
                       <div className="p-8 flex items-center justify-center">
@@ -443,14 +463,14 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                       </div>
                     </div>
                     <div className="w-full text-xs text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-white/5">
-                      พื้นหลังสีเขียว <code>#22C55E</code> ทรง Squircle โค้งมน พร้อมสัญลักษณ์สีขาวทึบ 100%
+                      พื้นหลังสีฟ้าไซแอน <code>#1EC1CB</code> ทรง Squircle โค้งมน พร้อมสัญลักษณ์สีขาวทึบ 100%
                     </div>
                   </UnifiedCard>
 
                   {/* Favicon */}
                   <UnifiedCard isDarkMode={isDarkMode} className="p-6 flex flex-col items-center text-center justify-between">
                     <div>
-                      <span className="text-xs font-bold text-[#22C55E] uppercase tracking-wider block mb-4">
+                      <span className="text-xs font-bold text-[#1EC1CB] uppercase tracking-wider block mb-4">
                         Favicon (Browser Tabs & Bookmarks)
                       </span>
                       <div className="p-8 flex items-center justify-center">
@@ -458,24 +478,24 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                       </div>
                     </div>
                     <div className="w-full text-xs text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-white/5">
-                      พื้นหลังสีขาวนวล <code>#F8FAFC</code> พร้อมสัญลักษณ์แบบเต็มสีและเส้นขอบบางประณีต
+                      พื้นหลังสีขาวนวล <code>#F5F7FA</code> พร้อมสัญลักษณ์แบบเต็มสีและเส้นขอบบางประณีต
                     </div>
                   </UnifiedCard>
                 </div>
 
                 {/* Background Usage Row */}
                 <UnifiedCard isDarkMode={isDarkMode} className="p-6">
-                  <span className="text-xs font-bold text-[#22C55E] uppercase tracking-wider block mb-4">
+                  <span className="text-xs font-bold text-[#1EC1CB] uppercase tracking-wider block mb-4">
                     Background Usage Variations
                   </span>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="p-4 rounded-[14px] bg-[#F8FAFC] border border-slate-200 flex items-center justify-center min-h-[90px]">
+                    <div className="p-4 rounded-[14px] bg-[#F5F7FA] border border-slate-200 flex items-center justify-center min-h-[90px]">
                       <EduEaseLogo variant="symbol" size={42} />
                     </div>
-                    <div className="p-4 rounded-[14px] bg-[#1F2937] border border-slate-700 flex items-center justify-center min-h-[90px]">
+                    <div className="p-4 rounded-[14px] bg-[#1C1C28] border border-slate-700 flex items-center justify-center min-h-[90px]">
                       <EduEaseLogo variant="symbol" size={42} isDarkMode />
                     </div>
-                    <div className="p-4 rounded-[14px] bg-[#22C55E] border border-[#16A34A] flex items-center justify-center min-h-[90px]">
+                    <div className="p-4 rounded-[14px] bg-[#1EC1CB] border border-[#169EA7] flex items-center justify-center min-h-[90px]">
                       <EduEaseLogo variant="symbol" size={42} forcedColor="#FFFFFF" />
                     </div>
                     <div className="p-4 rounded-[14px] bg-black border border-white/20 flex items-center justify-center min-h-[90px]">
@@ -603,22 +623,22 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
                   <div className="p-8 rounded-[16px] bg-[#F8FAFC] dark:bg-[#1B242D] border border-slate-200 dark:border-white/10 flex flex-col items-center justify-center gap-4 text-center">
                     <div className="flex flex-col items-center">
                       <div className="text-4xl md:text-5xl font-black font-display tracking-tight">
-                        <span className="text-[#1F2937] dark:text-[#F8FAFC]">Edu</span>
-                        <span className="text-[#22C55E]">Ease</span>
+                        <span className="text-[#1C1C28] dark:text-[#F5F7FB]">Edu</span>
+                        <span className="text-[#1EC1CB]">Ease</span>
                       </div>
-                      <span className="text-lg md:text-xl font-medium tracking-[0.22em] text-[#1F2937] dark:text-[#94A3B8] uppercase mt-1">
+                      <span className="text-lg md:text-xl font-medium tracking-[0.22em] text-[#5D627A] dark:text-[#9DA3BA] uppercase mt-1">
                         Energy
                       </span>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg text-left text-xs mt-3">
                       <div className="p-3 rounded-[10px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                        <span className="font-bold text-[#1F2937] dark:text-[#F8FAFC] block">"Edu" (Charcoal #1F2937)</span>
-                        <span className="text-slate-500 text-[11px]">การเรียนรู้ ความเข้าใจเรื่องไฟที่ถูกต้อง</span>
+                        <span className="font-bold text-[#1C1C28] dark:text-[#F5F7FB] block">"Edu" (Deep Navy #1C1C28)</span>
+                        <span className="text-slate-500 text-[11px]">การเรียนรู้ ความเข้าใจเรื่องไฟที่ถูกต้องและลึกซึ้ง</span>
                       </div>
                       <div className="p-3 rounded-[10px] bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                        <span className="font-bold text-[#22C55E] block">"Ease" (Primary Green #22C55E)</span>
-                        <span className="text-slate-500 text-[11px]">ความง่าย ใช้งานสะดวก ประหยัดทันที</span>
+                        <span className="font-bold text-[#1EC1CB] block">"Ease" (Brand Cyan #1EC1CB)</span>
+                        <span className="text-slate-500 text-[11px]">ความง่าย สดใส ใช้งานสะดวก ประหยัดทันที</span>
                       </div>
                     </div>
                   </div>
@@ -629,9 +649,9 @@ export const BrandIdentityModal: React.FC<BrandIdentityModalProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-slate-200 dark:border-white/10 flex items-center justify-between shrink-0 bg-slate-50 dark:bg-[#1B242D]">
+          <div className="px-6 py-4 border-t border-slate-200 dark:border-white/10 flex items-center justify-between shrink-0 bg-slate-50 dark:bg-[#1C1C28]">
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-              <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
+              <ShieldCheck className="w-4 h-4 text-[#1EC1CB]" />
               <span>EduEase Energy CI Specification • 100% Vector Geometry</span>
             </div>
             <UnifiedButton

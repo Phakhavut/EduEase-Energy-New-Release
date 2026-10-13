@@ -46,7 +46,7 @@ export const SegmentedTabs = <T extends string = string>({
               onClick={() => onChange(tab.id)}
               className={`flex items-center gap-2 pb-3 px-1 text-xs md:text-sm font-bold border-b-2 transition-colors shrink-0 cursor-pointer ${
                 isActive
-                  ? 'border-[#16A34A] text-[#16A34A] dark:text-[#4ADE80]'
+                  ? 'border-[#1EC1CB] text-[#1EC1CB] dark:text-[#4DE5EE]'
                   : 'border-transparent text-[#78857D] dark:text-[#AAB4BE] hover:text-[#15201A] dark:hover:text-[#F5F7F8]'
               }`}
             >
@@ -57,8 +57,8 @@ export const SegmentedTabs = <T extends string = string>({
               )}
               <span>{lang === 'th' ? tab.labelTh : tab.labelEn}</span>
               {tab.badge !== undefined && (
-                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                  isActive ? 'bg-[#16A34A] text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
+                  isActive ? 'bg-[#1EC1CB] text-slate-900' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                 }`}>
                   {tab.badge}
                 </span>
@@ -74,8 +74,8 @@ export const SegmentedTabs = <T extends string = string>({
   return (
     <div className={`inline-flex items-center gap-1.5 p-1 rounded-[12px] border overflow-x-auto scrollbar-none max-w-full ${
       isDarkMode 
-        ? 'bg-[#1B242D] border-white/10' 
-        : 'bg-[#F6F8F7] border-[#E2E8E4]'
+        ? 'bg-[#1C1C28] border-[#38384E]' 
+        : 'bg-[#F5F7FA] border-[#CBD5E1]'
     } ${className}`}>
       {tabs.map((tab) => {
         const isActive = tab.id === activeTab;
@@ -90,8 +90,8 @@ export const SegmentedTabs = <T extends string = string>({
             className={`flex items-center justify-center gap-2 rounded-[9px] font-bold transition-all shrink-0 cursor-pointer ${paddingClass} ${
               isActive
                 ? isDarkMode
-                  ? 'bg-[#151C23] text-[#4ADE80] shadow-sm border border-[#16A34A]/30'
-                  : 'bg-[#FFFFFF] text-[#15803D] shadow-sm border border-[#16A34A]/30'
+                  ? 'bg-[#242435] text-[#4DE5EE] shadow-sm border border-[#1EC1CB]/40'
+                  : 'bg-[#FFFFFF] text-[#156D74] shadow-sm border border-[#1EC1CB]/30'
                 : 'text-[#53635A] dark:text-[#AAB4BE] hover:text-[#15201A] dark:hover:text-[#F5F7F8] border border-transparent'
             }`}
           >
@@ -102,9 +102,9 @@ export const SegmentedTabs = <T extends string = string>({
             )}
             <span>{lang === 'th' ? tab.labelTh : tab.labelEn}</span>
             {tab.badge !== undefined && (
-              <span className={`px-1.5 py-0.5 rounded-[6px] text-[10px] font-mono ${
+              <span className={`px-1.5 py-0.5 rounded-[6px] text-[10px] font-mono font-bold ${
                 isActive 
-                  ? 'bg-[#16A34A] text-white' 
+                  ? 'bg-[#1EC1CB] text-slate-900' 
                   : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
               }`}>
                 {tab.badge}

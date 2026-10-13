@@ -29,10 +29,10 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <div className={`p-8 md:p-12 text-center rounded-[16px] border ${
       isDarkMode 
-        ? 'bg-[#151C23]/60 border-white/10 text-[#F5F7F8]' 
+        ? 'bg-[#1C1C28]/80 border-[#38384E] text-[#F5F7F8]' 
         : 'bg-[#FFFFFF] border-[#E2E8E4] text-[#15201A]'
     } ${className}`}>
-      <div className="w-12 h-12 mx-auto mb-4 rounded-[14px] bg-[#DCFCE7] dark:bg-[#16A34A]/15 text-[#15803D] dark:text-[#4ADE80] flex items-center justify-center">
+      <div className="w-12 h-12 mx-auto mb-4 rounded-[14px] bg-[#E0F7F9] dark:bg-[#1EC1CB]/15 text-[#156D74] dark:text-[#4DE5EE] flex items-center justify-center">
         {renderIcon(Icon, "w-6 h-6")}
       </div>
 

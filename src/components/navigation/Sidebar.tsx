@@ -167,8 +167,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
     <aside className="hidden lg:flex flex-col w-[240px] shrink-0 h-[calc(100vh-2rem)] sticky top-4 left-4 z-40 my-4 ml-4">
       <div className={`flex flex-col justify-between h-full p-4 rounded-[16px] border transition-colors duration-200 overflow-y-auto ${
         isDarkMode 
-          ? 'bg-[#151C23] border-white/10 text-[#F5F7F8]' 
-          : 'bg-[#FFFFFF] border-[#E2E8E4] text-[#15201A]'
+          ? 'bg-[#11161D] border-[#1F2935] text-[#F3F6F9]' 
+          : 'bg-[#FFFFFF] border-[#E2E8F0] text-[#1E293B]'
       }`}>
         {/* Top: Branding */}
         <div>
@@ -189,11 +189,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {isCleanMode ? (
             <div className={`p-3 rounded-[10px] mb-4 border transition-colors ${
               isDarkMode 
-                ? 'bg-[#1B242D] border-white/10' 
-                : 'bg-[#F6F8F7] border-[#E2E8E4]'
+                ? 'bg-[#161E27] border-[#2A3848]' 
+                : 'bg-[#F8FAFC] border-[#E2E8F0]'
             }`}>
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-[8px] bg-[#16A34A] flex items-center justify-center text-white text-sm shrink-0">
+                <div className="w-8 h-8 rounded-[8px] bg-[#1AA298] flex items-center justify-center text-white text-sm font-bold shrink-0">
                   ⚡
                 </div>
                 <div className="flex-1 min-w-0">
@@ -201,7 +201,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span className="font-semibold text-xs truncate" title={selectedLocationName}>
                       {selectedLocationName}
                     </span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-[6px] bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80]">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-[6px] bg-[#E8F8F6] text-[#138A81] dark:bg-[#1AA298]/20 dark:text-[#38C7BA]">
                       PRO
                     </span>
                   </div>
@@ -212,13 +212,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </div>
             </div>
           ) : (
-            <div className={`p-3 rounded-[10px] mb-4 border transition-colors ${
+            <div className={`p-3 rounded-[12px] mb-4 border transition-colors ${
               isDarkMode 
-                ? 'bg-[#1B242D] border-white/10' 
-                : 'bg-[#F6F8F7] border-[#E2E8E4]'
+                ? 'bg-[#0B132B] border-[#1E2E5D]' 
+                : 'bg-[#F8FAFC] border-[#E2E8F0]'
             }`}>
               <div className="flex items-center gap-2.5 mb-2">
-                <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-amber-400 to-amber-500 text-[#15201A] flex items-center justify-center text-base font-bold shadow-sm shrink-0">
+                <div className="w-9 h-9 rounded-[8px] bg-gradient-to-br from-[#2563EB] to-[#38BDF8] text-white flex items-center justify-center text-base font-bold shadow-md shadow-blue-600/20 shrink-0">
                   {currentAvatar || '⚡'}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -226,11 +226,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <span className="font-semibold text-xs truncate" title={selectedLocationName}>
                       {selectedLocationName}
                     </span>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-[6px] bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80]">
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-[6px] bg-blue-50 text-[#1D4ED8] dark:bg-blue-500/20 dark:text-[#60A5FA] border border-blue-400/30">
                       Lv. {userLevel}
                     </span>
                   </div>
-                  <p className="text-[11px] text-[#53635A] dark:text-[#AAB4BE] truncate">
+                  <p className="text-[11px] text-[#53635A] dark:text-[#94A3B8] truncate">
                     {lang === 'th' ? personaConfig.roleBadgeTh : personaConfig.roleBadgeEn}
                   </p>
                 </div>
@@ -254,13 +254,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               {/* XP Progress Bar */}
               <div>
-                <div className="flex justify-between text-[10px] font-medium text-[#78857D] mb-1">
+                <div className="flex justify-between text-[10px] font-medium text-[#78857D] dark:text-[#94A3B8] mb-1">
                   <span>XP</span>
                   <span className="font-mono">{userXp}/{userXpMax}</span>
                 </div>
                 <div className="w-full h-1.5 rounded-full bg-[#E2E8E4] dark:bg-white/10 overflow-hidden">
                   <motion.div 
-                    className="h-full bg-[#16A34A] rounded-full"
+                    className="h-full bg-gradient-to-r from-[#2563EB] to-[#38BDF8] rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min(100, (userXp / userXpMax) * 100)}%` }}
                     transition={{ duration: 0.8 }}
@@ -274,7 +274,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <nav className="space-y-3">
             {/* 1. MAIN */}
             <div className="space-y-1">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] px-2.5">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] dark:text-[#64748B] px-2.5">
                 {lang === 'th' ? 'MAIN (เมนูหลัก)' : 'MAIN'}
               </div>
               {mainNavItems.map((item) => {
@@ -286,19 +286,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onClick={() => setCurrentPage(item.id)}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-xs transition-colors group cursor-pointer ${
                       isActive
-                        ? 'bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80] font-semibold border border-[#16A34A]/30'
+                        ? 'bg-blue-50 text-[#1D4ED8] dark:bg-[#2563EB]/25 dark:text-[#60A5FA] font-bold border border-blue-200 dark:border-blue-500/40 shadow-sm'
                         : isDarkMode
-                          ? 'text-[#AAB4BE] hover:text-[#F5F7F8] hover:bg-[#1B242D]'
-                          : 'text-[#53635A] hover:text-[#15201A] hover:bg-[#F6F8F7]'
+                          ? 'text-[#94A3B8] hover:text-[#FFFFFF] hover:bg-[#101B3B]'
+                          : 'text-[#53635A] hover:text-[#0A1128] hover:bg-[#F1F5F9]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#16A34A] dark:text-[#4ADE80]' : 'text-[#78857D]'}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#2563EB] dark:text-[#38BDF8]' : 'text-[#78857D] dark:text-[#64748B]'}`} />
                       <span>{lang === 'th' ? item.labelTh : item.labelEn}</span>
                     </div>
 
                     {item.badge && (
-                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-[6px] bg-[#16A34A]/15 text-[#16A34A] dark:text-[#4ADE80]">
+                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-[6px] bg-[#38BDF8]/15 text-[#0284C7] dark:text-[#38BDF8] border border-[#38BDF8]/30">
                         {item.badge}
                       </span>
                     )}
@@ -308,8 +308,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             {/* 2. ENERGY */}
-            <div className="space-y-1 pt-2 border-t border-[#E2E8E4] dark:border-white/10">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] px-2.5">
+            <div className="space-y-1 pt-2 border-t border-[#E2E8E4] dark:border-[#1E2E5D]/60">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] dark:text-[#64748B] px-2.5">
                 {lang === 'th' ? 'ENERGY (พลังงาน)' : 'ENERGY'}
               </div>
               {energyNavItems.map((item) => {
@@ -321,19 +321,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onClick={() => setCurrentPage(item.id)}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-xs transition-colors group cursor-pointer ${
                       isActive
-                        ? 'bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80] font-semibold border border-[#16A34A]/30'
+                        ? 'bg-blue-50 text-[#1D4ED8] dark:bg-[#2563EB]/25 dark:text-[#60A5FA] font-bold border border-blue-200 dark:border-blue-500/40 shadow-sm'
                         : isDarkMode
-                          ? 'text-[#AAB4BE] hover:text-[#F5F7F8] hover:bg-[#1B242D]'
-                          : 'text-[#53635A] hover:text-[#15201A] hover:bg-[#F6F8F7]'
+                          ? 'text-[#94A3B8] hover:text-[#FFFFFF] hover:bg-[#101B3B]'
+                          : 'text-[#53635A] hover:text-[#0A1128] hover:bg-[#F1F5F9]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#16A34A] dark:text-[#4ADE80]' : 'text-[#78857D]'}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#2563EB] dark:text-[#38BDF8]' : 'text-[#78857D] dark:text-[#64748B]'}`} />
                       <span>{lang === 'th' ? item.labelTh : item.labelEn}</span>
                     </div>
 
                     {item.badge && (
-                      <span className="text-[9px] font-medium max-w-[70px] truncate px-1.5 py-0.5 rounded-[5px] bg-[#16A34A]/10 text-[#16A34A] dark:text-[#4ADE80]">
+                      <span className="text-[9px] font-medium max-w-[70px] truncate px-1.5 py-0.5 rounded-[5px] bg-[#38BDF8]/15 text-[#0284C7] dark:text-[#7DD3FC]">
                         {item.badge}
                       </span>
                     )}
@@ -343,8 +343,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             {/* 3. LEARN & PLAY */}
-            <div className="space-y-1 pt-2 border-t border-[#E2E8E4] dark:border-white/10">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] px-2.5">
+            <div className="space-y-1 pt-2 border-t border-[#E2E8E4] dark:border-[#1E2E5D]/60">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] dark:text-[#64748B] px-2.5">
                 {lang === 'th' ? 'LEARN & PLAY (เรียนรู้ & เล่น)' : 'LEARN & PLAY'}
               </div>
               {learnPlayNavItems.map((item) => {
@@ -356,19 +356,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onClick={() => setCurrentPage(item.id)}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-xs transition-colors group cursor-pointer ${
                       isActive
-                        ? 'bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80] font-semibold border border-[#16A34A]/30'
+                        ? 'bg-blue-50 text-[#1D4ED8] dark:bg-[#2563EB]/25 dark:text-[#60A5FA] font-bold border border-blue-200 dark:border-blue-500/40 shadow-sm'
                         : isDarkMode
-                          ? 'text-[#AAB4BE] hover:text-[#F5F7F8] hover:bg-[#1B242D]'
-                          : 'text-[#53635A] hover:text-[#15201A] hover:bg-[#F6F8F7]'
+                          ? 'text-[#94A3B8] hover:text-[#FFFFFF] hover:bg-[#101B3B]'
+                          : 'text-[#53635A] hover:text-[#0A1128] hover:bg-[#F1F5F9]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#16A34A] dark:text-[#4ADE80]' : 'text-[#78857D]'}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#2563EB] dark:text-[#38BDF8]' : 'text-[#78857D] dark:text-[#64748B]'}`} />
                       <span>{lang === 'th' ? item.labelTh : item.labelEn}</span>
                     </div>
 
                     {item.badge && (
-                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-[6px] bg-[#16A34A]/15 text-[#16A34A] dark:text-[#4ADE80]">
+                      <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-[6px] bg-[#10B981]/15 text-[#059669] dark:text-[#34D399]">
                         {item.badge}
                       </span>
                     )}
@@ -378,8 +378,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             {/* 4. SYSTEM */}
-            <div className="space-y-1 pt-2 border-t border-[#E2E8E4] dark:border-white/10">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] px-2.5">
+            <div className="space-y-1 pt-2 border-t border-[#E2E8E4] dark:border-[#1E2E5D]/60">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-[#78857D] dark:text-[#64748B] px-2.5">
                 {lang === 'th' ? 'SYSTEM (ระบบ)' : 'SYSTEM'}
               </div>
               {systemNavItems.map((item) => {
@@ -391,14 +391,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onClick={() => setCurrentPage(item.id)}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-[10px] text-xs transition-colors group cursor-pointer ${
                       isActive
-                        ? 'bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80] font-semibold border border-[#16A34A]/30'
+                        ? 'bg-blue-50 text-[#1D4ED8] dark:bg-[#2563EB]/25 dark:text-[#60A5FA] font-bold border border-blue-200 dark:border-blue-500/40 shadow-sm'
                         : isDarkMode
-                          ? 'text-[#AAB4BE] hover:text-[#F5F7F8] hover:bg-[#1B242D]'
-                          : 'text-[#53635A] hover:text-[#15201A] hover:bg-[#F6F8F7]'
+                          ? 'text-[#94A3B8] hover:text-[#FFFFFF] hover:bg-[#101B3B]'
+                          : 'text-[#53635A] hover:text-[#0A1128] hover:bg-[#F1F5F9]'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
-                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#16A34A] dark:text-[#4ADE80]' : 'text-[#78857D]'}`} />
+                      <Icon className={`w-4 h-4 ${isActive ? 'text-[#2563EB] dark:text-[#38BDF8]' : 'text-[#78857D] dark:text-[#64748B]'}`} />
                       <span>{lang === 'th' ? item.labelTh : item.labelEn}</span>
                     </div>
                   </button>
@@ -409,18 +409,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Bottom Actions: Language, Theme, Logout */}
-        <div className="pt-3 border-t border-[#E2E8E4] dark:border-white/10 space-y-2">
+        <div className="pt-3 border-t border-[#E2E8E4] dark:border-[#1E2E5D]/60 space-y-2">
           <div className="flex items-center justify-between gap-1.5">
             {/* Language Switch */}
             <button
               onClick={() => setLang(lang === 'th' ? 'en' : 'th')}
               className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-[10px] border text-xs font-semibold transition-colors ${
                 isDarkMode 
-                  ? 'border-white/10 bg-[#1B242D] hover:bg-[#25323E] text-[#F5F7F8]' 
-                  : 'border-[#E2E8E4] bg-[#F6F8F7] hover:bg-[#EAEFEA] text-[#15201A]'
+                  ? 'border-[#1E2E5D] bg-[#0B132B] hover:bg-[#101B3B] text-[#FFFFFF]' 
+                  : 'border-[#CBD5E1] bg-[#F8FAFC] hover:bg-[#EAEFEA] text-[#0A1128]'
               }`}
             >
-              <Globe className="w-3.5 h-3.5 text-[#16A34A]" />
+              <Globe className="w-3.5 h-3.5 text-[#38BDF8]" />
               <span>{lang.toUpperCase()}</span>
             </button>
 
@@ -429,8 +429,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={onToggleTheme}
               className={`p-1.5 rounded-[10px] border transition-colors ${
                 isDarkMode 
-                  ? 'border-white/10 bg-[#1B242D] text-amber-400' 
-                  : 'border-[#E2E8E4] bg-[#F6F8F7] text-[#53635A]'
+                  ? 'border-[#1E2E5D] bg-[#0B132B] text-amber-400' 
+                  : 'border-[#CBD5E1] bg-[#F8FAFC] text-[#53635A]'
               }`}
               aria-label="Toggle Theme"
             >

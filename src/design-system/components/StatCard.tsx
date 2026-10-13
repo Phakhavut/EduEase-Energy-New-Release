@@ -44,7 +44,7 @@ export const StatCard: React.FC<StatCardProps> = ({
       : trend.direction === 'down'; // In energy app, decreasing is usually good
 
     const textColor = isGood
-      ? 'text-[#15803D] dark:text-[#4ADE80] bg-[#DCFCE7] dark:bg-[#16A34A]/20'
+      ? 'text-[#156D74] dark:text-[#4DE5EE] bg-[#E0F7F9] dark:bg-[#1EC1CB]/15'
       : trend.direction === 'neutral'
       ? 'text-[#53635A] dark:text-[#AAB4BE] bg-slate-100 dark:bg-slate-800'
       : 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40';
@@ -74,7 +74,7 @@ export const StatCard: React.FC<StatCardProps> = ({
         </span>
         <div className="flex items-center gap-1.5 shrink-0">
           {badge}
-          <div className="w-8 h-8 rounded-[10px] bg-[#DCFCE7] dark:bg-[#16A34A]/15 text-[#15803D] dark:text-[#4ADE80] flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-[10px] bg-[#E0F7F9] dark:bg-[#1EC1CB]/15 text-[#156D74] dark:text-[#4DE5EE] flex items-center justify-center shrink-0">
             {renderIcon(Icon, "w-4 h-4")}
           </div>
         </div>

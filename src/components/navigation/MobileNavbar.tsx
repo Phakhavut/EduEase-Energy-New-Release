@@ -113,7 +113,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
           ---------------------------------------------------- */}
       <header className={`lg:hidden sticky top-0 z-40 h-14 px-4 border-b flex items-center justify-between transition-colors ${
         isDarkMode 
-          ? 'bg-[#151C23]/95 border-white/10 text-[#F5F7F8]' 
+          ? 'bg-[#1C1C28]/95 border-[#2D2D40] text-[#F5F7F8]' 
           : 'bg-[#FFFFFF]/95 border-[#E2E8E4] text-[#15201A]'
       } backdrop-blur-md`}>
         {/* Left: Location Switcher Target */}
@@ -122,12 +122,12 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
             onClick={() => setShowLocationSelect(!showLocationSelect)}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-[10px] border text-xs font-semibold max-w-[200px] transition-colors ${
               isDarkMode 
-                ? 'bg-[#1B242D] border-white/10 text-[#F5F7F8]' 
-                : 'bg-[#F6F8F7] border-[#E2E8E4] text-[#15201A]'
+                ? 'bg-[#242435] border-[#38384E] text-[#F5F7F8]' 
+                : 'bg-[#F5F7FA] border-[#E2E6EE] text-[#15201A]'
             }`}
             aria-label="Switch location"
           >
-            <MapPin className="w-3.5 h-3.5 text-[#16A34A] shrink-0" />
+            <MapPin className="w-3.5 h-3.5 text-[#1EC1CB] shrink-0" />
             <span className="truncate text-xs font-medium font-display">
               {currentLoc?.name || 'My Dorm'}
             </span>
@@ -142,7 +142,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 8, scale: 0.96 }}
                 className={`absolute left-0 top-full mt-2 w-64 p-2 rounded-[16px] border shadow-xl z-50 ${
-                  isDarkMode ? 'bg-[#151C23] border-white/10 text-[#F5F7F8]' : 'bg-[#FFFFFF] border-[#E2E8E4] text-[#15201A]'
+                  isDarkMode ? 'bg-[#1C1C28] border-[#38384E] text-[#F5F7F8]' : 'bg-[#FFFFFF] border-[#E2E8E4] text-[#15201A]'
                 }`}
               >
                 <div className="text-[11px] font-semibold text-[#78857D] px-2 py-1 uppercase tracking-wider">
@@ -160,12 +160,12 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
                         }}
                         className={`w-full flex items-center justify-between p-2 rounded-[10px] text-xs transition-colors ${
                           isSelected
-                            ? 'bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80] font-semibold'
-                            : isDarkMode ? 'hover:bg-[#1B242D] text-[#AAB4BE]' : 'hover:bg-[#F6F8F7] text-[#53635A]'
+                            ? 'bg-[#E0F7F9] text-[#156D74] dark:bg-[#1EC1CB]/20 dark:text-[#4DE5EE] font-semibold'
+                            : isDarkMode ? 'hover:bg-[#242435] text-[#AAB4BE]' : 'hover:bg-[#F5F7FA] text-[#53635A]'
                         }`}
                       >
                         <span className="truncate">{loc.name}</span>
-                        {isSelected && <Check className="w-3.5 h-3.5 text-[#16A34A] shrink-0" />}
+                        {isSelected && <Check className="w-3.5 h-3.5 text-[#1EC1CB] shrink-0" />}
                       </button>
                     );
                   })}
@@ -251,13 +251,13 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
                             }}
                             className={`flex items-center gap-2.5 p-2.5 rounded-[10px] border text-xs font-semibold transition-colors text-left cursor-pointer ${
                               isActive
-                                ? 'bg-[#DCFCE7] border-[#16A34A] text-[#15803D] dark:bg-[#16A34A]/20 dark:border-[#16A34A]/40 dark:text-[#4ADE80]'
+                                ? 'bg-[#E0F7F9] border-[#1EC1CB] text-[#156D74] dark:bg-[#1EC1CB]/20 dark:border-[#1EC1CB]/40 dark:text-[#4DE5EE]'
                                 : isDarkMode
-                                  ? 'bg-[#1B242D] border-white/10 text-[#AAB4BE] hover:text-[#F5F7F8]'
-                                  : 'bg-[#F6F8F7] border-[#E2E8E4] text-[#53635A] hover:text-[#15201A]'
+                                  ? 'bg-[#242435] border-white/10 text-[#AAB4BE] hover:text-[#F5F7F8]'
+                                  : 'bg-[#F5F7FA] border-[#E2E8E4] text-[#53635A] hover:text-[#15201A]'
                             }`}
                           >
-                            <Icon className="w-4 h-4 text-[#16A34A] shrink-0" />
+                            <Icon className="w-4 h-4 text-[#1EC1CB] shrink-0" />
                             <span className="truncate">{lang === 'th' ? item.labelTh : item.labelEn}</span>
                           </button>
                         );
@@ -274,7 +274,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
                   <button
                     onClick={() => setLang(lang === 'th' ? 'en' : 'th')}
                     className={`px-2.5 py-1 rounded-[10px] border font-bold text-xs ${
-                      isDarkMode ? 'border-white/10 bg-[#1B242D] text-[#F5F7F8]' : 'border-[#E2E8E4] bg-[#F6F8F7] text-[#15201A]'
+                      isDarkMode ? 'border-white/10 bg-[#242435] text-[#F5F7F8]' : 'border-[#E2E8E4] bg-[#F5F7FA] text-[#15201A]'
                     }`}
                   >
                     {lang === 'th' ? 'EN' : 'TH'}
@@ -282,7 +282,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
                   <button
                     onClick={onToggleTheme}
                     className={`p-1.5 rounded-[10px] border ${
-                      isDarkMode ? 'border-white/10 bg-[#1B242D] text-[#F5F7F8]' : 'border-[#E2E8E4] bg-[#F6F8F7] text-[#15201A]'
+                      isDarkMode ? 'border-white/10 bg-[#242435] text-[#F5F7F8]' : 'border-[#E2E8E4] bg-[#F5F7FA] text-[#15201A]'
                     }`}
                   >
                     {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-[#53635A]" />}
@@ -297,7 +297,7 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
       {/* ----------------------------------------------------
           MOBILE BOTTOM NAV (CI LOCK: Max 5 Items, Height 72px, Safe Area)
           ---------------------------------------------------- */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FFFFFF]/95 dark:bg-[#151C23]/95 border-t border-[#E2E8E4] dark:border-white/10 backdrop-blur-md">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FFFFFF]/95 dark:bg-[#1C1C28]/95 border-t border-[#E2E8E4] dark:border-[#2D2D40] backdrop-blur-md">
         <div className="h-[72px] max-w-md mx-auto px-2 flex items-center justify-around pb-[env(safe-area-inset-bottom)]">
           {bottomNavItems.map((item) => {
             const Icon = item.icon;
@@ -311,13 +311,13 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
                 }}
                 className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] px-2 py-1 rounded-[10px] transition-colors cursor-pointer ${
                   isActive
-                    ? 'text-[#15803D] dark:text-[#4ADE80] font-semibold'
+                    ? 'text-[#156D74] dark:text-[#4DE5EE] font-semibold'
                     : 'text-[#53635A] dark:text-[#AAB4BE] hover:text-[#15201A] dark:hover:text-[#F5F7F8]'
                 }`}
                 aria-label={lang === 'th' ? item.labelTh : item.labelEn}
               >
                 <div className={`p-1 rounded-[8px] transition-colors ${
-                  isActive ? 'bg-[#DCFCE7] dark:bg-[#16A34A]/20' : ''
+                  isActive ? 'bg-[#E0F7F9] dark:bg-[#1EC1CB]/20' : ''
                 }`}>
                   <Icon className="w-5 h-5" />
                 </div>
@@ -333,13 +333,13 @@ export const MobileNavbar: React.FC<MobileNavbarProps> = ({
             onClick={() => setShowMoreMenu(!showMoreMenu)}
             className={`flex flex-col items-center justify-center min-w-[54px] min-h-[44px] px-2 py-1 rounded-[10px] transition-colors cursor-pointer ${
               showMoreMenu || ['locations', 'budget', 'analytics', 'learning', 'game', 'profile', 'settings', 'trust-center', 'ux-assessment', 'crypto'].includes(currentPage)
-                ? 'text-[#15803D] dark:text-[#4ADE80] font-semibold'
+                ? 'text-[#156D74] dark:text-[#4DE5EE] font-semibold'
                 : 'text-[#53635A] dark:text-[#AAB4BE] hover:text-[#15201A] dark:hover:text-[#F5F7F8]'
             }`}
             aria-label="More menu"
           >
             <div className={`p-1 rounded-[8px] transition-colors ${
-              showMoreMenu ? 'bg-[#DCFCE7] dark:bg-[#16A34A]/20' : ''
+              showMoreMenu ? 'bg-[#E0F7F9] dark:bg-[#1EC1CB]/20' : ''
             }`}>
               <Menu className="w-5 h-5" />
             </div>

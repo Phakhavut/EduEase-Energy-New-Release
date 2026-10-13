@@ -24,10 +24,10 @@ export interface EduEaseLogoProps {
 /**
  * EduEase Energy Official Vector Logo System
  * Faithful vector recreation of the official brand identity sheet:
- * - Left Wing: Upward-curving organic book/leaf in fresh gradient green
+ * - Left Wing: Upward-curving organic book/leaf in fresh gradient cyan (#4DE5EE -> #1EC1CB -> #169EA7)
  * - Center Spark: Dynamic geometric lightning bolt in solar yellow (#FBBF24)
- * - Right Wing: Asymmetric leaf with inner cutout aperture in gradient emerald
- * - Wordmark: "Edu" (Charcoal #1F2937) + "Ease" (Green #22C55E) / "Energy" (Spaced Charcoal)
+ * - Right Wing: Asymmetric leaf with inner cutout aperture in gradient cyan-teal (#1EC1CB -> #169EA7 -> #156D74)
+ * - Wordmark: "Edu" (Deep Navy #1C1C28) + "Ease" (Cyan #1EC1CB) / "Energy" (Spaced Navy/Muted)
  */
 export const EduEaseLogo: React.FC<EduEaseLogoProps> = ({
   variant = 'primary',
@@ -60,16 +60,16 @@ export const EduEaseLogo: React.FC<EduEaseLogoProps> = ({
   const isMonoWhite = variant === 'monochrome-white';
   const isAppIcon = variant === 'app-icon';
 
-  // Palette tokens from official brand guidelines
-  const primaryGreen = isMonoBlack ? '#000000' : isMonoWhite ? '#FFFFFF' : '#22C55E';
-  const textDark = isMonoBlack ? '#000000' : isMonoWhite ? '#FFFFFF' : isDarkMode ? '#F8FAFC' : '#1F2937';
-  const textSub = isMonoBlack ? '#000000' : isMonoWhite ? '#FFFFFF' : isDarkMode ? '#94A3B8' : '#1F2937';
+  // Palette tokens from official brand guidelines (Cyber Electric Blue & Sky suite)
+  const primaryCyan = isMonoBlack ? '#000000' : isMonoWhite ? '#FFFFFF' : '#38BDF8';
+  const textDark = isMonoBlack ? '#000000' : isMonoWhite ? '#FFFFFF' : isDarkMode ? '#FFFFFF' : '#0A1128';
+  const textSub = isMonoBlack ? '#000000' : isMonoWhite ? '#FFFFFF' : isDarkMode ? '#93C5FD' : '#64748B';
 
   // Unique ID prefix for gradients to prevent collision if multiple logos are rendered
   const gradId = React.useId().replace(/:/g, '');
 
   // ----------------------------------------------------
-  // VECTOR SYMBOL SVG (Faithful to Brand Sheet)
+  // VECTOR SYMBOL SVG (Faithful to Brand Sheet & Cyber Energy)
   // ----------------------------------------------------
   const renderSymbol = (symbolDim: number, forcedColor?: string) => {
     const isSolid = forcedColor !== undefined || isMonoBlack || isMonoWhite || isAppIcon;
@@ -87,21 +87,21 @@ export const EduEaseLogo: React.FC<EduEaseLogoProps> = ({
       >
         {!isSolid && (
           <defs>
-            {/* Left Leaf/Wing Gradient: Lime-Green to Emerald */}
+            {/* Left Leaf/Wing Gradient: Cyber Electric Royal Blue */}
             <linearGradient id={`leftWing_${gradId}`} x1="30%" y1="10%" x2="50%" y2="90%">
-              <stop offset="0%" stopColor="#4ADE80" />
-              <stop offset="55%" stopColor="#22C55E" />
-              <stop offset="100%" stopColor="#0D9488" />
+              <stop offset="0%" stopColor="#60A5FA" />
+              <stop offset="55%" stopColor="#2563EB" />
+              <stop offset="100%" stopColor="#1D4ED8" />
             </linearGradient>
 
-            {/* Right Leaf Gradient: Vivid Green to Deep Teal */}
+            {/* Right Leaf Gradient: Neon Mint (ระบบสังกัด gauge) */}
             <linearGradient id={`rightWing_${gradId}`} x1="85%" y1="20%" x2="35%" y2="85%">
-              <stop offset="0%" stopColor="#22C55E" />
-              <stop offset="60%" stopColor="#16A34A" />
-              <stop offset="100%" stopColor="#0F766E" />
+              <stop offset="0%" stopColor="#34D399" />
+              <stop offset="60%" stopColor="#10B981" />
+              <stop offset="100%" stopColor="#059669" />
             </linearGradient>
 
-            {/* Solar Lightning Gradient */}
+            {/* Solar Lightning Gradient: Streamer Gold */}
             <linearGradient id={`spark_${gradId}`} x1="20%" y1="0%" x2="80%" y2="100%">
               <stop offset="0%" stopColor="#FDE047" />
               <stop offset="60%" stopColor="#FBBF24" />
@@ -152,13 +152,13 @@ export const EduEaseLogo: React.FC<EduEaseLogoProps> = ({
   }
 
   // ----------------------------------------------------
-  // 2. APP ICON SQUIRCLE (Green BG + White Symbol)
+  // 2. APP ICON SQUIRCLE (Cyan BG + White Symbol)
   // ----------------------------------------------------
   if (variant === 'app-icon') {
     return (
       <div 
         onClick={onClick}
-        className={`inline-flex items-center justify-center rounded-[22%] bg-[#22C55E] shadow-md p-[15%] ${onClick ? 'cursor-pointer hover:scale-105 transition-transform' : ''} ${className}`}
+        className={`inline-flex items-center justify-center rounded-[22%] bg-[#1EC1CB] shadow-md p-[15%] ${onClick ? 'cursor-pointer hover:scale-105 transition-transform' : ''} ${className}`}
         style={{ width: dim, height: dim }}
         title="EduEase Energy App Icon"
       >
@@ -168,13 +168,13 @@ export const EduEaseLogo: React.FC<EduEaseLogoProps> = ({
   }
 
   // ----------------------------------------------------
-  // 3. FAVICON CONTAINER (Off-White BG + Full-Color Symbol)
+  // 3. FAVICON CONTAINER (Neutral BG + Full-Color Symbol)
   // ----------------------------------------------------
   if (variant === 'favicon') {
     return (
       <div 
         onClick={onClick}
-        className={`inline-flex items-center justify-center rounded-[24%] bg-[#F8FAFC] dark:bg-[#1B242D] border border-slate-200/80 dark:border-white/10 shadow-sm p-[12%] ${onClick ? 'cursor-pointer hover:scale-105 transition-transform' : ''} ${className}`}
+        className={`inline-flex items-center justify-center rounded-[24%] bg-[#FFFFFF] dark:bg-[#242435] border border-[#E2E6EE] dark:border-white/10 shadow-sm p-[12%] ${onClick ? 'cursor-pointer hover:scale-105 transition-transform' : ''} ${className}`}
         style={{ width: dim, height: dim }}
         title="EduEase Energy Favicon"
       >
@@ -197,11 +197,11 @@ export const EduEaseLogo: React.FC<EduEaseLogoProps> = ({
         </div>
         <div className="flex flex-col items-center">
           <div className="font-display font-extrabold tracking-tight text-2xl md:text-3xl leading-none flex items-center">
-            <span style={{ color: textDark }}>Edu</span>
-            <span style={{ color: primaryGreen }}>Ease</span>
+            <span style={{ color: primaryCyan }}>Edu</span>
+            <span style={{ color: textDark }}>Ease</span>
           </div>
           <span 
-            className="text-xs md:text-sm font-semibold tracking-[0.25em] uppercase mt-1 font-sans"
+            className="text-xs md:text-sm font-bold tracking-[0.25em] uppercase mt-1 font-sans"
             style={{ color: textSub }}
           >
             Energy
@@ -228,12 +228,13 @@ export const EduEaseLogo: React.FC<EduEaseLogoProps> = ({
         {renderSymbol(dim)}
         <div className="flex flex-col justify-center leading-tight">
           <div className="flex items-baseline gap-1">
-            <span className="font-display font-extrabold tracking-tight text-base md:text-lg" style={{ color: textDark }}>
-              Edu<span style={{ color: primaryGreen }}>Ease</span>
+            <span className="font-display font-extrabold tracking-tight text-base md:text-lg">
+              <span style={{ color: primaryCyan }}>Edu</span>
+              <span style={{ color: textDark }}>Ease</span>
             </span>
           </div>
           <span 
-            className="text-[10px] md:text-[11px] font-medium tracking-[0.18em] uppercase -mt-0.5"
+            className="text-[10px] md:text-[11px] font-bold tracking-[0.18em] uppercase -mt-0.5"
             style={{ color: textSub }}
           >
             Energy
@@ -254,11 +255,11 @@ export const EduEaseLogo: React.FC<EduEaseLogoProps> = ({
       {renderSymbol(dim)}
       <div className="flex flex-col justify-center">
         <div className="font-display font-extrabold tracking-tight text-lg md:text-xl leading-none">
-          <span style={{ color: textDark }}>Edu</span>
-          <span style={{ color: primaryGreen }}>Ease</span>
+          <span style={{ color: primaryCyan }}>Edu</span>
+          <span style={{ color: textDark }}>Ease</span>
         </div>
         <span 
-          className="text-[11px] md:text-xs font-medium tracking-[0.22em] uppercase mt-1 leading-none font-sans"
+          className="text-[11px] md:text-xs font-bold tracking-[0.22em] uppercase mt-1 leading-none font-sans"
           style={{ color: textSub }}
         >
           Energy

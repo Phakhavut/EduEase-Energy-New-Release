@@ -16,31 +16,59 @@
           extend: {
             colors: {
               brand: {
-                DEFAULT: '#16A34A',
-                dark: '#15803D',
-                soft: '#DCFCE7',
+                DEFAULT: '#2563EB', // Royal Electric Blue (matching EZUP primary)
+                dark: '#1D4ED8',    // Deep Royal Blue
+                soft: '#EFF6FF',
+                light: '#3B82F6',   // Bright Electric Blue
+                sky: '#38BDF8',     // Cyber Sky Blue (EZUP Cyan)
+              },
+              eco: {
+                DEFAULT: '#10B981', // Neon Mint / Emerald (ระบบสังกัด gauge)
+                dark: '#059669',
+                soft: '#ECFDF5',
+                light: '#34D399',
+              },
+              solar: {
+                DEFAULT: '#F59E0B', // Streamer Bronze / Amber
+                dark: '#D97706',
+                soft: '#FFFBEB',
+                light: '#FBBF24',
+              },
+              purple: {
+                DEFAULT: '#6366F1', // 67 Challenge & 2FA Purple
+                dark: '#4F46E5',
+                soft: '#EEF2FF',
+                light: '#818CF8',
+              },
+              sky: {
+                DEFAULT: '#38BDF8', // Cyber Sky / QR pill
+                dark: '#0284C7',
+                soft: '#F0F9FF',
+                light: '#7DD3FC',
               },
               neutral: {
-                bgLight: '#F6F8F7',
+                bgLight: '#F1F5F9',
                 surfaceLight: '#FFFFFF',
-                borderLight: '#E2E8E4',
-                textPrimary: '#15201A',
-                textSecondary: '#53635A',
-                textTertiary: '#78857D',
+                borderLight: '#CBD5E1',
+                textPrimary: '#0A1128',
+                textSecondary: '#475569',
+                textTertiary: '#94A3B8',
               },
               darkTheme: {
-                bgDark: '#0F141A',
-                surfaceDark: '#151C23',
-                elevatedDark: '#1B242D',
-                textPrimary: '#F5F7F8',
-                textSecondary: '#AAB4BE',
-                borderDark: 'rgba(255,255,255,0.08)',
+                bgDark: '#060A18',       // Midnight Abyss Space (Image background)
+                surfaceDark: '#0B132B',  // Deep Bento Card Navy
+                elevatedDark: '#101B3B', // Elevated Bento Card
+                borderDark: 'rgba(59, 130, 246, 0.2)', // Electric Blue Rim
+                borderGlow: 'rgba(56, 189, 248, 0.35)',
+                textPrimary: '#FFFFFF',
+                textSecondary: '#94A3B8',
+                textMuted: '#64748B',
               },
               semantic: {
-                info: '#2563EB',
-                warning: '#D97706',
-                danger: '#DC2626',
-                success: '#16A34A',
+                info: '#38BDF8',
+                warning: '#F59E0B',
+                danger: '#F43F5E',
+                success: '#10B981',
               }
             },
             borderRadius: {
@@ -84,7 +112,7 @@
             inset: 0;
             pointer-events: none;
             z-index: 9985;
-            background-color: rgba(15, 20, 26, 0.7);
+            background-color: rgba(28, 28, 40, 0.75);
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
             transition: clip-path 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
@@ -106,74 +134,88 @@
             will-change: top, left, width, height, box-shadow;
         }
         :root {
-            /* EduEase Energy Design System (CI Lock) */
-            --brand-primary: #16A34A;
-            --brand-dark: #15803D;
-            --brand-soft: #DCFCE7;
+            /* EduEase Energy Design System - EZUP Cyber Blue & Ice Slate */
+            --brand-primary: #2563EB;
+            --brand-dark: #1D4ED8;
+            --brand-soft: #EFF6FF;
+            --brand-light: #3B82F6;
+            --brand-sky: #38BDF8;
 
-            --bg-body: #F6F8F7;
+            --eco-primary: #10B981;
+            --solar-primary: #F59E0B;
+            --sky-primary: #38BDF8;
+            --purple-primary: #6366F1;
+
+            --bg-body: #F1F5F9;
             --surface: #FFFFFF;
-            --border: #E2E8E4;
-            --text-primary: #15201A;
-            --text-secondary: #53635A;
-            --text-tertiary: #78857D;
+            --border: #CBD5E1;
+            --text-primary: #0A1128;
+            --text-secondary: #475569;
+            --text-tertiary: #94A3B8;
 
-            --primary: #16A34A; 
-            --primary-hover: #15803D;
+            --primary: #2563EB; 
+            --primary-hover: #1D4ED8;
             --sidebar-bg: #FFFFFF;
             --card-bg: #FFFFFF; 
-            --card-hover: #F6F8F7;
-            --text-main: #15201A;
-            --text-gray: #53635A;
-            --input-bg: #F6F8F7;
-            --accent: #16A34A;
+            --card-hover: #F8FAFC;
+            --text-main: #0A1128;
+            --text-gray: #475569;
+            --input-bg: #F1F5F9;
+            --accent: #2563EB;
             
-            --semantic-info: #2563EB;
-            --semantic-warning: #D97706;
-            --semantic-danger: #DC2626;
-            --semantic-success: #16A34A;
+            --semantic-info: #38BDF8;
+            --semantic-warning: #F59E0B;
+            --semantic-danger: #F43F5E;
+            --semantic-success: #10B981;
 
-            --info: #2563EB;
-            --warning: #D97706;
-            --danger: #DC2626;
-            --success: #16A34A;
+            --info: #38BDF8;
+            --warning: #F59E0B;
+            --danger: #F43F5E;
+            --success: #10B981;
 
-            --radius-btn: 10px;
-            --radius-card: 16px;
-            --radius-hero: 20px;
+            --radius-btn: 12px;
+            --radius-card: 18px;
+            --radius-hero: 24px;
         }
         [data-theme="dark"] {
-            --brand-primary: #16A34A;
-            --brand-dark: #15803D;
-            --brand-soft: rgba(22, 163, 74, 0.16);
+            --brand-primary: #2563EB;
+            --brand-dark: #1D4ED8;
+            --brand-soft: rgba(37, 99, 235, 0.18);
+            --brand-light: #3B82F6;
+            --brand-sky: #38BDF8;
 
-            --bg-body: #0F141A; 
-            --surface: #151C23;
-            --surface-elevated: #1B242D;
-            --border: rgba(255, 255, 255, 0.08);
-            --text-primary: #F5F7F8;
-            --text-secondary: #AAB4BE;
-            --text-tertiary: #78857D;
+            --eco-primary: #10B981;
+            --solar-primary: #F59E0B;
+            --sky-primary: #38BDF8;
+            --purple-primary: #6366F1;
 
-            --primary: #16A34A; 
-            --primary-hover: #15803D;
-            --sidebar-bg: #151C23; 
-            --card-bg: #151C23;
-            --card-hover: #1B242D;
-            --text-main: #F5F7F8; 
-            --text-gray: #AAB4BE;
-            --input-bg: #1B242D;
-            --accent: #16A34A;
+            --bg-body: #060A18;          /* Midnight abyss background */
+            --surface: #0B132B;          /* Bento card deep navy */
+            --surface-elevated: #101B3B; /* Elevated bento surface */
+            --border: rgba(59, 130, 246, 0.2); /* Cyber electric blue rim */
+            --text-primary: #FFFFFF;
+            --text-secondary: #94A3B8;
+            --text-tertiary: #64748B;
+
+            --primary: #2563EB; 
+            --primary-hover: #1D4ED8;
+            --sidebar-bg: #090E22; 
+            --card-bg: #0B132B;
+            --card-hover: #101B3B;
+            --text-main: #FFFFFF; 
+            --text-gray: #94A3B8;
+            --input-bg: #0E1838;
+            --accent: #38BDF8;
             
-            --semantic-info: #2563EB;
-            --semantic-warning: #D97706;
-            --semantic-danger: #DC2626;
-            --semantic-success: #16A34A;
+            --semantic-info: #38BDF8;
+            --semantic-warning: #F59E0B;
+            --semantic-danger: #F43F5E;
+            --semantic-success: #10B981;
 
-            --info: #2563EB;
-            --warning: #D97706;
-            --danger: #DC2626;
-            --success: #16A34A;
+            --info: #38BDF8;
+            --warning: #F59E0B;
+            --danger: #F43F5E;
+            --success: #10B981;
         }
 
         html, body {
@@ -424,14 +466,14 @@
         }
         
         .nav-link:hover {
-            background: rgba(34, 197, 94, 0.08) !important;
+            background: rgba(30, 193, 203, 0.08) !important;
             color: var(--primary) !important;
         }
 
         .nav-link.active { 
-            background: rgba(34, 197, 94, 0.15) !important; 
+            background: rgba(30, 193, 203, 0.15) !important; 
             color: var(--primary) !important; 
-            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.08);
+            box-shadow: 0 8px 20px rgba(30, 193, 203, 0.12);
             font-weight: 600 !important;
         }
 
@@ -517,22 +559,22 @@
 
         .calculator-node:focus-within {
             border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
+            box-shadow: 0 0 20px rgba(30, 193, 203, 0.15);
         }
 
         .hologram-card {
-            background: linear-gradient(135deg, #22C55E 0%, #15803d 100%);
+            background: linear-gradient(135deg, #1EC1CB 0%, #169EA7 60%, #1C1C28 100%);
             color: white;
             border-radius: 40px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 20px 50px rgba(34, 197, 94, 0.3);
+            box-shadow: 0 20px 50px rgba(30, 193, 203, 0.3);
         }
 
         .tech-grid {
             background-image: 
-                linear-gradient(rgba(34, 197, 94, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(34, 197, 94, 0.03) 1px, transparent 1px);
+                linear-gradient(rgba(30, 193, 203, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(30, 193, 203, 0.04) 1px, transparent 1px);
             background-size: 25px 25px;
         }
 
@@ -544,13 +586,13 @@
         
         .neural-pulse {
             width: 10px; height: 10px; background: var(--success); border-radius: 50%;
-            display: inline-block; animation: pulse-green 2s infinite;
+            display: inline-block; animation: pulse-cyan 2s infinite;
         }
 
-        @keyframes pulse-green {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        @keyframes pulse-cyan {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(30, 193, 203, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(30, 193, 203, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(30, 193, 203, 0); }
         }
 
         @keyframes slideUp {
@@ -650,8 +692,8 @@
     </noscript>
     
     <div id="root">
-      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background-color: #0f172a; color: white; font-family: sans-serif;">
-        <svg style="width: 64px; height: 64px; animation: spin 1s linear infinite; margin-bottom: 20px; color: #10b981;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background-color: #1C1C28; color: white; font-family: sans-serif;">
+        <svg style="width: 64px; height: 64px; animation: spin 1s linear infinite; margin-bottom: 20px; color: #1EC1CB;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path style="opacity: 0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>

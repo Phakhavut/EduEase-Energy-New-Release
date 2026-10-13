@@ -67,9 +67,9 @@ export const InsightCard: React.FC<InsightCardProps> = ({
       default:
         return {
           icon: renderIcon(Icon, "w-4 h-4", <Sparkles className="w-4 h-4" />),
-          iconBg: 'bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80]',
-          border: 'border-[#16A34A]/30 dark:border-[#16A34A]/30',
-          impactBg: 'bg-[#DCFCE7]/60 text-[#15803D] dark:bg-[#16A34A]/10 dark:text-[#4ADE80]',
+          iconBg: 'bg-[#E0F7F9] text-[#156D74] dark:bg-[#1EC1CB]/15 dark:text-[#4DE5EE]',
+          border: 'border-[#1EC1CB]/30 dark:border-[#1EC1CB]/30',
+          impactBg: 'bg-[#E0F7F9]/80 text-[#156D74] dark:bg-[#1EC1CB]/15 dark:text-[#4DE5EE]',
         };
     }
   };
@@ -101,7 +101,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
               </span>
             )}
             {isApplied && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-bold bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80]">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-bold bg-[#E0F7F9] text-[#156D74] dark:bg-[#1EC1CB]/15 dark:text-[#4DE5EE]">
                 <CheckCircle2 className="w-3 h-3" />
                 <span>ปรับใช้แล้ว</span>
               </span>
@@ -133,7 +133,7 @@ export const InsightCard: React.FC<InsightCardProps> = ({
                 type="button"
                 onClick={onAction}
                 disabled={isApplied}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-[#16A34A] hover:bg-[#15803D] text-white text-xs font-bold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] bg-[#1EC1CB] hover:bg-[#169EA7] text-[#1C1C28] text-xs font-bold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 <span>{actionText}</span>
                 <ArrowRight className="w-3.5 h-3.5" />

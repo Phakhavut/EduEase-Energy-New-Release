@@ -260,7 +260,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
           {infoDetailMode === 'detailed' && (
             <button
               onClick={handleExportCSV}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] border border-[#16A34A]/30 bg-[#DCFCE7] dark:bg-[#16A34A]/10 text-[#15803D] dark:text-[#4ADE80] font-semibold text-xs transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] border border-[#1EC1CB]/30 bg-[#E0F7F9] dark:bg-[#1EC1CB]/10 text-[#156D74] dark:text-[#4DE5EE] font-semibold text-xs transition-colors"
             >
               <FileSpreadsheet className="w-3.5 h-3.5" />
               <span>{lang === 'th' ? 'ส่งออก CSV' : 'Export CSV'}</span>
@@ -268,7 +268,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
           )}
           <button
             onClick={onExportPDF}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] bg-[#16A34A] hover:bg-[#15803D] text-white font-semibold text-xs transition-colors shadow-none"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] bg-[#1EC1CB] hover:bg-[#156D74] text-[#1C1C28] hover:text-white font-semibold text-xs transition-colors shadow-none"
           >
             <Download className="w-3.5 h-3.5" />
             <span>{lang === 'th' ? 'ดาวน์โหลดรายงาน' : 'Export Report'}</span>
@@ -279,10 +279,10 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
       {/* 2. STRICT REQUIREMENT (SECTION 44): THE FIRST VISUAL MUST BE AN EXPLANATION, NOT A CHART */}
       <div className={`p-5 sm:p-6 rounded-[16px] border transition-colors ${
         isDarkMode 
-          ? 'bg-[#151C23] border-white/10 text-[#F5F7F8]' 
+          ? 'bg-[#1C1C28] border-white/10 text-[#F5F7F8]' 
           : 'bg-[#FFFFFF] border-[#E2E8E4] text-[#15201A]'
       }`}>
-        <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-[#16A34A]">
+        <div className="flex items-center gap-2 mb-2 text-xs font-semibold text-[#1EC1CB]">
           <Sparkles className="w-4 h-4" />
           <span>{lang === 'th' ? 'บทวิเคราะห์ค่าไฟล่าสุด' : 'Energy Trend Diagnosis'}</span>
         </div>
@@ -300,7 +300,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
         </h3>
 
         {/* Secondary Explanation Box: "สาเหตุหลักคือ..." */}
-        <div className="mt-4 p-4 rounded-[12px] bg-[#F6F8F7] dark:bg-[#1B242D] border border-[#E2E8E4] dark:border-white/10 space-y-2">
+        <div className="mt-4 p-4 rounded-[12px] bg-[#F5F7FA] dark:bg-[#242435] border border-[#E2E8E4] dark:border-white/10 space-y-2">
           <div className="text-xs font-bold text-[#78857D] uppercase tracking-wider">
             {lang === 'th' ? 'สาเหตุหลักคือ:' : 'Primary Reason:'}
           </div>
@@ -308,7 +308,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
             {lang === 'th' ? monthlyData.topSavingReasonTh : monthlyData.topSavingReasonEn}
           </p>
           <div className="pt-2 border-t border-[#E2E8E4] dark:border-white/10 flex items-start gap-2 text-xs text-[#53635A] dark:text-[#AAB4BE]">
-            <span className="font-semibold text-[#16A34A] shrink-0">
+            <span className="font-semibold text-[#1EC1CB] shrink-0">
               {lang === 'th' ? 'สิ่งที่ทำได้ทันที:' : 'Actionable Tip:'}
             </span>
             <span>
@@ -335,7 +335,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
           </div>
           <div>
             <span className="text-[#78857D] block">{lang === 'th' ? 'ผลต่าง' : 'Difference'}</span>
-            <span className={`text-base font-bold font-mono tabular-nums ${isSavings ? 'text-[#16A34A]' : 'text-amber-500'}`}>
+            <span className={`text-base font-bold font-mono tabular-nums ${isSavings ? 'text-[#1EC1CB]' : 'text-amber-500'}`}>
               {isSavings ? '-' : '+'}฿{Math.abs(monthlyData.costDiff).toLocaleString()}
             </span>
           </div>
@@ -344,7 +344,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
 
       {/* 3. SUPPORTING CHART (Directly answers and validates the explanation above) */}
       <div className={`p-5 sm:p-6 rounded-[16px] border transition-colors ${
-        isDarkMode ? 'bg-[#151C23] border-white/10' : 'bg-[#FFFFFF] border-[#E2E8E4]'
+        isDarkMode ? 'bg-[#1C1C28] border-white/10' : 'bg-[#FFFFFF] border-[#E2E8E4]'
       }`}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
@@ -367,13 +367,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
           </div>
 
           {/* Mode Switcher */}
-          <div className="inline-flex items-center gap-1 p-1 rounded-[10px] bg-[#F6F8F7] dark:bg-[#1B242D] border border-[#E2E8E4] dark:border-white/10 shrink-0 self-start sm:self-auto overflow-x-auto">
+          <div className="inline-flex items-center gap-1 p-1 rounded-[10px] bg-[#F5F7FA] dark:bg-[#242435] border border-[#E2E8E4] dark:border-white/10 shrink-0 self-start sm:self-auto overflow-x-auto">
             <button
               type="button"
               onClick={() => setComparisonMode('month_cycle')}
               className={`px-2.5 py-1 rounded-[7px] text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                 comparisonMode === 'month_cycle'
-                  ? 'bg-[#16A34A] text-white shadow-xs'
+                  ? 'bg-[#1EC1CB] text-[#1C1C28] font-bold shadow-xs'
                   : 'text-[#53635A] dark:text-[#AAB4BE] hover:text-[#15201A] dark:hover:text-[#F5F7F8]'
               }`}
             >
@@ -384,7 +384,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
               onClick={() => setComparisonMode('daily')}
               className={`px-2.5 py-1 rounded-[7px] text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                 comparisonMode === 'daily'
-                  ? 'bg-[#16A34A] text-white shadow-xs'
+                  ? 'bg-[#1EC1CB] text-[#1C1C28] font-bold shadow-xs'
                   : 'text-[#53635A] dark:text-[#AAB4BE] hover:text-[#15201A] dark:hover:text-[#F5F7F8]'
               }`}
             >
@@ -395,7 +395,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
               onClick={() => setComparisonMode('history3m')}
               className={`px-2.5 py-1 rounded-[7px] text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                 comparisonMode === 'history3m'
-                  ? 'bg-[#16A34A] text-white shadow-xs'
+                  ? 'bg-[#1EC1CB] text-[#1C1C28] font-bold shadow-xs'
                   : 'text-[#53635A] dark:text-[#AAB4BE] hover:text-[#15201A] dark:hover:text-[#F5F7F8]'
               }`}
             >
@@ -416,10 +416,10 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-[3px] bg-[#16A34A] inline-block" />
+                <span className="w-3 h-3 rounded-[3px] bg-[#1EC1CB] inline-block" />
                 <span className="text-[#53635A] dark:text-[#AAB4BE] font-medium">
                   {lang === 'th' ? `เดือนนี้ (${monthlyData.currentMonth.nameTh.split(' ')[0]})` : `This Month (${monthlyData.currentMonth.nameEn.split(' ')[0]})`}: 
-                  <strong className="ml-1 text-[#16A34A] font-mono">฿{monthlyData.currentMonth.totalCost.toLocaleString()}</strong>
+                  <strong className="ml-1 text-[#1EC1CB] font-mono">฿{monthlyData.currentMonth.totalCost.toLocaleString()}</strong>
                 </span>
               </div>
             </>
@@ -434,7 +434,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-[3px] bg-[#16A34A] inline-block" />
+                <span className="w-3 h-3 rounded-[3px] bg-[#1EC1CB] inline-block" />
                 <span className="text-[#53635A] dark:text-[#AAB4BE] font-medium">
                   {lang === 'th' ? 'สัปดาห์นี้ (This Week)' : 'This Week'}
                 </span>
@@ -444,7 +444,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
 
           {comparisonMode === 'history3m' && (
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-[3px] bg-[#16A34A] inline-block" />
+              <span className="w-3 h-3 rounded-[3px] bg-[#1EC1CB] inline-block" />
               <span className="text-[#53635A] dark:text-[#AAB4BE] font-medium">
                 {lang === 'th' ? 'ค่าไฟฟ้ารายเดือน (บาท)' : 'Monthly Electricity Cost (THB)'}
               </span>
@@ -477,14 +477,14 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                   }}
                   contentStyle={{ 
                     borderRadius: '10px', 
-                    background: isDarkMode ? '#1B242D' : '#FFFFFF', 
+                    background: isDarkMode ? '#242435' : '#FFFFFF', 
                     border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8E4',
                     fontSize: '12px',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                   }}
                 />
                 <Bar dataKey="prevMonthCost" fill={isDarkMode ? '#475569' : '#94A3B8'} radius={[6, 6, 0, 0]} name="prevMonthCost" />
-                <Bar dataKey="thisMonthCost" fill="#16A34A" radius={[6, 6, 0, 0]} name="thisMonthCost" />
+                <Bar dataKey="thisMonthCost" fill="#1EC1CB" radius={[6, 6, 0, 0]} name="thisMonthCost" />
               </BarChart>
             ) : comparisonMode === 'daily' ? (
               <BarChart data={weeklyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -498,13 +498,13 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                   ]}
                   contentStyle={{ 
                     borderRadius: '10px', 
-                    background: isDarkMode ? '#1B242D' : '#FFFFFF', 
+                    background: isDarkMode ? '#242435' : '#FFFFFF', 
                     border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8E4',
                     fontSize: '12px'
                   }}
                 />
                 <Bar dataKey="prevCost" fill={isDarkMode ? '#475569' : '#94A3B8'} radius={[6, 6, 0, 0]} name="prevCost" />
-                <Bar dataKey="cost" fill="#16A34A" radius={[6, 6, 0, 0]} name="cost" />
+                <Bar dataKey="cost" fill="#1EC1CB" radius={[6, 6, 0, 0]} name="cost" />
               </BarChart>
             ) : (
               <BarChart data={historical3MonthsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -518,7 +518,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                   ]}
                   contentStyle={{ 
                     borderRadius: '10px', 
-                    background: isDarkMode ? '#1B242D' : '#FFFFFF', 
+                    background: isDarkMode ? '#242435' : '#FFFFFF', 
                     border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8E4',
                     fontSize: '12px'
                   }}
@@ -527,7 +527,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                   {historical3MonthsData.map((entry, index) => (
                     <Cell 
                       key={`hist-${index}`} 
-                      fill={entry.isCurrent ? '#16A34A' : isDarkMode ? '#475569' : '#94A3B8'} 
+                      fill={entry.isCurrent ? '#1EC1CB' : isDarkMode ? '#475569' : '#94A3B8'} 
                     />
                   ))}
                 </Bar>
@@ -556,10 +556,10 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
               onClick={() => setActiveTab(tab.id as any)}
               className={`px-3.5 py-1.5 rounded-[10px] text-xs font-medium transition-colors shrink-0 ${
                 activeTab === tab.id
-                  ? 'bg-[#16A34A] text-white font-semibold'
+                  ? 'bg-[#1EC1CB] text-[#1C1C28] font-bold'
                   : isDarkMode
-                    ? 'bg-[#1B242D] text-[#AAB4BE] hover:text-[#F5F7F8]'
-                    : 'bg-[#F6F8F7] text-[#53635A] hover:text-[#15201A] border border-[#E2E8E4]'
+                    ? 'bg-[#242435] text-[#AAB4BE] hover:text-[#F5F7F8]'
+                    : 'bg-[#F5F7FA] text-[#53635A] hover:text-[#15201A] border border-[#E2E8E4]'
               }`}
             >
               {lang === 'th' ? tab.th : tab.en}
@@ -579,7 +579,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
           />
         ) : activeTab === 'room' ? (
           <div className={`p-5 rounded-[16px] border ${
-            isDarkMode ? 'bg-[#151C23] border-white/10' : 'bg-[#FFFFFF] border-[#E2E8E4]'
+            isDarkMode ? 'bg-[#1C1C28] border-white/10' : 'bg-[#FFFFFF] border-[#E2E8E4]'
           }`}>
             <h5 className="font-bold text-sm text-[#15201A] dark:text-[#F5F7F8] mb-3">
               {lang === 'th' ? 'สัดส่วนค่าไฟแบ่งตามห้องใช้งาน' : 'Electricity Spend by Room'}
@@ -592,9 +592,9 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({
                   <YAxis stroke="#78857D" fontSize={11} unit="฿" tickLine={false} />
                   <Tooltip
                     formatter={(value: any) => [`฿${value}`, 'Cost']}
-                    contentStyle={{ borderRadius: '10px', background: isDarkMode ? '#1B242D' : '#FFFFFF', border: '1px solid #E2E8E4' }}
+                    contentStyle={{ borderRadius: '10px', background: isDarkMode ? '#242435' : '#FFFFFF', border: '1px solid #E2E8E4' }}
                   />
-                  <Bar dataKey="cost" fill="#16A34A" radius={[6, 6, 0, 0]}>
+                  <Bar dataKey="cost" fill="#1EC1CB" radius={[6, 6, 0, 0]}>
                     {roomData.map((entry, index) => (
                       <Cell key={`room-${index}`} fill={entry.color} />
                     ))}

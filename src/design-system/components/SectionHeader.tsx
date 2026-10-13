@@ -16,7 +16,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   title,
   subtitle,
   icon: Icon,
-  iconColor = 'text-[#16A34A]',
+  iconColor = 'text-[#1EC1CB]',
   badge,
   action,
   isDarkMode = false,

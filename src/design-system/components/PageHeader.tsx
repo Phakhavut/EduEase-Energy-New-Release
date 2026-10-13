@@ -21,7 +21,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   title,
   subtitle,
   icon: Icon,
-  iconColor = 'text-[#16A34A]',
+  iconColor = 'text-[#1EC1CB]',
   badgeText,
   badgeVariant = 'brand',
   actions,
@@ -41,7 +41,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       case 'neutral':
         return isDarkMode ? 'bg-slate-800 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-200';
       default:
-        return isDarkMode ? 'bg-[#16A34A]/15 text-[#4ADE80] border-[#16A34A]/30' : 'bg-[#DCFCE7] text-[#15803D] border-[#16A34A]/30';
+        return isDarkMode ? 'bg-[#1EC1CB]/15 text-[#4DE5EE] border-[#1EC1CB]/30' : 'bg-[#E0F7F9] text-[#156D74] border-[#1EC1CB]/30';
     }
   };
 
@@ -50,7 +50,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
       <div className="flex items-start gap-3">
         {Icon && (
           <div className={`p-2.5 rounded-[12px] shrink-0 ${
-            isDarkMode ? 'bg-[#1B242D] border border-white/10' : 'bg-[#F6F8F7] border border-[#E2E8E4]'
+            isDarkMode ? 'bg-[#1C1C28] border border-[#38384E]' : 'bg-[#F5F7FA] border border-[#E2E6EE]'
           }`}>
             {renderIcon(Icon, `w-6 h-6 ${iconColor}`)}
           </div>

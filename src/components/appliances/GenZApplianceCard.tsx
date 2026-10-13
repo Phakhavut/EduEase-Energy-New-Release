@@ -102,10 +102,10 @@ export const GenZApplianceCard: React.FC<GenZApplianceCardProps> = ({
     <div
       className={`rounded-[16px] border transition-all duration-200 overflow-hidden relative ${
         isSelected
-          ? 'border-[#16A34A] ring-2 ring-[#16A34A]/20'
+          ? 'border-[#1EC1CB] ring-2 ring-[#1EC1CB]/20'
           : isDarkMode 
-            ? 'bg-[#151C23] border-white/10 hover:border-white/20' 
-            : 'bg-[#FFFFFF] border-[#E2E8E4] hover:border-[#16A34A]/40'
+            ? 'bg-[#1C1C28] border-white/10 hover:border-white/20' 
+            : 'bg-[#FFFFFF] border-[#E2E8E4] hover:border-[#1EC1CB]/40'
       }`}
     >
       {/* INITIAL CARD (Strict Section 43: ICON, NAME, STATUS, MONTHLY COST, SHARE, ONE ACTION) */}
@@ -121,7 +121,7 @@ export const GenZApplianceCard: React.FC<GenZApplianceCardProps> = ({
                 }}
                 className={`w-6 h-6 rounded-[8px] border flex items-center justify-center transition-colors ${
                   isSelected 
-                    ? 'bg-[#16A34A] border-[#16A34A] text-white' 
+                    ? 'bg-[#1EC1CB] border-[#1EC1CB] text-[#1C1C28]' 
                     : isDarkMode ? 'border-white/20' : 'border-[#E2E8E4]'
                 }`}
                 aria-label="Select appliance"
@@ -129,7 +129,7 @@ export const GenZApplianceCard: React.FC<GenZApplianceCardProps> = ({
                 {isSelected && <Check className="w-4 h-4" />}
               </button>
             ) : (
-              <div className="w-10 h-10 rounded-[10px] bg-[#DCFCE7] dark:bg-[#16A34A]/15 text-[#15803D] dark:text-[#4ADE80] flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-[10px] bg-[#E0F7F9] dark:bg-[#1EC1CB]/15 text-[#156D74] dark:text-[#4DE5EE] flex items-center justify-center shrink-0">
                 {renderIcon(appliance.icon)}
               </div>
             )}
@@ -141,7 +141,7 @@ export const GenZApplianceCard: React.FC<GenZApplianceCardProps> = ({
               {/* STATUS */}
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className={`inline-block w-2 h-2 rounded-full ${
-                  appliance.status === 'active' ? 'bg-[#16A34A]' : 'bg-[#78857D]'
+                  appliance.status === 'active' ? 'bg-[#1EC1CB]' : 'bg-[#78857D]'
                 }`} />
                 <span className="text-xs text-[#53635A] dark:text-[#AAB4BE] font-medium">
                   {appliance.status === 'active' 
@@ -158,7 +158,7 @@ export const GenZApplianceCard: React.FC<GenZApplianceCardProps> = ({
               ฿{Math.round(monthlyCost).toLocaleString()}
               <span className="text-[11px] font-normal text-[#78857D] ml-1">/{lang === 'th' ? 'ด.' : 'mo'}</span>
             </div>
-            <div className="text-[11px] font-medium text-[#15803D] dark:text-[#4ADE80] font-mono mt-0.5">
+            <div className="text-[11px] font-medium text-[#156D74] dark:text-[#4DE5EE] font-mono mt-0.5">
               {percentageOfTotal}% {lang === 'th' ? 'ของค่าไฟ' : 'of bill'}
             </div>
           </div>
@@ -170,8 +170,8 @@ export const GenZApplianceCard: React.FC<GenZApplianceCardProps> = ({
             onClick={() => onToggleStatus(appliance.id)}
             className={`px-2.5 py-1 rounded-[8px] text-[11px] font-semibold transition-colors flex items-center gap-1.5 ${
               appliance.status === 'active'
-                ? 'bg-[#DCFCE7] text-[#15803D] dark:bg-[#16A34A]/20 dark:text-[#4ADE80]'
-                : isDarkMode ? 'bg-[#1B242D] text-[#AAB4BE]' : 'bg-[#F6F8F7] text-[#53635A]'
+                ? 'bg-[#E0F7F9] text-[#156D74] dark:bg-[#1EC1CB]/20 dark:text-[#4DE5EE]'
+                : isDarkMode ? 'bg-[#242435] text-[#AAB4BE]' : 'bg-[#F5F7FA] text-[#53635A]'
             }`}
           >
             <Power className="w-3 h-3" />
@@ -180,7 +180,7 @@ export const GenZApplianceCard: React.FC<GenZApplianceCardProps> = ({
 
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="flex items-center gap-1 text-xs font-semibold text-[#15803D] dark:text-[#4ADE80] hover:underline"
+            className="flex items-center gap-1 text-xs font-semibold text-[#156D74] dark:text-[#4DE5EE] hover:underline"
           >
             <span>{isExpanded ? (lang === 'th' ? 'ย่อข้อมูล' : 'Collapse') : (lang === 'th' ? 'ดูรายละเอียด' : 'Details')}</span>
             {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}

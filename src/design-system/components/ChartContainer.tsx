@@ -30,7 +30,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
   const getProvenanceBadge = () => {
     switch (provenanceType) {
       case 'measured':
-        return { label: 'วัดจากมิเตอร์จริง (Measured)', color: 'text-[#15803D] dark:text-[#4ADE80] bg-[#DCFCE7] dark:bg-[#16A34A]/20' };
+        return { label: 'วัดจากมิเตอร์จริง (Measured)', color: 'text-[#156D74] dark:text-[#4DE5EE] bg-[#E0F7F9] dark:bg-[#1EC1CB]/15' };
       case 'predicted':
         return { label: 'พยากรณ์โดย AI (Predicted)', color: 'text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/40' };
       case 'user':
@@ -48,7 +48,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2.5">
           {Icon && (
-            <div className="w-8 h-8 rounded-[10px] bg-[#DCFCE7] dark:bg-[#16A34A]/15 text-[#15803D] dark:text-[#4ADE80] flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-[10px] bg-[#E0F7F9] dark:bg-[#1EC1CB]/15 text-[#156D74] dark:text-[#4DE5EE] flex items-center justify-center shrink-0">
               {typeof Icon === 'function' ? <Icon className="w-4 h-4" /> : Icon}
             </div>
           )}

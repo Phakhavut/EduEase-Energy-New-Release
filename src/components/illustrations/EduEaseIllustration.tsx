@@ -176,7 +176,7 @@ export const EduEaseIllustration: React.FC<IllustrationProps> = ({
       {renderSvg()}
 
       {badge !== undefined && (
-        <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-[20px] px-1 text-[11px] font-bold text-white bg-emerald-500 border-2 border-white dark:border-slate-900 rounded-full shadow-sm">
+        <span className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-[20px] px-1 text-[11px] font-bold text-slate-900 bg-[#1EC1CB] border-2 border-white dark:border-[#1C1C28] rounded-full shadow-sm">
           {badge}
         </span>
       )}

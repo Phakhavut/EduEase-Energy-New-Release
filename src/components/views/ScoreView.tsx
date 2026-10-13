@@ -219,11 +219,11 @@ export const ScoreView: React.FC<ScoreViewProps> = ({
           <div className="flex items-center gap-6">
             <div className="relative flex items-center justify-center">
               {/* Outer Score Ring */}
-              <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-[#16A34A] p-2 flex items-center justify-center shadow-lg shadow-[#16A34A]/20">
+              <div className="w-28 h-28 md:w-32 md:h-32 rounded-full bg-[#1EC1CB] p-2 flex items-center justify-center shadow-lg shadow-[#1EC1CB]/20">
                 <div className={`w-full h-full rounded-full flex flex-col items-center justify-center ${
-                  isDarkMode ? 'bg-[#151C23]' : 'bg-[#FFFFFF]'
+                  isDarkMode ? 'bg-[#1C1C28]' : 'bg-[#FFFFFF]'
                 }`}>
-                  <span className="text-3xl md:text-4xl font-bold font-mono text-[#16A34A] dark:text-[#4ADE80] tracking-tight">
+                  <span className="text-3xl md:text-4xl font-bold font-mono text-[#156D74] dark:text-[#4DE5EE] tracking-tight">
                     {overallScore}
                   </span>
                   <span className="text-[10px] font-bold text-[#78857D] dark:text-[#AAB4BE] uppercase tracking-widest">
@@ -232,7 +232,7 @@ export const ScoreView: React.FC<ScoreViewProps> = ({
                 </div>
               </div>
 
-              <div className="absolute -bottom-2 px-2.5 py-0.5 rounded-full bg-[#16A34A] text-white font-bold text-[10px] flex items-center gap-1 shadow-sm">
+              <div className="absolute -bottom-2 px-2.5 py-0.5 rounded-full bg-[#1EC1CB] text-[#1C1C28] font-bold text-[10px] flex items-center gap-1 shadow-sm">
                 <TrendingUp className="w-3 h-3" />
                 <span>+5 {lang === 'th' ? 'จากสัปดาห์ก่อน' : 'vs last week'}</span>
               </div>
@@ -259,18 +259,18 @@ export const ScoreView: React.FC<ScoreViewProps> = ({
 
           {/* Quick Money Impact Banner */}
           <div className={`p-4 md:p-5 rounded-[12px] border flex flex-col justify-between max-w-xs ${
-            isDarkMode ? 'bg-[#1B242D] border-white/10' : 'bg-[#F6F8F7] border-[#E2E8E4]'
+            isDarkMode ? 'bg-[#242435] border-white/10' : 'bg-[#F5F7FA] border-[#E2E8E4]'
           }`}>
             <div className="flex items-center justify-between gap-2 mb-2">
               <span className="text-xs font-bold text-[#78857D] dark:text-[#AAB4BE] uppercase tracking-wider">
                 {lang === 'th' ? 'เงินเซฟสะสมคาดการณ์' : 'Est. Monthly Impact'}
               </span>
-              <div className="p-1.5 rounded-[8px] bg-[#DCFCE7] dark:bg-[#16A34A]/20 text-[#15803D] dark:text-[#4ADE80]">
+              <div className="p-1.5 rounded-[8px] bg-[#E0F7F9] dark:bg-[#1EC1CB]/20 text-[#156D74] dark:text-[#4DE5EE]">
                 <Coins className="w-4 h-4" />
               </div>
             </div>
 
-            <div className="text-2xl font-bold font-mono text-[#15803D] dark:text-[#4ADE80]">
+            <div className="text-2xl font-bold font-mono text-[#156D74] dark:text-[#4DE5EE]">
               ~ ฿320 / {lang === 'th' ? 'เดือน' : 'mo'}
             </div>
             <p className="text-[0.7rem] text-slate-500 dark:text-slate-400 font-medium mt-1">

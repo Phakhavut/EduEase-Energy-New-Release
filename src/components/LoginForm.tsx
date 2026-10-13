@@ -48,7 +48,7 @@ export const DEMO_USERS = [
     descTh: 'งบ MEA & ตัดไฟ',
     descEn: 'Budget & Eco Cut',
     icon: Home,
-    badgeColor: 'bg-indigo-500 text-white'
+    badgeColor: 'bg-teal-600 text-white'
   },
   {
     role: 'facility',
@@ -116,19 +116,19 @@ const LoginForm: React.FC<LoginFormProps> = ({
     }
   };
 
-  const inputBg = isDarkMode ? 'bg-slate-800/80 border-slate-700/80' : 'bg-slate-50 border-slate-200';
-  const inputTextColor = isDarkMode ? 'text-white placeholder-slate-500' : 'text-slate-900 placeholder-slate-400 font-semibold';
+  const inputBg = isDarkMode ? 'bg-[#0E1A3D]/90 border-[#1E2E5D]' : 'bg-slate-50 border-slate-200';
+  const inputTextColor = isDarkMode ? 'text-white placeholder-slate-400' : 'text-slate-900 placeholder-slate-400 font-semibold';
   const headingColor = isDarkMode ? 'text-white' : 'text-slate-900';
 
   return (
     <div className={`w-full max-w-sm mx-auto relative z-20 ${error ? 'animate-shake' : ''}`}>
-      <div className={`p-5 sm:p-6 rounded-3xl border relative overflow-hidden transition-all shadow-xl backdrop-blur-xl ${
+      <div className={`p-5 sm:p-6 rounded-3xl border relative overflow-hidden transition-all shadow-2xl backdrop-blur-xl ${
         isDarkMode 
-          ? 'border-slate-800 bg-slate-900/90 text-white shadow-emerald-950/20' 
+          ? 'border-[#1E2E5D] bg-[#0B132B]/95 text-white shadow-blue-950/60' 
           : 'border-slate-200 bg-white/95 text-slate-800 shadow-slate-200/50'
       }`}>
         {/* Top subtle glow accent */}
-        <div className={`absolute -top-16 -right-16 w-36 h-36 ${isDarkMode ? 'bg-emerald-500/10' : 'bg-emerald-500/10'} blur-3xl rounded-full pointer-events-none`} />
+        <div className={`absolute -top-16 -right-16 w-36 h-36 ${isDarkMode ? 'bg-[#2563EB]/20' : 'bg-blue-400/10'} blur-3xl rounded-full pointer-events-none`} />
         
         <div className="relative z-10 space-y-4">
           
@@ -136,7 +136,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl overflow-hidden border border-emerald-500/30 shadow-sm shrink-0 bg-[#0B1220]">
+                <div className="w-8 h-8 rounded-xl overflow-hidden border border-blue-500/30 shadow-sm shrink-0 bg-[#0E1A3D]">
                   <img
                     src={logoImg}
                     alt="EduEase Energy Logo"
@@ -145,11 +145,11 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   />
                 </div>
                 <span className="font-bold text-sm tracking-tight font-display text-slate-900 dark:text-white">
-                  EduEase Energy
+                  <span className="text-[#38BDF8]">Edu</span>Ease Energy
                 </span>
               </div>
               <span className="text-[0.65rem] text-slate-400 font-mono">
-                {selectedRole === 'student' ? (lang === 'th' ? 'ห้องพัก: ' : 'Unit: ') : selectedRole === 'homeowner' ? (lang === 'th' ? 'บ้าน: ' : 'Home: ') : (lang === 'th' ? 'อาคาร: ' : 'Node: ')}<strong className="text-emerald-500 font-bold truncate max-w-[90px] inline-block align-bottom">{selectedHouseName}</strong>
+                {selectedRole === 'student' ? (lang === 'th' ? 'ห้องพัก: ' : 'Unit: ') : selectedRole === 'homeowner' ? (lang === 'th' ? 'บ้าน: ' : 'Home: ') : (lang === 'th' ? 'อาคาร: ' : 'Node: ')}<strong className="text-[#38BDF8] font-bold truncate max-w-[90px] inline-block align-bottom">{selectedHouseName}</strong>
               </span>
             </div>
 
@@ -167,7 +167,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
               {lang === 'th' ? 'สิทธิ์ผู้ใช้งาน (1-Click Roles):' : 'Demo Role Switcher:'}
             </label>
             
-            <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60">
+            <div className="grid grid-cols-3 gap-1.5 p-1 rounded-2xl bg-slate-100 dark:bg-[#080E24] border border-slate-200 dark:border-[#1E2E5D]/60">
               {DEMO_USERS.map((demo) => {
                 const Icon = demo.icon;
                 const isSelected = selectedRole === demo.role;
@@ -178,11 +178,11 @@ const LoginForm: React.FC<LoginFormProps> = ({
                     onClick={() => handleSelectDemoRole(demo)}
                     className={`py-2 px-1.5 rounded-xl transition-all text-center flex flex-col items-center gap-1 cursor-pointer ${
                       isSelected
-                        ? 'bg-white dark:bg-slate-700 text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-500/30'
+                        ? 'bg-white dark:bg-[#101B3B] text-blue-600 dark:text-[#38BDF8] shadow-sm border border-blue-500/40'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
-                    <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-emerald-500' : 'text-slate-400'}`} />
+                    <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-[#38BDF8]' : 'text-slate-400'}`} />
                     <span className="text-[0.65rem] font-extrabold leading-none truncate w-full">
                       {lang === 'th' ? demo.titleTh : demo.titleEn}
                     </span>
@@ -206,7 +206,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder={lang === 'th' ? 'กรอกชื่อผู้ใช้' : 'Enter username'}
-                className={`w-full ${inputBg} border rounded-xl px-3.5 py-2.5 ${inputTextColor} focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all text-xs font-semibold`}
+                className={`w-full ${inputBg} border rounded-xl px-3.5 py-2.5 ${inputTextColor} focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-xs font-semibold`}
               />
             </div>
 
@@ -222,12 +222,12 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className={`w-full ${inputBg} border rounded-xl px-3.5 pr-10 py-2.5 ${inputTextColor} focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition-all text-xs font-mono tracking-wider`}
+                  className={`w-full ${inputBg} border rounded-xl px-3.5 pr-10 py-2.5 ${inputTextColor} focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-all text-xs font-mono tracking-wider`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-500 p-1 transition-colors cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-400 p-1 transition-colors cursor-pointer"
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
@@ -236,9 +236,9 @@ const LoginForm: React.FC<LoginFormProps> = ({
             </div>
 
             {/* Biometric / Passkey Toggle Strip */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-100/70 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/50">
+            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-100/70 dark:bg-[#080E24]/80 border border-slate-200/80 dark:border-[#1E2E5D]/60">
               <div className="flex items-center gap-1.5">
-                <KeyRound className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <KeyRound className="w-3.5 h-3.5 text-[#38BDF8] shrink-0" />
                 <span className="text-[0.68rem] font-bold text-slate-700 dark:text-slate-300">
                   {lang === 'th' ? 'เปิดใช้ Passkey / Biometrics' : 'Enable Passkey'}
                 </span>
@@ -247,7 +247,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 type="button"
                 onClick={() => setUsePasskey(!usePasskey)}
                 className={`w-8 h-4.5 rounded-full transition-colors p-0.5 cursor-pointer flex items-center ${
-                  usePasskey ? 'bg-emerald-500' : 'bg-slate-300 dark:bg-slate-700'
+                  usePasskey ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-700'
                 }`}
               >
                 <div className={`w-3.5 h-3.5 rounded-full bg-white transition-transform ${
@@ -266,7 +266,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             <button
               disabled={isLoading}
               type="submit"
-              className={`w-full bg-emerald-500 text-white font-extrabold py-2.5 rounded-xl shadow-md shadow-emerald-500/25 hover:bg-emerald-400 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs ${
+              className={`w-full bg-[#2563EB] text-white font-extrabold py-2.5 rounded-xl shadow-lg shadow-blue-600/30 border border-blue-400/25 hover:bg-[#1D4ED8] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer text-xs ${
                 isLoading ? 'animate-pulse cursor-wait opacity-80' : ''
               }`}
             >
@@ -282,7 +282,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
 
             {/* Micro Trust Indicator */}
             <div className="flex items-center justify-center gap-1.5 pt-0.5 text-[0.62rem] text-slate-400 font-mono">
-              <ShieldCheck className="w-3 h-3 text-emerald-500" />
+              <ShieldCheck className="w-3 h-3 text-[#38BDF8]" />
               <span>PBKDF2 & JWT Encrypted Session</span>
             </div>
           </form>

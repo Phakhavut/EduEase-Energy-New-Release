@@ -432,8 +432,8 @@ export const AppliancesView: React.FC<AppliancesViewProps> = ({
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder={lang === 'th' ? 'ค้นหาชื่อ หรือห้อง...' : 'Search name or room...'}
-                className={`w-full pl-9 pr-3 py-2 rounded-[10px] text-xs font-medium border focus:outline-none focus:ring-2 focus:ring-[#16A34A] transition-all ${
-                  isDarkMode ? 'bg-[#151C23] border-white/10 text-white' : 'bg-[#F6F8F7] border-[#E2E8E4] text-[#15201A]'
+                className={`w-full pl-9 pr-3 py-2 rounded-[10px] text-xs font-medium border focus:outline-none focus:ring-2 focus:ring-[#1EC1CB] transition-all ${
+                  isDarkMode ? 'bg-[#1C1C28] border-white/10 text-white' : 'bg-[#F5F7FA] border-[#E2E8E4] text-[#15201A]'
                 }`}
               />
             </div>

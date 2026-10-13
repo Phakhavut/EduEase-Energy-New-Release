@@ -337,8 +337,8 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={lang === 'th' ? "ค้นหาชื่อสถานที่ หรือ จังหวัด..." : "Search property name or province..."}
-              className={`w-full pl-9 pr-8 py-2 rounded-[10px] border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#16A34A] transition-all ${
-                isDarkMode ? 'bg-[#151C23] border-white/10 text-white placeholder:text-slate-500' : 'bg-[#F6F8F7] border-[#E2E8E4] text-[#15201A] placeholder:text-slate-400'
+              className={`w-full pl-9 pr-8 py-2 rounded-[10px] border text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-[#1EC1CB] transition-all ${
+                isDarkMode ? 'bg-[#1C1C28] border-white/10 text-white placeholder:text-slate-500' : 'bg-[#F5F7FA] border-[#E2E8E4] text-[#15201A] placeholder:text-slate-400'
               }`}
             />
             {searchQuery && (
@@ -365,10 +365,10 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
                 onClick={() => setFilterType(tab.id)}
                 className={`px-3 py-1.5 rounded-[8px] text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                   filterType === tab.id
-                    ? 'bg-[#16A34A] text-white shadow-sm'
+                    ? 'bg-[#1EC1CB] text-[#1C1C28] shadow-sm'
                     : isDarkMode
-                      ? 'bg-[#1B242D] text-[#AAB4BE] hover:bg-[#1E2832] border border-white/5'
-                      : 'bg-[#F6F8F7] text-[#53635A] hover:bg-slate-200 border border-[#E2E8E4]'
+                      ? 'bg-[#242435] text-[#AAB4BE] hover:bg-[#2C2C40] border border-white/5'
+                      : 'bg-[#F5F7FA] text-[#53635A] hover:bg-slate-200 border border-[#E2E8E4]'
                 }`}
               >
                 {lang === 'th' ? tab.labelTh : tab.labelEn}
@@ -384,8 +384,8 @@ export const LocationsView: React.FC<LocationsViewProps> = ({
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className={`px-3 py-2 rounded-[10px] border text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#16A34A] ${
-                isDarkMode ? 'bg-[#151C23] border-white/10 text-white' : 'bg-[#F6F8F7] border-[#E2E8E4] text-[#15201A]'
+              className={`px-3 py-2 rounded-[10px] border text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#1EC1CB] ${
+                isDarkMode ? 'bg-[#1C1C28] border-white/10 text-white' : 'bg-[#F5F7FA] border-[#E2E8E4] text-[#15201A]'
               }`}
             >
               <option value="utilization">{lang === 'th' ? 'การใช้งบสูงสุด' : 'Budget Utilization'}</option>
