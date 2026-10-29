@@ -16,14 +16,22 @@ import {
   ExternalLink,
   MessageSquare,
   Clock,
-  Laptop
+  Laptop,
+  Sun,
+  TrendingDown,
+  TrendingUp,
+  Calendar
 } from 'lucide-react';
 import { 
   NotificationService, 
   NotificationSettingsConfig, 
   DEFAULT_NOTIFICATION_CONFIG 
 } from '../../services/notificationService';
-import { UserPersona } from '../../types';
+import { 
+  DailyDigestService, 
+  DailyEnergyDigest 
+} from '../../services/dailyDigestService';
+import { UserPersona, Appliance } from '../../types';
 
 interface NotificationHubModalProps {
   isOpen: boolean;
@@ -33,7 +41,9 @@ interface NotificationHubModalProps {
   monthlyEstimate: number;
   monthlyBudget: number;
   persona?: UserPersona;
+  appliances?: Appliance[];
   onTriggerToast?: (type: 'danger' | 'warning', customTh?: string, customEn?: string) => void;
+  onOpenFullDigestModal?: () => void;
 }
 
 export const NotificationHubModal: React.FC<NotificationHubModalProps> = ({
@@ -44,13 +54,17 @@ export const NotificationHubModal: React.FC<NotificationHubModalProps> = ({
   monthlyEstimate,
   monthlyBudget,
   persona = 'student',
+  appliances = [],
   onTriggerToast,
+  onOpenFullDigestModal,
 }) => {
   const [config, setConfig] = useState<NotificationSettingsConfig>(DEFAULT_NOTIFICATION_CONFIG);
-  const [activeTab, setActiveTab] = useState<'webpush' | 'line' | 'email' | 'rules'>('webpush');
+  const [activeTab, setActiveTab] = useState<'webpush' | 'daily' | 'line' | 'email' | 'rules'>('daily');
   const [isTestingWebPush, setIsTestingWebPush] = useState(false);
   const [isTestingLine, setIsTestingLine] = useState(false);
   const [isTestingEmail, setIsTestingEmail] = useState(false);
+  const [isTestingDigest, setIsTestingDigest] = useState(false);
+  const [digestPreview, setDigestPreview] = useState<DailyEnergyDigest | null>(null);
   const [testResult, setTestResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Sync config from localStorage on mount/open
@@ -60,12 +74,37 @@ export const NotificationHubModal: React.FC<NotificationHubModalProps> = ({
       setConfig(currentConfig);
       // Init Service worker
       NotificationService.initServiceWorker();
+      // Generate daily digest preview
+      const preview = DailyDigestService.generateLocalDigest(appliances, monthlyBudget, persona, 1);
+      setDigestPreview(preview);
     }
-  }, [isOpen]);
+  }, [isOpen, appliances, monthlyBudget, persona]);
 
   const handleUpdate = (partial: Partial<NotificationSettingsConfig>) => {
     const updated = NotificationService.updateConfig(partial);
     setConfig(updated);
+  };
+
+  const handleTestDailyDigest = async () => {
+    setIsTestingDigest(true);
+    setTestResult(null);
+
+    const digestToUse = digestPreview || DailyDigestService.generateLocalDigest(appliances, monthlyBudget, persona, 1);
+    const res = await DailyDigestService.dispatchDigestToChannels(
+      digestToUse,
+      {
+        webPush: true,
+        email: config.emailDigestEnabled,
+        line: config.lineNotifyEnabled,
+      },
+      lang
+    );
+
+    setTestResult({
+      type: res.success ? 'success' : 'error',
+      message: res.message,
+    });
+    setIsTestingDigest(false);
   };
 
   const handleRequestWebPush = async () => {
@@ -209,6 +248,18 @@ export const NotificationHubModal: React.FC<NotificationHubModalProps> = ({
           {/* Navigation Tabs */}
           <div className="flex items-center gap-1 p-2 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 overflow-x-auto">
             <button
+              onClick={() => { setActiveTab('daily'); setTestResult(null); }}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                activeTab === 'daily'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+              }`}
+            >
+              <Sun className="w-3.5 h-3.5 text-amber-400" />
+              <span>{lang === 'th' ? 'Daily Energy Digest (สรุปประจำวัน)' : 'Daily Energy Digest'}</span>
+            </button>
+
+            <button
               onClick={() => { setActiveTab('webpush'); setTestResult(null); }}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 activeTab === 'webpush'
@@ -241,7 +292,7 @@ export const NotificationHubModal: React.FC<NotificationHubModalProps> = ({
               }`}
             >
               <Mail className="w-3.5 h-3.5" />
-              <span>{lang === 'th' ? 'อีเมลสรุปสัปดาห์' : 'Email Digest'}</span>
+              <span>{lang === 'th' ? 'อีเมลสรุป' : 'Email Digest'}</span>
             </button>
 
             <button
@@ -277,6 +328,128 @@ export const NotificationHubModal: React.FC<NotificationHubModalProps> = ({
                 )}
                 <span>{testResult.message}</span>
               </motion.div>
+            )}
+
+            {/* TAB: DAILY ENERGY DIGEST */}
+            {activeTab === 'daily' && digestPreview && (
+              <div className="space-y-4">
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/15 via-blue-500/10 to-transparent border border-blue-500/20 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Sun className="w-4 h-4 text-amber-500 animate-spin-slow" />
+                      <span className="font-extrabold text-xs text-slate-900 dark:text-white">
+                        {lang === 'th' ? 'Daily Energy Digest: สรุปแนวโน้มการใช้ไฟเมื่อวานนี้' : 'Daily Energy Digest: Yesterday Trends'}
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      {lang === 'th' ? digestPreview.displayDateTh : digestPreview.displayDateEn}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300">
+                    {lang === 'th' ? digestPreview.overallSummaryTh : digestPreview.overallSummaryEn}
+                  </p>
+                </div>
+
+                {/* Key Metrics Row */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                    <span className="text-[10px] text-slate-400 font-semibold block">
+                      {lang === 'th' ? 'ค่าไฟเมื่อวาน' : 'Yesterday Cost'}
+                    </span>
+                    <span className="text-base font-extrabold font-mono text-[#2563EB] dark:text-[#38BDF8]">
+                      ฿{digestPreview.yesterdayCostThb}
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                    <span className="text-[10px] text-slate-400 font-semibold block">
+                      {lang === 'th' ? 'แนวโน้มวันต่อวัน' : 'Day-over-Day'}
+                    </span>
+                    <span className={`text-xs font-bold inline-flex items-center gap-0.5 ${
+                      digestPreview.dayOverDayTrend === 'improved'
+                        ? 'text-emerald-500'
+                        : 'text-amber-500'
+                    }`}>
+                      {digestPreview.dayOverDayTrend === 'improved' ? <TrendingDown className="w-3.5 h-3.5" /> : <TrendingUp className="w-3.5 h-3.5" />}
+                      <span>{digestPreview.dayOverDayChangePct >= 0 ? '+' : ''}{digestPreview.dayOverDayChangePct}%</span>
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                    <span className="text-[10px] text-slate-400 font-semibold block">
+                      {lang === 'th' ? 'ช่วงพีคโหลด' : 'Peak Window'}
+                    </span>
+                    <span className="text-xs font-bold font-mono text-amber-500">
+                      {digestPreview.peakHourWindow}
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                    <span className="text-[10px] text-slate-400 font-semibold block">
+                      {lang === 'th' ? 'เป้าหมายรายวัน' : 'Daily Goal'}
+                    </span>
+                    <span className="text-xs font-bold font-mono text-slate-700 dark:text-slate-300">
+                      {digestPreview.goalPercent}%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Personalized Tips Preview */}
+                <div className="space-y-2">
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
+                    {lang === 'th' ? 'เคล็ดลับเฉพาะคุณที่สร้างจากข้อมูลเมื่อวาน' : 'Personalized Tips Generated for You'}
+                  </span>
+                  {digestPreview.personalizedTips.slice(0, 2).map((tip) => (
+                    <div
+                      key={tip.id}
+                      className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30 flex items-start gap-2.5"
+                    >
+                      <span className="text-lg shrink-0">{tip.icon}</span>
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold text-slate-900 dark:text-white block">
+                          {lang === 'th' ? tip.titleTh : tip.titleEn}
+                        </span>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 block line-clamp-1">
+                          {lang === 'th' ? tip.descTh : tip.descEn}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Schedule Time & Action */}
+                <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between flex-wrap gap-3">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-slate-400" />
+                    <span className="text-xs text-slate-600 dark:text-slate-400">
+                      {lang === 'th' ? 'เวลาส่งแจ้งเตือนทุกวัน:' : 'Daily Schedule:'}
+                    </span>
+                    <span className="text-xs font-mono font-bold text-[#2563EB] dark:text-[#38BDF8]">
+                      {config.dailyDigestTime || '08:00'} น.
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    {onOpenFullDigestModal && (
+                      <button
+                        onClick={onOpenFullDigestModal}
+                        className="px-3 py-1.5 rounded-xl border border-blue-500/40 text-[#2563EB] dark:text-[#38BDF8] text-xs font-bold hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all cursor-pointer"
+                      >
+                        {lang === 'th' ? 'ดูรายงานฉบับเต็ม' : 'Full Digest View'}
+                      </button>
+                    )}
+
+                    <button
+                      onClick={handleTestDailyDigest}
+                      disabled={isTestingDigest}
+                      className="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs shadow-md shadow-blue-500/20 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>{isTestingDigest ? (lang === 'th' ? 'กำลังส่ง...' : 'Sending...') : (lang === 'th' ? 'ส่งสรุปนี้เข้าเครื่องทันที' : 'Send Digest Push')}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
             )}
 
             {/* TAB 1: WEB PUSH NOTIFICATIONS */}

@@ -28,6 +28,7 @@ import { NotificationModal } from "./NotificationModal";
 import { GlobalSearchModal } from "./common/GlobalSearchModal";
 import { SystemStatusModal } from "./common/SystemStatusModal";
 import { ProjectCreditsFooter } from "./common/ProjectCreditsFooter";
+import { QuickSupportWidget } from "./trust/QuickSupportWidget";
 import { UserManual } from "./UserManual";
 import LoginForm from "./LoginForm";
 import { GuidedTour } from "./GuidedTour";
@@ -60,6 +61,7 @@ import {
 } from "../data/smartInsightsData";
 import { jsPDF } from "jspdf";
 import { MonthlyReportPdfModal } from "./export/MonthlyReportPdfModal";
+import { DailyEnergyDigestModal } from "./notifications/DailyEnergyDigestModal";
 import { BudgetAlertToastContainer, BudgetToastNotification } from "./notifications/BudgetAlertToastContainer";
 import { NotificationPermissionBanner } from "./notifications/NotificationPermissionBanner";
 import { UserPersona } from "../types";
@@ -214,6 +216,7 @@ export default function Dashboard({
 
   // Monthly PDF Report & Budget Alert Toast States
   const [showMonthlyReportModal, setShowMonthlyReportModal] = useState(false);
+  const [showDailyDigestModal, setShowDailyDigestModal] = useState(false);
   const [budgetToasts, setBudgetToasts] = useState<BudgetToastNotification[]>([]);
 
   // Collections state
@@ -604,6 +607,7 @@ export default function Dashboard({
             onStartPageTour={handleStartTour}
             onOpenMonthlyReport={handleExportPDF}
             onTriggerBudgetToast={handleTriggerBudgetToast}
+            onOpenDailyDigest={() => setShowDailyDigestModal(true)}
             gamificationSettings={gamificationSettings}
             persona={currentPersona}
             badges={badges}
@@ -901,6 +905,7 @@ export default function Dashboard({
           onMarkAsRead={handleMarkNotifRead}
           onMarkAllAsRead={handleMarkAllNotifsRead}
           onNavigateToPage={setCurrentPage}
+          onOpenDailyDigest={() => setShowDailyDigestModal(true)}
           isDarkMode={isDarkMode}
           lang={lang}
         />
@@ -929,6 +934,26 @@ export default function Dashboard({
           onClose={() => setShowSystemStatus(false)}
           isDarkMode={isDarkMode}
           lang={lang}
+        />
+
+        {/* Daily Energy Digest Notification Service Modal */}
+        <DailyEnergyDigestModal
+          isOpen={showDailyDigestModal}
+          onClose={() => setShowDailyDigestModal(false)}
+          appliances={appliances}
+          monthlyBudget={monthlyBudget}
+          persona={currentPersona}
+          lang={lang}
+          isDarkMode={isDarkMode}
+          onApplyTipReward={(tip) => {
+            setUserXp(prev => prev + 25);
+            setUserCoins(prev => prev + 10);
+            handleTriggerBudgetToast(
+              'warning',
+              `นำเคล็ดลับ '${tip.titleTh}' ไปปรับใช้แล้ว! ได้รับ +25 XP และ 10 เหรียญ`,
+              `Applied tip '${tip.titleEn}'! Earned +25 XP and 10 Coins`
+            );
+          }}
         />
 
         {/* Monthly Performance & AI Optimization PDF Report Modal */}
@@ -960,6 +985,13 @@ export default function Dashboard({
           onClose={() => setShowBrandIdentityModal(false)}
           lang={lang}
           isDarkMode={isDarkMode}
+        />
+
+        {/* Floating Quick Support & PDPA Privacy Center Widget */}
+        <QuickSupportWidget
+          lang={lang}
+          isDarkMode={isDarkMode}
+          onOpenManual={() => setShowUserManual(true)}
         />
 
         <AnimatePresence>

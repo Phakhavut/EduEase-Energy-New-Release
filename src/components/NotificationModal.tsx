@@ -12,6 +12,7 @@ interface NotificationModalProps {
   onNavigateToPage: (page: AppPage) => void;
   isDarkMode: boolean;
   lang: 'th' | 'en';
+  onOpenDailyDigest?: () => void;
 }
 
 export const NotificationModal: React.FC<NotificationModalProps> = ({
@@ -23,6 +24,7 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
   onNavigateToPage,
   isDarkMode,
   lang,
+  onOpenDailyDigest,
 }) => {
   if (!isOpen) return null;
 
@@ -47,18 +49,44 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={onMarkAllAsRead}
-              className="text-[0.7rem] font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+              className="text-[0.7rem] font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
             >
               {lang === 'th' ? 'อ่านทั้งหมด' : 'Mark all read'}
             </button>
             <button
               onClick={onClose}
-              className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
             >
               <X className="w-4 h-4 text-slate-400" />
             </button>
           </div>
         </div>
+
+        {/* Daily Energy Digest Quick Trigger Banner */}
+        {onOpenDailyDigest && (
+          <div 
+            onClick={() => {
+              onOpenDailyDigest();
+              onClose();
+            }}
+            className="mb-3 p-3 rounded-2xl bg-gradient-to-r from-amber-500/15 via-blue-500/15 to-transparent border border-blue-500/30 flex items-center justify-between cursor-pointer hover:border-blue-500/60 transition-all group"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="text-xl">🌅</span>
+              <div>
+                <span className="text-xs font-extrabold text-slate-900 dark:text-white block group-hover:text-blue-400 transition-colors">
+                  {lang === 'th' ? 'Daily Energy Digest' : 'Daily Energy Digest'}
+                </span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400">
+                  {lang === 'th' ? 'สรุปการใช้ไฟเมื่อวาน & เคล็ดลับเฉพาะคุณ' : 'Yesterday trends & personalized tips'}
+                </span>
+              </div>
+            </div>
+            <span className="text-[11px] font-bold text-[#2563EB] dark:text-[#38BDF8] group-hover:translate-x-0.5 transition-transform">
+              {lang === 'th' ? 'เปิดดู →' : 'View →'}
+            </span>
+          </div>
+        )}
 
         <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
           {notifications.length === 0 ? (
@@ -71,7 +99,10 @@ export const NotificationModal: React.FC<NotificationModalProps> = ({
                 key={notif.id}
                 onClick={() => {
                   onMarkAsRead(notif.id);
-                  if (notif.actionPage) {
+                  if (notif.actionPage === ('digest' as any) && onOpenDailyDigest) {
+                    onOpenDailyDigest();
+                    onClose();
+                  } else if (notif.actionPage) {
                     onNavigateToPage(notif.actionPage);
                     onClose();
                   }

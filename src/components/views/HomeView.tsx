@@ -11,7 +11,8 @@ import {
   GraduationCap,
   Zap,
   Leaf,
-  Calculator
+  Calculator,
+  Sun
 } from 'lucide-react';
 import { Mission, Appliance, AppPage, InfoDetailMode, GamificationSettings, DEFAULT_GAMIFICATION_SETTINGS, UserPersona, Badge, LearningPath } from '../../types';
 import { WhatIfSimulationModal } from '../simulation/WhatIfSimulationModal';
@@ -20,6 +21,7 @@ import { getMonthlyComparison } from '../../data/monthlyComparisonData';
 import { LinearRegressionForecastCard } from '../forecasting/LinearRegressionForecastCard';
 import { buildLinearRegressionForecast } from '../../utils/linearRegressionForecasting';
 import { MonthlySavingsProgressBar } from '../gamification/MonthlySavingsProgressBar';
+import { DailyEnergyDigestBanner } from '../notifications/DailyEnergyDigestBanner';
 
 interface HomeViewProps {
   lang: 'th' | 'en';
@@ -41,6 +43,7 @@ interface HomeViewProps {
   onStartPageTour?: (stepIndex: number) => void;
   onOpenMonthlyReport?: () => void;
   onTriggerBudgetToast?: (type: 'danger' | 'warning') => void;
+  onOpenDailyDigest?: () => void;
   gamificationSettings?: GamificationSettings;
   persona?: UserPersona;
   badges?: Badge[];
@@ -67,6 +70,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onStartPageTour,
   onOpenMonthlyReport,
   onTriggerBudgetToast,
+  onOpenDailyDigest,
   gamificationSettings = DEFAULT_GAMIFICATION_SETTINGS,
   persona = 'student',
   badges,
@@ -165,6 +169,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
         {/* Compact action buttons */}
         <div className="flex items-center gap-2 shrink-0">
+          {onOpenDailyDigest && (
+            <button
+              onClick={onOpenDailyDigest}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] border text-xs font-semibold transition-colors cursor-pointer ${
+                isDarkMode 
+                  ? 'bg-[#101B3B] border-[#1E2E5D] hover:bg-[#142352] text-white shadow-sm' 
+                  : 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700 shadow-sm'
+              }`}
+            >
+              <Sun className="w-3.5 h-3.5 text-amber-400" />
+              <span>{lang === 'th' ? 'สรุปประจำวัน' : 'Daily Digest'}</span>
+            </button>
+          )}
+
           {onOpenMonthlyReport && (
             <button
               onClick={onOpenMonthlyReport}
@@ -199,6 +217,21 @@ export const HomeView: React.FC<HomeViewProps> = ({
           Mobile < 768px: 4 cols, gap: 12px
           ---------------------------------------------------- */}
       <div className="grid grid-cols-4 md:grid-cols-8 lg:grid-cols-12 gap-3 md:gap-4 xl:gap-5">
+
+        {/* ====================================================
+            DAILY ENERGY DIGEST NOTIFICATION BANNER (12 cols)
+            Summarizes previous day energy usage trends & personalized tips
+            ==================================================== */}
+        <div id="section-daily-digest-banner" className="col-span-4 md:col-span-8 lg:col-span-12">
+          <DailyEnergyDigestBanner
+            appliances={appliances}
+            monthlyBudget={monthlyBudget}
+            persona={persona}
+            lang={lang}
+            isDarkMode={isDarkMode}
+            onOpenDigestModal={() => onOpenDailyDigest && onOpenDailyDigest()}
+          />
+        </div>
 
         {/* ====================================================
             ROW 1: HOME KPI SUMMARY (3 Widgets: 4 + 4 + 4 cols)

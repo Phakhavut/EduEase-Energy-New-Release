@@ -1182,6 +1182,15 @@ export const INITIAL_LEARNING_PATHS: LearningPath[] = [
 
 export const INITIAL_NOTIFICATIONS = [
   {
+    id: 'notif_daily_digest',
+    title: '🌅 Daily Energy Digest: สรุปการใช้ไฟเมื่อวานนี้พร้อมแล้ว!',
+    desc: 'เมื่อวานใช้ไฟไป ฿48.5 (ประหยัดลง 11.2% เทียบวันก่อน) มีเคล็ดลับประหยัดแอร์เฉพาะคุณพร้อมให้กดรับรางวัล',
+    priority: 'info' as const,
+    timestamp: 'เมื่อเช้านี้ 08:00',
+    read: false,
+    actionPage: 'home' as const
+  },
+  {
     id: 'notif_1',
     title: 'ค่าไฟเดือนนี้เข้าใกล้งบประมาณแล้ว ⚠️',
     desc: 'ใช้ไฟไปแล้ว ฿2,188 จากงบ ฿2,500 (คิดเป็น 87%) แนะนำปรับแอร์ 26°C เพื่อประหยัดช่วงท้ายเดือน',
